@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\Gil\AppData\Local\JetBrains\Rider2020.3\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\Gil\AppData\Local\JetBrains\Rider2020.3\resharper-host\Local\Transient\Rider\v203\SolutionCaches\_eCommerce.1609836224.00" t="ExcludeRecursive" />
+    <e p="C:\Users\Gil\Desktop\לימודים\סמסטר ו'\סדנא\git repo\eCommerce\eCommerce" t="IncludeRecursive">
+      <e p="Admin.cs" t="Include" />
+      <e p="appsettings.Development.json" t="Include" />
+      <e p="appsettings.json" t="Include" />
+      <e p="Basket.cs" t="Include" />
+      <e p="bin" t="ExcludeRecursive" />
+      <e p="Cart.cs" t="Include" />
+      <e p="Category.cs" t="Include" />
+      <e p="DiscountStrategy.cs" t="Include" />
+      <e p="eCommerce.csproj" t="IncludeRecursive" />
+      <e p="eCommerce.sln" t="IncludeFlat" />
+      <e p="Guest.cs" t="Include" />
+      <e p="Item.cs" t="Include" />
+      <e p="Manager.cs" t="Include" />
+      <e p="MarketFacade.cs" t="Include" />
+      <e p="Member.cs" t="Include" />
+      <e p="obj" t="ExcludeRecursive">
+        <e p="Debug" t="Include">
+          <e p="net5.0" t="Include">
+            <e p="eCommerce.AssemblyInfo.cs" t="Include" />
+          </e>
+        </e>
+      </e>
+      <e p="Owner.cs" t="Include" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Program.cs" t="Include" />
+      <e p="Properties" t="Include">
+        <e p="launchSettings.json" t="Include" />
+      </e>
+      <e p="PurchaseStrategy.cs" t="Include" />
+      <e p="Registered.cs" t="Include" />
+      <e p="Startup.cs" t="Include" />
+      <e p="Store.cs" t="Include" />
+      <e p="StoresManager.cs" t="Include" />
+      <e p="User.cs" t="Include" />
+      <e p="UserStateInStore.cs" t="Include" />
+      <e p="UserToSystemState.cs" t="Include" />
+      <e p="UserTransactionHistory.cs" t="Include" />
+    </e>
+  </component>
+</project>
