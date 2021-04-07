@@ -1,4 +1,4 @@
-﻿namespace eCommerce
+﻿namespace eCommerce.Business
 {
     public class Manager
     {
