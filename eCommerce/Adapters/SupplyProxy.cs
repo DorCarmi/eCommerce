@@ -1,4 +1,4 @@
-﻿namespace eCommerce.Business
+﻿namespace eCommerce.Adapters
 {
     public class SupplyProxy : ISupplyAdapter
     {

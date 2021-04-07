@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 
-namespace eCommerce.Business
+namespace eCommerce.Auth
 {
 
     public class AuthData

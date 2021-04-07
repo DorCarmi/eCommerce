@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace eCommerce.Business
+namespace eCommerce.Auth
 {
     public class JWTAuth
     {

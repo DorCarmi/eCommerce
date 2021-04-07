@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace eCommerce.Business
+namespace eCommerce.Adapters
 {
     public interface IPaymentAdapter
     {
