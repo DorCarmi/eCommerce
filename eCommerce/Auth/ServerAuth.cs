@@ -14,6 +14,8 @@ namespace eCommerce.Auth
         }
     }
     
+    public record Token(string JwtToken);
+    
     //TODO make thread safe
     public class ServerAuth
     {
@@ -31,18 +33,20 @@ namespace eCommerce.Auth
             return Instance;
         }
 
-        public string GenerateToken(AuthData authData)
+        public Token GenerateToken(AuthData authData)
         {
 
-            return _jwtAuth.GenerateToken(new Claim[]
-            {
-                new Claim(ClaimTypes.Name, authData.Username)
-            });
+            return new Token(
+                _jwtAuth.GenerateToken(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, authData.Username)
+                })
+            );
         }
 
-        public AuthData GetDataIfValid(string token)
+        public AuthData GetDataIfValid(Token token)
         {
-            var claims = _jwtAuth.GetClaimsFromToken(token);
+            var claims = _jwtAuth.GetClaimsFromToken(token.JwtToken);
             
             if (claims == null)
             {
