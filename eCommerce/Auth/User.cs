@@ -42,6 +42,13 @@ namespace eCommerce.Auth
             return Result.Ok();
         }
 
+        public bool HasRole(UserRole role)
+        {
+            return _roles.Contains(role);
+        }
+        
+        // ========== Properties ========== //
+
         public IEnumerator<UserRole> Roles
         {
             get => _roles.GetEnumerator();

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using eCommerce.Business;
 using eCommerce.Common;
 
@@ -15,9 +18,11 @@ namespace eCommerce.Auth
 
         private readonly JWTAuth _jwtAuth;
 
+        private readonly string GUEST_ROLE_STRING = "Guest";
         // TODO make this filed in DB
         private long _guestId;
         private ConcurrentRegisteredUserRepo _userRepo;
+        private readonly SHA256 _sha256;
 
         
         private UserAuth()
@@ -25,6 +30,7 @@ namespace eCommerce.Auth
             _jwtAuth = new JWTAuth("keykeykeykeykeyekeykey");
             _guestId = 0;
             _userRepo = new ConcurrentRegisteredUserRepo();
+            _sha256 = SHA256.Create();
         }
 
         public static UserAuth GetInstance()
@@ -37,7 +43,7 @@ namespace eCommerce.Auth
             throw new NotImplementedException();
         }
         
-        public Result Register(string username, string password, UserRole role)
+        public Result Register(string username, string password)
         {
             Result policyCheck = RegistrationsPolicy(username, password);
             if (policyCheck.IsFailure)
@@ -45,14 +51,15 @@ namespace eCommerce.Auth
                 return policyCheck;
             }
 
-            Result<User> newUserResult = _userRepo.Add(username, password);
-            if (newUserResult.IsFailure)
+            User newUser = new User(username, HashPassword(password));
+            newUser.AddRole(UserRole.Member);
+            
+            if (!_userRepo.Add(newUser))
             {
                 return Result.Fail("Username already taken");
             }
-
-            User user = newUserResult.Value;
-            return user.AddRole(role);
+            
+            return Result.Ok();
         }
 
         private Result RegistrationsPolicy(string username, string password)
@@ -70,9 +77,33 @@ namespace eCommerce.Auth
 
         }
 
-        public Result<Token> Login(string username, string password)
+        public Result<Token> Login(string username, string password, UserRole role)
         {
-            throw new NotImplementedException();
+            
+            Result policyCheck = RegistrationsPolicy(username, password);
+            if (policyCheck.IsFailure)
+            {
+                return Result.Fail<Token>("Username or password cant be empty");
+            }
+
+            User user = _userRepo.GetUserOrNull(username);
+            if (user == null || !user.HashedPassword.SequenceEqual(HashPassword(password)) || !user.HasRole(role))
+            {
+                return Result.Fail<Token>("Invalid username or password or role");
+            }
+
+            return Result.Ok<>(GenerateToken(new AuthData(user.Username,  role.ToString())));
+        }
+
+        /// <summary>
+        /// Hash the password.
+        /// <para>Precondition: password is not empty.</para>
+        /// </summary>
+        /// <param name="password">The password</param>
+        /// <returns>The password hash</returns>
+        private byte[] HashPassword(string password)
+        {
+            return _sha256.ComputeHash(Encoding.Default.GetBytes(password));
         }
         
         // ========== Token ========== //
@@ -85,7 +116,7 @@ namespace eCommerce.Auth
                 new Claim(ClaimTypes.Role, authData.Role)
             };
 
-            if (authData.Role == "Guest")
+            if (authData.Role.Equals(GUEST_ROLE_STRING))
             {
                 claims.Add(new Claim(ClaimTypes.UserData, _guestId.ToString()));
                 _guestId++;
@@ -97,7 +128,6 @@ namespace eCommerce.Auth
         private AuthData GetDataIfValid(Token token)
         {
             var claims = _jwtAuth.GetClaimsFromToken(token.JwtToken);
-            
             if (claims == null)
             {
                 return null;
@@ -124,7 +154,7 @@ namespace eCommerce.Auth
                 }
             }
 
-            if (data.IsFull())
+            if (data.AllDataIsNotNull())
             {
                 return null;
             }

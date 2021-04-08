@@ -11,7 +11,7 @@
             Role = role;
         }
 
-        public bool IsFull()
+        public bool AllDataIsNotNull()
         {
             return Username != null & Role != null;
         }
