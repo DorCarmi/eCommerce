@@ -15,8 +15,9 @@ namespace eCommerce.Auth
         /// </summary>
         /// <param name="username">The user name</param>
         /// <param name="password">The user password</param>
+        /// <param name="role">The user role</param>
         /// <returns>Successful Result if the user has been successfully registered</returns>
-        public Result Register(string username, string password);
+        public Result Register(string username, string password, UserRole role);
         
         /// <summary>
         /// Log in to the system

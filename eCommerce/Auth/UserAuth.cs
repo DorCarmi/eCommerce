@@ -6,24 +6,6 @@ using eCommerce.Common;
 
 namespace eCommerce.Auth
 {
-
-    public class AuthData
-    {
-        public string Username { get; set; }
-        public string Role { get; set; }
-        
-        public AuthData(string username, string role)
-        {
-            Username = username;
-            Role = role;
-        }
-
-        public bool IsFull()
-        {
-            return Username != null & Role != null;
-        }
-    }
-
     public record Token(string JwtToken);
     
     //TODO make thread safe
@@ -55,7 +37,7 @@ namespace eCommerce.Auth
             throw new NotImplementedException();
         }
         
-        public Result Register(string username, string password)
+        public Result Register(string username, string password, UserRole role)
         {
             Result policyCheck = RegistrationsPolicy(username, password);
             if (policyCheck.IsFailure)
@@ -63,12 +45,14 @@ namespace eCommerce.Auth
                 return policyCheck;
             }
 
-            if (!_userRepo.Add(username, password))
+            Result<User> newUserResult = _userRepo.Add(username, password);
+            if (newUserResult.IsFailure)
             {
                 return Result.Fail("Username already taken");
             }
 
-            return Result.Ok();
+            User user = newUserResult.Value;
+            return user.AddRole(role);
         }
 
         private Result RegistrationsPolicy(string username, string password)

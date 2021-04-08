@@ -42,7 +42,7 @@ namespace eCommerce.Common
   
     public class Result<T> : Result
     {
-        private T Value { get; }
+        public T Value { get; }
 
         protected internal Result(T value, bool success, string error) : base(success, error)
         {
