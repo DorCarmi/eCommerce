@@ -9,8 +9,6 @@ using eCommerce.Common;
 
 namespace eCommerce.Auth
 {
-    public record Token(string JwtToken);
-    
     //TODO make thread safe
     public class UserAuth  : IUserAuth
     {
@@ -38,9 +36,16 @@ namespace eCommerce.Auth
             return Instance;
         }
         
-        public Result<Token> Connect()
+        public Result<string> Connect()
         {
-            throw new NotImplementedException();
+            Result<string> tokenRes = Result.Ok<string>(GenerateToken(new AuthData(GenerateGuestUsername(), GUEST_ROLE_STRING)));
+            _guestId++;
+            return tokenRes;
+        }
+
+        private string GenerateGuestUsername()
+        {
+            return string.Format("_Guest%ln", _guestId);
         }
         
         public Result Register(string username, string password)
@@ -77,19 +82,19 @@ namespace eCommerce.Auth
 
         }
 
-        public Result<Token> Login(string username, string password, UserRole role)
+        public Result<string> Login(string username, string password, UserRole role)
         {
             
             Result policyCheck = RegistrationsPolicy(username, password);
             if (policyCheck.IsFailure)
             {
-                return Result.Fail<Token>("Username or password cant be empty");
+                return Result.Fail<string>("Username or password cant be empty");
             }
 
             User user = _userRepo.GetUserOrNull(username);
             if (user == null || !user.HashedPassword.SequenceEqual(HashPassword(password)) || !user.HasRole(role))
             {
-                return Result.Fail<Token>("Invalid username or password or role");
+                return Result.Fail<string>("Invalid username or password or role");
             }
 
             return Result.Ok<>(GenerateToken(new AuthData(user.Username,  role.ToString())));
@@ -108,26 +113,26 @@ namespace eCommerce.Auth
         
         // ========== Token ========== //
         
-        private Token GenerateToken(AuthData authData)
+        private string GenerateToken(AuthData authData)
         {
             List<Claim> claims = new List<Claim>()
             {
-                new Claim(ClaimTypes.Name, authData.Username),
-                new Claim(ClaimTypes.Role, authData.Role)
+                new Claim(AuthClaimTypes.Username, authData.Username),
+                new Claim(AuthClaimTypes.Role, authData.Role)
             };
 
             if (authData.Role.Equals(GUEST_ROLE_STRING))
             {
-                claims.Add(new Claim(ClaimTypes.UserData, _guestId.ToString()));
+                claims.Add(new Claim(AuthClaimTypes.GuestId, _guestId.ToString()));
                 _guestId++;
             }
-            
-            return new Token(_jwtAuth.GenerateToken(claims.ToArray()));
+
+            return _jwtAuth.GenerateToken(claims.ToArray());
         }
 
-        private AuthData GetDataIfValid(Token token)
+        private AuthData GetDataIfValid(string token)
         {
-            var claims = _jwtAuth.GetClaimsFromToken(token.JwtToken);
+            var claims = _jwtAuth.GetClaimsFromToken(token);
             if (claims == null)
             {
                 return null;
@@ -138,12 +143,12 @@ namespace eCommerce.Auth
             {
                 switch (claim.Type)
                 {
-                    case ClaimTypes.Name:
+                    case AuthClaimTypes.Username:
                     {
                         data.Username = claim.Value;
                         break;
                     }
-                    case ClaimTypes.Role:
+                    case AuthClaimTypes.Role:
                     {
                         data.Role = claim.Value;
                         break;

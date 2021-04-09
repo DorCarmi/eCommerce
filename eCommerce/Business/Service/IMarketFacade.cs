@@ -13,7 +13,7 @@ namespace eCommerce.Business.Service
         /// Connect a new get to the system
         /// </summary>
         /// <returns>New auth token</returns>
-        public Result<Token> Connect();
+        public Result<string> Connect();
 
         /// <summary>
         /// Disconnect a user from the system
@@ -35,14 +35,14 @@ namespace eCommerce.Business.Service
         /// <param name="username">The user name</param>
         /// <param name="password">The user password</param>
         /// <returns>Authorization token</returns>
-        public Result<Token> Login(string username, string password);
+        public Result<string> Login(string username, string password);
 
         /// <summary>
         /// Logout a user form the system.
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>True if the user is logged in</returns>
-        public Result<bool> Logout(Token token);
+        public Result<bool> Logout(string token);
 
         // ========== Search option ==========
         

@@ -5,10 +5,10 @@ namespace eCommerce.Auth
     public interface IUserAuth
     {
         /// <summary>
-        /// Connect a new get to the system
+        /// Connect a new guest to the system
         /// </summary>
         /// <returns>New auth token</returns>
-        public Result<Token> Connect();
+        public Result<string> Connect();
         
         /// <summary>
         /// Register a new user to the system as a member.
@@ -25,6 +25,6 @@ namespace eCommerce.Auth
         /// <param name="password">The user password</param>
         /// <param name="role">The user role</param>
         /// <returns>Authorization token</returns>
-        public Result<Token> Login(string username, string password, UserRole role);
+        public Result<string> Login(string username, string password, UserRole role);
     }
 }
