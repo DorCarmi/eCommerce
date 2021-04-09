@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using eCommerce.Business;
 using eCommerce.Common;
 
@@ -16,12 +17,11 @@ namespace eCommerce.Auth
 
         private readonly JWTAuth _jwtAuth;
 
-        private readonly string GUEST_ROLE_STRING = "Guest";
+        private const string GUEST_ROLE_STRING = "Guest";
         // TODO make this filed in DB
         private long _guestId;
         private ConcurrentRegisteredUserRepo _userRepo;
         private readonly SHA256 _sha256;
-
         
         private UserAuth()
         {
@@ -39,15 +39,14 @@ namespace eCommerce.Auth
         public Result<string> Connect()
         {
             Result<string> tokenRes = Result.Ok<string>(GenerateToken(new AuthData(GenerateGuestUsername(), GUEST_ROLE_STRING)));
-            _guestId++;
+            IncrementGuestId();
             return tokenRes;
         }
 
-        private string GenerateGuestUsername()
+        public void Disconnect(string token)
         {
-            return string.Format("_Guest%ln", _guestId);
         }
-        
+
         public Result Register(string username, string password)
         {
             Result policyCheck = RegistrationsPolicy(username, password);
@@ -65,21 +64,6 @@ namespace eCommerce.Auth
             }
             
             return Result.Ok();
-        }
-
-        private Result RegistrationsPolicy(string username, string password)
-        {
-            if (string.IsNullOrEmpty(username))
-            {
-                return Result.Fail("Username cant be empty");
-            }
-            
-            if (string.IsNullOrEmpty(password))
-            {
-                return Result.Fail("Password cant be empty");
-            }
-            return Result.Ok();
-
         }
 
         public Result<string> Login(string username, string password, UserRole role)
@@ -100,37 +84,11 @@ namespace eCommerce.Auth
             return Result.Ok<>(GenerateToken(new AuthData(user.Username,  role.ToString())));
         }
 
-        /// <summary>
-        /// Hash the password.
-        /// <para>Precondition: password is not empty.</para>
-        /// </summary>
-        /// <param name="password">The password</param>
-        /// <returns>The password hash</returns>
-        private byte[] HashPassword(string password)
+        public void Logout(string token)
         {
-            return _sha256.ComputeHash(Encoding.Default.GetBytes(password));
         }
         
-        // ========== Token ========== //
-        
-        private string GenerateToken(AuthData authData)
-        {
-            List<Claim> claims = new List<Claim>()
-            {
-                new Claim(AuthClaimTypes.Username, authData.Username),
-                new Claim(AuthClaimTypes.Role, authData.Role)
-            };
-
-            if (authData.Role.Equals(GUEST_ROLE_STRING))
-            {
-                claims.Add(new Claim(AuthClaimTypes.GuestId, _guestId.ToString()));
-                _guestId++;
-            }
-
-            return _jwtAuth.GenerateToken(claims.ToArray());
-        }
-
-        private AuthData GetDataIfValid(string token)
+        public AuthData GetDataIfValid(string token)
         {
             var claims = _jwtAuth.GetClaimsFromToken(token);
             if (claims == null)
@@ -139,6 +97,29 @@ namespace eCommerce.Auth
             }
             
             AuthData data = new AuthData(null, null);
+            if (!FillAuthData(claims, data))
+            {
+                return null;
+            }
+
+            if (data.AllDataIsNotNull())
+            {
+                return null;
+            }
+
+            return data;
+        }
+
+        // ========== Private methods ========== //
+
+        /// <summary>
+        /// Fill the AuthData from claims
+        /// </summary>
+        /// <param name="claims">The claims</param>
+        /// <param name="data">The auth data to fill</param>
+        /// <returns>True if all the claims are valid</returns>
+        private bool FillAuthData(IEnumerable<Claim> claims, AuthData data)
+        {
             foreach (var claim in claims)
             {
                 switch (claim.Type)
@@ -153,18 +134,70 @@ namespace eCommerce.Auth
                         data.Role = claim.Value;
                         break;
                     }
+                    case AuthClaimTypes.GuestId:
+                    {
+                        break;
+                    }
                     default:
                         // TODO maybe log it
-                        return null;
+                        return false;
                 }
             }
 
-            if (data.AllDataIsNotNull())
+            return true;
+        }
+
+        /// <summary>
+        /// Hash the password.
+        /// <para>Precondition: password is not empty.</para>
+        /// </summary>
+        /// <param name="password">The password</param>
+        /// <returns>The password hash</returns>
+        private byte[] HashPassword(string password)
+        {
+            return _sha256.ComputeHash(Encoding.Default.GetBytes(password));
+        }
+        
+        private string GenerateToken(AuthData authData)
+        {
+            List<Claim> claims = new List<Claim>()
             {
-                return null;
+                new Claim(AuthClaimTypes.Username, authData.Username),
+                new Claim(AuthClaimTypes.Role, authData.Role)
+            };
+
+            if (authData.Role.Equals(GUEST_ROLE_STRING))
+            {
+                claims.Add(new Claim(AuthClaimTypes.GuestId, _guestId.ToString()));
+                IncrementGuestId();
             }
 
-            return data;
+            return _jwtAuth.GenerateToken(claims.ToArray());
+        }
+
+        private void IncrementGuestId()
+        {
+            Interlocked.Increment(ref _guestId);
+        }
+        
+        private string GenerateGuestUsername()
+        {
+            return string.Format("_Guest%ln", _guestId);
+        }
+
+        private Result RegistrationsPolicy(string username, string password)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                return Result.Fail("Username cant be empty");
+            }
+            
+            if (string.IsNullOrEmpty(password))
+            {
+                return Result.Fail("Password cant be empty");
+            }
+            
+            return Result.Ok();
         }
     }
 }

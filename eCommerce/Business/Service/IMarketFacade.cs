@@ -18,8 +18,7 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Disconnect a user from the system
         /// </summary>
-        /// <returns>The if the user has been disconnected</returns>
-        public Result<bool> Disconnect();
+        public void Disconnect(string token);
         
         /// <summary>
         /// Register a new user to the system
@@ -41,8 +40,7 @@ namespace eCommerce.Business.Service
         /// Logout a user form the system.
         /// </summary>
         /// <param name="token">Authorization token</param>
-        /// <returns>True if the user is logged in</returns>
-        public Result<bool> Logout(string token);
+        public void Logout(string token);
 
         // ========== Search option ==========
         

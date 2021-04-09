@@ -11,6 +11,11 @@ namespace eCommerce.Auth
         public Result<string> Connect();
         
         /// <summary>
+        /// Disconnect a user from the system
+        /// </summary>
+        public void Disconnect(string token);
+        
+        /// <summary>
         /// Register a new user to the system as a member.
         /// </summary>
         /// <param name="username">The user name</param>
@@ -26,5 +31,11 @@ namespace eCommerce.Auth
         /// <param name="role">The user role</param>
         /// <returns>Authorization token</returns>
         public Result<string> Login(string username, string password, UserRole role);
+        
+        /// <summary>
+        /// Logout a user form the system.
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        public void Logout(string token);
     }
 }
