@@ -26,13 +26,14 @@ namespace eCommerce.Business
         private Dictionary<String, int> _amountOfItemsInStore;
         private Dictionary<String, List<Item>> _aquiredItemsInStore;
         
-        private 
         
         
         //User issues
         private User _founder;
-        private List<OwnerAppointment> _owners;
-        private List<ManagerAppointment> _managers;
+        private List<OwnerAppointment> _ownersAppoinements;
+        private List<User> _owners;
+        private List<ManagerAppointment> _managersAppointments;
+        private List<User> _managers;
         
         private List<Basket> _basketsOfThisStore;
 
@@ -72,9 +73,11 @@ namespace eCommerce.Business
         {
             
         }
-
-        public void AddItemsToStore(Dictionary<String, List<Item>> items)
+        
+        
+        public void AddItemsToStore(User user, Dictionary<String, List<Item>> items)
         {
+            searchForPermission();
             foreach (var item in items)
             {
                 if (this._itemsInStore.ContainsKey(item.Key))
