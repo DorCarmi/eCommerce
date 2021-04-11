@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Business
 {
-    public class PurchaseStrategy
+    public interface PurchaseStrategy
     {
         
     }
