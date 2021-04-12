@@ -21,7 +21,7 @@ namespace eCommerce.Business
             this._belongsToStore = store;
             _amount = 1;
             this._keyWords=new List<string>();
-            _purchaseStrategy = new DefaultPurchasePolicy();
+            _purchaseStrategy = new DefaultPurchaseStrategy();
             
         }
 

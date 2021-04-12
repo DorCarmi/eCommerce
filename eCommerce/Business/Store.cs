@@ -46,7 +46,7 @@ namespace eCommerce.Business
             this._myDiscountStrategies = new List<DiscountStrategy>();
             this._myDiscountStrategies.Add(new DefaultDiscountStrategy());
             this._myPurchaseStrategies = new List<PurchaseStrategy>();
-            this._myPurchaseStrategies.Add(new DefaultPurchasePolicy());
+            this._myPurchaseStrategies.Add(new DefaultPurchaseStrategy());
             
             _myPurchasePolicy = new PurchasePolicy();
             _myDiscountPolicy = new DiscountPolicy();

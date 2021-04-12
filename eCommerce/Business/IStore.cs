@@ -14,11 +14,11 @@ namespace eCommerce.Business.Service
         
         
         public Result<Item> GetItem();
-        public IList<Item> SearchForItems(string stringSearch);
-        public IList<Item> SearchForItems(string categoryName);
-        public IList<Item> SearchForItems(string[] keyWords);
-        public IList<Item> SearchForItems(string[] keyWords);
-        public IList<Item> SearchForItems(string[] keyWords);
+        public IList<Item> SearchForItems1(string stringSearch);
+        public IList<Item> SearchForItems2(string categoryName);
+        public IList<Item> SearchForItems3(string[] keyWords);
+        public IList<Item> SearchForItems4(string[] keyWords);
+        public IList<Item> SearchForItems5(string[] keyWords);
         public IList<Item> SearchForItems(string stringSearch);
         public IList<Store> SearchForStore(string stringSearch);
 
