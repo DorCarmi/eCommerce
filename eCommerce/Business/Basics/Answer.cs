@@ -20,6 +20,7 @@ namespace eCommerce.Business.Basics
         {
             this.ans = true;
             this.returnVal = new Some<T>(returnVal);
+            reason = "";
         }
 
         public bool isOk()
@@ -30,6 +31,11 @@ namespace eCommerce.Business.Basics
         public AnswerValue<T> getValue()
         {
             return returnVal;
+        }
+
+        public string getReason()
+        {
+            return reason;
         }
     }
 }

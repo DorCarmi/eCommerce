@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using eCommerce.Business.Basics;
 using Microsoft.Extensions.Logging;
 
@@ -8,10 +9,13 @@ namespace eCommerce.Business
     public class Store
     {
         //Individual
-        private String _storeName;
+        private readonly String _storeName;
         
         //General
         private MarketFacade _marketFacade;
+        
+        //Inventory
+        private ItemsInventory _invetory;
 
         //Store's issues
         //Discounts and purchases
@@ -22,12 +26,8 @@ namespace eCommerce.Business
         
         //History and inventory
         private StoreTransactionHistory _transactionHistory;
-        private Dictionary<String, Item> _itemsInStore;
-        private Dictionary<String, int> _amountOfItemsInStore;
-        private Dictionary<String, List<Item>> _aquiredItemsInStore;
-        
-        
-        
+
+
         //User issues
         private User _founder;
         private List<OwnerAppointment> _ownersAppoinements;
@@ -37,141 +37,91 @@ namespace eCommerce.Business
         
         private List<Basket> _basketsOfThisStore;
 
-        public Store(String name, MarketFacade facade, User founder, Item item)
+        public Store(String name, MarketFacade facade, User founder, ItemInfo item)
         {
-            this._storeName = name;
-            
-            this._marketFacade = facade;
-
-            this._myDiscountStrategies = new List<DiscountStrategy>();
-            this._myDiscountStrategies.Add(new DefaultDiscountStrategy());
-            this._myPurchaseStrategies = new List<PurchaseStrategy>();
-            this._myPurchaseStrategies.Add(new DefaultPurchasePolicy());
-            
-            _myPurchasePolicy = new PurchasePolicy();
+            _storeName = name;
+            _marketFacade = facade;
+            _invetory = new ItemsInventory(this);
+            _invetory.addNewItem(item);
+            _myDiscountStrategies = new List<DiscountStrategy>();
+            _myDiscountStrategies.Add(new DefaultDiscountStrategy());
+            _myPurchaseStrategies = new List<PurchaseStrategy>();
+            _myPurchaseStrategies.Add(new DefaultPurchasePolicy());
             _myDiscountPolicy = new DiscountPolicy();
-            
+            _myPurchasePolicy = new PurchasePolicy();
             _transactionHistory = new StoreTransactionHistory();
-
-            _itemsInStore = new Dictionary<string, List<Item>>();
-            _itemsInStore.Add(item.getName(),new List<Item>{item});
-            _aquiredItemsInStore = new Dictionary<string, List<Item>>();
-            
-            
-
-            this._founder = founder;
-
-            _owners = new List<OwnerAppointment>();
-            _managers = new List<ManagerAppointment>();
-
+            _founder = founder;
+            _ownersAppoinements = new List<OwnerAppointment>();
+            _owners = new List<User>();
+            _managersAppointments = new List<ManagerAppointment>();
+            _managers = new List<User>();
             _basketsOfThisStore = new List<Basket>();
-
+            
             facade.addNewStore(this);
         }
-
-        public Dictionary<Item,int> getItemsToBasket(String itemID, int amount)
-        {
-            
-        }
-        
-        
-        public void AddItemsToStore(User user, Dictionary<String, List<Item>> items)
-        {
-            searchForPermission();
-            foreach (var item in items)
-            {
-                if (this._itemsInStore.ContainsKey(item.Key))
-                {
-                    //Already have item with the same name
-                    _itemsInStore[item.Key].InsertRange(0,item.Value);
-                }
-                else
-                {
-                    this._itemsInStore.Add(item.Key,item.Value);
-                }
-            }
-        }
-
         public String getStoreName()
         {
             return this._storeName;
         }
-        
+
+        public Answer<bool> addNewItemToStore(User user,ItemInfo item)
+        {
+            if (user.hasPermission(this, StorePermission.AddItemToStore))
+            {
+                return _invetory.addNewItem(item);
+            }
+            else
+            {
+                return new Answer<bool>("Has no permissions to add item to store");
+            }
+        }
+
+        public Answer<bool> addItemsToStore(String itemName, int amount)
+        {
+            return _invetory.addExistingItem(itemName, amount);
+        }
+
+        public Answer<Item> getItemsToBasket(String itemName, int amount)
+        {
+            return _invetory.getItemsToBasket(itemName, amount);
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="itemName"></param>
         /// <returns></returns>
-        public Dictionary<Item,int> searchForStoreItems(String searchString)
+        public Answer<List<ItemInfo>> searchForStoreItems(String searchString)
         {
-            Dictionary<Item, int> itemsFound = new Dictionary<Item, int>();
-            foreach (var itemInStore in this._itemsInStore)
-            {
-                List<Item> itemInven=itemInStore.Value;
-                Item first=itemInven[0];
-                if (first.checkResemblance(searchString))
-                {
-                    itemsFound.Add(first, itemInven.Count);
-                }
-            }
-
-            return itemsFound;
+            return _invetory.findItems(searchString);
         }
 
-        public Answer<List<Item>> aquireItems(String itemName, int amount)
+        
+
+        public bool checkWithStorePolicy(PurchaseStrategies strategyName)
         {
-            if (amount <= 0 || itemName == null || itemName.Length == 0)
+            bool ans=this._myPurchasePolicy.checkStrategy(strategyName);
+            ans = ans && this._myPurchaseStrategies.Select(x => x.getStrategyName() == strategyName).Count() > 0;
+            return ans;
+        }
+
+        public bool checkWithStorePolicy(int pricePerUnit, int amount)
+        {
+            return _myPurchasePolicy.checkAmountAndPrice(pricePerUnit, amount);
+        }
+
+        public PurchaseStrategy getPurchaseStrategy(PurchaseStrategies strategyName)
+        {
+            var strategy= this._myPurchaseStrategies.FirstOrDefault(x => x.getStrategyName() == strategyName);
+            if (strategy==null)
             {
-                return new Answer<List<Item>>("Bad input");
-            }
-
-            if (this._itemsInStore.ContainsKey(itemName))
-            {
-                if (this._itemsInStore[itemName].Count - amount> 1)
-                {
-                    List<Item> aquiredItems = new List<Item>();
-
-                    for (int i = 0; i < amount; i++)
-                    {
-                        aquiredItems.Add(_itemsInStore[itemName][0]);
-                        _itemsInStore[itemName].RemoveAt(0);
-                    }
-
-                    if (this._aquiredItemsInStore.ContainsKey(itemName))
-                    {
-                        this._aquiredItemsInStore[itemName].InsertRange(0,aquiredItems);
-                    }
-                    else
-                    {
-                        this._aquiredItemsInStore.Add(itemName,aquiredItems);
-                    }
-
-                    return new Answer<List<Item>>(aquiredItems);
-                }
-                else
-                {
-                    return new Answer<List<Item>>("No enough items in store");
-                }
+                return new DefaultPurchasePolicy();
             }
             else
             {
-                return new Answer<List<Item>>("Item doesn't exist in store");
+                return strategy;
             }
-        }
-
-        public Answer<List<Item>> purchaseAquiredItems(List<Item> aquiredItems)
-        {
-            List<Item> unAquiredItems = new List<Item>();
-            foreach (var item in aquiredItems)
-            {
-                if (this._aquiredItemsInStore.ContainsKey(item.getName()) &&
-                    this._aquiredItemsInStore[item.getName()].Count==aquiredItems.Count)
-                {
-                    
-                }
-            }
-
-            return null;
+            
         }
     }
 }
