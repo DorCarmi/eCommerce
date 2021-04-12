@@ -5,6 +5,10 @@ namespace eCommerce.Business.Service
 {
     public interface IStore
     {
+        /// <summary>
+        /// <CNAME>StoreGetAllItems</CNAME>
+        /// </summary>
+        /// <returns></returns>
         public IList<Item> GetAllItems();
         public IList<StoreInfo> GetAllStores();
         
