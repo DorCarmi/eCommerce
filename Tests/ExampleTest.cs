@@ -1,14 +1,14 @@
-using System;
+using eCommerce;
 using NUnit.Framework;
 
 namespace Tests
 {
-    public class Tests
+    public class ExampleTests
     {
         [SetUp]
         public void Setup()
         {
-            Console.WriteLine("Unittest example");
+            Item item = new Item();
         }
 
         [Test]
