@@ -8,7 +8,6 @@ namespace Tests
         [SetUp]
         public void Setup()
         {
-            Item item = new Item();
         }
 
         [Test]

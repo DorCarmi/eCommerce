@@ -81,7 +81,7 @@ namespace eCommerce.Auth
                 return Result.Fail<string>("Invalid username or password or role");
             }
 
-            return Result.Ok<>(GenerateToken(new AuthData(user.Username,  role.ToString())));
+            return Result.Ok(GenerateToken(new AuthData(user.Username,  role.ToString())));
         }
 
         public void Logout(string token)

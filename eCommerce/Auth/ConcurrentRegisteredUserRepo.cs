@@ -32,8 +32,11 @@ namespace eCommerce.Auth
         /// <returns>Return a User of exists</returns>
         public User GetUserOrNull(string username)
         {
-            User user = null;
-            if (!_dictionary.TryGetValue(username, out user)) ;
+            User user;
+            if (!_dictionary.TryGetValue(username, out user))
+            {
+                user = null;
+            }
             return user;
         }
     }
