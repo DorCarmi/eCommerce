@@ -53,7 +53,7 @@ namespace Tests.Auth
             };
             
             string token = _jwt.GenerateToken(claims);
-            IEnumerable<Claim> tokenClaims = _jwt.GetClaimsFromToken(token);
+            Claim[] tokenClaims = _jwt.GetClaimsFromToken(token).ToArray();
 
             bool equalClaims = ContainsClaims(claims, tokenClaims);
             Assert.True(equalClaims,
@@ -72,7 +72,7 @@ namespace Tests.Auth
                 "Receive invalid token");
         }
         
-        private bool ContainsClaims(Claim[] soruce, IEnumerable<Claim> dest)
+        private bool ContainsClaims(Claim[] soruce, Claim[] dest)
         {
             bool equalClaims = true;
             foreach (var claim in soruce)
