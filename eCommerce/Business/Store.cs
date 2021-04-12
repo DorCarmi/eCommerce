@@ -53,16 +53,16 @@ namespace eCommerce.Business
             
             _transactionHistory = new StoreTransactionHistory();
 
-            _itemsInStore = new Dictionary<string, List<Item>>();
-            _itemsInStore.Add(item.getName(),new List<Item>{item});
+            //_itemsInStore = new Dictionary<string, List<Item>>();
+            //_itemsInStore.Add(item.getName(),new List<Item>{item});
             _aquiredItemsInStore = new Dictionary<string, List<Item>>();
             
             
 
             this._founder = founder;
 
-            _owners = new List<OwnerAppointment>();
-            _managers = new List<ManagerAppointment>();
+            //_owners = new List<OwnerAppointment>();
+            //_managers = new List<ManagerAppointment>();
 
             _basketsOfThisStore = new List<Basket>();
 
@@ -71,23 +71,23 @@ namespace eCommerce.Business
 
         public Dictionary<Item,int> getItemsToBasket(String itemID, int amount)
         {
-            
+            return null;
         }
         
         
         public void AddItemsToStore(User user, Dictionary<String, List<Item>> items)
         {
-            searchForPermission();
+            //searchForPermission();
             foreach (var item in items)
             {
                 if (this._itemsInStore.ContainsKey(item.Key))
                 {
                     //Already have item with the same name
-                    _itemsInStore[item.Key].InsertRange(0,item.Value);
+                    //_itemsInStore[item.Key].InsertRange(0,item.Value);
                 }
                 else
                 {
-                    this._itemsInStore.Add(item.Key,item.Value);
+                    //this._itemsInStore.Add(item.Key,item.Value);
                 }
             }
         }
@@ -104,10 +104,11 @@ namespace eCommerce.Business
         /// <returns></returns>
         public Dictionary<Item,int> searchForStoreItems(String searchString)
         {
+            /*
             Dictionary<Item, int> itemsFound = new Dictionary<Item, int>();
             foreach (var itemInStore in this._itemsInStore)
             {
-                List<Item> itemInven=itemInStore.Value;
+                //List<Item> itemInven=itemInStore.Value;
                 Item first=itemInven[0];
                 if (first.checkResemblance(searchString))
                 {
@@ -115,7 +116,8 @@ namespace eCommerce.Business
                 }
             }
 
-            return itemsFound;
+            return itemsFound;*/
+            return null;
         }
 
         public Answer<List<Item>> aquireItems(String itemName, int amount)
@@ -127,14 +129,14 @@ namespace eCommerce.Business
 
             if (this._itemsInStore.ContainsKey(itemName))
             {
-                if (this._itemsInStore[itemName].Count - amount> 1)
+                if (this._itemsInStore[itemName].getAmount() - amount> 1)
                 {
                     List<Item> aquiredItems = new List<Item>();
 
                     for (int i = 0; i < amount; i++)
                     {
-                        aquiredItems.Add(_itemsInStore[itemName][0]);
-                        _itemsInStore[itemName].RemoveAt(0);
+                        aquiredItems.Add(_itemsInStore[itemName]);
+                        //_itemsInStore[itemName];
                     }
 
                     if (this._aquiredItemsInStore.ContainsKey(itemName))

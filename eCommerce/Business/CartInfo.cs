@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Business
 {
-    public class Owner
+    public class CartInfo
     {
         
     }

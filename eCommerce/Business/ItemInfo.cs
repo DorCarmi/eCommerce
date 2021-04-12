@@ -10,6 +10,7 @@ namespace eCommerce.Business
         public string storeName;
         public string category;
         public List<string> keyWords;
+        public int pricePerUnit;
 
         public ItemInfo(int amount, string name, string storeName, string category, List<string> keyWords)
         {
