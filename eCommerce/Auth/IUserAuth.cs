@@ -39,6 +39,13 @@ namespace eCommerce.Auth
         public void Logout(string token);
 
         /// <summary>
+        /// Check if a user is registered to the system
+        /// </summary>
+        /// <param name="username">The user name</param>
+        /// <returns>True if the user is registered to the system</returns>
+        public bool IsRegistered(string username);
+        
+        /// <summary>
         /// Check if the token is valid
         /// </summary>
         /// <param name="token">Authorization token</param>

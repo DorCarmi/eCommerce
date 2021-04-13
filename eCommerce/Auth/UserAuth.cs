@@ -11,27 +11,32 @@ namespace eCommerce.Auth
     //TODO make thread safe
     public class UserAuth  : IUserAuth
     {
-        private static readonly UserAuth Instance = new UserAuth();
+        private static readonly UserAuth Instance = new UserAuth(new ConcurrentRegisteredUserRepo());
 
         private readonly JWTAuth _jwtAuth;
 
         private const string GUEST_ROLE_STRING = "Guest";
         // TODO make this filed in DB
         private long _guestId;
-        private ConcurrentRegisteredUserRepo _userRepo;
+        private IRegisteredUserRepo _userRepo;
         private readonly SHA256 _sha256;
         
-        private UserAuth()
+        private UserAuth(IRegisteredUserRepo repo)
         {
             _jwtAuth = new JWTAuth("keykeykeykeykeyekeykey");
             _guestId = 0;
-            _userRepo = new ConcurrentRegisteredUserRepo();
+            _userRepo = repo;
             _sha256 = SHA256.Create();
         }
 
         public static UserAuth GetInstance()
         {
             return Instance;
+        }
+        
+        public static UserAuth CreateInstanceForTests(IRegisteredUserRepo userRepo)
+        {
+            return new UserAuth(userRepo);
         }
         
         public Result<string> Connect()
@@ -53,14 +58,14 @@ namespace eCommerce.Auth
                 return policyCheck;
             }
 
-            User newUser = new User(username, HashPassword(password));
-            newUser.AddRole(UserRole.Member);
-            
-            if (!_userRepo.Add(newUser))
+            if (IsRegistered(username))
             {
                 return Result.Fail("Username already taken");
             }
             
+            User newUser = new User(username, HashPassword(password));
+            newUser.AddRole(UserRole.Member);
+
             return Result.Ok();
         }
 
@@ -84,6 +89,11 @@ namespace eCommerce.Auth
 
         public void Logout(string token)
         {
+        }
+
+        public bool IsRegistered(string username)
+        {
+            return _userRepo.GetUserOrNull(username) != null;
         }
 
         public bool IsValidToken(string token)

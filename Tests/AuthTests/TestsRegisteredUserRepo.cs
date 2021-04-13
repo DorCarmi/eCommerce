@@ -1,16 +1,14 @@
 ﻿using System.Collections.Concurrent;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using eCommerce.Common;
+using eCommerce.Auth;
 
-namespace eCommerce.Auth
+namespace Tests.Auth
 {
-    internal class ConcurrentRegisteredUserRepo : IRegisteredUserRepo
+    public class TestsRegisteredUserRepo : IRegisteredUserRepo
     {
+        
         private ConcurrentDictionary<string, User> _dictionary;
 
-        public ConcurrentRegisteredUserRepo()
+        public TestsRegisteredUserRepo()
         {
             _dictionary = new ConcurrentDictionary<string, User>();
         }

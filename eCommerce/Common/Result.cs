@@ -5,7 +5,7 @@ namespace eCommerce.Common
     public class Result
     {
         private bool Success { get; }
-        private string Error { get; set; }
+        public string Error { get; }
         public bool IsSuccess => Success;
         public bool IsFailure => !Success;
 
