@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -8,25 +10,41 @@ using eCommerce.Common;
 
 namespace eCommerce.Auth
 {
-    //TODO make thread safe
     public class UserAuth  : IUserAuth
     {
         private static readonly UserAuth Instance = new UserAuth(new ConcurrentRegisteredUserRepo());
 
         private readonly JWTAuth _jwtAuth;
+        private readonly SHA256 _sha256;
 
         private const string GUEST_ROLE_STRING = "Guest";
         // TODO make this filed in DB
         private long _guestId;
         private IRegisteredUserRepo _userRepo;
-        private readonly SHA256 _sha256;
+        private IDictionary<string, string> _connectedGuests;
+        private IDictionary<string, string> _connectedUsers;
         
         private UserAuth(IRegisteredUserRepo repo)
         {
             _jwtAuth = new JWTAuth("keykeykeykeykeyekeykey");
             _guestId = 0;
-            _userRepo = repo;
             _sha256 = SHA256.Create();
+            _userRepo = repo;
+            _connectedGuests = new ConcurrentDictionary<string, string>();
+            _connectedUsers = new ConcurrentDictionary<string, string>();
+            InitOneAdmin();
+        }
+
+        private void InitOneAdmin()
+        {
+            Register("Admin", "Admin");
+            User adminUser = _userRepo.GetUserOrNull("Admin");
+            if (adminUser == null)
+            {
+                throw new Exception("There isnt at least one admin in the system");
+            }
+
+            adminUser.AddRole(UserRole.Admin);
         }
 
         public static UserAuth GetInstance()
@@ -39,15 +57,19 @@ namespace eCommerce.Auth
             return new UserAuth(userRepo);
         }
         
-        public Result<string> Connect()
+        public string Connect()
         {
-            Result<string> tokenRes = Result.Ok(GenerateToken(new AuthData(GenerateGuestUsername(), GUEST_ROLE_STRING)));
+            //TODO make it thread safe
             IncrementGuestId();
-            return tokenRes;
+            string guestUsername = GenerateGuestUsername();
+            string token = GenerateToken(new AuthData(GenerateGuestUsername(), GUEST_ROLE_STRING));
+            _connectedGuests.Add(token, guestUsername);
+            return token;
         }
 
         public void Disconnect(string token)
         {
+            _connectedGuests.Remove(token);
         }
 
         public Result Register(string username, string password)
@@ -66,16 +88,17 @@ namespace eCommerce.Auth
             User newUser = new User(username, HashPassword(password));
             newUser.AddRole(UserRole.Member);
 
+            _userRepo.Add(newUser);
             return Result.Ok();
         }
 
-        public Result<string> Login(string username, string password, UserRole role)
+        public Result<string> Login(string guestToken, string username, string password, UserRole role)
         {
-            
-            Result policyCheck = RegistrationsPolicy(username, password);
-            if (policyCheck.IsFailure)
+
+            Result discountGuestRes = DiscountGuestIfConnected(guestToken);
+            if (discountGuestRes.IsFailure)
             {
-                return Result.Fail<string>("Username or password cant be empty");
+                return Result.Fail<string>(discountGuestRes.Error);
             }
 
             User user = _userRepo.GetUserOrNull(username);
@@ -84,16 +107,35 @@ namespace eCommerce.Auth
                 return Result.Fail<string>("Invalid username or password or role");
             }
 
-            return Result.Ok(GenerateToken(new AuthData(user.Username,  role.ToString())));
+            if (IsLoggedIn(username))
+            {
+                return Result.Fail<string>("User already connected");
+            }
+
+            string token = GenerateToken(new AuthData(user.Username, role.ToString()));
+            _connectedUsers.Add(username, token);
+
+            return Result.Ok(token);
         }
 
-        public void Logout(string token)
+        public string Logout(string token)
         {
+            Result<AuthData> authData = GetData(token);
+            if (authData.IsSuccess)
+            {
+                _connectedUsers.Remove(authData.Value.Username);
+            }
+            return Connect();
         }
 
         public bool IsRegistered(string username)
         {
             return _userRepo.GetUserOrNull(username) != null;
+        }
+        
+        public bool IsLoggedIn(string username)
+        {
+            return _connectedUsers.ContainsKey(username);
         }
 
         public bool IsValidToken(string token)
@@ -142,10 +184,6 @@ namespace eCommerce.Auth
                         data.Role = claim.Value;
                         break;
                     }
-                    /*case AuthClaimTypes.GuestId:
-                    {
-                        break;
-                    }*/
                     default:
                         // TODO check the other expected types
                         break;
@@ -195,16 +233,50 @@ namespace eCommerce.Auth
 
         private Result RegistrationsPolicy(string username, string password)
         {
+            String errMessage = null;
             if (string.IsNullOrEmpty(username))
             {
-                return Result.Fail("Username cant be empty");
+                errMessage = $"{errMessage}\nUsername cant be empty";
             }
-            
+            else if(username.StartsWith("_Guest"))
+            {
+                errMessage = $"{errMessage}\nUsername not valid";
+            }
+
             if (string.IsNullOrEmpty(password))
             {
-                return Result.Fail("Password cant be empty");
+                errMessage = $"{errMessage}\nPassword not valid";
             }
-            
+
+            return errMessage == null ? Result.Ok() : Result.Fail(errMessage);
+        }
+
+        private bool IsGuestConnected(string token)
+        {
+            return _connectedGuests.ContainsKey(token);
+        }
+        
+        private string GetConnectedGuestUsername(string token)
+        {
+            string username = null;
+            _connectedGuests.TryGetValue(token, out username);
+            return username;
+        }
+        
+        private Result DiscountGuestIfConnected(string guestToken)
+        {
+            Result<AuthData> authData = GetData(guestToken);
+            if (authData.IsFailure)
+            {
+                return Result.Fail<string>($"Not valid guest token\nError: {authData.Error}");
+            }
+
+            if (!IsGuestConnected(guestToken))
+            {
+                return Result.Fail<string>("Not connected as guest");
+            }
+
+            Disconnect(guestToken);
             return Result.Ok();
         }
     }

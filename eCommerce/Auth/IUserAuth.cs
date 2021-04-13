@@ -8,7 +8,7 @@ namespace eCommerce.Auth
         /// Connect a new guest to the system
         /// </summary>
         /// <returns>New auth token</returns>
-        public Result<string> Connect();
+        public string Connect();
         
         /// <summary>
         /// Disconnect a user from the system
@@ -26,17 +26,19 @@ namespace eCommerce.Auth
         /// <summary>
         /// Log in to the system
         /// </summary>
+        /// <param name="guestToken">The guest Authorization token</param>
         /// <param name="username">The user name</param>
         /// <param name="password">The user password</param>
         /// <param name="role">The user role</param>
         /// <returns>Authorization token</returns>
-        public Result<string> Login(string username, string password, UserRole role);
+        public Result<string> Login(string guestToken ,string username, string password, UserRole role);
         
         /// <summary>
         /// Logout a user form the system.
         /// </summary>
         /// <param name="token">Authorization token</param>
-        public void Logout(string token);
+        /// <returns>New guest Authorization token</returns>
+        public string Logout(string token);
 
         /// <summary>
         /// Check if a user is registered to the system
@@ -44,6 +46,13 @@ namespace eCommerce.Auth
         /// <param name="username">The user name</param>
         /// <returns>True if the user is registered to the system</returns>
         public bool IsRegistered(string username);
+
+        /// <summary>
+        /// Check if the user is logged in
+        /// </summary>
+        /// <param name="username">The user name</param>
+        /// <returns>True if the user logged in</returns>
+        public bool IsLoggedIn(string username);
         
         /// <summary>
         /// Check if the token is valid
