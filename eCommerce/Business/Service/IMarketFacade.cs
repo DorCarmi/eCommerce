@@ -6,39 +6,44 @@ namespace eCommerce.Business.Service
 {
     public interface IMarketFacade
     {
+        
+        // ========== Connection and Authorization ========== //
+        
         /// <summary>
-        /// Connect a new get to the system
+        /// Connect a new guest to the system
         /// </summary>
         /// <returns>New auth token</returns>
-        public Result<string> Connect();
-
+        public string Connect();
+        
         /// <summary>
         /// Disconnect a user from the system
         /// </summary>
         public void Disconnect(string token);
         
         /// <summary>
-        /// Register a new user to the system
+        /// Register a new user to the system as a member.
         /// </summary>
         /// <param name="username">The user name</param>
         /// <param name="password">The user password</param>
-        /// <returns>True if the user has been successfully registered</returns>
+        /// <returns>Successful Result if the user has been successfully registered</returns>
         public Result Register(string username, string password);
         
         /// <summary>
         /// Log in to the system
         /// </summary>
+        /// <param name="guestToken">The guest Authorization token</param>
         /// <param name="username">The user name</param>
         /// <param name="password">The user password</param>
+        /// <param name="role">The user role</param>
         /// <returns>Authorization token</returns>
-        // TODO add role as parameter
-        public Result<string> Login(string username, string password);
-
+        public Result<string> Login(string guestToken ,string username, string password, ServiceUserRole role);
+        
         /// <summary>
         /// Logout a user form the system.
         /// </summary>
         /// <param name="token">Authorization token</param>
-        public void Logout(string token);
+        /// <returns>New guest Authorization token</returns>
+        public string Logout(string token);
         
         // ========== Store ========== //
         
