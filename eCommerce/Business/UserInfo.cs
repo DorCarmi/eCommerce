@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Business
 {
-    public interface DiscountStrategy
+    public class UserInfo
     {
         
     }

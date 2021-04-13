@@ -25,7 +25,7 @@ namespace Tests.Auth
             _loggedinUsers = new Dictionary<string, TestsUserData>();
         }
 
-        [Test]
+        [Test, Order(1)]
         public void ConnectTest()
         {
             string token = _userAuth.Connect();
@@ -41,7 +41,7 @@ namespace Tests.Auth
             _connectedGuestTokens.Add(token);
         }
 
-        [Test]
+        [Test, Order(2)]
         public void RegisterValidUsersTest()
         {
             IList<Result> registeredRes = new List<Result>();
@@ -60,7 +60,7 @@ namespace Tests.Auth
             }
         }
 
-        [Test]
+        [Test, Order(3)]
         public void TryRegistersRegisteredUsersTest()
         {
             if (_registeredUsers.Count > 0)
@@ -72,7 +72,7 @@ namespace Tests.Auth
             }
         }
         
-        [Test]
+        [Test, Order(4)]
         public void RegisterInvalidUsersTest()
         {
             IList<TestsUserData> userData = new List<TestsUserData>
@@ -90,18 +90,24 @@ namespace Tests.Auth
             }
         }
         
-        [Test]
+        [Test, Order(5)]
         public void IsUserRegisteredTest()
         {
+            IList<TestsUserData> usersToRemove = new List<TestsUserData>();
             foreach (var user in _registeredUsers)
             {
                 Assert.True(_userAuth.IsRegistered(user.Username),
                     $"User {user.Username} wasn't registered, but test RegisterValidUsersTest said it was");
-                _registeredUsers.Remove(user);
+                usersToRemove.Add(user);
+            }
+
+            foreach (var userToRemove in usersToRemove)
+            {
+                _registeredUsers.Remove(userToRemove);
             }
         }
 
-        [Test]
+        [Test, Order(6)]
         public void LogInAllRegisteredUsersTest()
         {
             foreach (var user in _registeredUsers)
