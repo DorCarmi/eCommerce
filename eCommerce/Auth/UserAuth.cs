@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using eCommerce.Business;
 using eCommerce.Common;
 
 namespace eCommerce.Auth
@@ -38,7 +36,7 @@ namespace eCommerce.Auth
         
         public Result<string> Connect()
         {
-            Result<string> tokenRes = Result.Ok<string>(GenerateToken(new AuthData(GenerateGuestUsername(), GUEST_ROLE_STRING)));
+            Result<string> tokenRes = Result.Ok(GenerateToken(new AuthData(GenerateGuestUsername(), GUEST_ROLE_STRING)));
             IncrementGuestId();
             return tokenRes;
         }
@@ -87,27 +85,27 @@ namespace eCommerce.Auth
         public void Logout(string token)
         {
         }
+
+        public bool IsValidToken(string token)
+        {
+            return GetData(token).IsSuccess;
+        }
         
-        public AuthData GetDataIfValid(string token)
+        public Result<AuthData> GetData(string token)
         {
             var claims = _jwtAuth.GetClaimsFromToken(token);
             if (claims == null)
             {
-                return null;
+                return Result.Fail<AuthData>("Token is not valid");
             }
             
             AuthData data = new AuthData(null, null);
-            if (!FillAuthData(claims, data))
+            if (!FillAuthData(claims, data) || !data.AllDataIsNotNull())
             {
-                return null;
+                return Result.Fail<AuthData>("Token have missing or redundant data");
             }
 
-            if (data.AllDataIsNotNull())
-            {
-                return null;
-            }
-
-            return data;
+            return Result.Ok(data);
         }
 
         // ========== Private methods ========== //
@@ -134,13 +132,13 @@ namespace eCommerce.Auth
                         data.Role = claim.Value;
                         break;
                     }
-                    case AuthClaimTypes.GuestId:
+                    /*case AuthClaimTypes.GuestId:
                     {
                         break;
-                    }
+                    }*/
                     default:
-                        // TODO maybe log it
-                        return false;
+                        // TODO check the other expected types
+                        break;
                 }
             }
 
@@ -166,11 +164,11 @@ namespace eCommerce.Auth
                 new Claim(AuthClaimTypes.Role, authData.Role)
             };
 
-            if (authData.Role.Equals(GUEST_ROLE_STRING))
+            /*if (authData.Role.Equals(GUEST_ROLE_STRING))
             {
                 claims.Add(new Claim(AuthClaimTypes.GuestId, _guestId.ToString()));
                 IncrementGuestId();
-            }
+            }*/
 
             return _jwtAuth.GenerateToken(claims.ToArray());
         }
@@ -182,7 +180,7 @@ namespace eCommerce.Auth
         
         private string GenerateGuestUsername()
         {
-            return string.Format("_Guest%ln", _guestId);
+            return $"_Guest{_guestId:D}";
         }
 
         private Result RegistrationsPolicy(string username, string password)

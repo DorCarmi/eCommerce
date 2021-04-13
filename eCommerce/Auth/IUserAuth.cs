@@ -37,5 +37,19 @@ namespace eCommerce.Auth
         /// </summary>
         /// <param name="token">Authorization token</param>
         public void Logout(string token);
+
+        /// <summary>
+        /// Check if the token is valid
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <returns>True if the token is valid</returns>
+        public bool IsValidToken(string token);
+        
+        /// <summary>
+        /// Get the user authorization data if the token is valid
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <returns>Authorization data</returns>
+        public Result<AuthData> GetData(string token);
     }
 }
