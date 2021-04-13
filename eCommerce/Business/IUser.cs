@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using Microsoft.AspNetCore.SignalR;
 
 namespace eCommerce.Business
 {
@@ -12,8 +13,7 @@ namespace eCommerce.Business
         public Result Logout();
         public Result<string> OpenStore(string storeName);
         public Result<IStore> OpenNewStore(StoreInfo storeInfo);
-
-
+        
         public Result AddItemToCart(Item item);
         public Result<CartInfo> GetCartInfo();
         public Result EditCart(ItemInfo info);
@@ -32,14 +32,13 @@ namespace eCommerce.Business
         //InBusiness
         public Result HasPermission(IStore store, StorePermission storePermission);
         public Result EnterBasketToHistory(IBasket basket);
-
-
-
-
-
-
-
-
+        
+        // Added
+        // TODO check with the implementer
+        string UserId
+        {
+            get;
+        }
     }
 
     

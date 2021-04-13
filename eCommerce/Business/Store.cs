@@ -66,7 +66,7 @@ namespace eCommerce.Business
 
             _basketsOfThisStore = new List<Basket>();
 
-            facade.addNewStore(this);
+            //facade.addNewStore(this);
         }
 
         public Dictionary<Item,int> getItemsToBasket(String itemID, int amount)
