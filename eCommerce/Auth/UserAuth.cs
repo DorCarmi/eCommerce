@@ -18,6 +18,7 @@ namespace eCommerce.Auth
         private readonly SHA256 _sha256;
 
         private const string GUEST_ROLE_STRING = "Guest";
+        private Mutex _guestIdMutex;
         // TODO make this filed in DB
         private long _guestId;
         private IRegisteredUserRepo _userRepo;
@@ -27,6 +28,7 @@ namespace eCommerce.Auth
         private UserAuth(IRegisteredUserRepo repo)
         {
             _jwtAuth = new JWTAuth("keykeykeykeykeyekeykey");
+            _guestIdMutex = new Mutex();
             _guestId = 0;
             _sha256 = SHA256.Create();
             _userRepo = repo;
@@ -59,10 +61,8 @@ namespace eCommerce.Auth
         
         public string Connect()
         {
-            //TODO make it thread safe
-            IncrementGuestId();
             string guestUsername = GenerateGuestUsername();
-            string token = GenerateToken(new AuthData(GenerateGuestUsername(), GUEST_ROLE_STRING));
+            string token = GenerateToken(new AuthData(guestUsername, GUEST_ROLE_STRING));
             _connectedGuests.Add(token, guestUsername);
             return token;
         }
@@ -225,10 +225,20 @@ namespace eCommerce.Auth
         {
             Interlocked.Increment(ref _guestId);
         }
+
+        private long GetAndIncrementGuestId()
+        {
+            long guestId = -1;
+            _guestIdMutex.WaitOne();
+            guestId = _guestId;
+            _guestId++;
+            _guestIdMutex.ReleaseMutex();
+            return guestId;
+        }
         
         private string GenerateGuestUsername()
         {
-            return $"_Guest{_guestId:D}";
+            return $"_Guest{GetAndIncrementGuestId():D}";
         }
 
         private Result RegistrationsPolicy(string username, string password)

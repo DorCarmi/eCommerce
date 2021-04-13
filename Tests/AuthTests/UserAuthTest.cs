@@ -13,14 +13,14 @@ namespace Tests.Auth
     public class UserAuthTest
     {
         private IUserAuth _userAuth;
-        private IList<string> _connectedGuestTokens;
+        private IDictionary<string, AuthData> _connectedGuest;
         private IList<TestsUserData> _registeredUsers;
         private IDictionary<string, TestsUserData> _loggedinUsers;
 
         public UserAuthTest()
         {
             _userAuth = UserAuth.CreateInstanceForTests(new TestsRegisteredUserRepo());
-            _connectedGuestTokens = new List<string>();
+            _connectedGuest = new Dictionary<string, AuthData>(); 
             _registeredUsers = new List<TestsUserData>();
             _loggedinUsers = new Dictionary<string, TestsUserData>();
         }
@@ -28,20 +28,36 @@ namespace Tests.Auth
         [Test, Order(1)]
         public void ConnectTest()
         {
-            string token = _userAuth.Connect();
+            for (int i = 0; i < 3; i++)
+            {
+                string token = _userAuth.Connect();
 
-            Result<AuthData> authDataRes = _userAuth.GetData(token);
-            Assert.True(authDataRes.IsSuccess,
-                        "Generated token from Connect is not valid");
-            
-            Assert.AreEqual("Guest",
-                            authDataRes.Value.Role,
-                            "Token generated for the guest doesnt not have the matching role");
-            Console.WriteLine(authDataRes.Value.Username);
-            _connectedGuestTokens.Add(token);
+                Result<AuthData> authDataRes = _userAuth.GetData(token);
+                Assert.True(authDataRes.IsSuccess,
+                    "Generated token from Connect is not valid");
+
+                AuthData authData = authDataRes.Value;
+                Assert.AreEqual("Guest",
+                    authData.Role,
+                    "Token generated for the guest doesnt not have the matching role");
+
+                Console.WriteLine($"Created guest name {authData.Username}");
+                _connectedGuest.Add(token, authData);
+            }
+        }
+        
+        [Test, Order(2)]
+        public void UniqueGuestNameTest()
+        {
+            ISet<string> nameSet = new HashSet<string>();
+            foreach (var authData in _connectedGuest.Values)
+            {
+                Assert.True(nameSet.Add(authData.Username),
+                    $"Duplicate guest name {authData.Username}");
+            }
         }
 
-        [Test, Order(2)]
+        [Test, Order(3)]
         public void RegisterValidUsersTest()
         {
             IList<Result> registeredRes = new List<Result>();
@@ -60,7 +76,7 @@ namespace Tests.Auth
             }
         }
 
-        [Test, Order(3)]
+        [Test, Order(4)]
         public void TryRegistersRegisteredUsersTest()
         {
             if (_registeredUsers.Count > 0)
@@ -72,7 +88,7 @@ namespace Tests.Auth
             }
         }
         
-        [Test, Order(4)]
+        [Test, Order(5)]
         public void RegisterInvalidUsersTest()
         {
             IList<TestsUserData> userData = new List<TestsUserData>
@@ -90,7 +106,7 @@ namespace Tests.Auth
             }
         }
         
-        [Test, Order(5)]
+        [Test, Order(6)]
         public void IsUserRegisteredTest()
         {
             IList<TestsUserData> usersToRemove = new List<TestsUserData>();
@@ -107,7 +123,7 @@ namespace Tests.Auth
             }
         }
 
-        [Test, Order(6)]
+        [Test, Order(7)]
         public void LogInAllRegisteredUsersTest()
         {
             foreach (var user in _registeredUsers)
@@ -127,13 +143,12 @@ namespace Tests.Auth
         [OneTimeTearDown]
         public void TestsCleanup()
         {
-
             foreach (var loggedinUser in _loggedinUsers)
             {
-                _connectedGuestTokens.Add(_userAuth.Logout(loggedinUser.Key));
+                _connectedGuest.Add(_userAuth.Logout(loggedinUser.Key), null);
             }
             
-            foreach (var guestToken in _connectedGuestTokens)
+            foreach (var guestToken in _connectedGuest.Keys)
             {
                 _userAuth.Disconnect(guestToken);
             }
