@@ -32,7 +32,7 @@ namespace Tests.AuthTests
             {
                 string token = _userAuth.Connect();
 
-                Result<AuthData> authDataRes = _userAuth.GetDataIfConnectedOrLoggedIn(token);
+                Result<AuthData> authDataRes = _userAuth.GetDataIfConnected(token);
                 Assert.True(authDataRes.IsSuccess,
                     "Generated token from Connect is not valid");
 

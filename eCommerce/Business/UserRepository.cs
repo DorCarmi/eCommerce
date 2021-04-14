@@ -37,6 +37,11 @@ namespace eCommerce.Business
             return user;
         }
 
+        public void Remove(string username)
+        {
+            _users.Remove(username);
+        }
+
         private long GetAndIncrementID()
         {
             return _idGenerator.MoveNext();

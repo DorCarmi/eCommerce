@@ -9,8 +9,8 @@ namespace eCommerce.Business
     public interface IUser
     {
         //Facade
-        public Result Login(UserToSystemState systemState);
-        public Result Logout();
+        public Result Login(UserToSystemState systemState, MemberData memberData);
+        public Result Logout(string toGuestName);
         public Result<string> OpenStore(string storeName);
         public Result<IStore> OpenNewStore(StoreInfo storeInfo);
         

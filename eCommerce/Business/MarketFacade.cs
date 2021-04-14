@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
@@ -15,19 +16,20 @@ namespace eCommerce.Business
         private static MarketFacade _instance = 
                 new MarketFacade(
                     UserAuth.GetInstance(),
-                    new UserRepository(),
                     new StoreRepository());
 
         private IUserAuth _auth;
-        private IRepository<IUser> _userRepository;
+        private IRepository<MemberData> _memberDataRepository;
         private IRepository<IStore> _storeRepository;
+        private IDictionary<string, IUser> _connectedUsers;
         
-        private MarketFacade(IUserAuth userAuth, IRepository<IUser> userRepo, 
+        private MarketFacade(IUserAuth userAuth,
             IRepository<IStore> storeRepo)
         {
             _auth = userAuth;
-            _userRepository = userRepo;
+            _memberDataRepository = new MemberDataRepository();
             _storeRepository = storeRepo;
+            _connectedUsers = new ConcurrentDictionary<string, IUser>();
         }
 
         public static MarketFacade GetInstance()
@@ -35,24 +37,24 @@ namespace eCommerce.Business
             return _instance;
         }
 
-        public static MarketFacade CreateInstanceForTests(IUserAuth userAuth, 
-            IRepository<IUser> userRepo, IRepository<IStore> storeRepo)
+        public static MarketFacade CreateInstanceForTests(IUserAuth userAuth, IRepository<IStore> storeRepo)
         {
-            return new MarketFacade(userAuth, userRepo, storeRepo);
+            return new MarketFacade(userAuth, storeRepo);
         }
         
         // <CNAME>Connect</CNAME>
         public string Connect()
         {
             string token = _auth.Connect();
-            Result<AuthData> userAuthDataRes = _auth.GetDataIfConnectedOrLoggedIn(token);
+            Result<AuthData> userAuthDataRes = _auth.GetDataIfConnected(token);
             if (userAuthDataRes.IsFailure)
             {
                 throw new AuthenticationException("Authorization connect returned not valid token");
             }
 
-            IUser newUser = CreateGuestUser(userAuthDataRes.Value.Username);
-            if (!_userRepository.Add(newUser))
+            string username = userAuthDataRes.Value.Username;
+            IUser newUser = CreateGuestUser(username);
+            if (!_connectedUsers.TryAdd(username, newUser))
             {
                 throw new AuthenticationException("Not new guest has been created");
             }
@@ -64,15 +66,22 @@ namespace eCommerce.Business
         // <CNAME>Disconnect</CNAME>
         public void Disconnect(string token)
         {
-            Result<AuthData> authData = _auth.GetDataIfConnectedOrLoggedIn(token);
+            Result<AuthData> authData = _auth.GetDataIfConnected(token);
             if (authData.IsFailure)
             {
                 return;
             }
             
             _auth.Disconnect(token);
-            IUser user = _userRepository.GetOrNull(authData.Value.Username);
+            IUser user = GetOrNullConnectedOrLoggedInUser(authData.Value.Username);
+            if (user == null)
+            {
+                // TODO log it
+                return;
+            }
+            
             user.Disconnect();
+            _connectedUsers.Remove(user.Username);
         }
 
         // <CNAME>Register</CNAME>
@@ -90,9 +99,9 @@ namespace eCommerce.Business
                 return authRegistrationRes;
             }
             
-            MemberInfo clonedInfo = memberInfo.Clone();
-            IUser newUser = new User(clonedInfo);
-            if (!_userRepository.Add(newUser))
+            MemberData memberData = new MemberData(memberInfo.Clone());
+            IUser newUser = new User(memberData);
+            if (!_memberDataRepository.Add(memberData))
             {
                 // TODO maybe remove the user form userAuth and log it
                 return Result.Fail("User already exists");
@@ -104,10 +113,10 @@ namespace eCommerce.Business
         // <CNAME>Login</CNAME>
         public Result<string> Login(string guestToken, string username, string password, ServiceUserRole role)
         {
-
-            if (!_auth.IsConnected(guestToken))
+            Result<AuthData> guestAuthData = _auth.GetDataIfConnected(guestToken);
+            if (guestAuthData.IsFailure)
             {
-                return Result.Fail<string>("Guest is not connected");
+                return Result.Fail<string>(guestAuthData.Error);;
             }
             
             Result<string> authLoginRes = _auth.Login(username, password, ServiceUserRoleToAuthUserRole(role));
@@ -116,22 +125,25 @@ namespace eCommerce.Business
                 return Result.Fail<string>(authLoginRes.Error);
             }
             
-            IUser user = _userRepository.GetOrNull(username);
-            if (user == null || user.Login(ServiceUserRoleToSystemState(role)).IsFailure)
+            IUser user = GetOrNullConnectedOrLoggedInUser(guestAuthData.Value.Username);
+            MemberData memberData = _memberDataRepository.GetOrNull(username);
+            if (user == null || memberData == null 
+                || user.Login(ServiceUserRoleToSystemState(role), memberData).IsFailure)
             {
                 // TODO log it since in auth the user can log in
                 _auth.Logout(authLoginRes.Value);
                 return Result.Fail<string>("Invalid username or password");
             }
-            
+
+            ExchangeKeyToConnected(guestAuthData.Value.Username, username);
             _auth.Disconnect(guestToken);
             return Result.Ok(authLoginRes.Value);
         }
 
-        // <CNAME>Login</CNAME>
+        // <CNAME>Logout</CNAME>
         public Result<string> Logout(string token)
         {
-            Result<AuthData> userAuthDataRes = _auth.GetDataIfConnectedOrLoggedIn(token);
+            Result<AuthData> userAuthDataRes = _auth.GetDataIfLoggedIn(token);
             if (userAuthDataRes.IsFailure)
             {
                 // TODO log it
@@ -139,15 +151,20 @@ namespace eCommerce.Business
             }
 
             AuthData authData = userAuthDataRes.Value;
-            IUser user = _userRepository.GetOrNull(authData.Username);
+            IUser user = GetOrNullConnectedOrLoggedInUser(authData.Username);
             if (user == null)
             {
                 // TODO log it since in auth has the user logged in
                 return Result.Ok(Connect());
             }
 
+            string newGuestToken = _auth.Connect();
+            string newGuestUsername = _auth.GetDataIfConnected(newGuestToken).Value.Username;
+            
             _auth.Logout(token);
-            return Result.Ok(Connect());
+            user.Logout(newGuestUsername);
+            ExchangeKeyToConnected(authData.Username, newGuestUsername);
+            return Result.Ok(newGuestToken);
         }
 
         public Result<IEnumerable<ProductDto>> SearchForProduct(string token, string query)
@@ -253,6 +270,28 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
+        private IUser GetOrNullConnectedOrLoggedInUser(string username)
+        {
+            if (!_connectedUsers.TryGetValue(username, out var user))
+            {
+                return null;
+            }
+
+            return user;
+        }
+        
+        private void ExchangeKeyToConnected(string fromUsername, string toUsername)
+        {
+            IUser user = GetOrNullConnectedOrLoggedInUser(fromUsername);
+            if (user == null)
+            {
+                return;
+            }
+
+            _connectedUsers.Remove(fromUsername);
+            _connectedUsers.Add(toUsername, user);
+        }
+        
         private IUser CreateGuestUser(string guestName)
         {
             // TODO update it with user implementation
@@ -266,15 +305,19 @@ namespace eCommerce.Business
         /// <returns>The user recognized by the token</returns>
         private Result<IUser> GetUser(string token)
         {
-            Result<AuthData> userAuthDataRes = _auth.GetDataIfConnectedOrLoggedIn(token);
+            Result<AuthData> userAuthDataRes = _auth.GetDataIfLoggedIn(token);
             if (userAuthDataRes.IsFailure)
             {
-                // TODO log it
-                return Result.Fail<IUser>(userAuthDataRes.Error);
+                userAuthDataRes = _auth.GetDataIfConnected(token);
+                if (userAuthDataRes.IsFailure)
+                {
+                    // TODO log it
+                    return Result.Fail<IUser>(userAuthDataRes.Error);
+                }
             }
 
             AuthData authData = userAuthDataRes.Value;
-            IUser user = _userRepository.GetOrNull(authData.Username);
+            IUser user = GetOrNullConnectedOrLoggedInUser(authData.Username);
             if (user == null)
             {
                 // TODO log it since in auth has the user logged in

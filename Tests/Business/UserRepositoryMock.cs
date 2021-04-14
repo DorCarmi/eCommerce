@@ -33,5 +33,10 @@ namespace Tests.Business
             _users.TryGetValue(id, out user);
             return user;
         }
+
+        public void Remove(string id)
+        {
+            _users.Remove(id);
+        }
     }
 }

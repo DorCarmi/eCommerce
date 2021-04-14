@@ -70,10 +70,19 @@ namespace eCommerce.Auth
         
         /// <summary>
         /// Get the user authorization data if the token is valid and if
-        /// The user is connected or logged in
+        /// The user is connected
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>Authorization data</returns>
-        public Result<AuthData> GetDataIfConnectedOrLoggedIn(string token);
+        public Result<AuthData> GetDataIfConnected(string token);
+        
+        /// <summary>
+        /// Get the user authorization data if the token is valid and if
+        /// The user is  logged in
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <returns>Authorization data</returns>
+        public Result<AuthData> GetDataIfLoggedIn(string token);
+        
     }
 }

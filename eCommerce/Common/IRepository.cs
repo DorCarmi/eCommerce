@@ -18,5 +18,11 @@ namespace eCommerce.Common
         /// <param name="id">The id of the required data</param>
         /// <returns>The data if exists else null</returns>
         public T GetOrNull([NotNull] string id);
+        
+        /// <summary>
+        /// Remove a user
+        /// </summary>
+        /// <param name="id">The user id</param>
+        public void Remove([NotNull] string id);
     }
 }

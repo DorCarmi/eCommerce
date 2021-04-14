@@ -16,6 +16,16 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
+        public Result Login(UserToSystemState systemState, MemberData memberData)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result Logout(string toGuestName)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Result<string> OpenStore(string storeName)
         {
             throw new System.NotImplementedException();
@@ -108,7 +118,7 @@ namespace eCommerce.Business
             
         }
         
-        public User(MemberInfo memberInfo)
+        public User(MemberData memberData)
         {
             
         }

@@ -27,5 +27,10 @@ namespace eCommerce.Business
             _stores.TryGetValue(storeName, out store);
             return store;
         }
+
+        public void Remove(string id)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

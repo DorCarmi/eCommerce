@@ -108,7 +108,7 @@ namespace eCommerce.Auth
         
         public Result Logout(string token)
         {
-            Result<AuthData> authData = GetDataIfConnectedOrLoggedIn(token);
+            Result<AuthData> authData = GetDataIfLoggedIn(token);
             if (authData.IsFailure)
             {
                 return Result.Fail<string>("The user need to be logged in");
@@ -116,10 +116,10 @@ namespace eCommerce.Auth
             _connectedUsers.Remove(authData.Value.Username);
             return Result.Ok();
         }
-
+        
         public bool IsConnected(string token)
         {
-            return _connectedGuests.ContainsKey(token);
+            return IsValidToken(token) & _connectedGuests.ContainsKey(token);
         }
         
         public bool IsRegistered(string username)
@@ -134,17 +134,35 @@ namespace eCommerce.Auth
 
         public bool IsValidToken(string token)
         {
-            return GetDataIfConnectedOrLoggedIn(token).IsSuccess;
+            return GetData(token).IsSuccess;
         }
         
-        public Result<AuthData> GetDataIfConnectedOrLoggedIn(string token)
+        public Result<AuthData> GetDataIfConnected(string token)
         {
 
-            if (!IsConnected(token) & !IsLoggedIn(token))
+            if (!IsConnected(token))
             {
                 return Result.Fail<AuthData>("The user isn't connected");
             }
-            
+
+            return GetData(token);
+        }
+        
+        public Result<AuthData> GetDataIfLoggedIn(string token)
+        {
+
+            if (!_connectedUsers.Values.Contains(token))
+            {
+                return Result.Fail<AuthData>("The user isn't connected");
+            }
+
+            return GetData(token);
+        }
+
+        // ========== Private methods ========== //
+
+        private Result<AuthData> GetData(string token)
+        {
             var claims = _jwtAuth.GetClaimsFromToken(token);
             if (claims == null)
             {
@@ -159,9 +177,7 @@ namespace eCommerce.Auth
 
             return Result.Ok(data);
         }
-
-        // ========== Private methods ========== //
-
+        
         /// <summary>
         /// Fill the AuthData from claims
         /// </summary>
