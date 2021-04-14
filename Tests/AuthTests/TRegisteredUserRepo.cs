@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using eCommerce.Auth;
 
-namespace Tests.Auth
+namespace Tests.AuthTests
 {
     public class TRegisteredUserRepo : IRegisteredUserRepo
     {

@@ -6,7 +6,7 @@ using eCommerce.Auth;
 using eCommerce.Common;
 using NUnit.Framework;
 
-namespace Tests.Auth
+namespace Tests.AuthTests
 {
     
     [TestFixture]
@@ -14,15 +14,15 @@ namespace Tests.Auth
     {
         private IUserAuth _userAuth;
         private IDictionary<string, AuthData> _connectedGuest;
-        private IList<TestsUserData> _registeredUsers;
-        private IDictionary<string, TestsUserData> _loggedinUsers;
+        private IList<TUserData> _registeredUsers;
+        private IDictionary<string, TUserData> _loggedinUsers;
 
         public UserAuthTests()
         {
             _userAuth = UserAuth.CreateInstanceForTests(new TRegisteredUserRepo());
             _connectedGuest = new Dictionary<string, AuthData>(); 
-            _registeredUsers = new List<TestsUserData>();
-            _loggedinUsers = new Dictionary<string, TestsUserData>();
+            _registeredUsers = new List<TUserData>();
+            _loggedinUsers = new Dictionary<string, TUserData>();
         }
 
         [Test, Order(1)]
@@ -61,10 +61,10 @@ namespace Tests.Auth
         public void RegisterValidUsersTest()
         {
             IList<Result> registeredRes = new List<Result>();
-            IList<TestsUserData> userData = new List<TestsUserData>
+            IList<TUserData> userData = new List<TUserData>
             {
-                new TestsUserData("User1", "User1"),
-                new TestsUserData("TheGreatStore", "ThisIsTheGreatestStorePassword")
+                new TUserData("User1", "User1"),
+                new TUserData("TheGreatStore", "ThisIsTheGreatestStorePassword")
             };
 
             foreach (var user in userData)
@@ -81,7 +81,7 @@ namespace Tests.Auth
         {
             if (_registeredUsers.Count > 0)
             {
-                TestsUserData user = _registeredUsers.First();
+                TUserData user = _registeredUsers.First();
                 Result registerRes = _userAuth.Register(user.Username, user.Password);
                 Assert.True(registerRes.IsFailure,
                             $"Register already registered user: username: {user.Username} password: {user.Password}");
@@ -91,11 +91,11 @@ namespace Tests.Auth
         [Test, Order(5)]
         public void RegisterInvalidUsersTest()
         {
-            IList<TestsUserData> userData = new List<TestsUserData>
+            IList<TUserData> userData = new List<TUserData>
             {
-                new TestsUserData(null, "User1"),
-                new TestsUserData("TheGreatStore", null),
-                new TestsUserData(null, null)
+                new TUserData(null, "User1"),
+                new TUserData("TheGreatStore", null),
+                new TUserData(null, null)
             };
 
             foreach (var user in userData)
@@ -109,7 +109,7 @@ namespace Tests.Auth
         [Test, Order(6)]
         public void IsUserRegisteredTest()
         {
-            IList<TestsUserData> usersToRemove = new List<TestsUserData>();
+            IList<TUserData> usersToRemove = new List<TUserData>();
             foreach (var user in _registeredUsers)
             {
                 Assert.True(_userAuth.IsRegistered(user.Username),
