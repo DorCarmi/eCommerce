@@ -33,7 +33,7 @@ namespace eCommerce.Business.Service
         public Result FinishPurchaseOfBasket(IBasket basket);
 
 
-        public Result AddItemToStore(ItemInfo newItem, User user);
+        public Result AddItemToStore(ItemInfo newItem, IUser user);
 
         public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment);
         public Result AppointNewManager(IUser user, OwnerAppointment ownerAppointment);
@@ -41,6 +41,11 @@ namespace eCommerce.Business.Service
         public Result<IList<IBasket>> GetPurchaseHistory();
         public Result EnterBasketToHistory(IBasket basket);
 
-
+        // TODO check with the implementor
+        
+        public string StoreName
+        {
+            get;
+        }
     }
 }

@@ -37,7 +37,8 @@ namespace Tests.Business
         {
             _marketFacade = MarketFacade.CreateInstanceForTests(
                 new UserAuthMock(),
-                new UserRepositoryMock());
+                new UserRepositoryMock(), 
+                null);
 
             _loggedInTokens = new List<string>();
         }

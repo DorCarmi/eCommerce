@@ -55,23 +55,23 @@ namespace eCommerce.Business.Service
         /// <param name="query">The product query the search</param>
         /// <param name="token">Authorization token</param>
         /// <returns>List of match products</returns>
-        public Result<IEnumerable<ItemDto>> SearchForProduct(string token, string query);
+        public Result<IEnumerable<ProductDto>> SearchForProduct(string token, string query);
         
         /// <summary>
         /// Add new item to the sore
         /// </summary>
         /// <param name="token">Authorization token</param>
-        /// <param name="item">The new item</param>
+        /// <param name="product">The new item</param>
         /// <returns>Result of the item addition</returns>
-        public Result AddNewItemToStore(string token,  ItemDto item);
+        public Result AddNewItemToStore(string token,  ProductDto product);
         
         /// <summary>
         /// Edit the item
         /// </summary>
         /// <param name="token">Authorization token</param>
-        /// <param name="item">The new item</param>
+        /// <param name="product">The new item</param>
         /// <returns>Result of the edit</returns>
-        public Result EditItemAmountInStore(string token, ItemDto item);
+        public Result EditItemAmountInStore(string token, ProductDto product);
         
         /// <summary>
         /// Remove item from store

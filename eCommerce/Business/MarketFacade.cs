@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Authentication;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
@@ -14,15 +15,19 @@ namespace eCommerce.Business
         private static MarketFacade _instance = 
                 new MarketFacade(
                     UserAuth.GetInstance(),
-                    new UserRepository());
+                    new UserRepository(),
+                    new StoreRepository());
 
         private IUserAuth _auth;
         private IRepository<IUser> _userRepository;
+        private IRepository<IStore> _storeRepository;
         
-        private MarketFacade(IUserAuth userAuth, IRepository<IUser> userRepo)
+        private MarketFacade(IUserAuth userAuth, IRepository<IUser> userRepo, 
+            IRepository<IStore> storeRepo)
         {
             _auth = userAuth;
             _userRepository = userRepo;
+            _storeRepository = storeRepo;
         }
 
         public static MarketFacade GetInstance()
@@ -30,9 +35,10 @@ namespace eCommerce.Business
             return _instance;
         }
 
-        public static MarketFacade CreateInstanceForTests(IUserAuth userAuth, IRepository<IUser> userRepo)
+        public static MarketFacade CreateInstanceForTests(IUserAuth userAuth, 
+            IRepository<IUser> userRepo, IRepository<IStore> storeRepo)
         {
-            return new MarketFacade(userAuth, userRepo);
+            return new MarketFacade(userAuth, userRepo, storeRepo);
         }
         
         // <CNAME>Connect</CNAME>
@@ -144,17 +150,30 @@ namespace eCommerce.Business
             return Result.Ok(Connect());
         }
 
-        public Result<IEnumerable<ItemDto>> SearchForProduct(string token, string query)
+        public Result<IEnumerable<ProductDto>> SearchForProduct(string token, string query)
         {
             throw new System.NotImplementedException();
         }
 
-        public Result AddNewItemToStore(string token, ItemDto item)
+        public Result AddNewItemToStore(string token, ProductDto product)
         {
-            throw new System.NotImplementedException();
+            Result<IUser> userRes = GetUser(token);
+            if (userRes.IsFailure)
+            {
+                return userRes;
+            }
+            IUser user = userRes.Value;
+            
+            IStore store = _storeRepository.GetOrNull(product.StoreName);
+            if (store == null)
+            {
+                return Result.Fail("Store doesn't exist");
+            }
+
+            return store.AddItemToStore(ProductDtoToProductInfo(product), user);
         }
 
-        public Result EditItemAmountInStore(string token, ItemDto item)
+        public Result EditItemAmountInStore(string token, ProductDto product)
         {
             throw new System.NotImplementedException();
         }
@@ -241,6 +260,31 @@ namespace eCommerce.Business
         }
 
         /// <summary>
+        /// Get the user if connected or logged in
+        /// </summary>
+        /// <param name="token">The Authorization token</param>
+        /// <returns>The user recognized by the token</returns>
+        private Result<IUser> GetUser(string token)
+        {
+            Result<AuthData> userAuthDataRes = _auth.GetDataIfConnectedOrLoggedIn(token);
+            if (userAuthDataRes.IsFailure)
+            {
+                // TODO log it
+                return Result.Fail<IUser>(userAuthDataRes.Error);
+            }
+
+            AuthData authData = userAuthDataRes.Value;
+            IUser user = _userRepository.GetOrNull(authData.Username);
+            if (user == null)
+            {
+                // TODO log it since in auth has the user logged in
+                return Result.Fail<IUser>("Error with the connection of the user");
+            }
+
+            return Result.Ok(user);
+        }
+
+        /// <summary>
         /// Check if the member information is valid
         /// </summary>
         /// <returns>Result of the check</returns>
@@ -295,6 +339,16 @@ namespace eCommerce.Business
 
             // TODO log if it gets here
             throw new NotImplementedException();
+        }
+        
+        private ItemInfo ProductDtoToProductInfo(ProductDto productDto)
+        {
+            return new ItemInfo(
+                productDto.Amount,
+                productDto.ProductName,
+                productDto.StoreName,
+                productDto.Categories.FirstOrDefault(),
+                productDto.KeyWords);
         }
     }
 }

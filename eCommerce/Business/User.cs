@@ -89,13 +89,15 @@ namespace eCommerce.Business
                         
         // TODO check with the implementor
         public string UserId { get; set; }
-        public string Email { get; }
+        
+        public string Username { get; }
+        
         public void Connect()
         {
             throw new System.NotImplementedException();
         }
 
-        public void Disconnect()
+        public bool Disconnect()
         {
             throw new System.NotImplementedException();
         }

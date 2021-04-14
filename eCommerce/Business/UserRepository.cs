@@ -21,7 +21,7 @@ namespace eCommerce.Business
 
         public bool Add([NotNull] IUser user)
         {
-            bool added = _users.TryAdd(user.UserId, user);
+            bool added = _users.TryAdd(user.Username, user);
             if (added)
             {
                 user.UserId = GetAndIncrementID().ToString();

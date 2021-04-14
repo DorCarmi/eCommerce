@@ -36,10 +36,13 @@ namespace eCommerce.Business
         // Added
         // TODO check with the implementer
         public string UserId { get; set; }
-        public string Email { get; }
-
+        public string Username { get; }
         public void Connect();
-        public void Disconnect();
+        /// <summary>
+        /// Discount the user
+        /// </summary>
+        /// <returns>If the user was registered or not</returns>
+        public bool Disconnect();
     }
 
     

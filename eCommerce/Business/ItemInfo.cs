@@ -9,10 +9,10 @@ namespace eCommerce.Business
         public string name;
         public string storeName;
         public string category;
-        public List<string> keyWords;
+        public IList<string> keyWords;
         public int pricePerUnit;
 
-        public ItemInfo(int amount, string name, string storeName, string category, List<string> keyWords)
+        public ItemInfo(int amount, string name, string storeName, string category, IList<string> keyWords)
         {
             this.amount = amount;
             this.name = name;
