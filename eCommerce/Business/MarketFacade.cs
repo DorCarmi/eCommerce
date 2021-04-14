@@ -5,6 +5,7 @@ using System.Security.Authentication;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using Microsoft.AspNetCore.DataProtection.XmlEncryption;
 
 namespace eCommerce.Business
 {
@@ -28,43 +29,104 @@ namespace eCommerce.Business
             return _instance;
         }
         
-        /// <CNAME>Connect</CNAME>
+        // <CNAME>Connect</CNAME>
         public string Connect()
         {
             string token = _auth.Connect();
             Result<AuthData> userAuthDataRes = _auth.GetData(token);
-            
             if (userAuthDataRes.IsFailure)
             {
                 throw new AuthenticationException("Authorization connect returned not valid token");
             }
 
-            if (!_userRepository.Add(CreateGuestUser(userAuthDataRes.Value.Username)))
+            IUser newUser = CreateGuestUser(userAuthDataRes.Value.Username);
+            if (!_userRepository.Add(newUser))
             {
                 throw new AuthenticationException("Not new guest has been created");
             }
 
+            newUser.Connect();
             return token;
         }
 
+        // <CNAME>Disconnect</CNAME>
         public void Disconnect(string token)
         {
-            throw new System.NotImplementedException();
+            Result<AuthData> authData = _auth.GetData(token);
+            if (authData.IsFailure)
+            {
+                return;
+            }
+            
+            _auth.Disconnect(token);
+            IUser user = _userRepository.GetOrNull(authData.Value.Username);
+            user.Disconnect();
         }
 
-        public Result Register(string username, string password)
+        // <CNAME>Register</CNAME>
+        public Result Register(MemberInfo memberInfo, string password)
         {
-            throw new System.NotImplementedException();
+            Result validMemberInfoRes = IsValidMemberInfo(memberInfo);
+            if (validMemberInfoRes.IsFailure)
+            {
+                return validMemberInfoRes;
+            }
+
+            Result authRegistrationRes = _auth.Register(memberInfo.Username, password);
+            if (authRegistrationRes.IsFailure)
+            {
+                return authRegistrationRes;
+            }
+            
+            MemberInfo clonedInfo = memberInfo.Clone();
+            IUser newUser = new User(clonedInfo);
+            if (!_userRepository.Add(newUser))
+            {
+                // TODO maybe remove the user form userAuth and log it
+                return Result.Fail("User already exists");
+            }
+
+            return Result.Ok();
         }
 
+        // <CNAME>Login</CNAME>
         public Result<string> Login(string guestToken, string username, string password, ServiceUserRole role)
         {
-            throw new System.NotImplementedException();
+            Result authTryLoginRes = _auth.TryLogin(guestToken, username, password, ServiceUserRoleToAuthUserRole(role));
+            if (authTryLoginRes.IsFailure)
+            {
+                return Result.Fail<string>(authTryLoginRes.Error);
+            }
+            
+            IUser user = _userRepository.GetOrNull(username);
+            if (user == null || user.Login(ServiceUserRoleToSystemState(role)).IsFailure)
+            {
+                // TODO log it since in auth the user can log in
+                Result.Fail("Invalid username or password");
+            }
+
+            return _auth.Login(guestToken, username, password, ServiceUserRoleToAuthUserRole(role));
         }
 
-        public string Logout(string token)
+        // <CNAME>Login</CNAME>
+        public Result<string> Logout(string token)
         {
-            throw new System.NotImplementedException();
+            Result<AuthData> userAuthDataRes = _auth.GetData(token);
+            if (userAuthDataRes.IsFailure)
+            {
+                throw new AuthenticationException("Authorization not valid token");
+            }
+
+            AuthData authData = userAuthDataRes.Value;
+            IUser user = _userRepository.GetOrNull(authData.Username);
+            if (user == null)
+            {
+                // TODO log it since in auth has the user logged in
+                _userRepository.Add(CreateGuestUser(authData.Username));
+                return Result.Ok(_auth.Connect());
+            }
+
+            return _auth.Logout(token);
         }
 
         public Result<IEnumerable<ItemDto>> SearchForProduct(string token, string query)
@@ -161,6 +223,63 @@ namespace eCommerce.Business
         {
             // TODO update it with user implementation
             return new User(guestName);
+        }
+
+        /// <summary>
+        /// Check if the member information is valid
+        /// </summary>
+        /// <returns>Result of the check</returns>
+        private Result IsValidMemberInfo(MemberInfo memberInfo)
+        {
+            Result fullDataRes = memberInfo.IsBasicDataFull();
+            if (fullDataRes.IsFailure)
+            {
+                return fullDataRes;
+            }
+
+            if (!RegexUtils.IsValidEmail(memberInfo.Email))
+            {
+                return Result.Fail("Invalid email address");
+            }
+
+            return Result.Ok();
+        }
+
+        private AuthUserRole ServiceUserRoleToAuthUserRole(ServiceUserRole role)
+        {
+            switch (role)
+            {
+                case ServiceUserRole.Member:
+                {
+                    return AuthUserRole.Member;
+                }
+                case ServiceUserRole.Admin:
+                {
+                    return AuthUserRole.Admin;
+                }
+            }
+
+            // TODO log if it gets here
+            return AuthUserRole.Member;
+        }
+        
+        private UserToSystemState ServiceUserRoleToSystemState(ServiceUserRole role)
+        {
+            // TODO implement
+            switch (role)
+            {
+                case ServiceUserRole.Member:
+                {
+                    throw new NotImplementedException();
+                }
+                case ServiceUserRole.Admin:
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            // TODO log if it gets here
+            throw new NotImplementedException();
         }
     }
 }

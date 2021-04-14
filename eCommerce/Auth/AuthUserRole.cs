@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Auth
 {
-    public enum UserRole
+    public enum AuthUserRole
     {
         Member,
         Admin

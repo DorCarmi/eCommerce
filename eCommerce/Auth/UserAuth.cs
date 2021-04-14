@@ -18,9 +18,8 @@ namespace eCommerce.Auth
         private readonly SHA256 _sha256;
 
         private const string GUEST_ROLE_STRING = "Guest";
-        private Mutex _guestIdMutex;
-        // TODO make this filed in DB
-        private long _guestId;
+        private ConcurrentIdGenerator _concurrentIdGenerator;
+        
         private IRegisteredUserRepo _userRepo;
         private IDictionary<string, string> _connectedGuests;
         private IDictionary<string, string> _connectedUsers;
@@ -28,8 +27,8 @@ namespace eCommerce.Auth
         private UserAuth(IRegisteredUserRepo repo)
         {
             _jwtAuth = new JWTAuth("keykeykeykeykeyekeykey");
-            _guestIdMutex = new Mutex();
-            _guestId = 0;
+            // TODO get the initialze id value from DB
+            _concurrentIdGenerator = new ConcurrentIdGenerator(0);
             _sha256 = SHA256.Create();
             _userRepo = repo;
             _connectedGuests = new ConcurrentDictionary<string, string>();
@@ -46,7 +45,7 @@ namespace eCommerce.Auth
                 throw new Exception("There isnt at least one admin in the system");
             }
 
-            adminUser.AddRole(UserRole.Admin);
+            adminUser.AddRole(AuthUserRole.Admin);
         }
 
         public static UserAuth GetInstance()
@@ -86,13 +85,13 @@ namespace eCommerce.Auth
             }
             
             User newUser = new User(username, HashPassword(password));
-            newUser.AddRole(UserRole.Member);
+            newUser.AddRole(AuthUserRole.Member);
 
             _userRepo.Add(newUser);
             return Result.Ok();
         }
 
-        public Result<string> Login(string guestToken, string username, string password, UserRole role)
+        public Result<string> Login(string guestToken, string username, string password, AuthUserRole role)
         {
 
             Result discountGuestRes = DiscountGuestIfConnected(guestToken);
@@ -102,14 +101,10 @@ namespace eCommerce.Auth
             }
 
             User user = _userRepo.GetUserOrNull(username);
-            if (user == null || !user.HashedPassword.SequenceEqual(HashPassword(password)) || !user.HasRole(role))
+            Result canLogInRes = CanLogIn(user, password, role);
+            if (canLogInRes.IsFailure)
             {
-                return Result.Fail<string>("Invalid username or password or role");
-            }
-
-            if (IsLoggedIn(username))
-            {
-                return Result.Fail<string>("User already connected");
+                return Result.Fail<string>(canLogInRes.Error);
             }
 
             string token = GenerateToken(new AuthData(user.Username, role.ToString()));
@@ -118,14 +113,32 @@ namespace eCommerce.Auth
             return Result.Ok(token);
         }
 
-        public string Logout(string token)
+        public Result TryLogin(string guestToken, string username, string password, AuthUserRole role)
+        {
+            if (!IsGuestConnected(guestToken))
+            {
+                Result.Fail("Guest is not connected");
+            }
+            
+            User user = _userRepo.GetUserOrNull(username);
+            Result canLogInRes = CanLogIn(user, password, role);
+            if (canLogInRes.IsFailure)
+            {
+                return canLogInRes;
+            }
+
+            return Result.Ok();
+        }
+
+        public Result<string> Logout(string token)
         {
             Result<AuthData> authData = GetData(token);
-            if (authData.IsSuccess)
+            if (authData.IsFailure)
             {
-                _connectedUsers.Remove(authData.Value.Username);
+                return Result.Fail<string>("The user need to be logged in");
             }
-            return Connect();
+            _connectedUsers.Remove(authData.Value.Username);
+            return Result.Ok(Connect());
         }
 
         public bool IsRegistered(string username)
@@ -221,24 +234,14 @@ namespace eCommerce.Auth
             return _jwtAuth.GenerateToken(claims.ToArray());
         }
 
-        private void IncrementGuestId()
-        {
-            Interlocked.Increment(ref _guestId);
-        }
-
         private long GetAndIncrementGuestId()
         {
-            long guestId = -1;
-            _guestIdMutex.WaitOne();
-            guestId = _guestId;
-            _guestId++;
-            _guestIdMutex.ReleaseMutex();
-            return guestId;
+            return _concurrentIdGenerator.MoveNext();
         }
         
         private string GenerateGuestUsername()
         {
-            return $"_Guest{GetAndIncrementGuestId():D}";
+            return $"_{GUEST_ROLE_STRING}{GetAndIncrementGuestId():D}";
         }
 
         private Result RegistrationsPolicy(string username, string password)
@@ -272,21 +275,30 @@ namespace eCommerce.Auth
             _connectedGuests.TryGetValue(token, out username);
             return username;
         }
-        
+
         private Result DiscountGuestIfConnected(string guestToken)
         {
-            Result<AuthData> authData = GetData(guestToken);
-            if (authData.IsFailure)
-            {
-                return Result.Fail<string>($"Not valid guest token\nError: {authData.Error}");
-            }
-
             if (!IsGuestConnected(guestToken))
             {
                 return Result.Fail<string>("Not connected as guest");
             }
 
             Disconnect(guestToken);
+            return Result.Ok();
+        }
+
+        private Result CanLogIn(User user, string password, AuthUserRole role)
+        {
+            if (user == null || !user.HashedPassword.SequenceEqual(HashPassword(password)) || !user.HasRole(role))
+            {
+                return Result.Fail("Invalid username or password or role");
+            }
+
+            if (IsLoggedIn(user.Username))
+            {
+                return Result.Fail("User already connected");
+            }
+
             return Result.Ok();
         }
     }

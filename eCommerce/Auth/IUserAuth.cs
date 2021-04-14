@@ -24,21 +24,33 @@ namespace eCommerce.Auth
         public Result Register(string username, string password);
         
         /// <summary>
-        /// Log in to the system
+        /// Log in to the system. Delete the current guest token
         /// </summary>
         /// <param name="guestToken">The guest Authorization token</param>
         /// <param name="username">The user name</param>
         /// <param name="password">The user password</param>
         /// <param name="role">The user role</param>
         /// <returns>Authorization token</returns>
-        public Result<string> Login(string guestToken ,string username, string password, UserRole role);
+        public Result<string> Login(string guestToken ,string username, string password, AuthUserRole role);
+        
+        /// <summary>
+        /// Try to log in to the system
+        /// This method to not delete the current guest token 
+        /// </summary>
+        /// <param name="guestToken">The guest Authorization token</param>
+        /// <param name="username">The user name</param>
+        /// <param name="password">The user password</param>
+        /// <param name="role">The user role</param>
+        /// <returns>Authorization token</returns>
+        public Result TryLogin(string guestToken ,string username, string password, AuthUserRole role);
         
         /// <summary>
         /// Logout a user form the system.
+        /// The user need to be logged in
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>New guest Authorization token</returns>
-        public string Logout(string token);
+        public Result<string>Logout(string token);
 
         /// <summary>
         /// Check if a user is registered to the system

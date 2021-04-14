@@ -23,10 +23,10 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Register a new user to the system as a member.
         /// </summary>
-        /// <param name="username">The user name</param>
+        /// <param name="memberInfoDto">The user information</param>
         /// <param name="password">The user password</param>
         /// <returns>Successful Result if the user has been successfully registered</returns>
-        public Result Register(string username, string password);
+        public Result Register(MemberInfo memberInfoDto, string password);
         
         /// <summary>
         /// Log in to the system
@@ -43,7 +43,7 @@ namespace eCommerce.Business.Service
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>New guest Authorization token</returns>
-        public string Logout(string token);
+        public Result<string> Logout(string token);
         
         // ========== Store ========== //
         

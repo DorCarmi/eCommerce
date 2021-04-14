@@ -35,10 +35,11 @@ namespace eCommerce.Business
         
         // Added
         // TODO check with the implementer
-        string UserId
-        {
-            get;
-        }
+        public string UserId { get; set; }
+        public string Email { get; }
+
+        public void Connect();
+        public void Disconnect();
     }
 
     

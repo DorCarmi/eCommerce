@@ -86,12 +86,27 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
-        public string UserId { get; }
-        
-                
+                        
         // TODO check with the implementor
-        
+        public string UserId { get; set; }
+        public string Email { get; }
+        public void Connect()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Disconnect()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        // For guest
         public User(string username)
+        {
+            
+        }
+        
+        public User(MemberInfo memberInfo)
         {
             
         }

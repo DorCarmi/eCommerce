@@ -129,7 +129,7 @@ namespace Tests.Auth
             foreach (var user in _registeredUsers)
             {
                 string token = _userAuth.Connect();
-                Result<string> loginRes = _userAuth.Login(token, user.Username, user.Password, UserRole.Member);
+                Result<string> loginRes = _userAuth.Login(token, user.Username, user.Password, AuthUserRole.Member);
                 Assert.True(loginRes.IsSuccess,
                             $"Registered user {user.Username} wasn't able to login\nError: {loginRes.Error}");
                 
@@ -140,12 +140,29 @@ namespace Tests.Auth
             }
         }
         
-        [OneTimeTearDown]
-        public void TestsCleanup()
+        [Test, Order(8)]
+        public void LogoutAllTheLogInUsersTest()
         {
             foreach (var loggedinUser in _loggedinUsers)
             {
-                _connectedGuest.Add(_userAuth.Logout(loggedinUser.Key), null);
+                Result<string> logoutRes = _userAuth.Logout(loggedinUser.Key);
+                Assert.True(logoutRes.IsSuccess,
+                    $"The user {loggedinUser.Value.Username} was logged in but the logout say it wasn't");
+                _connectedGuest.Add(logoutRes.Value, null);
+            }
+        }
+        
+        [OneTimeTearDown]
+        public void TestsCleanup()
+        {
+            
+            foreach (var loggedinUser in _loggedinUsers)
+            {
+                Result<string> logoutRes = _userAuth.Logout(loggedinUser.Key);
+                if (logoutRes.IsSuccess)
+                {
+                    _connectedGuest.Add(logoutRes.Value, null);
+                }
             }
             
             foreach (var guestToken in _connectedGuest.Keys)
