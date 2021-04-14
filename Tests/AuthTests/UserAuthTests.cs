@@ -10,16 +10,16 @@ namespace Tests.Auth
 {
     
     [TestFixture]
-    public class UserAuthTest
+    public class UserAuthTests
     {
         private IUserAuth _userAuth;
         private IDictionary<string, AuthData> _connectedGuest;
         private IList<TestsUserData> _registeredUsers;
         private IDictionary<string, TestsUserData> _loggedinUsers;
 
-        public UserAuthTest()
+        public UserAuthTests()
         {
-            _userAuth = UserAuth.CreateInstanceForTests(new TestsRegisteredUserRepo());
+            _userAuth = UserAuth.CreateInstanceForTests(new TRegisteredUserRepo());
             _connectedGuest = new Dictionary<string, AuthData>(); 
             _registeredUsers = new List<TestsUserData>();
             _loggedinUsers = new Dictionary<string, TestsUserData>();
@@ -32,7 +32,7 @@ namespace Tests.Auth
             {
                 string token = _userAuth.Connect();
 
-                Result<AuthData> authDataRes = _userAuth.GetData(token);
+                Result<AuthData> authDataRes = _userAuth.GetDataIfConnectedOrLoggedIn(token);
                 Assert.True(authDataRes.IsSuccess,
                     "Generated token from Connect is not valid");
 
@@ -128,8 +128,7 @@ namespace Tests.Auth
         {
             foreach (var user in _registeredUsers)
             {
-                string token = _userAuth.Connect();
-                Result<string> loginRes = _userAuth.Login(token, user.Username, user.Password, AuthUserRole.Member);
+                Result<string> loginRes = _userAuth.Login(user.Username, user.Password, AuthUserRole.Member);
                 Assert.True(loginRes.IsSuccess,
                             $"Registered user {user.Username} wasn't able to login\nError: {loginRes.Error}");
                 
@@ -145,10 +144,9 @@ namespace Tests.Auth
         {
             foreach (var loggedinUser in _loggedinUsers)
             {
-                Result<string> logoutRes = _userAuth.Logout(loggedinUser.Key);
+                Result logoutRes = _userAuth.Logout(loggedinUser.Key);
                 Assert.True(logoutRes.IsSuccess,
                     $"The user {loggedinUser.Value.Username} was logged in but the logout say it wasn't");
-                _connectedGuest.Add(logoutRes.Value, null);
             }
         }
         
@@ -158,11 +156,7 @@ namespace Tests.Auth
             
             foreach (var loggedinUser in _loggedinUsers)
             {
-                Result<string> logoutRes = _userAuth.Logout(loggedinUser.Key);
-                if (logoutRes.IsSuccess)
-                {
-                    _connectedGuest.Add(logoutRes.Value, null);
-                }
+                Result logoutRes = _userAuth.Logout(loggedinUser.Key);
             }
             
             foreach (var guestToken in _connectedGuest.Keys)

@@ -6,7 +6,7 @@ using eCommerce.Common;
 
 namespace eCommerce.Business
 {
-    public class UserRepository
+    public class UserRepository : IRepository<IUser>
     {
         private IDictionary<string, IUser> _users;
         

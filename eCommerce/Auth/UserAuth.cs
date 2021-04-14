@@ -91,15 +91,8 @@ namespace eCommerce.Auth
             return Result.Ok();
         }
 
-        public Result<string> Login(string guestToken, string username, string password, AuthUserRole role)
+        public Result<string> Login(string username, string password, AuthUserRole role)
         {
-
-            Result discountGuestRes = DiscountGuestIfConnected(guestToken);
-            if (discountGuestRes.IsFailure)
-            {
-                return Result.Fail<string>(discountGuestRes.Error);
-            }
-
             User user = _userRepo.GetUserOrNull(username);
             Result canLogInRes = CanLogIn(user, password, role);
             if (canLogInRes.IsFailure)
@@ -112,35 +105,23 @@ namespace eCommerce.Auth
 
             return Result.Ok(token);
         }
-
-        public Result TryLogin(string guestToken, string username, string password, AuthUserRole role)
+        
+        public Result Logout(string token)
         {
-            if (!IsGuestConnected(guestToken))
-            {
-                Result.Fail("Guest is not connected");
-            }
-            
-            User user = _userRepo.GetUserOrNull(username);
-            Result canLogInRes = CanLogIn(user, password, role);
-            if (canLogInRes.IsFailure)
-            {
-                return canLogInRes;
-            }
-
-            return Result.Ok();
-        }
-
-        public Result<string> Logout(string token)
-        {
-            Result<AuthData> authData = GetData(token);
+            Result<AuthData> authData = GetDataIfConnectedOrLoggedIn(token);
             if (authData.IsFailure)
             {
                 return Result.Fail<string>("The user need to be logged in");
             }
             _connectedUsers.Remove(authData.Value.Username);
-            return Result.Ok(Connect());
+            return Result.Ok();
         }
 
+        public bool IsConnected(string token)
+        {
+            return _connectedGuests.ContainsKey(token);
+        }
+        
         public bool IsRegistered(string username)
         {
             return _userRepo.GetUserOrNull(username) != null;
@@ -153,11 +134,17 @@ namespace eCommerce.Auth
 
         public bool IsValidToken(string token)
         {
-            return GetData(token).IsSuccess;
+            return GetDataIfConnectedOrLoggedIn(token).IsSuccess;
         }
         
-        public Result<AuthData> GetData(string token)
+        public Result<AuthData> GetDataIfConnectedOrLoggedIn(string token)
         {
+
+            if (!IsConnected(token) & !IsLoggedIn(token))
+            {
+                return Result.Fail<AuthData>("The user isn't connected");
+            }
+            
             var claims = _jwtAuth.GetClaimsFromToken(token);
             if (claims == null)
             {
@@ -264,27 +251,11 @@ namespace eCommerce.Auth
             return errMessage == null ? Result.Ok() : Result.Fail(errMessage);
         }
 
-        private bool IsGuestConnected(string token)
-        {
-            return _connectedGuests.ContainsKey(token);
-        }
-        
         private string GetConnectedGuestUsername(string token)
         {
             string username = null;
             _connectedGuests.TryGetValue(token, out username);
             return username;
-        }
-
-        private Result DiscountGuestIfConnected(string guestToken)
-        {
-            if (!IsGuestConnected(guestToken))
-            {
-                return Result.Fail<string>("Not connected as guest");
-            }
-
-            Disconnect(guestToken);
-            return Result.Ok();
         }
 
         private Result CanLogIn(User user, string password, AuthUserRole role)

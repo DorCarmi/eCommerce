@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Security.Authentication;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
-using Microsoft.AspNetCore.DataProtection.XmlEncryption;
 
 namespace eCommerce.Business
 {
@@ -13,27 +11,35 @@ namespace eCommerce.Business
     // TODO check authException if we should throw them
     public class MarketFacade : IMarketFacade
     {
-        private static MarketFacade _instance = new MarketFacade();
+        private static MarketFacade _instance = 
+                new MarketFacade(
+                    UserAuth.GetInstance(),
+                    new UserRepository());
 
-        private UserAuth _auth;
-        private UserRepository _userRepository;
+        private IUserAuth _auth;
+        private IRepository<IUser> _userRepository;
         
-        private MarketFacade()
+        private MarketFacade(IUserAuth userAuth, IRepository<IUser> userRepo)
         {
-            _auth = UserAuth.GetInstance();
-            _userRepository = new UserRepository();
+            _auth = userAuth;
+            _userRepository = userRepo;
         }
 
         public static MarketFacade GetInstance()
         {
             return _instance;
         }
+
+        public static MarketFacade CreateInstanceForTests(IUserAuth userAuth, IRepository<IUser> userRepo)
+        {
+            return new MarketFacade(userAuth, userRepo);
+        }
         
         // <CNAME>Connect</CNAME>
         public string Connect()
         {
             string token = _auth.Connect();
-            Result<AuthData> userAuthDataRes = _auth.GetData(token);
+            Result<AuthData> userAuthDataRes = _auth.GetDataIfConnectedOrLoggedIn(token);
             if (userAuthDataRes.IsFailure)
             {
                 throw new AuthenticationException("Authorization connect returned not valid token");
@@ -52,7 +58,7 @@ namespace eCommerce.Business
         // <CNAME>Disconnect</CNAME>
         public void Disconnect(string token)
         {
-            Result<AuthData> authData = _auth.GetData(token);
+            Result<AuthData> authData = _auth.GetDataIfConnectedOrLoggedIn(token);
             if (authData.IsFailure)
             {
                 return;
@@ -92,29 +98,38 @@ namespace eCommerce.Business
         // <CNAME>Login</CNAME>
         public Result<string> Login(string guestToken, string username, string password, ServiceUserRole role)
         {
-            Result authTryLoginRes = _auth.TryLogin(guestToken, username, password, ServiceUserRoleToAuthUserRole(role));
-            if (authTryLoginRes.IsFailure)
+
+            if (!_auth.IsConnected(guestToken))
             {
-                return Result.Fail<string>(authTryLoginRes.Error);
+                return Result.Fail<string>("Guest is not connected");
+            }
+            
+            Result<string> authLoginRes = _auth.Login(username, password, ServiceUserRoleToAuthUserRole(role));
+            if (authLoginRes.IsFailure)
+            {
+                return Result.Fail<string>(authLoginRes.Error);
             }
             
             IUser user = _userRepository.GetOrNull(username);
             if (user == null || user.Login(ServiceUserRoleToSystemState(role)).IsFailure)
             {
                 // TODO log it since in auth the user can log in
-                Result.Fail("Invalid username or password");
+                _auth.Logout(authLoginRes.Value);
+                return Result.Fail<string>("Invalid username or password");
             }
-
-            return _auth.Login(guestToken, username, password, ServiceUserRoleToAuthUserRole(role));
+            
+            _auth.Disconnect(guestToken);
+            return Result.Ok(authLoginRes.Value);
         }
 
         // <CNAME>Login</CNAME>
         public Result<string> Logout(string token)
         {
-            Result<AuthData> userAuthDataRes = _auth.GetData(token);
+            Result<AuthData> userAuthDataRes = _auth.GetDataIfConnectedOrLoggedIn(token);
             if (userAuthDataRes.IsFailure)
             {
-                throw new AuthenticationException("Authorization not valid token");
+                // TODO log it
+                return Result.Fail<string>(userAuthDataRes.Error);
             }
 
             AuthData authData = userAuthDataRes.Value;
@@ -122,11 +137,11 @@ namespace eCommerce.Business
             if (user == null)
             {
                 // TODO log it since in auth has the user logged in
-                _userRepository.Add(CreateGuestUser(authData.Username));
-                return Result.Ok(_auth.Connect());
+                return Result.Ok(Connect());
             }
 
-            return _auth.Logout(token);
+            _auth.Logout(token);
+            return Result.Ok(Connect());
         }
 
         public Result<IEnumerable<ItemDto>> SearchForProduct(string token, string query)

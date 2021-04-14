@@ -3,12 +3,12 @@ using eCommerce.Auth;
 
 namespace Tests.Auth
 {
-    public class TestsRegisteredUserRepo : IRegisteredUserRepo
+    public class TRegisteredUserRepo : IRegisteredUserRepo
     {
         
         private ConcurrentDictionary<string, User> _dictionary;
 
-        public TestsRegisteredUserRepo()
+        public TRegisteredUserRepo()
         {
             _dictionary = new ConcurrentDictionary<string, User>();
         }
