@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Threading.Tasks;
 using eCommerce.Common;
 
 namespace eCommerce.Auth
@@ -10,7 +12,7 @@ namespace eCommerce.Auth
     {
         private string _username;
         private byte[] _hashedPassword;
-        private IEnumerable<AuthUserRole> _roles;
+        private IList<AuthUserRole> _roles;
 
         public User(string username, byte[] hashedPassword)
         {
@@ -39,6 +41,7 @@ namespace eCommerce.Auth
                 return Result.Fail("User already have this role");
             }
 
+            _roles.Add(role);
             return Result.Ok();
         }
 

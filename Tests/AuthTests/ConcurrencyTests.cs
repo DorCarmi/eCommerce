@@ -65,6 +65,81 @@ namespace Tests.AuthTests
                 registeredSuccessfully,
                 $"Only one task should has been able to register but {registeredSuccessfully} succeeded");
         }
+        
+        [Test, Repeat(2)]
+        public async Task ConcurrentLoginSameUserTest()
+        {
+            const int numberOfTasks = 5;
+
+            Result registerRes = _auth.Register("user1", "password1");
+            if (registerRes.IsFailure)
+            {
+                Assert.Fail("The registration of the user didnt work");
+            }
+            
+            Result[] loginRes = await CreateAndRunTasks(
+                () => _auth.Login("user1", "password1", AuthUserRole.Member), 
+                numberOfTasks);
+
+            int registeredSuccessfully = 0;
+            foreach (var res in loginRes)
+            {
+                if (res.IsSuccess)
+                {
+                    registeredSuccessfully++;
+                }
+            }
+            
+            Assert.AreEqual(1,
+                registeredSuccessfully,
+                $"Only one task should has been able to login but {registeredSuccessfully} succeeded");
+        }
+        
+        [Test]
+        public async Task ConcurrentLoginFewUsersTest()
+        {
+            const int numberOfTasks = 5;
+            string username = "user";
+            string password = "password";
+
+            for (int i = 0; i < numberOfTasks; i++)
+            {
+                Result registerRes = _auth.Register($"{username}{i}", $"{password}{i}");
+                if (registerRes.IsFailure)
+                {
+                    Assert.Fail("The registration of the user didnt work");
+                }
+            }
+
+            Task<Result<string>>[] loginTasks = new Task<Result<string>>[numberOfTasks];
+            for (int i = 0; i < numberOfTasks; i++)
+            {
+                string uname = $"{username}{i}";
+                string upassword = $"{password}{i}";
+                loginTasks[i] = new Task<Result<string>>(
+                    () => _auth.Login(uname, upassword, AuthUserRole.Member));
+            }
+
+            RunTasks(loginTasks);
+            Result<string>[] loginRes = await Task.WhenAll(loginTasks);
+
+            int numberOfUsersLoggedIn = 0;
+            foreach (var loginTokenRes in loginRes)
+            {
+                if (loginTokenRes.IsSuccess)
+                {
+                    numberOfUsersLoggedIn++;
+                }
+                else
+                {
+                    Console.WriteLine(loginTokenRes.Error);
+                }
+            }
+            
+            Assert.AreEqual(numberOfTasks,
+                numberOfUsersLoggedIn,
+                $"All the users should have been able to login but {numberOfUsersLoggedIn} succeeded");
+        }
 
         private Task<T[]> CreateAndRunTasks<T>(Func<T> func, int numberOfTasks)
         {

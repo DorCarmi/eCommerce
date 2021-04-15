@@ -15,21 +15,26 @@ namespace eCommerce.Auth
         private static readonly UserAuth Instance = new UserAuth(new ConcurrentRegisteredUserRepo());
 
         private readonly JWTAuth _jwtAuth;
+
+        private Mutex _hashMutex;
         private readonly SHA256 _sha256;
 
         private const string GUEST_ROLE_STRING = "Guest";
         private ConcurrentIdGenerator _concurrentIdGenerator;
         
         private IRegisteredUserRepo _userRepo;
-        private IDictionary<string, string> _connectedGuests;
-        private IDictionary<string, string> _connectedUsers;
+        private ConcurrentDictionary<string, string> _connectedGuests;
+        private ConcurrentDictionary<string, string> _connectedUsers;
         
         private UserAuth(IRegisteredUserRepo repo)
         {
             _jwtAuth = new JWTAuth("keykeykeykeykeyekeykey");
             // TODO get the initialze id value from DB
             _concurrentIdGenerator = new ConcurrentIdGenerator(0);
+
+            _hashMutex = new Mutex();
             _sha256 = SHA256.Create();
+            
             _userRepo = repo;
             _connectedGuests = new ConcurrentDictionary<string, string>();
             _connectedUsers = new ConcurrentDictionary<string, string>();
@@ -62,13 +67,13 @@ namespace eCommerce.Auth
         {
             string guestUsername = GenerateGuestUsername();
             string token = GenerateToken(new AuthData(guestUsername, GUEST_ROLE_STRING));
-            _connectedGuests.Add(token, guestUsername);
+            _connectedGuests.TryAdd(token, guestUsername);
             return token;
         }
 
         public void Disconnect(string token)
         {
-            _connectedGuests.Remove(token);
+            _connectedGuests.Remove(token, out var value);
         }
 
         public Result Register(string username, string password)
@@ -109,6 +114,7 @@ namespace eCommerce.Auth
                 return Result.Fail<string>("User already logged in");
             }
 
+
             return Result.Ok(token);
         }
         
@@ -120,7 +126,7 @@ namespace eCommerce.Auth
                 return Result.Fail<string>("The user need to be logged in");
             }
 
-            if (!_connectedUsers.Remove(authData.Value.Username))
+            if (!_connectedUsers.Remove(authData.Value.Username, out var value))
             {
                 return Result.Fail<string>("The user need to be logged in");
             }
@@ -228,7 +234,11 @@ namespace eCommerce.Auth
         /// <returns>The password hash</returns>
         private byte[] HashPassword(string password)
         {
-            return _sha256.ComputeHash(Encoding.Default.GetBytes(password));
+            byte[] hashedPassword = null;
+            _hashMutex.WaitOne();
+            hashedPassword = _sha256.ComputeHash(Encoding.Default.GetBytes(password));
+            _hashMutex.ReleaseMutex();
+            return hashedPassword;
         }
         
         private string GenerateToken(AuthData authData)
@@ -238,13 +248,7 @@ namespace eCommerce.Auth
                 new Claim(AuthClaimTypes.Username, authData.Username),
                 new Claim(AuthClaimTypes.Role, authData.Role)
             };
-
-            /*if (authData.Role.Equals(GUEST_ROLE_STRING))
-            {
-                claims.Add(new Claim(AuthClaimTypes.GuestId, _guestId.ToString()));
-                IncrementGuestId();
-            }*/
-
+            
             return _jwtAuth.GenerateToken(claims.ToArray());
         }
 
@@ -284,7 +288,7 @@ namespace eCommerce.Auth
             {
                 return Result.Fail("Invalid username or password or role");
             }
-
+            
             if (IsLoggedIn(user.Username))
             {
                 return Result.Fail("User already connected");
