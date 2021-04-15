@@ -1,7 +1,9 @@
 ﻿namespace eCommerce.Business
 {
-    public enum PurchaseStrategies
+    public enum PurchaseStrategyName
     {
         Regular
     }
+    
+    
 }

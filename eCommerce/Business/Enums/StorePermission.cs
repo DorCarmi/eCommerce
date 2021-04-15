@@ -4,6 +4,7 @@
     {
         ChangeItemStrategy,
         AddItemToStore,
-        ChangeItemPrice
+        ChangeItemPrice,
+        EditItemDetails
     }
 }

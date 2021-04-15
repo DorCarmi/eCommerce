@@ -2,8 +2,16 @@
 
 namespace eCommerce.Business
 {
-    public class DefaultPurchasePolicy: PurchaseStrategy
+    public class DefaultPurchasePolicy : PurchasePolicy
     {
+        /// <summary>
+        /// <Use case> </Use Case>
+        /// <Test></Test>
+        /// 
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public Answer<Item> getItemsToBasket(int amount)
         {
             throw new System.NotImplementedException();

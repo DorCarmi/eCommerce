@@ -1,132 +1,145 @@
 ﻿using System;
 using System.Collections.Generic;
 using eCommerce.Business.Basics;
-using Microsoft.AspNetCore.Mvc.Formatters;
+using eCommerce.Business.Service;
+using eCommerce.Common;
 
 namespace eCommerce.Business
 {
     public class Item
     {
-
         private String _name;
         private int _amount;
-        private Store _belongsToStore;
+        private IStore _belongsToStore;
         private Category _category;
         private List<String> _keyWords;
         private PurchaseStrategy _purchaseStrategy;
         private int _pricePerUnit;
-        private bool _isAquired;
-        public int TotalPrice => _amount * _pricePerUnit;
 
-        public Item(String name, Category category, Store store, int pricePerUnit)
+        public int GetTotalPrice()
         {
-            _isAquired = false;
+            
+            return _pricePerUnit * _amount;
+        }
+        
+        public Item(String name, Category category, IStore store, int pricePer)
+        {
             this._name = name;
             this._category = category;
             this._belongsToStore = store;
             _amount = 1;
-            _pricePerUnit = pricePerUnit;
             this._keyWords=new List<string>();
-            _purchaseStrategy = new DefaultPurchasePolicy();
+            this._pricePerUnit = pricePer;
         }
 
-        public Item(ItemInfo itemInfo, Store store)
+        public Item(ItemInfo info)
         {
-            this._amount = itemInfo.amount;
-            this._category = new Category(itemInfo.category);
-            this._name = itemInfo.name;
-            _keyWords = new List<string>();
-            foreach (var word in itemInfo.keyWords)
+            this._name = info.name;
+            this._amount = info.amount;
+            this._category = new Category(info.category);
+            this._keyWords = new List<string>();
+            foreach (var ketWord in info.keyWords)
             {
-                if (word == null)
+                _keyWords.Add(ketWord);
+            }
+
+            this._pricePerUnit = info.pricePerUnit;
+        }
+
+        public Result SetPrice(User user,int pricePerUnit)
+        {
+            if (user.hasPermission(_belongsToStore, StorePermission.ChangeItemPrice))
+            {
+                if (pricePerUnit > 0)
                 {
-                    throw new ArgumentException("Null key word argument");
+                    this._pricePerUnit = pricePerUnit;
+                    return Result.Ok();
                 }
                 else
                 {
-                    this._keyWords.Add(word);
-                }
-            }
-
-            this._belongsToStore = store;
-        }
-
-        public Answer<bool> aquireItem()
-        {
-            if (_isAquired)
-            {
-                return new Answer<bool>("Item already aquired");
-            }
-            else
-            {
-                this._isAquired = true;
-                return new Answer<bool>(true);
-            }
-        }
-
-        public bool IsAquired => _isAquired;
-
-        public int getPricePerUnit()
-        {
-            return _pricePerUnit;
-        }
-
-        public Answer<bool> setPricePerUnit(User user, int newPrice)
-        {
-            if (user.hasPermission(this._belongsToStore, StorePermission.ChangeItemPrice))
-            {
-                if (_belongsToStore.checkWithStorePolicy(_pricePerUnit, _amount))
-                {
-                    return new Answer<bool>(true);
-                }
-                else
-                {
-                    return new Answer<bool>("New price doesn't stand with store's policy");
+                    return Result.Fail("Bad new price input");
                 }
             }
             else
             {
-                return new Answer<bool>("User doesn't have the permissions");
+                return Result.Ok("User doesn't have the permission for this store");
             }
         }
 
-        public String getName()
+        public IStore GetStore()
+        {
+            return this._belongsToStore;
+        }
+
+        public String GetName()
         {
             return this._name;
         }
 
-        public int getAmount()
+        public int GetAmount()
         {
             return _amount;
         }
 
-        public Answer<int> getItems(int amount)
+        public Category GetCategory()
         {
-            if (_amount - amount < 0)
+            return _category;
+        }
+
+        public Result EditCategory(User user,Category category)
+        {
+            if (user.hasPermission(this._belongsToStore, StorePermission.EditItemDetails))
             {
-                return new Answer<int>("Bad amount- not enough items");
+                this._category = category;
+                return Result.Ok();
             }
             else
             {
-                this._amount -= amount;
-                return new Answer<int>(amount);
+                return Result.Fail("User doesn't have permission to edit item");
             }
         }
-
-        public Answer<bool> addItems(int amount)
+        
+        public Result AddKeyWord(User user,String keyWord)
         {
-            if (amount < 0)
+            if (user.hasPermission(this._belongsToStore, StorePermission.EditItemDetails))
             {
-                return new Answer<bool>("Bad amount- less than zero");
+                if (keyWord != null && keyWord.Length > 0)
+                {
+                    this._keyWords.Add(keyWord);
+                    return Result.Ok();
+                }
+                else
+                {
+                    return Result.Fail("Bad input of key word");
+                }
             }
             else
             {
-                return new Answer<bool>(true);
+                return Result.Fail("User doesn't have permission to edit item");
+            }
+        }
+
+        public Result<bool> CheckPricesInBetween(int startPrice, int endPrice)
+        {
+            if (startPrice > 0 && startPrice <= endPrice)
+            {
+                if (this._pricePerUnit >= startPrice && this._pricePerUnit <= endPrice)
+                {
+                    return Result<bool>.Ok(true);
+                }
+                else
+                {
+                    return Result<bool>.Ok(false);
+                }
+            }
+            else
+            {
+                return Result.Fail<bool>("Bad input- start or end price");
             }
         }
 
 
-        public bool checkResemblance(string searchString)
+        public bool CheckForResemblance(string searchString)
         {
             if (this._name.Contains(searchString))
             {
@@ -146,44 +159,103 @@ namespace eCommerce.Business
             }
         }
 
-
-        public ItemInfo getItemInfo()
+        public ItemInfo ShowItem()
         {
-            //int amount, string name, string storeName, string category, List<string> keyWords)
-
-            return new ItemInfo(
-                this._amount,
-                this._name,
-                this._belongsToStore.getStoreName(),
-                _category.getName(),
-                _keyWords
-            );
+            return GetItemInfo(this._amount);
         }
 
-        public Answer<bool> assignPurchaseStrategy(User user,PurchaseStrategies strategyName)
+        public Result<bool> CheckItemAvailability(int amount)
+        {
+            if (amount <= 0)
+            {
+                return Result.Fail<bool>("Bad amount input");
+            }
+            else if (this._amount - amount < 0)
+            {
+                return Result.Ok<bool>(false);
+            }
+            else
+            {
+                this._amount -= amount;
+                return Result.Ok<bool>(true);
+            }
+        }
+
+        private ItemInfo GetItemInfo(int amount)
+        {
+            return new ItemInfo(amount, this._name, this._belongsToStore.GetStoreName(), this._category.getName(),
+                this._keyWords,this);
+        }
+
+        public Result<ItemInfo> GetItems(int amount)
+        {
+            //Use to get items to put in basket
+            if (this._amount - amount < 0)
+            {
+                return Result.Fail<ItemInfo>("There are no enough items to answer the requested amount");
+            }
+            else
+            {
+                return Result.Ok<ItemInfo>(GetItemInfo(amount));
+            }
+        }
+
+        public Result FinalizeGetItems(int amount)
+        {
+            if (this._amount - amount < 0)
+            {
+                return Result.Fail("There are no enough items to answer the requested amount");
+            }
+            else
+            {
+                this._amount -= amount;
+                return Result.Ok();
+            }
+        }
+
+        public Result AddItems(User user,int amount)
+        {
+            if (amount > 0)
+            {
+                this._amount += amount;
+                return Result.Ok();
+            }
+            else
+            {
+                return Result.Fail("Bad input");
+            }
+        }
+        
+
+        public Result AssignPurchaseStrategy(User user,PurchaseStrategyName purchaseStrategy)
         {
             if (user.hasPermission(_belongsToStore, StorePermission.ChangeItemStrategy))
             {
-                if (_belongsToStore.checkWithStorePolicy(strategyName))
+                if (_belongsToStore.CheckWithPolicy(purchaseStrategy))
                 {
-                    this._purchaseStrategy = _belongsToStore.getPurchaseStrategy(strategyName);
-                    return new Answer<bool>(true);
+                    var resStrategy=DefaultPurchaseStrategy.GetPurchaseStrategyByName(purchaseStrategy);
+                    if (resStrategy.IsFailure)
+                    {
+                        return Result.Fail(resStrategy.GetErrorReason());
+                    }
+                    else
+                    {
+                        
+                        this._purchaseStrategy = resStrategy.GetValue();
+                        return Result.Ok();
+                    }
+                    
                 }
                 else
                 {
-                    return new Answer<bool>("Purchase strategy not agreed by store policy");
+                    return Result.Fail("Strategy not permitted by store's policy");
                 }
             }
             else
             {
-                return new Answer<bool>("Not permission to do that");
+                return Result.Fail(
+                    "User doesn't have the permission to change the strategy for this item in this store");
             }
         }
-
-        public PurchaseStrategy getCurrentPurchaseStrategy()
-        {
-            return this._purchaseStrategy;
-        }
-        
     }
 }

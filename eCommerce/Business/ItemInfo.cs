@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using eCommerce.Business.Service;
 
 namespace eCommerce.Business
 {
@@ -10,8 +11,11 @@ namespace eCommerce.Business
         public string storeName;
         public string category;
         public List<string> keyWords;
+        public int pricePerUnit;
+        private Item theItem;
+        private double discountFactor;
 
-        public ItemInfo(int amount, string name, string storeName, string category, List<string> keyWords)
+        public ItemInfo(int amount, string name, string storeName, string category, List<string> keyWords,Item theItem)
         {
             this.amount = amount;
             this.name = name;
@@ -30,7 +34,21 @@ namespace eCommerce.Business
                 }
                 
             }
+
+            this.theItem = theItem;
         }
+
+        public IStore GetStore()
+        {
+            return theItem.GetStore();
+        }
+
+        public void ApplyUniqueDiscountOnProduct(double discountFactor)
+        {
+            this.discountFactor = discountFactor; 
+        }
+        
+        
         
     }
 }
