@@ -35,8 +35,10 @@ namespace Tests.Business
         [SetUp]
         public void SetUp()
         {
+            // TODO fill it with mocks
             _marketFacade = MarketFacade.CreateInstanceForTests(
                 new UserAuthMock(),
+                new MemberDataRepositoryMock(),
                 null);
 
             _loggedInTokens = new List<string>();
@@ -69,15 +71,15 @@ namespace Tests.Business
             }
         }
         
-        [Test]
+        [Test, Order(2)]
         public void LoginAndLogoutTests()
         {
             RegisterMembers();
-            string[] loginTokens = new string[_membersInfo.Length];
 
             foreach (var member in _membersInfo)
             {
-                Result<string> loginRes = _marketFacade.Login(_marketFacade.Connect(), member.Username, PASSWORD, ServiceUserRole.Member);
+                Result<string> loginRes = _marketFacade.Login(_marketFacade.Connect(), member.Username, 
+                    PASSWORD, ServiceUserRole.Member);
                 Assert.True(loginRes.IsSuccess,
                     $"User {member.Username} should has been logged in");
                 _loggedInTokens.Add(loginRes.Value);
