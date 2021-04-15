@@ -3,6 +3,9 @@ using eCommerce.Auth;
 
 namespace Tests.AuthTests
 {
+    /// <summary>
+    /// Concurrent repository
+    /// </summary>
     public class TRegisteredUserRepo : IRegisteredUserRepo
     {
         

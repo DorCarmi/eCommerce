@@ -102,10 +102,11 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Error in logout");
             }
 
+            _auth.Logout(token);
+
             string newGuestToken = _auth.Connect();
             string newGuestUsername = _auth.GetDataIfConnected(newGuestToken).Value.Username;
             
-            _auth.Logout(token);
             user.Logout(newGuestUsername);
             ExchangeKeyToConnected(authData.Username, newGuestUsername);
             return Result.Ok(newGuestToken);

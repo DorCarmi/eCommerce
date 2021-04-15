@@ -87,7 +87,10 @@ namespace eCommerce.Auth
             User newUser = new User(username, HashPassword(password));
             newUser.AddRole(AuthUserRole.Member);
 
-            _userRepo.Add(newUser);
+            if (!_userRepo.Add(newUser))
+            {
+                return Result.Fail("Username already taken");
+            }
             return Result.Ok();
         }
 
@@ -101,7 +104,10 @@ namespace eCommerce.Auth
             }
 
             string token = GenerateToken(new AuthData(user.Username, role.ToString()));
-            _connectedUsers.Add(username, token);
+            if (!_connectedUsers.TryAdd(username, token))
+            {
+                return Result.Fail<string>("User already logged in");
+            }
 
             return Result.Ok(token);
         }
@@ -113,7 +119,12 @@ namespace eCommerce.Auth
             {
                 return Result.Fail<string>("The user need to be logged in");
             }
-            _connectedUsers.Remove(authData.Value.Username);
+
+            if (!_connectedUsers.Remove(authData.Value.Username))
+            {
+                return Result.Fail<string>("The user need to be logged in");
+            }
+            
             return Result.Ok();
         }
         
@@ -265,13 +276,6 @@ namespace eCommerce.Auth
             }
 
             return errMessage == null ? Result.Ok() : Result.Fail(errMessage);
-        }
-
-        private string GetConnectedGuestUsername(string token)
-        {
-            string username = null;
-            _connectedGuests.TryGetValue(token, out username);
-            return username;
         }
 
         private Result CanLogIn(User user, string password, AuthUserRole role)
