@@ -86,36 +86,26 @@ namespace eCommerce.Business
 
         public Result AddNewItemToStore(string token, IProduct product)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, product.StoreName);
+            if (userAndStoreRes.IsFailure)
             {
-                return userRes;
+                return userAndStoreRes;
             }
-            IUser user = userRes.Value;
-            
-            IStore store = _storeRepository.GetOrNull(product.StoreName);
-            if (store == null)
-            {
-                return Result.Fail("Store doesn't exist");
-            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
 
             return store.AddItemToStore(DtoUtils.ProductDtoToProductInfo(product), user);
         }
 
         public Result EditItemAmountInStore(string token, IProduct product)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, product.StoreName);
+            if (userAndStoreRes.IsFailure)
             {
-                return userRes;
+                return userAndStoreRes;
             }
-            IUser user = userRes.Value;
-            
-            IStore store = _storeRepository.GetOrNull(product.StoreName);
-            if (store == null)
-            {
-                return Result.Fail("Store doesn't exist");
-            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
             
             return store.EditProduct(DtoUtils.ProductDtoToProductInfo(product), user);
 
@@ -123,36 +113,26 @@ namespace eCommerce.Business
 
         public Result RemoveProductFromStore(string token, string storeId, string productId)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
             {
-                return userRes;
+                return userAndStoreRes;
             }
-            IUser user = userRes.Value;
-            
-            IStore store = _storeRepository.GetOrNull(storeId);
-            if (store == null)
-            {
-                return Result.Fail("Store doesn't exist");
-            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
             
             return store.RemoveProduct(productId, user);
         }
 
         public Result AppointCoOwner(string token, string storeId, string appointedUserId)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
             {
-                return userRes;
+                return userAndStoreRes;
             }
-            IUser user = userRes.Value;
-            
-            IStore store = _storeRepository.GetOrNull(storeId);
-            if (store == null)
-            {
-                return Result.Fail("Store doesn't exist");
-            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
             
             Result<IUser> appointedUserRes = _userManager.GetUser(appointedUserId);
             if (appointedUserRes.IsFailure)
@@ -166,18 +146,13 @@ namespace eCommerce.Business
 
         public Result AppointManager(string token, string storeId, string appointedManagerUserId)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
             {
-                return userRes;
+                return userAndStoreRes;
             }
-            IUser user = userRes.Value;
-            
-            IStore store = _storeRepository.GetOrNull(storeId);
-            if (store == null)
-            {
-                return Result.Fail("Store doesn't exist");
-            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
             
             Result<IUser> appointedUserRes = _userManager.GetUser(appointedManagerUserId);
             if (appointedUserRes.IsFailure)
@@ -189,9 +164,24 @@ namespace eCommerce.Business
             return user.AppointUserToOwner(store, appointedUser);
         }
 
-        public Result UpdateManagerPermission(string token, string storeId, string appointedManagerUserId, IList<Service.StorePermission> permissions)
+        public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)
         {
-            throw new System.NotImplementedException();
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+            
+            Result<IUser> mangerUserRes = _userManager.GetUser(managersUserId);
+            if (mangerUserRes.IsFailure)
+            {
+                return mangerUserRes;
+            }
+            IUser managerUser = mangerUserRes.Value;
+
+            return user.UpdatePermissionsToManager(store, managerUser, permissions);
         }
 
         public Result<IEnumerable<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId)
@@ -199,14 +189,43 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
-        public Result<IEnumerable<PurchaseHistory>> GetPurchaseHistoryOfStore(string token, string storeId)
+        public Result<PurchaseHistory> GetPurchaseHistoryOfStore(string token, string storeId)
         {
-            throw new System.NotImplementedException();
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<PurchaseHistory>(userAndStoreRes.Error);
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+            Result<IList<IBasket>> purchaseHistoryRes = store.GetPurchaseHistory();
+            if (purchaseHistoryRes.IsFailure)
+            {
+                return Result.Fail<PurchaseHistory>(purchaseHistoryRes.Error);
+            }
+            
+            return Result.Ok(new PurchaseHistory(purchaseHistoryRes.Value));
         }
 
         public Result AddItemToCart(string token, string itemId, string storeId, int amount)
         {
-            throw new System.NotImplementedException();
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+
+            Result<Item> itemRes = store.GetItem(itemId);
+            if (itemRes.IsFailure)
+            {
+                return itemRes;
+            }
+
+            return user.AddItemToCart(itemRes.Value, amount);
         }
 
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount)
@@ -216,7 +235,16 @@ namespace eCommerce.Business
 
         public Result<CartDto> GetCart(string token)
         {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<CartDto>(userRes.Error);
+            }
+            IUser user = userRes.Value;
+            
+            // TODO return cart info
             throw new System.NotImplementedException();
+
         }
 
         public Result<int> GetPurchaseCartPrice(string token)
@@ -229,9 +257,9 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
-        public Result OpenStore(string token, string storeName)
+        public Result OpenStore(string token, string storeName, IProduct product)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Result<IEnumerable<PurchaseHistory>> GetPurchaseHistory(string token)
@@ -247,6 +275,24 @@ namespace eCommerce.Business
         public Result<IEnumerable<PurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId)
         {
             throw new System.NotImplementedException();
+        }
+
+        private Result<Tuple<IUser, IStore>> GetUserAndStore(string token, string storeId)
+        {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<Tuple<IUser, IStore>>(userRes.Error);
+            }
+            IUser user = userRes.Value;
+            
+            IStore store = _storeRepository.GetOrNull(storeId);
+            if (store == null)
+            {
+                return Result.Fail<Tuple<IUser, IStore>>("Store doesn't exist");
+            }
+
+            return Result.Ok(new Tuple<IUser, IStore>(user, store));
         }
     }
 }

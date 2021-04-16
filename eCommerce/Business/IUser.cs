@@ -14,15 +14,14 @@ namespace eCommerce.Business
         public Result Logout();
 
         public Result<string> OpenStore(string storeName);
-        public Result AddItemToCart(Item item);
+        public Result AddItemToCart(Item item, int amount);
         public Result<CartInfo> GetCartInfo();
         public Result EditCart(ItemInfo info);
 
         public Result AppointUserToOwner(IStore store, IUser user);
         public Result AppointUserToManager(IStore store, IUser user);
 
-        public Result AddPermissionsToManager(IStore store, IUser user, StorePermission permission);
-        public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission);
+        public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permission);
 
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store);
         public Result<IBasket> GetUserPurchaseHistory(IStore store);
@@ -44,6 +43,5 @@ namespace eCommerce.Business
         /// <returns>If the user was registered or not</returns>
         public bool Disconnect();
     }
-
     
 }

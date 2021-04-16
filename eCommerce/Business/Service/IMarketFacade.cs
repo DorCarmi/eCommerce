@@ -109,10 +109,10 @@ namespace eCommerce.Business.Service
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
-        /// <param name="appointedManagerUserId">The User manager id</param>
+        /// <param name="managersUserId">The user id of the manger</param>
         /// <param name="permissions">The updated permission</param>
         /// <returns>Result of the update</returns>
-        public Result UpdateManagerPermission(string token, string storeId, string appointedManagerUserId, IList<StorePermission> permissions);
+        public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions);
 
         /// <summary>
         /// Get all the staff of the store and their permissions
@@ -128,7 +128,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
         /// <returns>List of the purchase history in a store</returns>
-        public Result<IEnumerable<PurchaseHistory>> GetPurchaseHistoryOfStore(string token, string storeId);
+        public Result<PurchaseHistory> GetPurchaseHistoryOfStore(string token, string storeId);
 
         // ========== User ========== //
         
@@ -174,15 +174,16 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <returns>The result the purchase</returns>
         public Result PurchaseCart(string token);
-        
+
         /// <summary>
         /// Open a new store for the user.
         /// The name need to be unique
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeName">The store name</param>
+        /// <param name="product">The start product of a sotre</param>
         /// <returns>Result of the request</returns>
-        public Result OpenStore(string token, string storeName);
+        public Result OpenStore(string token, string storeName, IProduct product);
 
         /// <summary>
         /// Get the purchase history of the user 

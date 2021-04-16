@@ -13,7 +13,7 @@ namespace eCommerce.Business.Service
         public IList<StoreInfo> GetAllStores();
         
         
-        public Result<Item> GetItem();
+        public Result<Item> GetItem(string itemId);
         public IList<Item> SearchForItems1(string stringSearch);
         public IList<Item> SearchForItems2(string categoryName);
         public IList<Item> SearchForItems3(string[] keyWords);

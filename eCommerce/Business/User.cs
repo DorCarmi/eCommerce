@@ -27,7 +27,7 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
-        public Result AddItemToCart(Item item)
+        public Result AddItemToCart(Item item, int amount)
         {
             throw new System.NotImplementedException();
         }
@@ -52,12 +52,7 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
-        public Result AddPermissionsToManager(IStore store, IUser user, StorePermission permission)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission)
+        public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permission)
         {
             throw new System.NotImplementedException();
         }
