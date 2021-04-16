@@ -100,27 +100,12 @@ namespace Tests.Business
             return long.TryParse(token, out var tokenNumber);
         }
 
-        public Result<AuthData> GetDataIfConnected(string token)
+        public string RoleToString(AuthUserRole role)
         {
-            if (!IsConnected(token))
-            {
-                return Result.Fail<AuthData>("Not connected or logged in");
-            }
-
-            return GetData(token);
+            return role.ToString();
         }
 
-        public Result<AuthData> GetDataIfLoggedIn(string token)
-        {
-            if (!_loggedInUsers.ContainsKey(token))
-            {
-                return Result.Fail<AuthData>("Not connected or logged in");
-            }
-
-            return GetData(token);
-        }
-
-        private Result<AuthData> GetData(string token)
+        public Result<AuthData> GetData(string token)
         {
             if (_connectedGuests.TryGetValue(token, out var guestName))
             {

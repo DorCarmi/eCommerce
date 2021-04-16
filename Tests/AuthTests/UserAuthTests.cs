@@ -25,7 +25,7 @@ namespace Tests.AuthTests
             _loggedinUsers = new Dictionary<string, TUserData>();
         }
 
-        [Test, Order(1)]
+        /*[Test, Order(1)]
         public void ConnectTest()
         {
             for (int i = 0; i < 3; i++)
@@ -163,7 +163,7 @@ namespace Tests.AuthTests
             {
                 _userAuth.Disconnect(guestToken);
             }
-        }
+        }*/
         
     }
 }

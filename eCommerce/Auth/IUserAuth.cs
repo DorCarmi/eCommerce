@@ -41,26 +41,12 @@ namespace eCommerce.Auth
         public Result Logout(string token);
 
         /// <summary>
-        /// Check if a guest is connected to the system
-        /// </summary>
-        /// <param name="token">The guest authorization token</param>
-        /// <returns>True if the guest is connected to the system</returns>
-        public bool IsConnected(string token);
-        
-        /// <summary>
         /// Check if a user is registered to the system
         /// </summary>
         /// <param name="username">The user name</param>
         /// <returns>True if the user is registered to the system</returns>
         public bool IsRegistered(string username);
 
-        /// <summary>
-        /// Check if the user is logged in
-        /// </summary>
-        /// <param name="username">The user name</param>
-        /// <returns>True if the user logged in</returns>
-        public bool IsLoggedIn(string username);
-        
         /// <summary>
         /// Check if the token is valid
         /// </summary>
@@ -69,20 +55,18 @@ namespace eCommerce.Auth
         public bool IsValidToken(string token);
         
         /// <summary>
-        /// Get the user authorization data if the token is valid and if
-        /// The user (guest) is connected
+        /// Get the Auth data if valid
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>Authorization data</returns>
-        public Result<AuthData> GetDataIfConnected(string token);
-        
+        public Result<AuthData> GetData(string token);
+
         /// <summary>
-        /// Get the user authorization data if the token is valid and if
-        /// The user is  logged in
+        /// Return the string representation of the role
         /// </summary>
-        /// <param name="token">Authorization token</param>
-        /// <returns>Authorization data</returns>
-        public Result<AuthData> GetDataIfLoggedIn(string token);
-        
+        /// <param name="role">The role</param>
+        /// <returns>The string representation of the role</returns>
+        public string RoleToString(AuthUserRole role);
+
     }
 }

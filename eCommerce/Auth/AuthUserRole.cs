@@ -2,6 +2,7 @@
 {
     public enum AuthUserRole
     {
+        Guest,
         Member,
         Admin
     }

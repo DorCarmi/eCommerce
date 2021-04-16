@@ -20,7 +20,7 @@ namespace Tests.AuthTests
             _auth = UserAuth.CreateInstanceForTests(new TRegisteredUserRepo());
         }
 
-        [Test]
+        /*[Test]
         public async Task ConcurrentConnectTest()
         {
             const int numberOfTasks = 10;
@@ -166,6 +166,6 @@ namespace Tests.AuthTests
             {
                 task.Start();
             }
-        }
+        }*/
     }
 }
