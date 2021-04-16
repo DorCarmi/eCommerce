@@ -8,10 +8,10 @@ namespace eCommerce.Business
     public interface IUser
     {
         //Facade
-        public Result Login(UserToSystemState systemState);
-        public Result Logout();
-        public Result<string> OpenStore(string storeName);
-        public Result<IStore> OpenNewStore(StoreInfo storeInfo);
+        public Result Login(UserToSystemState systemState, MemberData memberData);
+        public Result Logout(string toGuestName);
+        public Result<bool> IsRegistered();
+        public Result OpenStore(IStore store);
 
 
         public Result AddItemToCart(Item item);
@@ -20,6 +20,9 @@ namespace eCommerce.Business
 
         public Result AppointUserToOwner(IStore store, IUser user);
         public Result AppointUserToManager(IStore store, IUser user);
+        
+        public Result MakeOwner(IStore store);
+        public Result MakeManager(IStore store);
 
         public Result AddPermissionsToManager(IStore store, IUser user, StorePermission permission);
         public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission);
