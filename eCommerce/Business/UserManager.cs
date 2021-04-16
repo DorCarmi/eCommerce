@@ -7,15 +7,18 @@ using eCommerce.Common;
 
 namespace eCommerce.Business
 {
-    public class ConnectionManager
+    public class UserManager
     {
         private IUserAuth _auth;
         private ConcurrentDictionary<string, IUser> _connectedUsers;
+        private IRepository<IUser> _registeredUsersRepo;
 
-        public ConnectionManager(IUserAuth auth)
+
+        public UserManager(IUserAuth auth, IRepository<IUser> registeredUsersRepo)
         {
             _auth = auth;
             _connectedUsers = new ConcurrentDictionary<string, IUser>();
+            _registeredUsersRepo = registeredUsersRepo;
         }
 
         public string CreateNewGuestConnection()
@@ -31,7 +34,6 @@ namespace eCommerce.Business
             string username = userAuthDataRes.Value.Username;
             IUser newUser = CreateGuestUser(username);
             _connectedUsers.TryAdd(username, newUser);
-            newUser.Connect();
             return token;
         }
         
@@ -52,13 +54,42 @@ namespace eCommerce.Business
             }
         }
 
+        public Result Register(string token, MemberInfo memberInfo, string password)
+        {
+            if (GetUserIfConnectedOrLoggedIn(token).IsFailure)
+            {
+                return Result.Fail("Need to be connected or logged in");
+            }
+            
+            Result validMemberInfoRes = IsValidMemberInfo(memberInfo);
+            if (validMemberInfoRes.IsFailure)
+            {
+                return validMemberInfoRes;
+            }
+
+            Result authRegistrationRes = RegisterAtAuthorization(memberInfo.Username, password);
+            if (authRegistrationRes.IsFailure)
+            {
+                return authRegistrationRes;
+            }
+            
+            IUser newUser = new User(memberInfo.Clone());
+            if (!_registeredUsersRepo.Add(newUser))
+            {
+                // TODO maybe remove the user form userAuth and log it
+                return Result.Fail("User already exists");
+            }
+
+            return Result.Ok();
+        }
+        
         public Result RegisterAtAuthorization(string username, string password)
         {
             return _auth.Register(username, password);
         }
         
         public Result<string> Login(string guestToken, string username, string password, 
-            ServiceUserRole role, [NotNull] MemberData memberData)
+            ServiceUserRole role)
         {
             Result<AuthData> guestAuthData = _auth.GetDataIfConnected(guestToken);
             if (guestAuthData.IsFailure)
@@ -72,15 +103,17 @@ namespace eCommerce.Business
                 return Result.Fail<string>(authLoginRes.Error);
             }
             
-            IUser user = GetConnectedUserOrNull(guestAuthData.Value.Username);
-            if (user == null || user.Login(DtoUtils.ServiceUserRoleToSystemState(role), memberData).IsFailure)
+            IUser user = _registeredUsersRepo.GetOrNull(username);
+            if (user == null)
             {
                 // TODO log it since in auth the user can log in
                 _auth.Logout(authLoginRes.Value);
                 return Result.Fail<string>("Invalid username or password");
             }
 
-            ExchangeKeyToConnected(guestAuthData.Value.Username, username);
+            _connectedUsers.Remove(guestAuthData.Value.Username, out var guestUser);
+            _connectedUsers.TryAdd(username, user);
+            
             _auth.Disconnect(guestToken);
             return Result.Ok(authLoginRes.Value);
         }
@@ -107,9 +140,27 @@ namespace eCommerce.Business
             string newGuestToken = _auth.Connect();
             string newGuestUsername = _auth.GetDataIfConnected(newGuestToken).Value.Username;
             
-            user.Logout(newGuestUsername);
-            ExchangeKeyToConnected(authData.Username, newGuestUsername);
+            _connectedUsers.Remove(user.Username, out var tuser);
+            _connectedUsers.TryAdd(newGuestUsername, new User(newGuestUsername));
+            
             return Result.Ok(newGuestToken);
+        }
+        
+        /// <summary>
+        /// Get the user
+        /// </summary>
+        /// <param name="username">The username</param>
+        /// <returns>The user</returns>
+        public Result<IUser> GetUser(string username)
+        {
+            IUser user = _registeredUsersRepo.GetOrNull(username);
+            if (user == null)
+            {
+                // TODO log it 
+                return Result.Fail<IUser>("User doesn't exists");
+            }
+
+            return Result.Ok(user);
         }
         
         /// <summary>
@@ -117,7 +168,7 @@ namespace eCommerce.Business
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <returns>The user recognized by the token</returns>
-        public Result<IUser> GetUser(string token)
+        public Result<IUser> GetUserIfConnectedOrLoggedIn(string token)
         {
             Result<AuthData> userAuthDataRes = _auth.GetDataIfLoggedIn(token);
             if (userAuthDataRes.IsFailure)
@@ -169,6 +220,26 @@ namespace eCommerce.Business
         {
             // TODO update it with user implementation
             return new User(guestName);
+        }
+        
+        /// <summary>
+        /// Check if the member information is valid
+        /// </summary>
+        /// <returns>Result of the check</returns>
+        private Result IsValidMemberInfo(MemberInfo memberInfo)
+        {
+            Result fullDataRes = memberInfo.IsBasicDataFull();
+            if (fullDataRes.IsFailure)
+            {
+                return fullDataRes;
+            }
+
+            if (!RegexUtils.IsValidEmail(memberInfo.Email))
+            {
+                return Result.Fail("Invalid email address");
+            }
+
+            return Result.Ok();
         }
     }
 }

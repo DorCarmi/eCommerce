@@ -17,20 +17,18 @@ namespace eCommerce.Business
         private static MarketFacade _instance =
             new MarketFacade(
                 UserAuth.GetInstance(),
-                new MemberDataRepository(),
+                new RegisteredUsersRepository(),
                 new StoreRepository());
 
-        private IRepository<MemberData> _memberDataRepository;
         private StoreRepository _storeRepository;
-        private ConnectionManager _connectionManager;
+        private UserManager _userManager;
         
         private MarketFacade(IUserAuth userAuth,
-            IRepository<MemberData> memberDataRepository,
+            IRepository<IUser> registeredUsersRepo,
             StoreRepository storeRepo)
         {
-            _memberDataRepository = memberDataRepository;
             _storeRepository = storeRepo;
-            _connectionManager = new ConnectionManager(userAuth);
+            _userManager = new UserManager(userAuth, registeredUsersRepo);
         }
 
         public static MarketFacade GetInstance()
@@ -39,76 +37,45 @@ namespace eCommerce.Business
         }
 
         public static MarketFacade CreateInstanceForTests(IUserAuth userAuth,
-            IRepository<MemberData> memberDataRepository,
+            IRepository<IUser> registeredUsersRepo,
             StoreRepository storeRepo)
         {
-            return new MarketFacade(userAuth, memberDataRepository, storeRepo);
+            return new MarketFacade(userAuth, registeredUsersRepo, storeRepo);
         }
         
         // <CNAME>Connect</CNAME>
         public string Connect()
         {
-            return _connectionManager.CreateNewGuestConnection();
+            return _userManager.CreateNewGuestConnection();
         }
 
         // <CNAME>Disconnect</CNAME>
         public void Disconnect(string token)
         {
-            _connectionManager.Disconnect(token);
+            _userManager.Disconnect(token);
         }
 
         // <CNAME>Register</CNAME>
         public Result Register(string token, MemberInfo memberInfo, string password)
         {
-            if (_connectionManager.GetUser(token).IsFailure)
-            {
-                return Result.Fail("Need to be connected or logged in");
-            }
-            
-            Result validMemberInfoRes = IsValidMemberInfo(memberInfo);
-            if (validMemberInfoRes.IsFailure)
-            {
-                return validMemberInfoRes;
-            }
-
-            Result authRegistrationRes = _connectionManager.RegisterAtAuthorization(memberInfo.Username, password);
-            if (authRegistrationRes.IsFailure)
-            {
-                return authRegistrationRes;
-            }
-            
-            MemberData memberData = new MemberData(memberInfo.Clone());
-            if (!_memberDataRepository.Add(memberData))
-            {
-                // TODO maybe remove the user form userAuth and log it
-                return Result.Fail("User already exists");
-            }
-
-            return Result.Ok();
+            return _userManager.Register(token, memberInfo, password);
         }
 
         // <CNAME>Login</CNAME>
         public Result<string> Login(string guestToken, string username, string password, ServiceUserRole role)
         {
-            MemberData memberData = _memberDataRepository.GetOrNull(username);
-            if (memberData == null)
-            {
-                return Result.Fail<string>("Username or password not valid");
-            }
-
-            return _connectionManager.Login(guestToken, username,
-                password, role, memberData);
+            return _userManager.Login(guestToken, username, password, role);
         }
 
         // <CNAME>Logout</CNAME>
         public Result<string> Logout(string token)
         {
-            return _connectionManager.Logout(token);
+            return _userManager.Logout(token);
         }
 
         public Result<IEnumerable<IProduct>> SearchForProduct(string token, string query)
         {
-            Result<IUser> userRes = _connectionManager.GetUser(token);
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<IEnumerable<IProduct>>(userRes.Error);
@@ -119,7 +86,7 @@ namespace eCommerce.Business
 
         public Result AddNewItemToStore(string token, IProduct product)
         {
-            Result<IUser> userRes = _connectionManager.GetUser(token);
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return userRes;
@@ -137,7 +104,7 @@ namespace eCommerce.Business
 
         public Result EditItemAmountInStore(string token, IProduct product)
         {
-            Result<IUser> userRes = _connectionManager.GetUser(token);
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return userRes;
@@ -156,7 +123,7 @@ namespace eCommerce.Business
 
         public Result RemoveProductFromStore(string token, string storeId, string productId)
         {
-            Result<IUser> userRes = _connectionManager.GetUser(token);
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return userRes;
@@ -174,12 +141,52 @@ namespace eCommerce.Business
 
         public Result AppointCoOwner(string token, string storeId, string appointedUserId)
         {
-            throw new System.NotImplementedException();
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return userRes;
+            }
+            IUser user = userRes.Value;
+            
+            IStore store = _storeRepository.GetOrNull(storeId);
+            if (store == null)
+            {
+                return Result.Fail("Store doesn't exist");
+            }
+            
+            Result<IUser> appointedUserRes = _userManager.GetUser(appointedUserId);
+            if (appointedUserRes.IsFailure)
+            {
+                return appointedUserRes;
+            }
+            IUser appointedUser = appointedUserRes.Value;
+
+            return user.AppointUserToOwner(store, appointedUser);
         }
 
         public Result AppointManager(string token, string storeId, string appointedManagerUserId)
         {
-            throw new System.NotImplementedException();
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return userRes;
+            }
+            IUser user = userRes.Value;
+            
+            IStore store = _storeRepository.GetOrNull(storeId);
+            if (store == null)
+            {
+                return Result.Fail("Store doesn't exist");
+            }
+            
+            Result<IUser> appointedUserRes = _userManager.GetUser(appointedManagerUserId);
+            if (appointedUserRes.IsFailure)
+            {
+                return appointedUserRes;
+            }
+            IUser appointedUser = appointedUserRes.Value;
+
+            return user.AppointUserToOwner(store, appointedUser);
         }
 
         public Result UpdateManagerPermission(string token, string storeId, string appointedManagerUserId, IList<Service.StorePermission> permissions)
@@ -240,26 +247,6 @@ namespace eCommerce.Business
         public Result<IEnumerable<PurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId)
         {
             throw new System.NotImplementedException();
-        }
-        
-        /// <summary>
-        /// Check if the member information is valid
-        /// </summary>
-        /// <returns>Result of the check</returns>
-        private Result IsValidMemberInfo(MemberInfo memberInfo)
-        {
-            Result fullDataRes = memberInfo.IsBasicDataFull();
-            if (fullDataRes.IsFailure)
-            {
-                return fullDataRes;
-            }
-
-            if (!RegexUtils.IsValidEmail(memberInfo.Email))
-            {
-                return Result.Fail("Invalid email address");
-            }
-
-            return Result.Ok();
         }
     }
 }

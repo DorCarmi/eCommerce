@@ -16,7 +16,7 @@ namespace Tests.Business
     [TestFixture]
     public class MarketFacadeTests
     {
-        private IMarketFacade _marketFacade;
+        /*private IMarketFacade _marketFacade;
         private const string PASSWORD = "easyPassword";
 
         private IList<string> _connectedGuestTokens;
@@ -60,7 +60,7 @@ namespace Tests.Business
             };
         }
 
-        /*[Test, Order(1)]
+        [Test, Order(1)]
         public void RegisterTests()
         {
             foreach (var memberInfo in _membersInfo)

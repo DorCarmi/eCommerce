@@ -6,7 +6,7 @@ namespace eCommerce.Business
 {
     public class User : IUser
     {
-        public Result Login(UserToSystemState systemState)
+        public Result Login()
         {
             throw new System.NotImplementedException();
         }
@@ -15,16 +15,7 @@ namespace eCommerce.Business
         {
             throw new System.NotImplementedException();
         }
-
-        public Result Login(UserToSystemState systemState, MemberData memberData)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result Logout(string toGuestName)
-        {
-            throw new System.NotImplementedException();
-        }
+        
 
         public Result<string> OpenStore(string storeName)
         {
@@ -118,7 +109,7 @@ namespace eCommerce.Business
             
         }
         
-        public User(MemberData memberData)
+        public User(MemberInfo memberInfo)
         {
             
         }

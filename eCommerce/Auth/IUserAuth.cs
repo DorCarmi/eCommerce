@@ -70,7 +70,7 @@ namespace eCommerce.Auth
         
         /// <summary>
         /// Get the user authorization data if the token is valid and if
-        /// The user is connected
+        /// The user (guest) is connected
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>Authorization data</returns>
