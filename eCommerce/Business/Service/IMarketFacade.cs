@@ -23,10 +23,11 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Register a new user to the system as a member.
         /// </summary>
+        /// <param name="token">The Authorization token</param>
         /// <param name="memberInfoDto">The user information</param>
         /// <param name="password">The user password</param>
         /// <returns>Successful Result if the user has been successfully registered</returns>
-        public Result Register(MemberInfo memberInfoDto, string password);
+        public Result Register(string token, MemberInfo memberInfoDto, string password);
         
         /// <summary>
         /// Log in to the system
@@ -55,7 +56,7 @@ namespace eCommerce.Business.Service
         /// <param name="query">The product query the search</param>
         /// <param name="token">Authorization token</param>
         /// <returns>List of match products</returns>
-        public Result<IEnumerable<ProductDto>> SearchForProduct(string token, string query);
+        public Result<IEnumerable<IProduct>> SearchForProduct(string token, string query);
         
         /// <summary>
         /// Add new item to the sore
@@ -63,7 +64,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="product">The new item</param>
         /// <returns>Result of the item addition</returns>
-        public Result AddNewItemToStore(string token,  ProductDto product);
+        public Result AddNewItemToStore(string token,  IProduct product);
         
         /// <summary>
         /// Edit the item
@@ -71,16 +72,16 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="product">The new item</param>
         /// <returns>Result of the edit</returns>
-        public Result EditItemAmountInStore(string token, ProductDto product);
+        public Result EditItemAmountInStore(string token, IProduct product);
         
         /// <summary>
         /// Remove item from store
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The sore id</param>
-        /// <param name="itemId">The item id</param>
+        /// <param name="productId">The product id</param>
         /// <returns>Result of the product removal</returns>
-        public Result RemoveProductFromStore(string token, string storeId, string itemId);
+        public Result RemoveProductFromStore(string token, string storeId, string productId);
         
         // TODO requirement 4.2
 

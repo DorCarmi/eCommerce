@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using eCommerce.Business.Service;
 
 namespace eCommerce.Business
 {
-    public class ItemInfo
+    public class ItemInfo : IProduct
     {
         public int amount;
         public string name;
@@ -32,6 +34,12 @@ namespace eCommerce.Business
                 
             }
         }
-        
+
+        public string ProductName { get => name; }
+        public string StoreName { get => storeName; }
+        public int Amount { get => amount; }
+        public string Category { get => category; }
+        public ReadOnlyCollection<string> KeyWords { get => new ReadOnlyCollection<string>(keyWords); }
+        public float PricePerUnit { get => pricePerUnit; }
     }
 }

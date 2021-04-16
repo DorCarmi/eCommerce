@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +21,12 @@ namespace eCommerce.Business
                 new StoreRepository());
 
         private IRepository<MemberData> _memberDataRepository;
-        private IRepository<IStore> _storeRepository;
+        private StoreRepository _storeRepository;
         private ConnectionManager _connectionManager;
         
         private MarketFacade(IUserAuth userAuth,
             IRepository<MemberData> memberDataRepository,
-            IRepository<IStore> storeRepo)
+            StoreRepository storeRepo)
         {
             _memberDataRepository = memberDataRepository;
             _storeRepository = storeRepo;
@@ -39,7 +40,7 @@ namespace eCommerce.Business
 
         public static MarketFacade CreateInstanceForTests(IUserAuth userAuth,
             IRepository<MemberData> memberDataRepository,
-            IRepository<IStore> storeRepo)
+            StoreRepository storeRepo)
         {
             return new MarketFacade(userAuth, memberDataRepository, storeRepo);
         }
@@ -57,8 +58,13 @@ namespace eCommerce.Business
         }
 
         // <CNAME>Register</CNAME>
-        public Result Register(MemberInfo memberInfo, string password)
+        public Result Register(string token, MemberInfo memberInfo, string password)
         {
+            if (_connectionManager.GetUser(token).IsFailure)
+            {
+                return Result.Fail("Need to be connected or logged in");
+            }
+            
             Result validMemberInfoRes = IsValidMemberInfo(memberInfo);
             if (validMemberInfoRes.IsFailure)
             {
@@ -100,12 +106,18 @@ namespace eCommerce.Business
             return _connectionManager.Logout(token);
         }
 
-        public Result<IEnumerable<ProductDto>> SearchForProduct(string token, string query)
+        public Result<IEnumerable<IProduct>> SearchForProduct(string token, string query)
         {
-            throw new System.NotImplementedException();
+            Result<IUser> userRes = _connectionManager.GetUser(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<IEnumerable<IProduct>>(userRes.Error);
+            }
+
+            return Result.Ok<IEnumerable<IProduct>>(_storeRepository.SearchForProduct(query));
         }
 
-        public Result AddNewItemToStore(string token, ProductDto product)
+        public Result AddNewItemToStore(string token, IProduct product)
         {
             Result<IUser> userRes = _connectionManager.GetUser(token);
             if (userRes.IsFailure)
@@ -123,14 +135,41 @@ namespace eCommerce.Business
             return store.AddItemToStore(DtoUtils.ProductDtoToProductInfo(product), user);
         }
 
-        public Result EditItemAmountInStore(string token, ProductDto product)
+        public Result EditItemAmountInStore(string token, IProduct product)
         {
-            throw new System.NotImplementedException();
+            Result<IUser> userRes = _connectionManager.GetUser(token);
+            if (userRes.IsFailure)
+            {
+                return userRes;
+            }
+            IUser user = userRes.Value;
+            
+            IStore store = _storeRepository.GetOrNull(product.StoreName);
+            if (store == null)
+            {
+                return Result.Fail("Store doesn't exist");
+            }
+            
+            return store.EditProduct(DtoUtils.ProductDtoToProductInfo(product), user);
+
         }
 
-        public Result RemoveProductFromStore(string token, string storeId, string itemId)
+        public Result RemoveProductFromStore(string token, string storeId, string productId)
         {
-            throw new System.NotImplementedException();
+            Result<IUser> userRes = _connectionManager.GetUser(token);
+            if (userRes.IsFailure)
+            {
+                return userRes;
+            }
+            IUser user = userRes.Value;
+            
+            IStore store = _storeRepository.GetOrNull(storeId);
+            if (store == null)
+            {
+                return Result.Fail("Store doesn't exist");
+            }
+            
+            return store.RemoveProduct(productId, user);
         }
 
         public Result AppointCoOwner(string token, string storeId, string appointedUserId)

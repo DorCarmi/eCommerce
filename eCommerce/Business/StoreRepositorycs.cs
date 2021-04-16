@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
@@ -9,7 +10,7 @@ namespace eCommerce.Business
 {
     public class StoreRepository : IRepository<IStore>
     {
-        private IDictionary<string, IStore> _stores;
+        private ConcurrentDictionary<string, IStore> _stores;
 
         public StoreRepository()
         {
@@ -31,6 +32,20 @@ namespace eCommerce.Business
         public void Remove(string id)
         {
             throw new System.NotImplementedException();
+        }
+
+        public IEnumerable<ItemInfo> SearchForProduct(string query)
+        {
+            IList<ItemInfo> queryMatches = new List<ItemInfo>();
+            foreach (var store in _stores.Values)
+            {
+                foreach (var item in store.SearchForItems(query))
+                {
+                    queryMatches.Add(item);
+                }
+            }
+
+            return queryMatches;
         }
     }
 }

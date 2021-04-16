@@ -19,7 +19,7 @@ namespace eCommerce.Business.Service
         public IList<Item> SearchForItems3(string[] keyWords);
         public IList<Item> SearchForItems4(string[] keyWords);
         public IList<Item> SearchForItems5(string[] keyWords);
-        public IList<Item> SearchForItems(string stringSearch);
+        public IList<ItemInfo> SearchForItems(string stringSearch);
         public IList<Store> SearchForStore(string stringSearch);
 
         public Result AddBasketToStore(IBasket basket);
@@ -34,6 +34,12 @@ namespace eCommerce.Business.Service
 
 
         public Result AddItemToStore(ItemInfo newItem, IUser user);
+        
+        public Result EditProduct(ItemInfo item, IUser user);
+        
+        public Result RemoveProduct(string productId, IUser user);
+
+
 
         public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment);
         public Result AppointNewManager(IUser user, OwnerAppointment ownerAppointment);

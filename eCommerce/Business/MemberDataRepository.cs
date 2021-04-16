@@ -7,7 +7,7 @@ namespace eCommerce.Business
     public class MemberDataRepository : IRepository<MemberData>
     {
 
-        private IDictionary<string, MemberData> _membersData;
+        private ConcurrentDictionary<string, MemberData> _membersData;
 
         public MemberDataRepository()
         {

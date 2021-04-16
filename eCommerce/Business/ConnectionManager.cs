@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Authentication;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -10,12 +10,12 @@ namespace eCommerce.Business
     public class ConnectionManager
     {
         private IUserAuth _auth;
-        private IDictionary<string, IUser> _connectedUsers;
+        private ConcurrentDictionary<string, IUser> _connectedUsers;
 
         public ConnectionManager(IUserAuth auth)
         {
             _auth = auth;
-            _connectedUsers = new Dictionary<string, IUser>();
+            _connectedUsers = new ConcurrentDictionary<string, IUser>();
         }
 
         public string CreateNewGuestConnection()
@@ -48,7 +48,7 @@ namespace eCommerce.Business
             if (user != null)
             {
                 user.Disconnect();
-                _connectedUsers.Remove(user.Username);
+                _connectedUsers.Remove(user.Username, out var tuser);
             }
         }
 
@@ -161,8 +161,8 @@ namespace eCommerce.Business
                 return;
             }
 
-            _connectedUsers.Remove(fromUsername);
-            _connectedUsers.Add(toUsername, user);
+            _connectedUsers.Remove(fromUsername, out var tuser);
+            _connectedUsers.TryAdd(toUsername, user);
         }
 
         private IUser CreateGuestUser(string guestName)

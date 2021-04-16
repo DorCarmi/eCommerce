@@ -60,7 +60,7 @@ namespace Tests.Business
             };
         }
 
-        [Test, Order(1)]
+        /*[Test, Order(1)]
         public void RegisterTests()
         {
             foreach (var memberInfo in _membersInfo)
@@ -102,6 +102,6 @@ namespace Tests.Business
                     throw new TestCanceledException("Member didnt registered");
                 }
             }
-        }
+        }*/
     }
 }

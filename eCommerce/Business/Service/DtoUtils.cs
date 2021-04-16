@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Auth;
 
@@ -43,13 +44,13 @@ namespace eCommerce.Business.Service
             throw new NotImplementedException();
         }
         
-        public static ItemInfo ProductDtoToProductInfo(ProductDto productDto)
+        public static ItemInfo ProductDtoToProductInfo(IProduct productDto)
         {
             return new ItemInfo(
                 productDto.Amount,
                 productDto.ProductName,
                 productDto.StoreName,
-                productDto.Categories.FirstOrDefault(),
+                productDto.Category,
                 productDto.KeyWords);
         }
     }
