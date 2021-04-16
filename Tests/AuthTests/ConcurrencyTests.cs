@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using eCommerce.Auth;
-using eCommerce.Business;
 using eCommerce.Common;
 using NUnit.Framework;
 
@@ -20,11 +19,11 @@ namespace Tests.AuthTests
             _auth = UserAuth.CreateInstanceForTests(new TRegisteredUserRepo());
         }
 
-        /*[Test]
+        [Test]
         public async Task ConcurrentConnectTest()
         {
             const int numberOfTasks = 10;
-            string[] tokens = await CreateAndRunTasks(
+            string[] tokens = await TaskTestUtils.CreateAndRunTasks(
                 () => _auth.Connect(),
                 numberOfTasks);
             
@@ -32,7 +31,7 @@ namespace Tests.AuthTests
             
             for (var i = 0; i < numberOfTasks; i++)
             {
-                Result<AuthData> authData = _auth.GetDataIfConnected(tokens[i]);
+                Result<AuthData> authData = _auth.GetData(tokens[i]);
                 Assert.True(authData.IsSuccess, 
                     $"The guest is connect therefore the token should be valid\nError: {authData.Error}");
                 usernames.Add(authData.Value.Username);
@@ -48,7 +47,7 @@ namespace Tests.AuthTests
         public async Task ConcurrentRegisterSameUserTest()
         {
             const int numberOfTasks = 5;
-            Result[] registerRes = await CreateAndRunTasks(
+            Result[] registerRes = await TaskTestUtils.CreateAndRunTasks(
                 () => _auth.Register("user1", "password1"), 
                 numberOfTasks);
 
@@ -64,35 +63,6 @@ namespace Tests.AuthTests
             Assert.AreEqual(1,
                 registeredSuccessfully,
                 $"Only one task should has been able to register but {registeredSuccessfully} succeeded");
-        }
-        
-        [Test, Repeat(2)]
-        public async Task ConcurrentLoginSameUserTest()
-        {
-            const int numberOfTasks = 5;
-
-            Result registerRes = _auth.Register("user1", "password1");
-            if (registerRes.IsFailure)
-            {
-                Assert.Fail("The registration of the user didnt work");
-            }
-            
-            Result[] loginRes = await CreateAndRunTasks(
-                () => _auth.Login("user1", "password1", AuthUserRole.Member), 
-                numberOfTasks);
-
-            int registeredSuccessfully = 0;
-            foreach (var res in loginRes)
-            {
-                if (res.IsSuccess)
-                {
-                    registeredSuccessfully++;
-                }
-            }
-            
-            Assert.AreEqual(1,
-                registeredSuccessfully,
-                $"Only one task should has been able to login but {registeredSuccessfully} succeeded");
         }
         
         [Test]
@@ -120,7 +90,7 @@ namespace Tests.AuthTests
                     () => _auth.Login(uname, upassword, AuthUserRole.Member));
             }
 
-            RunTasks(loginTasks);
+            TaskTestUtils.RunTasks(loginTasks);
             Result<string>[] loginRes = await Task.WhenAll(loginTasks);
 
             int numberOfUsersLoggedIn = 0;
@@ -140,32 +110,5 @@ namespace Tests.AuthTests
                 numberOfUsersLoggedIn,
                 $"All the users should have been able to login but {numberOfUsersLoggedIn} succeeded");
         }
-
-        private Task<T[]> CreateAndRunTasks<T>(Func<T> func, int numberOfTasks)
-        {
-            Task<T>[] tasks = CreateArrayOfTasks(func, numberOfTasks);
-            RunTasks(tasks);
-
-            return Task.WhenAll<T>(tasks);
-        }
-
-        private Task<T>[] CreateArrayOfTasks<T>(Func<T> func, int numberOfTasks)
-        {
-            Task<T>[] tasks = new Task<T>[numberOfTasks];
-            for (var i = 0; i < numberOfTasks; i++)
-            {
-                tasks[i] = new Task<T>(func);
-            }
-
-            return tasks;
-        }
-        
-        private void RunTasks<T>(Task<T>[] tasks)
-        {
-            foreach (var task in tasks)
-            {
-                task.Start();
-            }
-        }*/
     }
 }

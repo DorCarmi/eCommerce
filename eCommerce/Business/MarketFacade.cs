@@ -46,7 +46,7 @@ namespace eCommerce.Business
         // <CNAME>Connect</CNAME>
         public string Connect()
         {
-            return _userManager.CreateNewGuestConnection();
+            return _userManager.Connect();
         }
 
         // <CNAME>Disconnect</CNAME>

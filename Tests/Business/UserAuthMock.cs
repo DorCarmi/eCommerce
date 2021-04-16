@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using eCommerce.Auth;
@@ -7,7 +8,7 @@ using eCommerce.Common;
 namespace Tests.Business
 {
     /// <summary>
-    /// <para>Implementation of synchronized use.</para>
+    /// <para>Implementation of concurrent.</para>
     /// <para>
     /// Assume Role in login is valid <br/>
     /// Assume password is valid <br/>
@@ -17,30 +18,30 @@ namespace Tests.Business
     public class UserAuthMock : IUserAuth
     {
 
-        private IDictionary<string, string> _connectedGuests;
-        private IDictionary<string, AuthData> _registeredUsers;
-        private IDictionary<string, string> _loggedInUsers;
+        private ConcurrentDictionary<string, string> _connectedGuests;
+        private ConcurrentDictionary<string, AuthData> _registeredUsers;
+        private ConcurrentDictionary<string, string> _loggedInUsers;
 
-        private long token = 0;
+        private ConcurrentIdGenerator _token;
 
         public UserAuthMock()
         {
-            _connectedGuests = new Dictionary<string, string>();
-            _registeredUsers = new Dictionary<string, AuthData>();
-            _loggedInUsers = new Dictionary<string, string>();
+            _connectedGuests = new ConcurrentDictionary<string, string>();
+            _registeredUsers = new ConcurrentDictionary<string, AuthData>();
+            _loggedInUsers = new ConcurrentDictionary<string, string>();
+            _token = new ConcurrentIdGenerator(0);
         }
 
         public string Connect()
         {
-            string tokenStr = token.ToString();
-            _connectedGuests.Add(tokenStr, $"Guest{tokenStr}");
-            token++;
+            string tokenStr = _token.MoveNext().ToString();
+            _connectedGuests.TryAdd(tokenStr, $"Guest{tokenStr}");
             return tokenStr;
         }
 
         public void Disconnect(string token)
         {
-            _connectedGuests.Remove(token);
+            _connectedGuests.Remove(token, out var tstring );
         }
 
         public Result Register(string username, string password)
@@ -60,15 +61,14 @@ namespace Tests.Business
                 return Result.Fail<string>("User already logged in");
             }
 
-            string tokenStr = token.ToString();
-            token++;
+            string tokenStr = _token.MoveNext().ToString();
             _loggedInUsers.TryAdd(tokenStr, username);
             return Result.Ok(tokenStr);
         }
 
         public Result Logout(string token)
         {
-            _loggedInUsers.Remove(token);
+            _loggedInUsers.Remove(token, out var tstring );
             return Result.Ok();
         }
 

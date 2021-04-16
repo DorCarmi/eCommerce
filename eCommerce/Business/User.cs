@@ -101,7 +101,7 @@ namespace eCommerce.Business
         // For guest
         public User(string username)
         {
-            
+            Username = username;
         }
         
         public User(MemberInfo memberInfo)

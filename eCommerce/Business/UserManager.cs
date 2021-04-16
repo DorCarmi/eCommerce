@@ -22,7 +22,7 @@ namespace eCommerce.Business
             _registeredUsersRepo = registeredUsersRepo;
         }
 
-        public string CreateNewGuestConnection()
+        public string Connect()
         {
             string token = _auth.Connect();
             Result<AuthData> userAuthDataRes = _auth.GetData(token);
@@ -83,7 +83,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
         
-        public Result RegisterAtAuthorization(string username, string password)
+        private Result RegisterAtAuthorization(string username, string password)
         {
             return _auth.Register(username, password);
         }

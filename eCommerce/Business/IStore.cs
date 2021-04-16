@@ -47,6 +47,8 @@ namespace eCommerce.Business.Service
         public Result<IList<IBasket>> GetPurchaseHistory();
         public Result EnterBasketToHistory(IBasket basket);
 
+        public Result<IList<StaffPermission>> GetStaffPermissions(IUser requester);
+        
         // TODO check with the implementor
         
         public string StoreName

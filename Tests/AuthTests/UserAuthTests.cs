@@ -25,14 +25,14 @@ namespace Tests.AuthTests
             _loggedinUsers = new Dictionary<string, TUserData>();
         }
 
-        /*[Test, Order(1)]
+        [Test, Order(1)]
         public void ConnectTest()
         {
             for (int i = 0; i < 3; i++)
             {
                 string token = _userAuth.Connect();
 
-                Result<AuthData> authDataRes = _userAuth.GetDataIfConnected(token);
+                Result<AuthData> authDataRes = _userAuth.GetData(token);
                 Assert.True(authDataRes.IsSuccess,
                     "Generated token from Connect is not valid");
 
@@ -131,10 +131,7 @@ namespace Tests.AuthTests
                 Result<string> loginRes = _userAuth.Login(user.Username, user.Password, AuthUserRole.Member);
                 Assert.True(loginRes.IsSuccess,
                             $"Registered user {user.Username} wasn't able to login\nError: {loginRes.Error}");
-                
-                Assert.True(_userAuth.IsLoggedIn(user.Username),
-                    $"The user {user.Username} logged in but the system say it isn't");
-                
+
                 _loggedinUsers.Add(loginRes.Value, user);
             }
         }
@@ -163,7 +160,7 @@ namespace Tests.AuthTests
             {
                 _userAuth.Disconnect(guestToken);
             }
-        }*/
+        }
         
     }
 }
