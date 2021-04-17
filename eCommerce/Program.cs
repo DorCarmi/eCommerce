@@ -14,11 +14,7 @@ namespace eCommerce
     {
         public static void Main(string[] args)
         {
-            ServerAuth mySrv = ServerAuth.GetInstance();
-            var outp=mySrv.GenerateToken(new AuthData("dor"));
-            Console.WriteLine(outp);
             CreateHostBuilder(args).Build().Run();
-            
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

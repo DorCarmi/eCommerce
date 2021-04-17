@@ -12,4 +12,10 @@
       <Folder Include="Adapters" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Tests\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="Tests\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="Tests\obj\Tests.csproj.nuget.dgspec.json" />
+    </ItemGroup>
+
 </Project>
