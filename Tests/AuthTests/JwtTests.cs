@@ -5,7 +5,7 @@ using System.Security.Claims;
 using eCommerce.Auth;
 using NUnit.Framework;
 
-namespace Tests.Auth
+namespace Tests.AuthTests
 {
     [TestFixture]
     public class JwtTests

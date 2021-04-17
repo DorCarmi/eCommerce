@@ -3,7 +3,7 @@ using eCommerce.Business.Service;
 
 namespace eCommerce.Business
 {
-    public class PurchaseRecord
+    public class PurchaseRecord : IPurchaseHistory
     {
         private StoreInfo _storeInfo;
         private BasketInfo _basketInfo;
@@ -29,5 +29,10 @@ namespace eCommerce.Business
         {
             return _dateTime;
         }
+
+
+        public string StoreId { get => _storeInfo.GetStoreName(); }
+        public BasketInfo BasketInfo { get => _basketInfo; }
+        public DateTime PurchaseTime { get => _dateTime; }
     }
 }

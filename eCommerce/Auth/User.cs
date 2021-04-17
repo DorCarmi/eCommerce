@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Threading.Tasks;
 using eCommerce.Common;
 
 namespace eCommerce.Auth
@@ -10,13 +12,13 @@ namespace eCommerce.Auth
     {
         private string _username;
         private byte[] _hashedPassword;
-        private IEnumerable<UserRole> _roles;
+        private IList<AuthUserRole> _roles;
 
         public User(string username, byte[] hashedPassword)
         {
             _username = username;
             _hashedPassword = hashedPassword;
-            _roles = new List<UserRole>();
+            _roles = new List<AuthUserRole>();
         }
 
         /// <summary>
@@ -27,9 +29,9 @@ namespace eCommerce.Auth
         /// </Postcondition> 
         /// <param name="role">The role to add</param>
         /// <returns>Result according to the invariants</returns>
-        public Result AddRole(UserRole role)
+        public Result AddRole(AuthUserRole role)
         {
-            if (role == UserRole.Admin && !AdminNeedToBeMemberConstraint())
+            if (role == AuthUserRole.Admin && !AdminNeedToBeMemberConstraint())
             {
                 return Result.Fail("In order to be admin, a user need to be a member");
             }
@@ -39,17 +41,18 @@ namespace eCommerce.Auth
                 return Result.Fail("User already have this role");
             }
 
+            _roles.Add(role);
             return Result.Ok();
         }
 
-        public bool HasRole(UserRole role)
+        public bool HasRole(AuthUserRole role)
         {
             return _roles.Contains(role);
         }
         
         // ========== Properties ========== //
 
-        public IEnumerator<UserRole> Roles
+        public IEnumerator<AuthUserRole> Roles
         {
             get => _roles.GetEnumerator();
         }
@@ -66,7 +69,7 @@ namespace eCommerce.Auth
 
         private bool AdminNeedToBeMemberConstraint()
         {
-            return _roles.Contains(UserRole.Member);
+            return _roles.Contains(AuthUserRole.Member);
         }
     }
 }

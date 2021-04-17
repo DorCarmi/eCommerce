@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using eCommerce.Business.Service;
 
 namespace eCommerce.Business
 {
-    public class ItemInfo
+    public class ItemInfo : IItem
     {
         public int amount;
         public string name;
@@ -45,8 +46,7 @@ namespace eCommerce.Business
             this.name = name;
             this.storeName = storeName;
             this.category = category;
-            this.pricePerUnit = pricePerUnit;
-            this.keyWords = new List<string>();
+            keyWords = new List<string>();
             foreach (var word in keyWords)
             {
                 if (word == null)
@@ -55,7 +55,7 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    this.keyWords.Add(String.Copy(word));
+                    keyWords.Add(String.Copy(word));
                 }
                 
             }
@@ -71,8 +71,12 @@ namespace eCommerce.Business
         {
             this.discountFactor = discountFactor; 
         }
-        
-        
-        
+
+        public string ItemName { get => name; }
+        public string StoreName { get => storeName; }
+        public int Amount { get => amount; }
+        public string Category { get => category; }
+        public ReadOnlyCollection<string> KeyWords { get => new ReadOnlyCollection<string>(keyWords); }
+        public float PricePerUnit { get => pricePerUnit; }
     }
 }

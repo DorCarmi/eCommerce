@@ -26,6 +26,11 @@ namespace Tests.Mokups
             return Result.Ok<Item>(this.item);
         }
 
+        public Result<Item> GetItem(string itemId)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public List<Item> SearchItem(string stringSearch)
         {
             throw new System.NotImplementedException();

@@ -5,7 +5,7 @@ using eCommerce.Common;
 
 namespace Tests.Mokups
 {
-    public class mokUserAlice :IUser
+    public class mokUserAlice : IUser
     {
         private bool isLoggedIn = false;
         private string userName = "ALICE";
@@ -27,6 +27,11 @@ namespace Tests.Mokups
             }
         }
 
+        public Result Login()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Result Logout()
         {
             if (isLoggedIn)
@@ -41,6 +46,16 @@ namespace Tests.Mokups
         }
 
         public Result<string> OpenStore(string storeName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result AddItemToCart(Item item, int amount)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        Result<CartInfo> IUser.GetCartInfo()
         {
             throw new System.NotImplementedException();
         }
@@ -71,6 +86,11 @@ namespace Tests.Mokups
         }
 
         public Result AppointUserToManager(IStore store, IUser user)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permission)
         {
             throw new System.NotImplementedException();
         }
@@ -109,5 +129,7 @@ namespace Tests.Mokups
         {
             throw new System.NotImplementedException();
         }
+
+        public string Username { get; }
     }
 }

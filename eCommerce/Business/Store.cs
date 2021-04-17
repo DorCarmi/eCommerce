@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
-using eCommerce.Business.Basics;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using Microsoft.Extensions.Logging;
@@ -78,6 +76,11 @@ namespace eCommerce.Business
         public Result<Item> GetItem(ItemInfo item)
         {
             return _inventory.GetItem(item);
+        }
+
+        public Result<Item> GetItem(string itemId)
+        {
+            throw new NotImplementedException();
         }
 
         public List<Item> SearchItem(string stringSearch)
@@ -219,6 +222,12 @@ namespace eCommerce.Business
             }
         }
 
+        // TODO implement this method
+        public Result RemoveItemToStore(string productName, IUser user)
+        {
+            throw new NotImplementedException();
+        }
+        
         public Result RemoveItemToStore(ItemInfo newItem, IUser user)
         {
             if (user.HasPermission(this, StorePermission.AddItemToStore).IsFailure)

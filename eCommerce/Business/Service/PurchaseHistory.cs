@@ -1,7 +1,14 @@
-﻿namespace eCommerce.Business.Service
+﻿using System;
+using System.Collections.Generic;
+
+namespace eCommerce.Business.Service
 {
-    public class PurchaseHistory
+    public interface IPurchaseHistory
     {
-        
+        public string StoreId { get; }
+
+        public BasketInfo BasketInfo { get; }
+
+        public DateTime PurchaseTime { get; }
     }
 }

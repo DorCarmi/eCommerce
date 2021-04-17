@@ -1,11 +1,11 @@
-﻿namespace Tests.Auth
+﻿namespace Tests.AuthTests
 {
-    public class TestsUserData
+    public class TUserData
     {
         public string Username { get; }
         public string Password { get; }
 
-        public TestsUserData(string username, string password)
+        public TUserData(string username, string password)
         {
             Username = username;
             Password = password;

@@ -23,10 +23,11 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Register a new user to the system as a member.
         /// </summary>
-        /// <param name="username">The user name</param>
+        /// <param name="token">The Authorization token</param>
+        /// <param name="memberInfoDto">The user information</param>
         /// <param name="password">The user password</param>
         /// <returns>Successful Result if the user has been successfully registered</returns>
-        public Result Register(string username, string password);
+        public Result Register(string token, MemberInfo memberInfoDto, string password);
         
         /// <summary>
         /// Log in to the system
@@ -43,7 +44,7 @@ namespace eCommerce.Business.Service
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>New guest Authorization token</returns>
-        public string Logout(string token);
+        public Result<string> Logout(string token);
         
         // ========== Store ========== //
         
@@ -55,7 +56,7 @@ namespace eCommerce.Business.Service
         /// <param name="query">The product query the search</param>
         /// <param name="token">Authorization token</param>
         /// <returns>List of match products</returns>
-        public Result<IEnumerable<ItemDto>> SearchForProduct(string token, string query);
+        public Result<IEnumerable<IItem>> SearchForProduct(string token, string query);
         
         /// <summary>
         /// Add new item to the sore
@@ -63,7 +64,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="item">The new item</param>
         /// <returns>Result of the item addition</returns>
-        public Result AddNewItemToStore(string token,  ItemDto item);
+        public Result AddNewItemToStore(string token,  IItem item);
         
         /// <summary>
         /// Edit the item
@@ -71,16 +72,16 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="item">The new item</param>
         /// <returns>Result of the edit</returns>
-        public Result EditItemAmountInStore(string token, ItemDto item);
+        public Result EditItemAmountInStore(string token, IItem item);
         
         /// <summary>
         /// Remove item from store
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The sore id</param>
-        /// <param name="itemId">The item id</param>
+        /// <param name="productId">The product id</param>
         /// <returns>Result of the product removal</returns>
-        public Result RemoveProductFromStore(string token, string storeId, string itemId);
+        public Result RemoveProductFromStore(string token, string storeId, string productId);
         
         // TODO requirement 4.2
 
@@ -108,10 +109,10 @@ namespace eCommerce.Business.Service
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
-        /// <param name="appointedManagerUserId">The User manager id</param>
+        /// <param name="managersUserId">The user id of the manger</param>
         /// <param name="permissions">The updated permission</param>
         /// <returns>Result of the update</returns>
-        public Result UpdateManagerPermission(string token, string storeId, string appointedManagerUserId, IList<StorePermission> permissions);
+        public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions);
 
         /// <summary>
         /// Get all the staff of the store and their permissions
@@ -127,7 +128,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
         /// <returns>List of the purchase history in a store</returns>
-        public Result<IEnumerable<PurchaseHistory>> GetPurchaseHistoryOfStore(string token, string storeId);
+        public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId);
 
         // ========== User ========== //
         
@@ -173,22 +174,23 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <returns>The result the purchase</returns>
         public Result PurchaseCart(string token);
-        
+
         /// <summary>
         /// Open a new store for the user.
         /// The name need to be unique
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeName">The store name</param>
+        /// <param name="item">The start product of a sotre</param>
         /// <returns>Result of the request</returns>
-        public Result OpenStore(string token, string storeName);
+        public Result OpenStore(string token, string storeName, IItem item);
 
         /// <summary>
         /// Get the purchase history of the user 
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The purchase history</returns>
-        public Result<IEnumerable<PurchaseHistory>> GetPurchaseHistory(string token);
+        public Result<IEnumerable<IPurchaseHistory>> GetPurchaseHistory(string token);
         
         // ========== Admin ========== //
         
@@ -199,7 +201,7 @@ namespace eCommerce.Business.Service
         /// <param name="storeId">The store id</param>
         /// <param name="ofUserId">The user id</param>
         /// <returns>The history purchase</returns>
-        public Result<IEnumerable<PurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId);
+        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId);
         
         /// <summary>
         /// Get the history purchase of a store
@@ -207,7 +209,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <returns>The history purchase</returns>
-        public Result<IEnumerable<PurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId);
+        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId);
 
     }
 }

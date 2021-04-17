@@ -17,6 +17,10 @@ namespace eCommerce.Business.Service
         public IList<Item> GetAllItems();
 
         public Result<Item> GetItem(ItemInfo item);
+        
+        // TODO implement
+        public Result<Item> GetItem(string itemId);
+
         public List<Item> SearchItem(string stringSearch);
 
         public List<Item> SearchItemWithPriceFilter(string stringSearch, int startPrice, int endPrice);
