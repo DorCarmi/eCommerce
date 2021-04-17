@@ -27,7 +27,7 @@ namespace eCommerce.Business.Service
         /// <param name="memberInfoDto">The user information</param>
         /// <param name="password">The user password</param>
         /// <returns>Successful Result if the user has been successfully registered</returns>
-        public Result Register(string token, MemberInfo memberInfoDto, string password);
+        public Result Register(string token, MemberInfo memberInfoDto, string password);                    //TODO
         
         /// <summary>
         /// Log in to the system
@@ -59,12 +59,12 @@ namespace eCommerce.Business.Service
         public Result<IEnumerable<IProduct>> SearchForProduct(string token, string query);
         
         /// <summary>
-        /// Add new item to the sore
+        /// Add new item to the store
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="product">The new item</param>
         /// <returns>Result of the item addition</returns>
-        public Result AddNewItemToStore(string token,  IProduct product);
+        public Result AddNewItemToStore(string token,  IProduct product);                    //TODO
         
         /// <summary>
         /// Edit the item
@@ -72,7 +72,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="product">The new item</param>
         /// <returns>Result of the edit</returns>
-        public Result EditItemAmountInStore(string token, IProduct product);
+        public Result EditItemInStore(string token, IProduct product);                    //TODO
         
         /// <summary>
         /// Remove item from store
@@ -175,15 +175,15 @@ namespace eCommerce.Business.Service
         /// <returns>The result the purchase</returns>
         public Result PurchaseCart(string token);
 
-        /// <summary>
+        /// <summary>       //TODO products needs a store to exist yet is required for founding a store.
         /// Open a new store for the user.
         /// The name need to be unique
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeName">The store name</param>
-        /// <param name="product">The start product of a sotre</param>
+        /// <param name="product">The start product of a store</param>
         /// <returns>Result of the request</returns>
-        public Result OpenStore(string token, string storeName, IProduct product);
+        public Result OpenStore(string token, string storeName, IProduct product);                    //TODO
 
         /// <summary>
         /// Get the purchase history of the user 
