@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Transactions;
+using System.Linq;
 using eCommerce.Business.Basics;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -9,18 +9,25 @@ namespace eCommerce.Business
 {
     public class Cart : ICart
     {
-        private User _cartHolder;
+        private IUser _cartHolder;
         private Transaction _performTransaction;
         
         private Dictionary<IStore, IBasket> _baskets;
+        private double _totalPrice;
 
-        public Cart(User user)
+        public Cart(IUser user)
         {
             this._cartHolder = user;
             _baskets = new Dictionary<IStore, IBasket>();
+            _totalPrice = 0;
         }
 
-        public Result AddItemToCart(User user,ItemInfo item)
+        public bool CheckForCartHolder(IUser user)
+        {
+            return this._cartHolder == user;
+        }
+
+        public Result AddItemToCart(IUser user,ItemInfo item)
         {
             if (user == this._cartHolder)
             {
@@ -28,8 +35,8 @@ namespace eCommerce.Business
                 {
                     if (item.GetStore().TryAddNewCartToStore(this))
                     {
-                        var newBasket = new Basket(item.GetStore(), this);
-                        item.GetStore().ConnectNewBasketToStore(newBasket);
+                        var newBasket = new Basket(this,item.GetStore());
+                        return item.GetStore().ConnectNewBasketToStore(newBasket);
                     }
                     else
                     {
@@ -37,7 +44,7 @@ namespace eCommerce.Business
                     }
                    
                 }
-                return this._baskets[item.GetStore()].AddItemToBasket(item);
+                return this._baskets[item.GetStore()].AddItemToBasket(user,item);
 
             }
             else
@@ -46,13 +53,13 @@ namespace eCommerce.Business
             }
         }
 
-        public Result EditCartItem(User user, ItemInfo item)
+        public Result EditCartItem(IUser user, ItemInfo item)
         {
             if (user == this._cartHolder)
             {
                 if (this._baskets.ContainsKey(item.GetStore()))
                 {
-                    return _baskets[item.GetStore()].EditItemInBasket(item);
+                    return _baskets[item.GetStore()].EditItemInBasket(user,item);
                 }
                 else
                 {
@@ -75,15 +82,24 @@ namespace eCommerce.Business
                 {
                     return currAns;
                 }
-            }
 
+                double currBasketPrice = storeBasket.Value.GetTotalPrice().GetValue();
+                this._totalPrice += currBasketPrice;
+            }
             return Result.Ok();
+        }
+
+        public double GetCurrentCartPrice()
+        {
+            return this._totalPrice;
         }
         
 
-        public Result<PurchaseInfo> BuyWholeCart(User user)
+        public Result<PurchaseInfo> BuyWholeCart(IUser user)
         {
-            List<Item> items = new List<Item>();
+
+            this._performTransaction = new Transaction(this);
+            List<ItemInfo> items = new List<ItemInfo>();
             double totalPrice = 0;
             if (user == this._cartHolder)
             {
@@ -120,6 +136,13 @@ namespace eCommerce.Business
             {
                 return Result.Fail<PurchaseInfo>("Only cart holder can edit cart");
             }
+        }
+
+        
+
+        public IList<IBasket> GetBaskets()
+        {
+            return this._baskets.Values.ToList();
         }
     }
 }

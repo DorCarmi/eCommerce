@@ -5,6 +5,9 @@
         ChangeItemStrategy,
         AddItemToStore,
         ChangeItemPrice,
-        EditItemDetails
+        EditItemDetails,
+        GetStoreHistory,
+        EditStorePolicy,
+        ControlStaffPermission
     }
 }

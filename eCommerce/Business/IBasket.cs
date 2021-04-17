@@ -7,10 +7,14 @@ namespace eCommerce.Business
     {
         public Result CalculateBasketPrices();
 
-        Result AddItemToBasket(ItemInfo item);
-        Result EditItemInBasket(ItemInfo item);
-        Result BuyWholeBasket();
-        Result<double>GetTotalPrice();
-        Result<IEnumerable<Item>> GetAllItems();
+        public Result AddItemToBasket(IUser user,ItemInfo item);
+        public Result EditItemInBasket(IUser user,ItemInfo item);
+        public Result BuyWholeBasket();
+        public Result<double>GetTotalPrice();
+        public Result<IList<ItemInfo>> GetAllItems();
+        public ICart GetCart();
+        Result SetTotalPrice();
+        public string GetStoreName();
+        public Result<ItemInfo> GetItem(IUser user, string itemName);
     }
 }

@@ -5,18 +5,18 @@ namespace eCommerce
 {
     public class PurchaseInfo
     {
-        private List<Item> allItems;
+        private List<ItemInfo> allItems;
         private double totalPrice;
-        private User user;
+        private IUser user;
 
-        public PurchaseInfo(List<Item> allItems, double totalPrice, User user)
+        public PurchaseInfo(List<ItemInfo> allItems, double totalPrice, IUser user)
         {
             this.allItems = allItems;
             this.totalPrice = totalPrice;
             this.user = user;
         }
 
-        public List<Item> GetAllItems()
+        public List<ItemInfo> GetAllItems()
         {
             return allItems;
         }
@@ -26,8 +26,9 @@ namespace eCommerce
             return totalPrice;
         }
 
-        public User GetUser()
+        public IUser GetUser()
         {
             return user;
         }
     }
+}

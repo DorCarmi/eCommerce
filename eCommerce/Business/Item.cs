@@ -21,6 +21,11 @@ namespace eCommerce.Business
             
             return _pricePerUnit * _amount;
         }
+
+        public int GetPricePerUnit()
+        {
+            return this._pricePerUnit;
+        }
         
         public Item(String name, Category category, IStore store, int pricePer)
         {
@@ -30,6 +35,7 @@ namespace eCommerce.Business
             _amount = 1;
             this._keyWords=new List<string>();
             this._pricePerUnit = pricePer;
+            _purchaseStrategy = new DefaultPurchaseStrategy(_belongsToStore);
         }
 
         public Item(ItemInfo info)
@@ -37,18 +43,23 @@ namespace eCommerce.Business
             this._name = info.name;
             this._amount = info.amount;
             this._category = new Category(info.category);
-            this._keyWords = new List<string>();
-            foreach (var ketWord in info.keyWords)
-            {
-                _keyWords.Add(ketWord);
-            }
-
+            CopyKeyWords(info.keyWords);
+            this._purchaseStrategy = new DefaultPurchaseStrategy(_belongsToStore);
             this._pricePerUnit = info.pricePerUnit;
         }
 
-        public Result SetPrice(User user,int pricePerUnit)
+        private void CopyKeyWords(IList<string> words)
         {
-            if (user.hasPermission(_belongsToStore, StorePermission.ChangeItemPrice))
+            this._keyWords = new List<string>();
+            foreach (var ketWord in words)
+            {
+                _keyWords.Add(ketWord);
+            }
+        }
+
+        public Result SetPrice(IUser user,int pricePerUnit)
+        {
+            if (!user.HasPermission(_belongsToStore, StorePermission.ChangeItemPrice).IsFailure)
             {
                 if (pricePerUnit > 0)
                 {
@@ -99,9 +110,10 @@ namespace eCommerce.Business
             }
         }
         
-        public Result AddKeyWord(User user,String keyWord)
+        public Result AddKeyWord(IUser user,String keyWord)
         {
-            if (user.hasPermission(this._belongsToStore, StorePermission.EditItemDetails))
+            
+            if (!user.HasPermission(this._belongsToStore, StorePermission.EditItemDetails).IsFailure)
             {
                 if (keyWord != null && keyWord.Length > 0)
                 {
@@ -170,13 +182,12 @@ namespace eCommerce.Business
             {
                 return Result.Fail<bool>("Bad amount input");
             }
-            else if (this._amount - amount < 0)
+            else if (this._amount - amount <= 1)
             {
                 return Result.Ok<bool>(false);
             }
             else
             {
-                this._amount -= amount;
                 return Result.Ok<bool>(true);
             }
         }
@@ -184,25 +195,31 @@ namespace eCommerce.Business
         private ItemInfo GetItemInfo(int amount)
         {
             return new ItemInfo(amount, this._name, this._belongsToStore.GetStoreName(), this._category.getName(),
-                this._keyWords,this);
+                this._pricePerUnit,this._keyWords,this);
+        }
+
+        public Result<ItemInfo> AquireItems(ItemInfo itemInfo)
+        {
+            return this._purchaseStrategy.AquireItems(itemInfo);
         }
 
         public Result<ItemInfo> GetItems(int amount)
         {
             //Use to get items to put in basket
-            if (this._amount - amount < 0)
+            if (this._amount - amount <= 1)
             {
                 return Result.Fail<ItemInfo>("There are no enough items to answer the requested amount");
             }
             else
             {
+                
                 return Result.Ok<ItemInfo>(GetItemInfo(amount));
             }
         }
 
         public Result FinalizeGetItems(int amount)
         {
-            if (this._amount - amount < 0)
+            if (this._amount - amount <= 1)
             {
                 return Result.Fail("There are no enough items to answer the requested amount");
             }
@@ -213,7 +230,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result AddItems(User user,int amount)
+        public Result AddItems(IUser user,int amount)
         {
             if (amount > 0)
             {
@@ -233,7 +250,7 @@ namespace eCommerce.Business
             {
                 if (_belongsToStore.CheckWithPolicy(purchaseStrategy))
                 {
-                    var resStrategy=DefaultPurchaseStrategy.GetPurchaseStrategyByName(purchaseStrategy);
+                    var resStrategy=DefaultPurchaseStrategy.GetPurchaseStrategyByName(purchaseStrategy,_belongsToStore);
                     if (resStrategy.IsFailure)
                     {
                         return Result.Fail(resStrategy.GetErrorReason());
@@ -256,6 +273,24 @@ namespace eCommerce.Business
                 return Result.Fail(
                     "User doesn't have the permission to change the strategy for this item in this store");
             }
+        }
+
+        public Result EditItem(ItemInfo newItem)
+        {
+            if (!newItem.name.Equals(this._name))
+            {
+                return Result.Fail("Item info is not for the same item");
+            }
+
+            if (!newItem.storeName.Equals(this._belongsToStore.GetStoreName()))
+            {
+                return Result.Fail("Item info is not about the same store");
+            }
+            this._amount=newItem.amount;
+            this._category = new Category(newItem.category);
+            CopyKeyWords(newItem.keyWords);
+            this._pricePerUnit = newItem.pricePerUnit;
+            return Result.Ok();
         }
     }
 }

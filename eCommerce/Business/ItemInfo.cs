@@ -15,13 +15,14 @@ namespace eCommerce.Business
         private Item theItem;
         private double discountFactor;
 
-        public ItemInfo(int amount, string name, string storeName, string category, List<string> keyWords,Item theItem)
+        public ItemInfo(int amount, string name, string storeName, string category,int pricePerUnit, List<string> keyWords,Item theItem)
         {
             this.amount = amount;
             this.name = name;
             this.storeName = storeName;
             this.category = category;
-            keyWords = new List<string>();
+            this.keyWords = new List<string>();
+            this.pricePerUnit = pricePerUnit;
             foreach (var word in keyWords)
             {
                 if (word == null)
@@ -30,12 +31,35 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    keyWords.Add(String.Copy(word));
+                    this.keyWords.Add(String.Copy(word));
                 }
                 
             }
 
             this.theItem = theItem;
+        }
+        
+        public ItemInfo(int amount, string name, string storeName, string category, List<string> keyWords, int pricePerUnit)
+        {
+            this.amount = amount;
+            this.name = name;
+            this.storeName = storeName;
+            this.category = category;
+            this.pricePerUnit = pricePerUnit;
+            this.keyWords = new List<string>();
+            foreach (var word in keyWords)
+            {
+                if (word == null)
+                {
+                    throw new ArgumentException("Bad key word- null");
+                }
+                else
+                {
+                    this.keyWords.Add(String.Copy(word));
+                }
+                
+            }
+            this.theItem = null;
         }
 
         public IStore GetStore()
