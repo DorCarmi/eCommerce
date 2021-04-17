@@ -73,20 +73,20 @@ namespace eCommerce.Business
             return _userManager.Logout(token);
         }
 
-        public Result<IEnumerable<IProduct>> SearchForProduct(string token, string query)
+        public Result<IEnumerable<IItem>> SearchForProduct(string token, string query)
         {
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
-                return Result.Fail<IEnumerable<IProduct>>(userRes.Error);
+                return Result.Fail<IEnumerable<IItem>>(userRes.Error);
             }
 
-            return Result.Ok<IEnumerable<IProduct>>(_storeRepository.SearchForProduct(query));
+            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForProduct(query));
         }
 
-        public Result AddNewItemToStore(string token, IProduct product)
+        public Result AddNewItemToStore(string token, IItem item)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, product.StoreName);
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
@@ -94,12 +94,12 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
 
-            return store.AddItemToStore(DtoUtils.ProductDtoToProductInfo(product), user);
+            return store.AddItemToStore(DtoUtils.ProductDtoToProductInfo(item), user);
         }
 
-        public Result EditItemAmountInStore(string token, IProduct product)
+        public Result EditItemInStore(string token, IItem item)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, product.StoreName);
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
@@ -107,13 +107,14 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
             
-            return store.EditProduct(DtoUtils.ProductDtoToProductInfo(product), user);
+            return store.EditItemToStore(DtoUtils.ProductDtoToProductInfo(item), user);
 
         }
 
         public Result RemoveProductFromStore(string token, string storeId, string productId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            // TODO verify 
+            /*Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
@@ -121,7 +122,8 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
             
-            return store.RemoveProduct(productId, user);
+            return store.RemoveItemToStore(productId, user);*/
+            throw new NotImplementedException();
         }
 
         public Result AppointCoOwner(string token, string storeId, string appointedUserId)
@@ -189,26 +191,26 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
-        public Result<PurchaseHistory> GetPurchaseHistoryOfStore(string token, string storeId)
+        public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
-                return Result.Fail<PurchaseHistory>(userAndStoreRes.Error);
+                return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
             }
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
 
-            Result<IList<IBasket>> purchaseHistoryRes = store.GetPurchaseHistory();
+            Result<IList<PurchaseRecord>> purchaseHistoryRes = store.GetPurchaseHistory(user);
             if (purchaseHistoryRes.IsFailure)
             {
-                return Result.Fail<PurchaseHistory>(purchaseHistoryRes.Error);
+                return Result.Fail<IList<PurchaseRecord>>(purchaseHistoryRes.Error);
             }
             
-            return Result.Ok(new PurchaseHistory(purchaseHistoryRes.Value));
+            return Result.Ok(purchaseHistoryRes.Value);
         }
 
-        public Result AddItemToCart(string token, string itemId, string storeId, int amount)
+        public Result AddItemToCart(string token, string productId, string storeId, int amount)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
@@ -219,7 +221,7 @@ namespace eCommerce.Business
             IStore store = userAndStoreRes.Value.Item2;
 
 
-            Result<Item> itemRes = store.GetItem(itemId);
+            Result<Item> itemRes = store.GetItem(productId);
             if (itemRes.IsFailure)
             {
                 return itemRes;
@@ -230,7 +232,16 @@ namespace eCommerce.Business
 
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount)
         {
-            throw new System.NotImplementedException();
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+            
+            // TODO implement store and user
+            return null;
         }
 
         public Result<CartDto> GetCart(string token)
@@ -257,22 +268,22 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
-        public Result OpenStore(string token, string storeName, IProduct product)
+        public Result OpenStore(string token, string storeName, IItem item)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IEnumerable<PurchaseHistory>> GetPurchaseHistory(string token)
+        public Result<IEnumerable<IPurchaseHistory>> GetPurchaseHistory(string token)
         {
             throw new System.NotImplementedException();
         }
 
-        public Result<IEnumerable<PurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId)
+        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId)
         {
             throw new System.NotImplementedException();
         }
 
-        public Result<IEnumerable<PurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId)
+        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId)
         {
             throw new System.NotImplementedException();
         }

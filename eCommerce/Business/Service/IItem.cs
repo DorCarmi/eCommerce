@@ -3,9 +3,9 @@ using System.Collections.ObjectModel;
 
 namespace eCommerce.Business.Service
 {
-    public interface IProduct
+    public interface IItem
     {
-        public string ProductName { get; }
+        public string ItemName { get; }
         public string StoreName { get; }
         public int Amount { get; }
         public string Category { get; }

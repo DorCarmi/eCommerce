@@ -19,7 +19,7 @@ namespace eCommerce.Business
 
         public bool Add([NotNull] IStore store)
         {
-            return _stores.TryAdd(store.StoreName, store);
+            return _stores.TryAdd(store.GetStoreName(), store);
         }
 
         public IStore GetOrNull([NotNull] string storeName)
@@ -39,9 +39,9 @@ namespace eCommerce.Business
             IList<ItemInfo> queryMatches = new List<ItemInfo>();
             foreach (var store in _stores.Values)
             {
-                foreach (var item in store.SearchForItems(query))
+                foreach (var item in store.SearchItem(query))
                 {
-                    queryMatches.Add(item);
+                    queryMatches.Add(item.ShowItem());
                 }
             }
 

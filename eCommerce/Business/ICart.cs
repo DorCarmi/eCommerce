@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using eCommerce.Common;
 
@@ -6,15 +7,19 @@ namespace eCommerce.Business
 {
     public interface ICart
     {
-        public Result AddItemToCart(Item item);
+        public Result AddItemToCart(IUser user,ItemInfo item);
+        
+        public Result EditCartItem(IUser user,ItemInfo item);
+        
 
         public Result CalculatePricesForCart();
 
-        public Result<CartInfo> ShowCart();
+        public Result<PurchaseInfo> BuyWholeCart(IUser user);
+        public bool CheckForCartHolder(IUser user);
 
-        public Result BuyWholeCart();
+        public IList<IBasket> GetBaskets();
 
-        
+
 
 
 

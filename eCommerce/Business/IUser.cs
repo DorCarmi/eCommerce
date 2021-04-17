@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using eCommerce.Business.Service;
 using eCommerce.Common;
-using Microsoft.AspNetCore.SignalR;
 
 namespace eCommerce.Business
 {
@@ -10,9 +9,7 @@ namespace eCommerce.Business
     {
         //Facade
         public Result Login();
-
         public Result Logout();
-
         public Result<string> OpenStore(string storeName);
         public Result AddItemToCart(Item item, int amount);
         public Result<CartInfo> GetCartInfo();
@@ -34,14 +31,9 @@ namespace eCommerce.Business
         
         // Added
         // TODO check with the implementer
-        public string UserId { get; set; }
         public string Username { get; }
-        public void Connect();
-        /// <summary>
-        /// Discount the user
-        /// </summary>
-        /// <returns>If the user was registered or not</returns>
-        public bool Disconnect();
+
     }
+
     
 }

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using eCommerce.Business;
 
 namespace eCommerce.Adapters
 {
@@ -11,7 +12,7 @@ namespace eCommerce.Adapters
             _adapter = null;
         }
         
-        public async Task<bool> Charge()
+        public async Task<bool> Charge(double price, string paymentInfoUserName, string paymentInfoIDNumber, string paymentInfoCreditCardNumber, string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)
         {
             if (_adapter == null)
             {
@@ -19,7 +20,7 @@ namespace eCommerce.Adapters
                 return true;
             }
 
-            return await _adapter.Charge();
+            return await _adapter.Charge(price,paymentInfoUserName,paymentInfoIDNumber, paymentInfoCreditCardNumber,paymentInfoCreditCardExpirationDate, paymentInfoThreeDigitsOnBackOfCard );
         }
     }
 }
