@@ -38,6 +38,11 @@ namespace eCommerce.Common
         {
             return new Result<T>(value, true, string.Empty);
         }
+
+        public String GetErrorReason()
+        {
+            return this.Error;
+        }
     }
   
     public class Result<T> : Result
@@ -47,6 +52,11 @@ namespace eCommerce.Common
         protected internal Result(T value, bool success, string error) : base(success, error)
         {
             Value = value;
+        }
+
+        public T GetValue()
+        {
+            return Value;
         }
     }
 }

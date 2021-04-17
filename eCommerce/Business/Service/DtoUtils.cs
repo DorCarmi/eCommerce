@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Auth;
+using Microsoft.Extensions.Logging.EventSource;
 
 namespace eCommerce.Business.Service
 {
@@ -44,14 +45,23 @@ namespace eCommerce.Business.Service
             throw new NotImplementedException();
         }
         
-        public static ItemInfo ProductDtoToProductInfo(IProduct productDto)
+        public static ItemInfo ProductDtoToProductInfo(IItem itemDto)
         {
+            List<string> keywords = new List<string>();
+            IEnumerator<string> enumerator = itemDto.KeyWords.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                keywords.Add(enumerator.Current);
+            }
+
             return new ItemInfo(
-                productDto.Amount,
-                productDto.ProductName,
-                productDto.StoreName,
-                productDto.Category,
-                productDto.KeyWords);
+                itemDto.Amount,
+                itemDto.ItemName,
+                itemDto.StoreName,
+                itemDto.Category,
+                keywords,
+                (int)itemDto.PricePerUnit);
+            return null;
         }
     }
 }

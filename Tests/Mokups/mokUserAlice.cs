@@ -1,33 +1,51 @@
 ﻿using System.Collections.Generic;
+using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
-namespace eCommerce.Business
+namespace Tests.Mokups
 {
-    public class User : IUser
+    public class mokUserAlice : IUser
     {
-        public Result Login()
+        private bool isLoggedIn = false;
+        private string userName = "ALICE";
+
+        public mokUserAlice()
         {
-            throw new System.NotImplementedException();
         }
 
         public Result Login(UserToSystemState systemState)
+        {
+            if (!isLoggedIn)
+            {
+                this.isLoggedIn = true;
+                return Result.Ok();
+            }
+            else
+            {
+                return Result.Fail("User already logged in");
+            }
+        }
+
+        public Result Login()
         {
             throw new System.NotImplementedException();
         }
 
         public Result Logout()
         {
-            throw new System.NotImplementedException();
+            if (isLoggedIn)
+            {
+                this.isLoggedIn = false;
+                return Result.Ok();
+            }
+            else
+            {
+                return Result.Fail("User already logged in");
+            }
         }
-        
 
         public Result<string> OpenStore(string storeName)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result<IStore> OpenNewStore(StoreInfo storeInfo)
         {
             throw new System.NotImplementedException();
         }
@@ -37,7 +55,22 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
-        public Result<CartInfo> GetCartInfo()
+        Result<CartInfo> IUser.GetCartInfo()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result<IStore> OpenNewStore(StoreInfo storeInfo)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result AddItemToCart(Item item)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result<Cart> GetCartInfo()
         {
             throw new System.NotImplementedException();
         }
@@ -57,17 +90,17 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
+        public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permission)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Result AddPermissionsToManager(IStore store, IUser user, StorePermission permission)
         {
             throw new System.NotImplementedException();
         }
 
         public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permission)
         {
             throw new System.NotImplementedException();
         }
@@ -89,7 +122,7 @@ namespace eCommerce.Business
 
         public Result HasPermission(IStore store, StorePermission storePermission)
         {
-            throw new System.NotImplementedException();
+            return Result.Ok();
         }
 
         public Result EnterBasketToHistory(IBasket basket)
@@ -97,35 +130,6 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
         }
 
-                        
-        // TODO check with the implementor
-        public string UserId { get; set; }
-        
         public string Username { get; }
-        
-        public void Connect()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public bool Disconnect()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        // For guest
-        public User(string username)
-        {
-            Username = username;
-        }
-        
-        public User(MemberInfo memberInfo)
-        {
-            
-        }
-        public bool hasPermission(IStore belongsToStore, StorePermission permission)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

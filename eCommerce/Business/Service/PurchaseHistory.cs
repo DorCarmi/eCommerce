@@ -1,18 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace eCommerce.Business.Service
 {
-    public class PurchaseHistory
+    public interface IPurchaseHistory
     {
-        private IList<IBasket> _basketes;
-        public IList<IBasket> Baskets
-        {
-            get => _basketes;
-        }
+        public string StoreId { get; }
 
-        public PurchaseHistory(IList<IBasket> basketes)
-        {
-            _basketes = basketes;
-        }
+        public BasketInfo BasketInfo { get; }
+
+        public DateTime PurchaseTime { get; }
     }
 }
