@@ -15,7 +15,7 @@ namespace eCommerce.Business
 
 
         public Result AddItemToCart(Item item);
-        public Result<CartInfo> GetCartInfo();
+        public Result<Cart> GetCartInfo();
         public Result EditCart(ItemInfo info);
 
         public Result AppointUserToOwner(IStore store, IUser user);
