@@ -8,18 +8,20 @@ namespace eCommerce.Business
     public interface IUser
     {
         //Facade
-        public Result Login();
-        public Result Logout();
-        public Result<string> OpenStore(string storeName);
-        public Result AddItemToCart(Item item, int amount);
-        public Result<CartInfo> GetCartInfo();
+        public Result OpenStore(IStore store);
+        public Result AddItemToCart(ItemInfo item);
+        public Result<ICart> GetCartInfo();
         public Result EditCart(ItemInfo info);
 
         public Result AppointUserToOwner(IStore store, IUser user);
         public Result AppointUserToManager(IStore store, IUser user);
+        
+        public Result<OwnerAppointment> MakeOwner(IStore store);
+        public Result<ManagerAppointment> MakeManager(IStore store);
 
-        public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permission);
+        public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permissions);
 
+        
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store);
         public Result<IBasket> GetUserPurchaseHistory(IStore store);
         public Result<IBasket> GetStorePurchaseHistory(IStore store);
@@ -30,8 +32,13 @@ namespace eCommerce.Business
         public Result EnterBasketToHistory(IBasket basket);
         
         // Added
-        // TODO check with the implementer
         public string Username { get; }
+
+
+
+
+
+
 
     }
 

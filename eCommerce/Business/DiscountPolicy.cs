@@ -29,7 +29,7 @@ namespace eCommerce.Business
 
         public Result AddAllowedDiscountRule(User user)
         {
-            if (user.hasPermission(_store, StorePermission.EditStorePolicy))
+            if (user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {
                 return Result.Ok();
             }

@@ -45,21 +45,22 @@ namespace Tests.Mokups
             }
         }
 
-        public Result<string> OpenStore(string storeName)
+      
+        public Result OpenStore(IStore store)
         {
             throw new System.NotImplementedException();
         }
 
-        public Result AddItemToCart(Item item, int amount)
+        public Result AddItemToCart(ItemInfo item)
         {
             throw new System.NotImplementedException();
         }
 
-        Result<CartInfo> IUser.GetCartInfo()
+        Result<ICart> IUser.GetCartInfo()
         {
             throw new System.NotImplementedException();
         }
-
+        
         public Result<IStore> OpenNewStore(StoreInfo storeInfo)
         {
             throw new System.NotImplementedException();
@@ -86,6 +87,16 @@ namespace Tests.Mokups
         }
 
         public Result AppointUserToManager(IStore store, IUser user)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result<OwnerAppointment> MakeOwner(IStore store)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result<ManagerAppointment> MakeManager(IStore store)
         {
             throw new System.NotImplementedException();
         }

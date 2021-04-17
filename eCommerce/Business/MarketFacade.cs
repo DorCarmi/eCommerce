@@ -226,8 +226,9 @@ namespace eCommerce.Business
             {
                 return itemRes;
             }
-
-            return user.AddItemToCart(itemRes.Value, amount);
+            var newItemInfo = itemRes.Value.ShowItem();
+            newItemInfo.amount = amount;
+            return user.AddItemToCart(newItemInfo);
         }
 
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount)

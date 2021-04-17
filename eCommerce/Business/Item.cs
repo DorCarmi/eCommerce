@@ -98,7 +98,7 @@ namespace eCommerce.Business
 
         public Result EditCategory(User user,Category category)
         {
-            if (user.hasPermission(this._belongsToStore, StorePermission.EditItemDetails))
+            if (user.HasPermission(this._belongsToStore, StorePermission.EditItemDetails).IsSuccess)
             {
                 this._category = category;
                 return Result.Ok();
@@ -245,7 +245,7 @@ namespace eCommerce.Business
 
         public Result AssignPurchaseStrategy(User user,PurchaseStrategyName purchaseStrategy)
         {
-            if (user.hasPermission(_belongsToStore, StorePermission.ChangeItemStrategy))
+            if (user.HasPermission(_belongsToStore, StorePermission.ChangeItemStrategy).IsSuccess)
             {
                 if (_belongsToStore.CheckWithPolicy(purchaseStrategy))
                 {

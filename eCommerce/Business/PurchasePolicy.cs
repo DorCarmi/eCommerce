@@ -34,7 +34,7 @@ namespace eCommerce.Business
 
         public Result AddAllowedPurchaseStrategy(User user)
         {
-            if (user.hasPermission(_store, StorePermission.EditStorePolicy))
+            if (user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {
                 return Result.Ok();
             }
@@ -46,7 +46,7 @@ namespace eCommerce.Business
 
         public Result AddTimesToStore(User user)
         {
-            if (user.hasPermission(_store, StorePermission.EditStorePolicy))
+            if (user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {
                 return Result.Ok();
             }
@@ -58,7 +58,7 @@ namespace eCommerce.Business
 
         public Result AddPriceRule(User user)
         {
-            if (user.hasPermission(_store, StorePermission.EditStorePolicy))
+            if (user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {
                 return Result.Ok();
             }

@@ -41,7 +41,7 @@ namespace eCommerce.Business
         
         public Result<IList<PurchaseRecord>> GetHistory(User user, DateTime dateStart, DateTime dateEnd)
         {
-            if (user.hasPermission(_store, StorePermission.GetStoreHistory))
+            if (user.HasPermission(_store, StorePermission.GetStoreHistory).IsSuccess)
             {
                 var lst = this._history.Where(x => x.GetDate() >= dateStart && x.GetDate() <= dateEnd).ToList();
                 return Result.Ok<IList<PurchaseRecord>>(lst);
