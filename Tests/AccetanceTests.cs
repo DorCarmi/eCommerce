@@ -28,7 +28,7 @@ namespace Tests
             _market.Register(token, lior, "987654321");
             Result<string> yossiLogInResult = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             string storeName = "yossi's store";
-            IProduct product = new ProductDto("Tara milk", storeName, 10, "dairy",
+            IItem product = new ItemDto("Tara milk", storeName, 10, "dairy",
                 new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (float)5.4);
             _market.OpenStore(yossiLogInResult.Value, storeName, product);
             token = _market.Logout(yossiLogInResult.Value).Value;
@@ -141,7 +141,7 @@ namespace Tests
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result addItemResult = _market.AddNewItemToStore(yossiLogin.Value,
-                new ProductDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(addItemResult.IsSuccess, "failed to add items: " + addItemResult.Error);
             token = _market.Logout(yossiLogin.Value).Value;
             _market.Disconnect(token);
@@ -165,7 +165,7 @@ namespace Tests
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result addItemResult = _market.AddNewItemToStore(yossiLogin.Value,
-                new ProductDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(addItemResult.IsFailure, "item addition was suppose to fail");
             token = _market.Logout(yossiLogin.Value).Value;
             _market.Disconnect(token);
@@ -184,7 +184,7 @@ namespace Tests
         {
             string token = _market.Connect();
             Result addItemResult = _market.AddNewItemToStore(token,
-                new ProductDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(addItemResult.IsFailure, "Item Addition was suppose to fail");
             token = _market.Logout(token).Value;
             _market.Disconnect(token);
@@ -214,7 +214,7 @@ namespace Tests
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result editItemResult = _market.EditItemInStore(yossiLogin.Value,
-                new ProductDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(editItemResult.IsSuccess, "failed to edit item: " + editItemResult.Error);
             token = _market.Logout(yossiLogin.Value).Value;
             _market.Disconnect(token);
@@ -242,7 +242,7 @@ namespace Tests
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result editItemResult = _market.EditItemInStore(yossiLogin.Value,
-                new ProductDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item");
             token = _market.Logout(yossiLogin.Value).Value;
             _market.Disconnect(token);
@@ -261,7 +261,7 @@ namespace Tests
         {
             string token = _market.Connect();
             Result editItemResult = _market.EditItemInStore(token,
-                new ProductDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(editItemResult.IsFailure, "should not succeed since no user is logged in");
             _market.Disconnect(token);
         }
