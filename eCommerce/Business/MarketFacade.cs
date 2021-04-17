@@ -97,7 +97,7 @@ namespace eCommerce.Business
             return store.AddItemToStore(DtoUtils.ProductDtoToProductInfo(item), user);
         }
 
-        public Result EditItemAmountInStore(string token, IItem item)
+        public Result EditItemInStore(string token, IItem item)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
             if (userAndStoreRes.IsFailure)

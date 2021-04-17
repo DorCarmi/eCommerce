@@ -62,7 +62,7 @@ namespace eCommerce.Business.Service
         /// Add new item to the sore
         /// </summary>
         /// <param name="token">Authorization token</param>
-        /// <param name="item">The new item</param>
+        /// <param name="product">The new item</param>
         /// <returns>Result of the item addition</returns>
         public Result AddNewItemToStore(string token,  IItem item);
         
@@ -70,9 +70,9 @@ namespace eCommerce.Business.Service
         /// Edit the item
         /// </summary>
         /// <param name="token">Authorization token</param>
-        /// <param name="item">The new item</param>
+        /// <param name="product">The new item</param>
         /// <returns>Result of the edit</returns>
-        public Result EditItemAmountInStore(string token, IItem item);
+        public Result EditItemInStore(string token, IItem item);
         
         /// <summary>
         /// Remove item from store
