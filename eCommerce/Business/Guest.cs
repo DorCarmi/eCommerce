@@ -44,14 +44,14 @@ namespace eCommerce.Business
             return Result.Fail("Illegal action for guest (Appoint-User).");
         }
 
-        public Result MakeOwner(User user, IStore store)
+        public Result<OwnerAppointment> MakeOwner(User user, IStore store)
         {
-            return Result.Fail("Illegal action for guest (Make-Owner).");
+            return Result.Fail<OwnerAppointment>("Illegal action for guest (Make-Owner).");
         }
 
-        public Result MakeManager(User user, IStore store)
+        public Result<ManagerAppointment> MakeManager(User user, IStore store)
         {
-            return Result.Fail("Illegal action for guest (Make-Manager).");
+            return Result.Fail<ManagerAppointment>("Illegal action for guest (Make-Manager).");
         }
 
         public Result AddPermissionsToManager(User user, IStore store, IUser otherUser, StorePermission permission)
@@ -63,16 +63,7 @@ namespace eCommerce.Business
         {
             return Result.Fail("Illegal action for guest (Take-Store-Permissions-From-User).");
         }
-
-        public Result AddPermissions(User user, IStore store, StorePermission permission)
-        {
-            return Result.Fail("Illegal action for guest (Add-Store-Permissions).");
-        }
-
-        public Result RemovePermissions(User user, IStore store, StorePermission permission)
-        {
-            return Result.Fail("Illegal action for guest (Remove-Store-Permissions).");
-        }
+        
 
         public Result HasPermission(User user, IStore store, StorePermission storePermission)
         {

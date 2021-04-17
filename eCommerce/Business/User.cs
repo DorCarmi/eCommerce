@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -7,13 +9,20 @@ namespace eCommerce.Business
 {
     public class User : IUser
     {
-        // 
-        // private Transactions - history
+        
         private bool _isRegistered;
         private UserToSystemState _systemState;
         private string _userName;
         private ICart _myCart;
-        private MemberData _myData;
+
+        private Object dataLock;
+        //MemberData:
+        private ConcurrentDictionary<IStore, bool> _storesFounded;
+        private ConcurrentDictionary<IStore, OwnerAppointment> _storesOwned;
+        private ConcurrentDictionary<IStore, ManagerAppointment> _storesManaged;
+        private ConcurrentDictionary<IStore, IList<OwnerAppointment>> _appointedOwners;
+        private ConcurrentDictionary<IStore, IList<ManagerAppointment>> _appointedManagers;
+        private UserTransactionHistory _transHistory ;
 
 
 
@@ -29,10 +38,16 @@ namespace eCommerce.Business
         public User(UserToSystemState systemState, MemberData memberData)
         {
             _systemState = systemState;
-            _myData = memberData;
-            _myCart = _myData.Cart;
-            _userName = _myData.Username;
+            // _myData = memberData;
+            _myCart = memberData.Cart;
+            _userName = memberData.Username;
             _isRegistered = true;
+            _storesFounded = memberData.StoresFounded;
+            _storesOwned = memberData.StoresOwned;
+            _storesManaged = memberData.StoresManaged;
+            _appointedOwners = memberData.AppointedOwners;
+            _appointedManagers = memberData.AppointedManagers;
+            _transHistory = memberData.History;
         }
     
 
@@ -68,15 +83,14 @@ namespace eCommerce.Business
             return _systemState.OpenStore(this, store);
         }
 
-        public Result AddItemToCart(Item item)
+        public Result AddItemToCart(ItemInfo item)
         {
             return _myCart.AddItemToCart(item);
         }
 
         public Result<CartInfo> GetCartInfo()
         {
-            //@TODO:: cart.getInfo();
-            throw new NotImplementedException();
+            return _myCart.ShowCart();
         }
 
         public Result EditCart(ItemInfo info)
@@ -86,9 +100,6 @@ namespace eCommerce.Business
 
         public Result AppointUserToOwner(IStore store, IUser user)
         {
-            // Result res = user.MakeOwner(store, this);
-            // if (res.IsFailure)
-            //     return res; //@TODO::move block to Member.AppointUserToOwner
             return _systemState.AppointUserToOwner(this, store, user);
         }
 
@@ -127,26 +138,15 @@ namespace eCommerce.Business
 
 
         //User to User
-        public Result MakeOwner(IStore store)
+        public Result<OwnerAppointment> MakeOwner(IStore store)
         {
             return _systemState.MakeOwner(this, store);
         }
 
-        public Result MakeManager(IStore store)
+        public Result<ManagerAppointment> MakeManager(IStore store)
         {
             return _systemState.MakeManager(this, store);
         }
-
-        public Result AddPermissions(IStore store, StorePermission permission)
-        {
-            return _systemState.AddPermissions(this, store, permission);
-        }
-
-        public Result RemovePermissions(IStore store, StorePermission permission)
-        {
-            return _systemState.RemovePermissions(this, store, permission);
-        }
-
 
 
         //InBusiness
@@ -161,33 +161,22 @@ namespace eCommerce.Business
         }
 
 
-
-
-        public void testPrint()
-        {
-            UserToSystemState guest = Guest.State;
-        }
-
-        public void testPrint(Guest s)
-        {
-            Console.WriteLine("printing Guest");
-        }
-
-        public void testPrint(Member s)
-        {
-            Console.WriteLine("printing Member");
-        }
+        
         
         
         
 
 
 
-        //Admin Functions
+    
+    #region Admin Functions
+        //@TODO:: add required functions
+       
 
-
-        //Guest Functions
-
+    #endregion Admin Functions
+    
+    
+    #region Guest Functions
         public Result Login(Guest guest, UserToSystemState systemState, MemberData memberData)
         {
             Result res = memberData.Cart.MergeCarts(_myCart);
@@ -195,20 +184,24 @@ namespace eCommerce.Business
             {
                 return res;
             }
+
+            throw new NotImplementedException();
             _systemState = systemState;
-            _myData = memberData;
-            _myCart = _myData.Cart;
-            _userName = _myData.Username;
+            // _myData = memberData;
+            // _myCart = _myData.Cart;
+            // _userName = _myData.Username;
             _isRegistered = true;
             return Result.Ok();
         }
-        
-        
-        //Member Functions
+    #endregion Guest Functions
+    
+    
+    #region Member Functions
         public Result Logout(Member member, string toGuestName)
         {
             _systemState = Guest.State;
-            _myData = null;
+            throw new NotImplementedException();
+            // _myData = null;
             _userName = toGuestName;
             _myCart = new Cart(this);
             _isRegistered = false;
@@ -217,8 +210,11 @@ namespace eCommerce.Business
 
         public Result OpenStore(Member member, IStore store)
         {
-            bool res =_myData.StoresFounded.TryAdd(store,true);
+            // adds store to both Owned-By and Founded-By
+            OwnerAppointment owner = new OwnerAppointment(this);
+            // @TODO:: add extra founder's permissions to 'owner'
             
+            bool res =_storesFounded.TryAdd(store,true) && _storesOwned.TryAdd(store,owner);
             if (res)
             {
                 return Result.Ok();
@@ -226,55 +222,158 @@ namespace eCommerce.Business
             return Result.Fail("Unable to open store");
         }
 
-        public Result AppointUserToOwner(Member store, IStore user, IUser otherUser)
+        public Result AppointUserToOwner(Member member, IStore store, IUser otherUser)
         {
-            throw new NotImplementedException();
+            if (!_storesOwned.ContainsKey(store))
+            {
+                return Result.Fail("user \'"+_userName+"\' is not an owner of the given store.");
+            }
+
+            Result<OwnerAppointment> res = otherUser.MakeOwner(store);
+            if (res.IsFailure)
+            {
+                return res;
+            }
+
+            OwnerAppointment newOwner = res.Value;
+            // acquire user-data lock
+            lock (dataLock)
+            {
+                if (!_appointedOwners.ContainsKey(store))
+                {
+                    IList<OwnerAppointment> ownerList = new List<OwnerAppointment>();
+                    ownerList.Add(newOwner);
+                    if (!_appointedOwners.TryAdd(store, ownerList))
+                        return Result.Fail("unable to add other-user as an Appointed-Owner");
+                }
+                else
+                {
+                    _appointedOwners[store].Add(newOwner);
+                }
+            }//release lock
+            return store.AppointNewOwner(otherUser,newOwner);
         }
 
-        public Result AppointUserToManager(Member store, IStore user, IUser otherUser)
+        public Result AppointUserToManager(Member member, IStore store, IUser otherUser)
         {
-            throw new NotImplementedException();
+            if (!_storesOwned.ContainsKey(store)){
+                return Result.Fail("user \'"+_userName+"\' is not an owner of the given store.");
+            }
+            Result<ManagerAppointment> res = otherUser.MakeManager(store);
+            if (res.IsFailure){
+                return res;
+            }
+
+            ManagerAppointment newManager = res.Value;
+            // acquire user-data lock
+            lock (dataLock)
+            {
+                if (!_appointedManagers.ContainsKey(store))
+                {
+                    IList<ManagerAppointment> managerList = new List<ManagerAppointment>();
+                    managerList.Add(newManager);
+                    if (!_appointedManagers.TryAdd(store, managerList))
+                        return Result.Fail("unable to add other-user as an Appointed-Manager");
+                }
+                else
+                {
+                    _appointedManagers[store].Add(newManager);
+                }
+            }//release lock
+            return store.AppointNewManager(otherUser,newManager);
         }
 
-        public Result MakeOwner(Member store, IStore store1)
+        public Result<OwnerAppointment> MakeOwner(Member member, IStore store)
         {
-            throw new NotImplementedException();
+            OwnerAppointment newOwner = new OwnerAppointment(this);
+            if (_storesOwned.TryAdd(store, newOwner))
+            {
+                return Result.Ok<OwnerAppointment>(newOwner);
+            }
+            return Result.Fail<OwnerAppointment>("unable to add user \'"+_userName+"\' as store owner");
         }
 
-        public Result MakeManager(Member store, IStore store1)
+        public Result<ManagerAppointment> MakeManager(Member member, IStore store)
         {
-            throw new NotImplementedException();
+            ManagerAppointment newManager = new ManagerAppointment();
+            if (!_storesOwned.ContainsKey(store) && _storesManaged.TryAdd(store, newManager))
+            {
+                return Result.Ok<ManagerAppointment>(newManager);
+            }
+            return Result.Fail<ManagerAppointment>("unable to add user \'"+_userName+"\' as store Manager");
         }
 
-        public Result AddPermissionsToManager(Member store, IStore user, IUser otherUser, StorePermission permission)
+        public Result AddPermissionsToManager(Member member, IStore store, IUser otherUser, StorePermission permission)
         {
-            throw new NotImplementedException();
+            // if (_appointedOwners.ContainsKey(store))
+            // {
+            //     OwnerAppointment owner = null;
+            //     lock (dataLock)
+            //     {
+            //         owner = _appointedOwners[store].FirstOrDefault((oa) => oa.User == otherUser);
+            //     }
+            //     if (owner != null)
+            //     {
+            //         return owner.AddPermissions(permission);
+            //     }
+            // }
+
+            if (_appointedManagers.ContainsKey(store))
+            {
+                ManagerAppointment manager = null;
+                lock (dataLock)
+                {
+                    manager = _appointedManagers[store].FirstOrDefault((ma) => ma.User == otherUser);
+                }
+
+                if (manager != null)
+                {
+                    return manager.AddPermissions(permission);
+                }
+            }
+            return Result.Fail("user\'"+_userName+"\' can not grant permissions to given manager");
         }
 
-        public Result RemovePermissionsToManager(Member store, IStore user, IUser otherUser, StorePermission permission)
+        public Result RemovePermissionsToManager(Member member, IStore store, IUser otherUser, StorePermission permission)
         {
-            throw new NotImplementedException();
+            if (_appointedManagers.ContainsKey(store))
+            {
+                ManagerAppointment manager = null;
+                lock (dataLock)
+                {
+                    manager = _appointedManagers[store].FirstOrDefault((ma) => ma.User == otherUser);
+                }
+
+                if (manager != null)
+                {
+                    return manager.RemovePermission(permission);
+                }
+            }
+            return Result.Fail("user\'"+_userName+"\' can not remove permissions from given manager");
         }
 
-        public Result AddPermissions(Member store, IStore permission, StorePermission storePermission)
+        public Result HasPermission(Member member, IStore store, StorePermission permission)
         {
-            throw new NotImplementedException();
+            if(_storesOwned.ContainsKey(store))
+            {
+                return _storesOwned[store].HasPermission(permission);
+            }
+
+            if (_storesManaged.ContainsKey(store))
+            {
+                return _storesManaged[store].HasPermission(permission);
+            }
+            
+            return Result.Fail("user\'"+_userName+"\' is not a stakeholder of the given store");
         }
 
-        public Result RemovePermissions(Member store, IStore permission, StorePermission storePermission)
+        public Result EnterBasketToHistory(Member member, IBasket basket)
         {
-            throw new NotImplementedException();
+            return _transHistory.EnterBasketToHistory(basket);
         }
-
-        public Result HasPermission(Member store, IStore storePermission, StorePermission storePermission1)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result EnterBasketToHistory(Member basket, IBasket basket1)
-        {
-            throw new NotImplementedException();
-        }
+        
+        #endregion //Member Functions
+        
     }
-
-}
+    
+   }

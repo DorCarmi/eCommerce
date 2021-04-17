@@ -43,12 +43,12 @@ namespace eCommerce.Business
             return user.AppointUserToManager(this, store, otherUser);
         }
 
-        public Result MakeOwner(User user, IStore store)
+        public Result<OwnerAppointment> MakeOwner(User user, IStore store)
         {
             return user.MakeOwner(this, store);
         }
 
-        public Result MakeManager(User user, IStore store)
+        public Result<ManagerAppointment> MakeManager(User user, IStore store)
         {
             return user.MakeManager(this, store);
         }
@@ -62,18 +62,8 @@ namespace eCommerce.Business
         {
             return user.RemovePermissionsToManager(this,store, otherUser,permission);
         }
-
-        public Result AddPermissions(User user, IStore store, StorePermission permission)
-        {
-            return user.AddPermissions(this, store,permission);
-        }
-
-        public Result RemovePermissions(User user, IStore store, StorePermission permission)
-        {
-            return user.RemovePermissions(this, store,permission);
-        }
-
-        public Result HasPermission(User user, IStore store, StorePermission storePermission)
+        
+        public virtual Result HasPermission(User user, IStore store, StorePermission storePermission)
         {
             return user.HasPermission(this, store,storePermission);
         }

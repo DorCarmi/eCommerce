@@ -14,19 +14,20 @@ namespace eCommerce.Business
         public Result OpenStore(IStore store);
 
 
-        public Result AddItemToCart(Item item);
+        public Result AddItemToCart(ItemInfo info);
         public Result<CartInfo> GetCartInfo();
         public Result EditCart(ItemInfo info);
 
         public Result AppointUserToOwner(IStore store, IUser user);
         public Result AppointUserToManager(IStore store, IUser user);
         
-        public Result MakeOwner(IStore store);
-        public Result MakeManager(IStore store);
+        public Result<OwnerAppointment> MakeOwner(IStore store);
+        public Result<ManagerAppointment> MakeManager(IStore store);
 
         public Result AddPermissionsToManager(IStore store, IUser user, StorePermission permission);
         public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission);
 
+        
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store);
         public Result<IBasket> GetUserPurchaseHistory(IStore store);
         public Result<IBasket> GetStorePurchaseHistory(IStore store);
