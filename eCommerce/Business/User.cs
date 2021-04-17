@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +12,10 @@ namespace eCommerce.Business
         
         private bool _isRegistered;
         private UserToSystemState _systemState;
-        private string _userName;
+        private MemberInfo _memberInfo;
         private ICart _myCart;
-
+        public string Username {get => _memberInfo.Username;}
+        
         private Object dataLock;
         //MemberData:
         private ConcurrentDictionary<IStore, bool> _storesFounded;
@@ -29,7 +30,7 @@ namespace eCommerce.Business
         //constructors
         public User(string userName)
         {
-            _userName = userName;
+            _memberInfo = new MemberInfo(userName, null,null,DateTime.Now, null);
             _systemState = Guest.State;
             _myCart = new Cart(this);
             _isRegistered = false;
@@ -37,31 +38,45 @@ namespace eCommerce.Business
 
         public User(UserToSystemState systemState, MemberData memberData)
         {
-            _systemState = systemState;
-            // _myData = memberData;
-            _myCart = memberData.Cart;
-            _userName = memberData.Username;
-            _isRegistered = true;
-            _storesFounded = memberData.StoresFounded;
-            _storesOwned = memberData.StoresOwned;
-            _storesManaged = memberData.StoresManaged;
-            _appointedOwners = memberData.AppointedOwners;
-            _appointedManagers = memberData.AppointedManagers;
-            _transHistory = memberData.History;
+            // _systemState = systemState;
+            // // _myData = memberData;
+            // _myCart = memberData.Cart;
+            // _userName = memberData.Username;
+            // _isRegistered = true;
+            // _storesFounded = memberData.StoresFounded;
+            // _storesOwned = memberData.StoresOwned;
+            // _storesManaged = memberData.StoresManaged;
+            // _appointedOwners = memberData.AppointedOwners;
+            // _appointedManagers = memberData.AppointedManagers;
+            // _transHistory = memberData.History;
         }
-    
 
-    //Facade
+        public User(MemberInfo info)
+        {
+            _memberInfo = info;
+            _systemState = Member.State;
+            _myCart = new Cart(this);
+            // _userName = memberData.Username;
+            _storesFounded = new ConcurrentDictionary<IStore, bool>();
+            _storesOwned = new ConcurrentDictionary<IStore, OwnerAppointment>();
+            _storesManaged = new ConcurrentDictionary<IStore, ManagerAppointment>();
+            _appointedOwners = new ConcurrentDictionary<IStore, IList<OwnerAppointment>>();
+            _appointedManagers = new ConcurrentDictionary<IStore, IList<ManagerAppointment>>();
+            _transHistory = new UserTransactionHistory();
+        }
+
+
+        //Facade
         public Result Login(UserToSystemState systemState, MemberData memberData)
         {
             if (systemState == null)
             {
-                return Result.Fail("Invalid State for user " + _userName);
+                return Result.Fail("Invalid State for user " + Username);
             }
 
             if (memberData == null)
             {
-                return Result.Fail("Invalid memberData for user " + _userName);
+                return Result.Fail("Invalid memberData for user " + Username);
             }
 
             return _systemState.Login(this,systemState, memberData);
@@ -85,17 +100,17 @@ namespace eCommerce.Business
 
         public Result AddItemToCart(ItemInfo item)
         {
-            return _myCart.AddItemToCart(item);
+            return _myCart.AddItemToCart(this, item);
         }
 
-        public Result<CartInfo> GetCartInfo()
+        public Result<ICart> GetCartInfo()
         {
-            return _myCart.ShowCart();
+            return Result.Ok<ICart>(_myCart);
         }
 
         public Result EditCart(ItemInfo info)
         {
-            return _myCart.EditCart(info);
+            return _myCart.EditCartItem(this, info);
         }
 
         public Result AppointUserToOwner(IStore store, IUser user)
@@ -108,6 +123,7 @@ namespace eCommerce.Business
             return _systemState.AppointUserToManager(this, store, user);
         }
 
+        // remove 2 functions:
         public Result AddPermissionsToManager(IStore store, IUser user, StorePermission permission)
         {
             return _systemState.AddPermissionsToManager(this, store, user, permission);
@@ -117,6 +133,12 @@ namespace eCommerce.Business
         {
             return _systemState.RemovePermissionsToManager(this, store, user, permission);
         }
+
+        public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permissions)
+        {
+            return _systemState.UpdatePermissionsToManager(this, store, user, permissions);
+        }
+
 
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store)
         {
@@ -161,15 +183,8 @@ namespace eCommerce.Business
         }
 
 
-        
-        
-        
-        
 
-
-
-    
-    #region Admin Functions
+        #region Admin Functions
         //@TODO:: add required functions
        
 
@@ -179,13 +194,14 @@ namespace eCommerce.Business
     #region Guest Functions
         public Result Login(Guest guest, UserToSystemState systemState, MemberData memberData)
         {
-            Result res = memberData.Cart.MergeCarts(_myCart);
-            if (res.IsFailure)
-            {
-                return res;
-            }
-
             throw new NotImplementedException();
+
+            // Result res = memberData.Cart.MergeCarts(_myCart);
+            // if (res.IsFailure)
+            // {
+            //     return res;
+            // }
+
             _systemState = systemState;
             // _myData = memberData;
             // _myCart = _myData.Cart;
@@ -202,7 +218,7 @@ namespace eCommerce.Business
             _systemState = Guest.State;
             throw new NotImplementedException();
             // _myData = null;
-            _userName = toGuestName;
+            // _userName = toGuestName;
             _myCart = new Cart(this);
             _isRegistered = false;
             return Result.Ok();
@@ -226,7 +242,7 @@ namespace eCommerce.Business
         {
             if (!_storesOwned.ContainsKey(store))
             {
-                return Result.Fail("user \'"+_userName+"\' is not an owner of the given store.");
+                return Result.Fail("user \'"+Username+"\' is not an owner of the given store.");
             }
 
             Result<OwnerAppointment> res = otherUser.MakeOwner(store);
@@ -257,7 +273,7 @@ namespace eCommerce.Business
         public Result AppointUserToManager(Member member, IStore store, IUser otherUser)
         {
             if (!_storesOwned.ContainsKey(store)){
-                return Result.Fail("user \'"+_userName+"\' is not an owner of the given store.");
+                return Result.Fail("user \'"+Username+"\' is not an owner of the given store.");
             }
             Result<ManagerAppointment> res = otherUser.MakeManager(store);
             if (res.IsFailure){
@@ -290,7 +306,7 @@ namespace eCommerce.Business
             {
                 return Result.Ok<OwnerAppointment>(newOwner);
             }
-            return Result.Fail<OwnerAppointment>("unable to add user \'"+_userName+"\' as store owner");
+            return Result.Fail<OwnerAppointment>("unable to add user \'"+Username+"\' as store owner");
         }
 
         public Result<ManagerAppointment> MakeManager(Member member, IStore store)
@@ -300,7 +316,7 @@ namespace eCommerce.Business
             {
                 return Result.Ok<ManagerAppointment>(newManager);
             }
-            return Result.Fail<ManagerAppointment>("unable to add user \'"+_userName+"\' as store Manager");
+            return Result.Fail<ManagerAppointment>("unable to add user \'"+Username+"\' as store Manager");
         }
 
         public Result AddPermissionsToManager(Member member, IStore store, IUser otherUser, StorePermission permission)
@@ -331,7 +347,7 @@ namespace eCommerce.Business
                     return manager.AddPermissions(permission);
                 }
             }
-            return Result.Fail("user\'"+_userName+"\' can not grant permissions to given manager");
+            return Result.Fail("user\'"+Username+"\' can not grant permissions to given manager");
         }
 
         public Result RemovePermissionsToManager(Member member, IStore store, IUser otherUser, StorePermission permission)
@@ -349,9 +365,28 @@ namespace eCommerce.Business
                     return manager.RemovePermission(permission);
                 }
             }
-            return Result.Fail("user\'"+_userName+"\' can not remove permissions from given manager");
+            return Result.Fail("user\'"+Username+"\' can not remove permissions from given manager");
         }
 
+        
+        public Result UpdatePermissionsToManager(Member member, IStore store, IUser otherUser, IList<StorePermission> permissions)
+        {
+            if (_appointedManagers.ContainsKey(store))
+            {
+                ManagerAppointment manager = null;
+                lock (dataLock)
+                {
+                    manager = _appointedManagers[store].FirstOrDefault((ma) => ma.User == otherUser);
+                }
+
+                if (manager != null)
+                {
+                    return manager.UpdatePermissions(permissions);
+                }
+            }
+            return Result.Fail("user\'"+Username+"\' can not remove permissions from given manager");
+        }
+        
         public Result HasPermission(Member member, IStore store, StorePermission permission)
         {
             if(_storesOwned.ContainsKey(store))
@@ -364,7 +399,7 @@ namespace eCommerce.Business
                 return _storesManaged[store].HasPermission(permission);
             }
             
-            return Result.Fail("user\'"+_userName+"\' is not a stakeholder of the given store");
+            return Result.Fail("user\'"+Username+"\' is not a stakeholder of the given store");
         }
 
         public Result EnterBasketToHistory(Member member, IBasket basket)
@@ -373,7 +408,7 @@ namespace eCommerce.Business
         }
         
         #endregion //Member Functions
-        
+
     }
     
    }

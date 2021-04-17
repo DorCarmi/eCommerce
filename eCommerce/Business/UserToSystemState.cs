@@ -1,4 +1,5 @@
-﻿using eCommerce.Business.Service;
+﻿using System.Collections.Generic;
+using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -14,6 +15,7 @@ namespace eCommerce.Business
         Result<ManagerAppointment> MakeManager(User user,IStore store);
         Result AddPermissionsToManager(User user,IStore store, IUser otherUser, StorePermission permission);
         Result RemovePermissionsToManager(User user,IStore store, IUser otherUser, StorePermission permission);
+        Result UpdatePermissionsToManager(User user, IStore store, IUser user1, IList<StorePermission> permissions);
         Result HasPermission(User user,IStore store, StorePermission storePermission);
         Result EnterBasketToHistory(User user,IBasket basket);
     }

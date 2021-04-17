@@ -4,7 +4,7 @@ using eCommerce.Common;
 
 namespace eCommerce.Business
 {
-    public class MemberInfo //: ICloneable<MemberInfo>
+    public class MemberInfo : ICloneable<MemberInfo>
     {
         public string Id { get; set; }
         public string Username { get; }

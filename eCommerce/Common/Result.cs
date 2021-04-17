@@ -5,7 +5,8 @@ namespace eCommerce.Common
     public class Result
     {
         private bool Success { get; }
-        private string Error { get; set; }
+        public string Error { get; }
+        public bool IsSuccess => Success;
         public bool IsFailure => !Success;
 
         protected Result(bool success, string error)
@@ -37,15 +38,25 @@ namespace eCommerce.Common
         {
             return new Result<T>(value, true, string.Empty);
         }
+
+        public String GetErrorReason()
+        {
+            return this.Error;
+        }
     }
   
     public class Result<T> : Result
     {
-        private T Value { get; }
+        public T Value { get; }
 
         protected internal Result(T value, bool success, string error) : base(success, error)
         {
             Value = value;
+        }
+
+        public T GetValue()
+        {
+            return Value;
         }
     }
 }

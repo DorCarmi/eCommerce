@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -63,7 +64,12 @@ namespace eCommerce.Business
         {
             return Result.Fail("Illegal action for guest (Take-Store-Permissions-From-User).");
         }
-        
+
+        public Result UpdatePermissionsToManager(User user, IStore store, IUser user1, IList<StorePermission> permissions)
+        {
+            return Result.Fail("Illegal action for guest (Update-Store-Permissions-From-User).");
+        }
+
 
         public Result HasPermission(User user, IStore store, StorePermission storePermission)
         {

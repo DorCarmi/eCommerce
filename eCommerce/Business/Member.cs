@@ -1,4 +1,5 @@
-﻿using eCommerce.Business.Service;
+﻿using System.Collections.Generic;
+using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -62,7 +63,12 @@ namespace eCommerce.Business
         {
             return user.RemovePermissionsToManager(this,store, otherUser,permission);
         }
-        
+
+        public Result UpdatePermissionsToManager(User user, IStore store, IUser otherUser, IList<StorePermission> permissions)
+        {
+            return user.UpdatePermissionsToManager(this,store, otherUser,permissions);
+        }
+
         public virtual Result HasPermission(User user, IStore store, StorePermission storePermission)
         {
             return user.HasPermission(this, store,storePermission);

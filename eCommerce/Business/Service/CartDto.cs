@@ -1,6 +1,6 @@
 ﻿namespace eCommerce.Business.Service
 {
-    public class ItemDto
+    public class CartDto
     {
         
     }

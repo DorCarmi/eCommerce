@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -27,6 +28,18 @@ namespace eCommerce.Business
             if(_permissions.ContainsKey(permission))
                 return Result.Ok();
             return Result.Fail("Manager does not have the required permission");
+        }
+
+        public Result UpdatePermissions(IList<StorePermission> permissions)
+        {
+            bool res = false;
+            var newPermissions = new ConcurrentDictionary<StorePermission, bool>();
+            foreach (var permission in permissions)
+            {
+                newPermissions.TryAdd(permission,true);
+            }
+            this._permissions = newPermissions;
+            return Result.Ok();
         }
     }
 }
