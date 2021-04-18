@@ -34,6 +34,7 @@ namespace eCommerce.Business
             _systemState = Guest.State;
             _myCart = new Cart(this);
             _isRegistered = false;
+            dataLock = new object();
         }
 
         public User(UserToSystemState systemState, MemberData memberData)
@@ -63,6 +64,7 @@ namespace eCommerce.Business
             _appointedOwners = new ConcurrentDictionary<IStore, IList<OwnerAppointment>>();
             _appointedManagers = new ConcurrentDictionary<IStore, IList<ManagerAppointment>>();
             _transHistory = new UserTransactionHistory();
+            dataLock = new object();
         }
 
 

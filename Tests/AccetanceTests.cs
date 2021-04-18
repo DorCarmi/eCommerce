@@ -7,6 +7,7 @@ using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using NUnit.Framework;
+using Tests.Business;
 
 namespace Tests
 {
@@ -18,7 +19,7 @@ namespace Tests
         [SetUp]
         public void SetUp()
         {
-            _market = MarketFacade.CreateInstanceForTests(UserAuth.GetInstance(), new RegisteredUsersRepository(), new StoreRepository());
+            _market = MarketFacade.CreateInstanceForTests(new UserAuthMock(), new RegisteredUsersRepository(), new StoreRepository());
             MemberInfo yossi = new MemberInfo("Yossi11","yossi@gmail.com", "Yossi Park", DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             MemberInfo shiran = new MemberInfo("singerMermaid","shiran@gmail.com", "Shiran Moris", DateTime.ParseExact("25/06/2008", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Rabin 14");
             MemberInfo lior = new MemberInfo("Liorwork","lior@gmail.com", "Lior Lee", DateTime.ParseExact("05/07/1996", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Carl Neter 14");
@@ -27,7 +28,7 @@ namespace Tests
             _market.Register(token, shiran, "130452abc");
             _market.Register(token, lior, "987654321");
             Result<string> yossiLogInResult = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            string storeName = "yossi's store";
+            string storeName = "Yossi's Store";
             IItem product = new ItemDto("Tara milk", storeName, 10, "dairy",
                 new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
             _market.OpenStore(yossiLogInResult.Value, storeName, product);
