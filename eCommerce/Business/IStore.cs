@@ -20,6 +20,9 @@ namespace eCommerce.Business.Service
         
         // TODO implement
         public Result<Item> GetItem(string itemId);
+        
+        // TODO implement, return list of username and there permissions
+        public Result<IEnumerable<Tuple<string, IEnumerable<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user);
 
         public List<Item> SearchItem(string stringSearch);
 

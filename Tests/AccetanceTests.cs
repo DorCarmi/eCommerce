@@ -29,7 +29,7 @@ namespace Tests
             Result<string> yossiLogInResult = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             string storeName = "yossi's store";
             IItem product = new ItemDto("Tara milk", storeName, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (float)5.4);
+                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
             _market.OpenStore(yossiLogInResult.Value, storeName, product);
             token = _market.Logout(yossiLogInResult.Value).Value;
             _market.Disconnect(token);
@@ -131,12 +131,12 @@ namespace Tests
          * Req - 4.1
          */
         [TestCase("iPhone X", "Yossi's Store", 35, "smartphones",
-            new string[] {"smartphone", "iPhone", "Apple", "Iphone X"}, (float) 5000.99)]
+            new string[] {"smartphone", "iPhone", "Apple", "Iphone X"}, (double) 5000.99)]
         [TestCase("Gans 356 air Rubik's cube", "Yossi's Store", 178, "games",
-            new string[] {"games", "Rubik's cube", "Gans","356 air"}, (float) 114.75)]
+            new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) 114.75)]
         [Test]
         public void TestAddNewItemToStoreSuccess(string name, string storeName, int amount, string category, string[] tags,
-            float price)
+            double price)
         {
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -151,16 +151,16 @@ namespace Tests
          * Req - 4.1
          */
         [TestCase("iPhone X", "Yossi's Store", -23, "smartphones",
-            new string[] {"smartphone", "iPhone", "Apple", "Iphone X"}, (float) 5000.99)]
+            new string[] {"smartphone", "iPhone", "Apple", "Iphone X"}, (double) 5000.99)]
         [TestCase("Gans 356 air Rubik's cube", "Yossi's Store", 178, "games",
-            new string[] {"games", "Rubik's cube", "Gans","356 air"}, (float) -75.9)]
+            new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) -75.9)]
         [TestCase("Cube Alarm", "the dancing pirate", 5986, "electronics",
-            new string[] {"alarm", "electronics", "cube","decorations"}, (float) 65.5)]
+            new string[] {"alarm", "electronics", "cube","decorations"}, (double) 65.5)]
         [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (float)5.8)]
+            new string[]{"dairy", "milk", "Tara"}, (double)5.8)]
         [Test]      //TODO add a test case for a store that exists but not owned by the current user
         public void TestAddNewItemToStoreFailureInput(string name, string storeName, int amount, string category, string[] tags,
-            float price)
+            double price)
         {
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -175,12 +175,12 @@ namespace Tests
          * Req - 4.1
          */
         [TestCase("iPhone X", "Yossi's Store", 35, "smartphones",
-            new string[] {"smartphone", "iPhone", "Apple", "Iphone X"}, (float) 5000.99)]
+            new string[] {"smartphone", "iPhone", "Apple", "Iphone X"}, (double) 5000.99)]
         [TestCase("Gans 356 air Rubik's cube", "Yossi's Store", 178, "games",
-            new string[] {"games", "Rubik's cube", "Gans","356 air"}, (float) 114.75)]
+            new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) 114.75)]
         [Test]
         public void TestAddNewItemToStoreFailureAccess(string name, string storeName, int amount, string category, string[] tags,
-            float price)
+            double price)
         {
             string token = _market.Connect();
             Result addItemResult = _market.AddNewItemToStore(token,
@@ -196,20 +196,20 @@ namespace Tests
          * Req - 4.1
          */
         [TestCase("Tara milk", "Yossi's Store", 15, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (float)5.4)] //edit amount (add)
+            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (add)
         [TestCase("Tara milk", "Yossi's Store", 5, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (float)5.4)] //edit amount (subtract)
+            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (subtract)
         [TestCase("Tara milk", "Yossi's Store", 0, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (float)5.4)] //edit amount (remove)
+            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (remove)
         [TestCase("Tara milk", "Yossi's Store", 10, "Tara",
-            new string[]{"dairy", "milk", "Tara"}, (float)5.4)] //edit category
+            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit category
         [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
-            new string[]{"milk", "Tara"}, (float)5.4)] //edit keywords
+            new string[]{"milk", "Tara"}, (double)5.4)] //edit keywords
         [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (float)6.2)] // edit price
+            new string[]{"dairy", "milk", "Tara"}, (double)6.2)] // edit price
         [Test]
         public void TestEditItemInStoreSuccess(string name, string storeName, int amount, string category, string[] tags,
-            float price)  //TODO change facade to reflect the function editing any part of an item
+            double price)  //TODO change facade to reflect the function editing any part of an item
         {
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -226,18 +226,18 @@ namespace Tests
          * Req - 4.1
          */
         [TestCase("Tara milk", "Yossi's Store", -23, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (float)5.4)] //edit amount (invalid subtract)
+            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (invalid subtract)
         [TestCase("Tara milk", "Yossi's Store", 10, "~~123~~~Tara",
-            new string[]{"dairy", "milk", "Tara"}, (float)5.4)] //edit invalid category
+            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit invalid category
         [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (float)-6.2)] // edit invalid price
+            new string[]{"dairy", "milk", "Tara"}, (double)-6.2)] // edit invalid price
         [TestCase("Gans 356 air Rubik's cube", "Yossi's Store", 178, "games",
-            new string[] {"games", "Rubik's cube", "Gans","356 air"}, (float) 114.75)] // edit a non-existing item
+            new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) 114.75)] // edit a non-existing item
         [TestCase("Tara milk", "prancing dragon", 10, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (float)5.4)] //edit fail, can't change the store (store doesn't exist)
+            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit fail, can't change the store (store doesn't exist)
         [Test] //TODO add test for an existing store that isn't owned by the user
         public void TestEditItemInStoreFailureInvalid(string name, string storeName, int amount, string category, string[] tags,
-            float price)
+            double price)
         {
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -254,10 +254,10 @@ namespace Tests
          * Req - 4.1
          */
         [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (float)6.2)] // edit price (will fail due to wrong steps)
+            new string[]{"dairy", "milk", "Tara"}, (double)6.2)] // edit price (will fail due to wrong steps)
         [Test]
         public void TestEditItemInStoreFailureLogic(string name, string storeName, int amount, string category, string[] tags,
-            float price)
+            double price)
         {
             string token = _market.Connect();
             Result editItemResult = _market.EditItemInStore(token,

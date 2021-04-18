@@ -45,7 +45,7 @@ namespace eCommerce.Business.Service
             throw new NotImplementedException();
         }
         
-        public static ItemInfo ProductDtoToProductInfo(IItem itemDto)
+        public static ItemInfo ItemDtoToProductInfo(IItem itemDto)
         {
             List<string> keywords = new List<string>();
             IEnumerator<string> enumerator = itemDto.KeyWords.GetEnumerator();
@@ -62,6 +62,15 @@ namespace eCommerce.Business.Service
                 keywords,
                 (int)itemDto.PricePerUnit);
             return null;
+        }
+
+        public static BasketDto IBasketToBasketDto(IBasket basket)
+        {
+            return new BasketDto(
+                basket.GetStoreName(),
+                basket.GetAllItems().Value,
+                basket.GetTotalPrice().Value
+            );
         }
     }
 }

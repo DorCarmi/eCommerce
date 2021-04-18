@@ -128,7 +128,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
         /// <returns>List of the purchase history in a store</returns>
-        public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId);
+        public Result<IList<IPurchaseHistory>> GetPurchaseHistoryOfStore(string token, string storeId);
 
         // ========== User ========== //
         
@@ -166,7 +166,7 @@ namespace eCommerce.Business.Service
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The total price of the cart</returns>
-        public Result<int> GetPurchaseCartPrice(string token);
+        public Result<double> GetPurchaseCartPrice(string token);
         
         /// <summary>
         /// Purchase the user cart

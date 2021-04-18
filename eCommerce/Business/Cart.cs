@@ -72,20 +72,20 @@ namespace eCommerce.Business
         }
 
 
-        public Result CalculatePricesForCart()
+        public Result<double> CalculatePricesForCart()
         {
             foreach (var storeBasket in _baskets)
             {
                 var currAns = storeBasket.Key.CalculateBasketPrices(storeBasket.Value);
                 if (currAns.IsFailure)
                 {
-                    return currAns;
+                    return Result.Fail<double>(currAns.Error);
                 }
 
                 double currBasketPrice = storeBasket.Value.GetTotalPrice().GetValue();
                 this._totalPrice += currBasketPrice;
             }
-            return Result.Ok();
+            return Result.Ok(_totalPrice);
         }
 
         public double GetCurrentCartPrice()

@@ -17,7 +17,7 @@ namespace Tests.Mokups
             throw new System.NotImplementedException();
         }
 
-        public Result CalculatePricesForCart()
+        public Result<double> CalculatePricesForCart()
         {
             throw new System.NotImplementedException();
         }
