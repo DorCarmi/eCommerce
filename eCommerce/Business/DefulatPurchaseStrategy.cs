@@ -38,6 +38,12 @@ namespace eCommerce.Business
         {
             return _store.FinishPurchaseOfBasket(basket);
         }
+
+        public PurchaseStrategyName GetStrategyName()
+        {
+            return PurchaseStrategyName.Regular;
+        }
+
         public Result BuyItems(ItemInfo item)
         {
             return _store.FinishPurchaseOfItems(item);

@@ -14,7 +14,7 @@ namespace eCommerce.Business
 
         public Result<double> CalculatePricesForCart();
 
-        public Result<PurchaseInfo> BuyWholeCart(IUser user);
+        public Result BuyWholeCart(IUser user, PaymentInfo paymentInfo);
         public bool CheckForCartHolder(IUser user);
 
         public IList<IBasket> GetBaskets();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,29 +34,32 @@ namespace eCommerce.Business
             _systemState = Guest.State;
             _myCart = new Cart(this);
             _isRegistered = false;
+            dataLock = new Object();
         }
 
-        public User(UserToSystemState systemState, MemberData memberData)
-        {
-            // _systemState = systemState;
-            // // _myData = memberData;
-            // _myCart = memberData.Cart;
-            // _userName = memberData.Username;
-            // _isRegistered = true;
-            // _storesFounded = memberData.StoresFounded;
-            // _storesOwned = memberData.StoresOwned;
-            // _storesManaged = memberData.StoresManaged;
-            // _appointedOwners = memberData.AppointedOwners;
-            // _appointedManagers = memberData.AppointedManagers;
-            // _transHistory = memberData.History;
-        }
 
-        public User(UserToSystemState userState, MemberInfo info)
+        public User(MemberInfo info)
         {
+            _isRegistered = true;
             _memberInfo = info;
-            _systemState = userState;
+            dataLock = new Object();
+            _systemState = Member.State;
             _myCart = new Cart(this);
             // _userName = memberData.Username;
+            _storesFounded = new ConcurrentDictionary<IStore, bool>();
+            _storesOwned = new ConcurrentDictionary<IStore, OwnerAppointment>();
+            _storesManaged = new ConcurrentDictionary<IStore, ManagerAppointment>();
+            _appointedOwners = new ConcurrentDictionary<IStore, IList<OwnerAppointment>>();
+            _appointedManagers = new ConcurrentDictionary<IStore, IList<ManagerAppointment>>();
+            _transHistory = new UserTransactionHistory();
+        } 
+        public User(UserToSystemState state, MemberInfo info)
+        {
+            _isRegistered = true;
+            _memberInfo = info;
+            dataLock = new Object();
+            _systemState = state;
+            _myCart = new Cart(this);
             _storesFounded = new ConcurrentDictionary<IStore, bool>();
             _storesOwned = new ConcurrentDictionary<IStore, OwnerAppointment>();
             _storesManaged = new ConcurrentDictionary<IStore, ManagerAppointment>();
@@ -139,21 +142,6 @@ namespace eCommerce.Business
             return _systemState.UpdatePermissionsToManager(this, store, user, permissions);
         }
 
-        Result<IList<PurchaseRecord>> IUser.GetUserPurchaseHistory(IStore store)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IStore store, IUser otherUser)
-        {
-            throw new NotImplementedException();
-        }
-
-        Result<IList<PurchaseRecord>> IUser.GetStorePurchaseHistory(IStore store)
-        {
-            throw new NotImplementedException();
-        }
-
 
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store)
         {
@@ -161,16 +149,18 @@ namespace eCommerce.Business
             throw new NotImplementedException();
         }
 
-        public Result<IBasket> GetUserPurchaseHistory(IStore store)
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory()
         {
-            //@TODO:: find out why store?;
-            throw new NotImplementedException();
+            return _systemState.GetUserPurchaseHistory(this);
+        }
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IUser otherUser)
+        {
+            return _systemState.GetUserPurchaseHistory(this, otherUser);
         }
 
-        public Result<IBasket> GetStorePurchaseHistory(IStore store)
+        public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(IStore store)
         {
-            //@TODO:: find out why this is here..?;
-            throw new NotImplementedException();
+            return _systemState.GetStorePurchaseHistory(this, store);
         }
 
 
@@ -192,14 +182,14 @@ namespace eCommerce.Business
             return _systemState.HasPermission(this, store, storePermission);
         }
 
-        public Result EnterBasketToHistory(IBasket basket)
+        public Result EnterRecordToHistory(PurchaseRecord record)
         {
-            return _systemState.EnterBasketToHistory(this, basket);
+            return _systemState.EnterRecordToHistory(this, record);
         }
 
 
 
-    #region Admin Functions
+        #region Admin Functions
         //@TODO:: add required functions
        
 
@@ -417,13 +407,23 @@ namespace eCommerce.Business
             return Result.Fail("user\'"+Username+"\' is not a stakeholder of the given store");
         }
 
-        public Result EnterBasketToHistory(Member member, IBasket basket)
+        public Result EnterRecordToHistory(Member member, PurchaseRecord record)
         {
-            return _transHistory.EnterBasketToHistory(basket);
+            return _transHistory.EnterRecordToHistory(record);
+        }
+        
+
+        public Result<IList<PurchaseRecord>> GetUserHistory()
+        {
+            return _transHistory.GetUserHistory();
+        }
+
+        public Result<IList<PurchaseRecord>> GetStoreHistory(IStore store)
+        {
+            return store.GetPurchaseHistory(this);
         }
         
         #endregion //Member Functions
-
     }
     
    }

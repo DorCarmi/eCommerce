@@ -42,7 +42,14 @@ namespace eCommerce.Business.Service
 
         public Result AddItemToStore(ItemInfo newItem, IUser user);
         public Result EditItemToStore(ItemInfo newItem, IUser user);
+        
+        public Result UpdateStock_AddItems(ItemInfo newItem, IUser user);
+        
+        public Result UpdateStock_SubtractItems(ItemInfo newItem, IUser user);
+        
+        
         public Result RemoveItemToStore(ItemInfo newItem, IUser user);
+        public Result RemoveItemToStore(string itemID, IUser user);
 
         public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment);
         public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment);
@@ -57,5 +64,11 @@ namespace eCommerce.Business.Service
         Result ConnectNewBasketToStore(Basket newBasket);
         bool CheckConnectionToCart(ICart cart);
         Result<double> CheckDiscount(Basket basket);
+        Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy);
+        Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(IUser user);
+        Result UpdatePurchaseStrategies(IUser user, PurchaseStrategyName purchaseStrategy);
+        Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
+        Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
+        Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
     }
 }

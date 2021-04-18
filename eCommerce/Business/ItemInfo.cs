@@ -46,7 +46,7 @@ namespace eCommerce.Business
             this.name = name;
             this.storeName = storeName;
             this.category = category;
-            keyWords = new List<string>();
+            this.keyWords = new List<string>();
             foreach (var word in keyWords)
             {
                 if (word == null)

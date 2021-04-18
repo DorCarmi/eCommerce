@@ -22,6 +22,11 @@ namespace Tests.Mokups
             throw new System.NotImplementedException();
         }
 
+        public Result BuyWholeCart(IUser user, PaymentInfo paymentInfo)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Result<PurchaseInfo> BuyWholeCart(IUser user)
         {
             throw new System.NotImplementedException();

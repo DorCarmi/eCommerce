@@ -15,6 +15,7 @@ namespace eCommerce.Business
             this.User = user;
             this._permissions = new ConcurrentDictionary<StorePermission, bool>();
             //add permissions
+            
         }
 
         public Result AddPermissions(StorePermission permission)
