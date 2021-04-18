@@ -181,7 +181,7 @@ namespace eCommerce.Business.Service
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeName">The store name</param>
-        /// <param name="item">The start product of a sotre</param>
+        /// <param name="item">The start product of a store</param>
         /// <returns>Result of the request</returns>
         public Result OpenStore(string token, string storeName, IItem item);
 
@@ -201,7 +201,7 @@ namespace eCommerce.Business.Service
         /// <param name="storeId">The store id</param>
         /// <param name="ofUserId">The user id</param>
         /// <returns>The history purchase</returns>
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId);
+        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string ofUserId);
         
         /// <summary>
         /// Get the history purchase of a store
