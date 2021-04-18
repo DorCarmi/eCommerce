@@ -54,6 +54,13 @@ namespace eCommerce.Business
                 null);
             _userManager.AddAdmin(adminInfo, "_Admin");
         }
+
+
+        #region UserManage
+
+        
+
+        
         
         // <CNAME>Connect</CNAME>
         public string Connect()
@@ -84,7 +91,157 @@ namespace eCommerce.Business
         {
             return _userManager.Logout(token);
         }
+        
+        //<CNAME>PersonalPurchaseHistory</CNAME>
+        public Result<IList<IPurchaseHistory>> GetPurchaseHistory(string token)
+        {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<IList<IPurchaseHistory>>(userRes.Error);
+            }
+            IUser user = userRes.Value;
+            
+            // TODO GetStorePurchaseHistory return IBusket instead of purchaseRecord
+            //user.GetStorePurchaseHistory();
+            //user.GetUserPurchaseHistory()
+            throw new System.NotImplementedException();
+        }
+        
+         //<CNAME>AppointCoOwner</CNAME>
+        public Result AppointCoOwner(string token, string storeId, string appointedUserId)
+        {
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+            
+            Result<IUser> appointedUserRes = _userManager.GetUser(appointedUserId);
+            if (appointedUserRes.IsFailure)
+            {
+                return appointedUserRes;
+            }
+            IUser appointedUser = appointedUserRes.Value;
 
+            return user.AppointUserToOwner(store, appointedUser);
+        }
+                
+        //<CNAME>AppointManager</CNAME>
+        public Result AppointManager(string token, string storeId, string appointedManagerUserId)
+        {
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+            
+            Result<IUser> appointedUserRes = _userManager.GetUser(appointedManagerUserId);
+            if (appointedUserRes.IsFailure)
+            {
+                return appointedUserRes;
+            }
+            IUser appointedUser = appointedUserRes.Value;
+
+            return user.AppointUserToOwner(store, appointedUser);
+        }
+        
+        public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)
+        {
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+            
+            Result<IUser> mangerUserRes = _userManager.GetUser(managersUserId);
+            if (mangerUserRes.IsFailure)
+            {
+                return mangerUserRes;
+            }
+            IUser managerUser = mangerUserRes.Value;
+            return user.UpdatePermissionsToManager(store, managerUser, permissions);
+        }
+        
+        //<CNAME>RemoveManagerPermissions</CNAME>
+        public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
+            IList<StorePermission> permissions)
+        {
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+            
+            Result<IUser> mangerUserRes = _userManager.GetUser(managersUserId);
+            if (mangerUserRes.IsFailure)
+            {
+                return mangerUserRes;
+            }
+            IUser managerUser = mangerUserRes.Value;
+            foreach (var permission in permissions)
+            {
+                var res = user.RemovePermissionsToManager(store, managerUser, permission);
+                if(res.IsFailure)
+                {
+                    return res;
+                }
+            }
+
+            return Result.Ok();
+        }
+        //<CNAME:GetStoreStaff</CNAME>
+        public Result<IList<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId)
+        {
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<IList<StaffPermission>>(userAndStoreRes.Error);
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+            var staffPermission = new List<StaffPermission>();
+            var tuplePermissionRes = store.GetStoreStaffAndTheirPermissions(user);
+            if (tuplePermissionRes.IsFailure)
+            {
+                return Result.Fail<IList<StaffPermission>>(tuplePermissionRes.Error);
+            }
+            
+            foreach (var (item1, item2) in tuplePermissionRes.Value)
+            {
+                staffPermission.Add(new StaffPermission(item1, item2));
+            }
+
+            return Result.Ok<IList<StaffPermission>>(staffPermission);
+        }
+        //<CNAME>AdminGetAllUserHistory</CNAME>
+        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId)
+         {
+             throw new NotImplementedException();
+         }
+         
+         //<CNAME>AdminGetStoreHistory</CNAME>
+         public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId)
+         {
+             throw new System.NotImplementedException();
+         }
+        #endregion
+
+        #region MyRegion
+
+        
+
+        #endregion
+        
         public Result<StoreDto> GetStore(string token, string storeId)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -240,102 +397,14 @@ namespace eCommerce.Business
             throw new NotImplementedException();
         }
         
-        //<CNAME>AppointCoOwner</CNAME>
-        public Result AppointCoOwner(string token, string storeId, string appointedUserId)
-        {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
-            
-            Result<IUser> appointedUserRes = _userManager.GetUser(appointedUserId);
-            if (appointedUserRes.IsFailure)
-            {
-                return appointedUserRes;
-            }
-            IUser appointedUser = appointedUserRes.Value;
-
-            return user.AppointUserToOwner(store, appointedUser);
-        }
-        
-        //<CNAME>AppointManager</CNAME>
-        public Result AppointManager(string token, string storeId, string appointedManagerUserId)
-        {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
-            
-            Result<IUser> appointedUserRes = _userManager.GetUser(appointedManagerUserId);
-            if (appointedUserRes.IsFailure)
-            {
-                return appointedUserRes;
-            }
-            IUser appointedUser = appointedUserRes.Value;
-
-            return user.AppointUserToOwner(store, appointedUser);
-        }
+       
         
         //<CNAME>UpdateManagerPermissions</CNAME>
-        public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)
-        {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
-            
-            Result<IUser> mangerUserRes = _userManager.GetUser(managersUserId);
-            if (mangerUserRes.IsFailure)
-            {
-                return mangerUserRes;
-            }
-            IUser managerUser = mangerUserRes.Value;
-
-            return user.UpdatePermissionsToManager(store, managerUser, permissions);
-        }
-        //<CNAME>RemoveManagerPermissions</CNAME>
-        public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
-            IList<StorePermission> permissions)
-        {
-            throw new System.NotImplementedException();
-        }
+        
         
         
 
-        //<CNAME:GetStoreStaff</CNAME>
-        public Result<IList<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId)
-        {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return Result.Fail<IList<StaffPermission>>(userAndStoreRes.Error);
-            }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
-
-            var staffPermission = new List<StaffPermission>();
-            var tuplePermissionRes = store.GetStoreStaffAndTheirPermissions(user);
-            if (tuplePermissionRes.IsFailure)
-            {
-                return Result.Fail<IList<StaffPermission>>(tuplePermissionRes.Error);
-            }
-            
-            foreach (var (item1, item2) in tuplePermissionRes.Value)
-            {
-                staffPermission.Add(new StaffPermission(item1, item2));
-            }
-
-            return Result.Ok<IList<StaffPermission>>(staffPermission);
-        }
+     
 
         public Result<IList<IPurchaseHistory>> GetPurchaseHistoryOfStore(string token, string storeId)
         {
@@ -489,34 +558,9 @@ namespace eCommerce.Business
             return Result.Ok();
         }
         
-        //<CNAME>PersonalPurchaseHistory</CNAME>
-        public Result<IList<IPurchaseHistory>> GetPurchaseHistory(string token)
-        {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<IList<IPurchaseHistory>>(userRes.Error);
-            }
-            IUser user = userRes.Value;
-            
-            // TODO GetStorePurchaseHistory return IBusket instead of purchaseRecord
-            //user.GetStorePurchaseHistory();
-            throw new System.NotImplementedException();
-
-        }
-
-        //<CNAME>AdminGetAllUserHistory</CNAME>
-
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId)
-        {
-            throw new NotImplementedException();
-        }
         
-        //<CNAME>AdminGetStoreHistory</CNAME>
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId)
-        {
-            throw new System.NotImplementedException();
-        }
+
+        
 
         private Result<Tuple<IUser, IStore>> GetUserAndStore(string token, string storeId)
         {

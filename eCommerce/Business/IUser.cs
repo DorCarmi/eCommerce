@@ -20,6 +20,7 @@ namespace eCommerce.Business
         public Result<ManagerAppointment> MakeManager(IStore store);
 
         public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permissions);
+        public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission);
 
         // TODO implement
         public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IStore store);
