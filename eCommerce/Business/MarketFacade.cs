@@ -97,11 +97,13 @@ namespace eCommerce.Business
             return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForProduct(query));
         }
         
+        //<CNAME>SearchForStore</CNAME>
         public Result<IEnumerable<IItem>> SearchForStore(string token, string query)
         {
             throw new NotImplementedException();
         }
-
+        
+        //<CNAME>ItemsToStore</CNAME>
         public Result AddNewItemToStore(string token, IItem item)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
@@ -114,7 +116,9 @@ namespace eCommerce.Business
 
             return store.AddItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
         }
-
+        
+        
+        //<CNAME>UpdateItemsStock</CNAME>
         public Result EditItemInStore(string token, IItem item)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
@@ -128,7 +132,8 @@ namespace eCommerce.Business
             return store.EditItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
 
         }
-
+        
+        //<CNAME>ItemsInStore</CNAME>
         public Result RemoveProductFromStore(string token, string storeId, string productId)
         {
             // TODO verify 
@@ -215,7 +220,7 @@ namespace eCommerce.Business
         }
         
         
-        //<CNAME:GetStoreStaff</CNAME>
+        //<CNAME>GetStoreStaff</CNAME>
         public Result<IEnumerable<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -259,7 +264,8 @@ namespace eCommerce.Business
 
             return Result.Ok<IList<IPurchaseHistory>>((IList<IPurchaseHistory>) purchaseHistoryRes.Value);
         }
-
+        
+        //<CNAME>AddItemToCart</CNAME>
         public Result AddItemToCart(string token, string productId, string storeId, int amount)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -281,6 +287,7 @@ namespace eCommerce.Business
             return user.AddItemToCart(newItemInfo);
         }
 
+        //<CNAME>EditCart</CNAME>   
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -294,7 +301,8 @@ namespace eCommerce.Business
             // TODO implement store and user
             return null;
         }
-
+        
+        //<CNAME>GetCart</CNAME>
         public Result<CartDto> GetCart(string token)
         {
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
@@ -338,7 +346,8 @@ namespace eCommerce.Business
             ICart cart = cartRes.Value;
             return cart.CalculatePricesForCart();
         }
-
+        
+        //<CNAME>BuyWholeCart</CNAME>
         public Result PurchaseCart(string token)
         {
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
@@ -363,7 +372,8 @@ namespace eCommerce.Business
 
             return Result.Ok();
         }
-
+        
+        //<CNAME>OpenStore</CNAME>
         public Result OpenStore(string token, string storeName, IItem item)
         {
             // TODO check with user and store
