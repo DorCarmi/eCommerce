@@ -69,14 +69,29 @@ namespace eCommerce.Business
             return user.UpdatePermissionsToManager(this,store, otherUser,permissions);
         }
 
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user)
+        {
+            return user.GetUserHistory();
+        }
+
+        public virtual Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, IUser otherUser)
+        {
+            return Result.Fail<IList<PurchaseRecord>>("Illegal action for member (Get-Other-User-History)");
+        }
+
+        public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(User user, IStore store)
+        {
+            return user.GetStoreHistory(store);
+        }
+
         public virtual Result HasPermission(User user, IStore store, StorePermission storePermission)
         {
             return user.HasPermission(this, store,storePermission);
         }
 
-        public Result EnterBasketToHistory(User user, IBasket basket)
+        public Result EnterRecordToHistory(User user, PurchaseRecord record)
         {
-            return user.EnterBasketToHistory(this, basket);
+            return user.EnterRecordToHistory(this, record);
         }
     }
 }
