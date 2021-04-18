@@ -106,6 +106,21 @@ namespace Tests.Mokups
             throw new System.NotImplementedException();
         }
 
+        Result<IList<PurchaseRecord>> IUser.GetUserPurchaseHistory(IStore store)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IStore store, IUser otherUser)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        Result<IList<PurchaseRecord>> IUser.GetStorePurchaseHistory(IStore store)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Result AddPermissionsToManager(IStore store, IUser user, StorePermission permission)
         {
             throw new System.NotImplementedException();
