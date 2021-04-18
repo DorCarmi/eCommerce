@@ -216,12 +216,12 @@ namespace eCommerce.Business
         
         
         //<CNAME:GetStoreStaff</CNAME>
-        public Result<IEnumerable<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId)
+        public Result<IList<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
-                return Result.Fail<IEnumerable<StaffPermission>>(userAndStoreRes.Error);
+                return Result.Fail<IList<StaffPermission>>(userAndStoreRes.Error);
             }
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
@@ -230,7 +230,7 @@ namespace eCommerce.Business
             var tuplePermissionRes = store.GetStoreStaffAndTheirPermissions(user);
             if (tuplePermissionRes.IsFailure)
             {
-                return Result.Fail<IEnumerable<StaffPermission>>(tuplePermissionRes.Error);
+                return Result.Fail<IList<StaffPermission>>(tuplePermissionRes.Error);
             }
             
             foreach (var (item1, item2) in tuplePermissionRes.Value)
@@ -238,7 +238,7 @@ namespace eCommerce.Business
                 staffPermission.Add(new StaffPermission(item1, item2));
             }
 
-            return Result.Ok<IEnumerable<StaffPermission>>(staffPermission);
+            return Result.Ok<IList<StaffPermission>>(staffPermission);
         }
 
         public Result<IList<IPurchaseHistory>> GetPurchaseHistoryOfStore(string token, string storeId)
@@ -389,12 +389,12 @@ namespace eCommerce.Business
         }
         
         //<CNAME>PersonalPurchaseHistory</CNAME>
-        public Result<IEnumerable<IPurchaseHistory>> GetPurchaseHistory(string token)
+        public Result<IList<IPurchaseHistory>> GetPurchaseHistory(string token)
         {
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
-                return Result.Fail<IEnumerable<IPurchaseHistory>>(userRes.Error);
+                return Result.Fail<IList<IPurchaseHistory>>(userRes.Error);
             }
             IUser user = userRes.Value;
             
@@ -404,18 +404,15 @@ namespace eCommerce.Business
 
         }
 
-        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId)
+        //<CNAME>AdminGetAllUserHistory</CNAME>
+
+        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId)
         {
             throw new NotImplementedException();
         }
-
-        //<CNAME>AdminGetAllUserHistory</CNAME>
-        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId)
-        {
-            throw new System.NotImplementedException();
-        }
+        
         //<CNAME>AdminGetStoreHistory</CNAME>
-        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId)
+        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId)
         {
             throw new System.NotImplementedException();
         }

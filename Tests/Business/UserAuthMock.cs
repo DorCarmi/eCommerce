@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using eCommerce.Auth;
 using eCommerce.Common;
+using NUnit.Framework;
 
 namespace Tests.Business
 {
@@ -112,7 +113,10 @@ namespace Tests.Business
                 return Result.Ok(new AuthData(guestName, "Guest"));
             }
 
-            _loggedInUsers.TryGetValue(token, out var username);
+            if (!_loggedInUsers.TryGetValue(token, out var username))
+            {
+                return Result.Fail<AuthData>("Not logged in");
+            }
             _registeredUsers.TryGetValue(username, out var userAuth);
             return Result.Ok(userAuth);
         }

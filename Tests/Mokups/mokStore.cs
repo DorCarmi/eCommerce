@@ -32,7 +32,7 @@ namespace Tests.Mokups
             throw new System.NotImplementedException();
         }
 
-        public Result<IEnumerable<Tuple<string, IEnumerable<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
+        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
         {
             throw new NotImplementedException();
         }
