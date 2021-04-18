@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using eCommerce.Common;
 
@@ -49,20 +50,64 @@ namespace eCommerce.Business.Service
         // ========== Store ========== //
         
         // TODO requirement 2.5, 2.6
+
+        /// <summary>
+        /// Get all the store information
+        /// </summary>
+        /// <param name="token">The Authorization token</param>
+        /// <param name="storeId">The store id</param>
+        /// <returns>The store information</returns>
+        public Result<StoreDto> GetStore(string token, string storeId);
+
+        /// <summary>
+        /// Get all the store items
+        /// </summary>
+        /// <param name="token">The Authorization token</param>
+        /// <param name="storeId">The store id</param>
+        /// <returns>The store items</returns>
+        public Result<IEnumerable<IItem>> GetAllStoreItems(string token, string storeId);
+
+        /// <summary>
+        /// Get the info of an item
+        /// </summary>
+        /// <param name="token">The Authorization token</param>
+        /// <param name="storeId">The store id</param>
+        /// <param name="itemId">The item id</param>
+        /// <returns>The item information</returns>
+        public Result<IItem> GetItem(string token, string storeId, string itemId);
         
         /// <summary>
-        /// Search for product
+        /// Search for item
         /// </summary>
-        /// <param name="query">The product query the search</param>
+        /// <param name="query">The item query the search</param>
         /// <param name="token">Authorization token</param>
         /// <returns>List of match products</returns>
-        public Result<IEnumerable<IItem>> SearchForProduct(string token, string query);
+        public Result<IEnumerable<IItem>> SearchForItem(string token, string query);
+        
+        /// <summary>
+        /// Search for item by price range
+        /// </summary>
+        /// <param name="query">The item query the search</param>
+        /// <param name="token">Authorization token</param>
+        /// <param name="from">From price</param>
+        /// <param name="to">To price</param>
+        /// <returns>List of match products</returns>
+        public Result<IEnumerable<IItem>> SearchForItemByPriceRange(string token, string query, double from = 0.0, double to = Double.MaxValue);
+        
+        /// <summary>
+        /// Search for item by category
+        /// </summary>
+        /// <param name="query">The item query the search</param>
+        /// <param name="token">Authorization token</param>
+        /// <param name="category">Search category</param>
+        /// <returns>List of match products</returns>
+        public Result<IEnumerable<IItem>> SearchForItemByCategory(string token, string query, string category);
         
         /// <summary>
         /// Add new item to the sore
         /// </summary>
         /// <param name="token">Authorization token</param>
-        /// <param name="product">The new item</param>
+        /// <param name="item">The new item</param>
         /// <returns>Result of the item addition</returns>
         public Result AddNewItemToStore(string token,  IItem item);
         
@@ -70,7 +115,7 @@ namespace eCommerce.Business.Service
         /// Edit the item
         /// </summary>
         /// <param name="token">Authorization token</param>
-        /// <param name="product">The new item</param>
+        /// <param name="item">The new item</param>
         /// <returns>Result of the edit</returns>
         public Result EditItemInStore(string token, IItem item);
         
@@ -120,7 +165,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
         /// <returns>List of all the staff and their permissions</returns>
-        public Result<IEnumerable<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId);
+        public Result<IList<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId);
         
         /// <summary>
         /// Return all the purchase history of a store
@@ -190,7 +235,7 @@ namespace eCommerce.Business.Service
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The purchase history</returns>
-        public Result<IEnumerable<IPurchaseHistory>> GetPurchaseHistory(string token);
+        public Result<IList<IPurchaseHistory>> GetPurchaseHistory(string token);
         
         // ========== Admin ========== //
         
@@ -201,7 +246,7 @@ namespace eCommerce.Business.Service
         /// <param name="storeId">The store id</param>
         /// <param name="ofUserId">The user id</param>
         /// <returns>The history purchase</returns>
-        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId);
+        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId);
         
         /// <summary>
         /// Get the history purchase of a store
@@ -209,7 +254,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <returns>The history purchase</returns>
-        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId);
+        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId);
 
     }
 }

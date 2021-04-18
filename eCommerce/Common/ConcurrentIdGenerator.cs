@@ -7,7 +7,7 @@ namespace eCommerce.Common
     public class ConcurrentIdGenerator
     {
         private SpinLock _mutex;
-        private bool _lockTaken;
+        private volatile bool _lockTaken;
         private long _id;
 
         public ConcurrentIdGenerator(long startFromId)

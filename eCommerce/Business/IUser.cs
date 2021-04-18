@@ -21,10 +21,12 @@ namespace eCommerce.Business
 
         public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permissions);
 
-        
-        public Result<IList<IUser>> GetAllStoreStakeholders(IStore store);
-        public Result<IBasket> GetUserPurchaseHistory(IStore store);
-        public Result<IBasket> GetStorePurchaseHistory(IStore store);
+        // TODO implement
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IStore store);
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IStore store, IUser otherUser);
+
+        public Result<IList<PurchaseRecord>>  GetStorePurchaseHistory(IStore store);
+
         
         
         //InBusiness

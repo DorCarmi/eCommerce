@@ -139,6 +139,21 @@ namespace eCommerce.Business
             return _systemState.UpdatePermissionsToManager(this, store, user, permissions);
         }
 
+        Result<IList<PurchaseRecord>> IUser.GetUserPurchaseHistory(IStore store)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IStore store, IUser otherUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        Result<IList<PurchaseRecord>> IUser.GetStorePurchaseHistory(IStore store)
+        {
+            throw new NotImplementedException();
+        }
+
 
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store)
         {
