@@ -72,7 +72,8 @@ namespace eCommerce.Business
         {
             return _userManager.Logout(token);
         }
-
+        
+        //<CNAME>SearchForProducts</CNAME>
         public Result<IEnumerable<IItem>> SearchForProduct(string token, string query)
         {
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
@@ -82,6 +83,11 @@ namespace eCommerce.Business
             }
 
             return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForProduct(query));
+        }
+        
+        public Result<IEnumerable<IItem>> SearchForStore(string token, string query)
+        {
+            throw new NotImplementedException();
         }
 
         public Result AddNewItemToStore(string token, IItem item)
@@ -125,7 +131,8 @@ namespace eCommerce.Business
             return store.RemoveItemToStore(productId, user);*/
             throw new NotImplementedException();
         }
-
+        
+        //<CNAME>AppointCoOwner</CNAME>
         public Result AppointCoOwner(string token, string storeId, string appointedUserId)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -145,7 +152,8 @@ namespace eCommerce.Business
 
             return user.AppointUserToOwner(store, appointedUser);
         }
-
+        
+        //<CNAME>AppointManager</CNAME>
         public Result AppointManager(string token, string storeId, string appointedManagerUserId)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -165,7 +173,8 @@ namespace eCommerce.Business
 
             return user.AppointUserToOwner(store, appointedUser);
         }
-
+        
+        //<CNAME>UpdateManagerPermissions</CNAME>
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -185,7 +194,16 @@ namespace eCommerce.Business
 
             return user.UpdatePermissionsToManager(store, managerUser, permissions);
         }
-
+        
+        //<CNAME>RemoveManagerPermissions</CNAME>
+        public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
+            IList<StorePermission> permissions)
+        {
+            throw new System.NotImplementedException();
+        }
+        
+        
+        //<CNAME:GetStoreStaff</CNAME>
         public Result<IEnumerable<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId)
         {
             throw new System.NotImplementedException();
@@ -273,17 +291,19 @@ namespace eCommerce.Business
         {
             throw new NotImplementedException();
         }
-
+        
+        //<CNAME>PersonalPurchaseHistory</CNAME>
         public Result<IEnumerable<IPurchaseHistory>> GetPurchaseHistory(string token)
         {
             throw new System.NotImplementedException();
         }
-
-        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId)
+        
+        //<CNAME>AdminGetAllUserHistory</CNAME>
+        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId)
         {
             throw new System.NotImplementedException();
         }
-
+        //<CNAME>AdminGetStoreHistory</CNAME>
         public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId)
         {
             throw new System.NotImplementedException();
