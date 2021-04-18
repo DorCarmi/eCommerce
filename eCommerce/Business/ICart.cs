@@ -12,7 +12,7 @@ namespace eCommerce.Business
         public Result EditCartItem(IUser user,ItemInfo item);
         
 
-        public Result CalculatePricesForCart();
+        public Result<double> CalculatePricesForCart();
 
         public Result<PurchaseInfo> BuyWholeCart(IUser user);
         public bool CheckForCartHolder(IUser user);

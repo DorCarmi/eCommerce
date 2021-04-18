@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,10 +51,10 @@ namespace eCommerce.Business
             // _transHistory = memberData.History;
         }
 
-        public User(MemberInfo info)
+        public User(UserToSystemState userState, MemberInfo info)
         {
             _memberInfo = info;
-            _systemState = Member.State;
+            _systemState = userState;
             _myCart = new Cart(this);
             // _userName = memberData.Username;
             _storesFounded = new ConcurrentDictionary<IStore, bool>();

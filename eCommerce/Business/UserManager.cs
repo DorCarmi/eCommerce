@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -73,7 +74,7 @@ namespace eCommerce.Business
                 return authRegistrationRes;
             }
             
-            IUser newUser = new User(memberInfo.Clone());
+            IUser newUser = new User(Member.State, memberInfo.Clone());
             if (!_registeredUsersRepo.Add(newUser))
             {
                 // TODO maybe remove the user form userAuth and log it
@@ -81,6 +82,13 @@ namespace eCommerce.Business
             }
 
             return Result.Ok();
+        }
+
+        public void AddAdmin(MemberInfo adminInfo, string password)
+        {
+            IUser user = new User(Admin.State, adminInfo);
+            RegisterAtAuthorization(adminInfo.Username, password);
+            _registeredUsersRepo.Add(user);
         }
         
         private Result RegisterAtAuthorization(string username, string password)
@@ -209,12 +217,23 @@ namespace eCommerce.Business
                 return fullDataRes;
             }
 
+            if (!IsValidUsername(memberInfo.Username))
+            {
+                return Result.Fail("Invalid username address");
+            }
+
             if (!RegexUtils.IsValidEmail(memberInfo.Email))
             {
                 return Result.Fail("Invalid email address");
             }
 
             return Result.Ok();
+        }
+
+        private bool IsValidUsername(string username)
+        {
+            return Regex.IsMatch(username,
+            "^[a-zA-z][a-zA-z0-9]*$");
         }
 
         private Result<string> IsConnectedGuest(string token)

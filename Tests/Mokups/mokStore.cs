@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -29,6 +30,11 @@ namespace Tests.Mokups
         public Result<Item> GetItem(string itemId)
         {
             throw new System.NotImplementedException();
+        }
+
+        public Result<IEnumerable<Tuple<string, IEnumerable<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
+        {
+            throw new NotImplementedException();
         }
 
         public List<Item> SearchItem(string stringSearch)

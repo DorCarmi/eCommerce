@@ -83,6 +83,11 @@ namespace eCommerce.Business
             throw new NotImplementedException();
         }
 
+        public Result<IEnumerable<Tuple<string, IEnumerable<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<Item> SearchItem(string stringSearch)
         {
             return this._inventory.SearchItem(stringSearch);
