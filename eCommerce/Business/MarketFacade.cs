@@ -403,7 +403,12 @@ namespace eCommerce.Business
             throw new System.NotImplementedException();
 
         }
-        
+
+        public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId)
+        {
+            throw new NotImplementedException();
+        }
+
         //<CNAME>AdminGetAllUserHistory</CNAME>
         public Result<IEnumerable<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId)
         {

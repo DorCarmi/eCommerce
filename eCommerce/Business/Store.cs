@@ -83,9 +83,47 @@ namespace eCommerce.Business
             throw new NotImplementedException();
         }
 
-        public Result<IEnumerable<Tuple<string, IEnumerable<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
+        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
         {
-            throw new NotImplementedException();
+            IList<Tuple<string, IList<StorePermission>>> netasCrazyList = new List<Tuple<string, IList<StorePermission>>>();
+            foreach (var manager in _managersAppointments)
+            {
+                List<StorePermission> mangPerm = new List<StorePermission>();
+                foreach (var perm in Enum.GetValues(typeof(StorePermission)).Cast<StorePermission>())
+                {
+                    if (manager.HasPermission(perm).IsSuccess)
+                    {
+                        mangPerm.Add(perm);
+                    }
+                }
+                netasCrazyList.Add(new Tuple<string, IList<StorePermission>>(manager.User.Username,mangPerm));
+            }
+            
+            foreach (var owner in _ownersAppointments)
+            {
+                List<StorePermission> ownerPerm = new List<StorePermission>();
+                foreach (var perm in Enum.GetValues(typeof(StorePermission)).Cast<StorePermission>())
+                {
+                    if (owner.HasPermission(perm).IsSuccess)
+                    {
+                        ownerPerm.Add(perm);
+                    }
+                }
+                netasCrazyList.Add(new Tuple<string, IList<StorePermission>>(owner.User.Username,ownerPerm));
+            }
+            
+            List<StorePermission> foundPerm = new List<StorePermission>();
+            foreach (var perm in Enum.GetValues(typeof(StorePermission)).Cast<StorePermission>())
+            {
+                if (this._founder.HasPermission(this,perm).IsSuccess)
+                {
+                    foundPerm.Add(perm);
+                }
+            }
+            netasCrazyList.Add(new Tuple<string, IList<StorePermission>>(_founder.Username,foundPerm));
+
+
+            return Result.Ok<IList<Tuple<string, IList<StorePermission>>>>(netasCrazyList);
         }
 
         public List<Item> SearchItem(string stringSearch)
