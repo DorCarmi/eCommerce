@@ -51,7 +51,6 @@ namespace eCommerce.Business
             _transactionHistory = new StoreTransactionHistory(this);
 
             _inventory = new ItemsInventory(this);
-            _inventory.AddNewItem(founder, item);
 
             this._founder = founder;
 
@@ -60,7 +59,7 @@ namespace eCommerce.Business
             _managers = new List<IUser>();
             _managersAppointments = new List<ManagerAppointment>();
             
-
+            _inventory.AddNewItem(founder, item);
             _basketsOfThisStore = new List<IBasket>();
         }
         
