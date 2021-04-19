@@ -30,6 +30,21 @@ namespace Tests
             Assert.False(user2.OpenStore(store2).IsSuccess);
             Assert.False(user2.HasPermission(store2,StorePermission.ControlStaffPermission).IsSuccess);
             
+        } [Test]
+        public void TestHasPermissions()
+        {
+            User user1 = new User(new MemberInfo("Ja Morant", "ja@mail.com", "Ja", DateTime.Now, "Memphis"));
+            mokStore store1= new mokStore("BasketBall stuff.. buy here");
+            user1.OpenStore(store1);
+            Assert.True(user1.HasPermission(store1,StorePermission.ControlStaffPermission).IsSuccess);
+            User user2 = new User(new MemberInfo("Jaren Jackson Jr.", "jjj@mail.com", "Jaren", DateTime.Now, "Memphis"));
+            Assert.False(user2.HasPermission(store1,StorePermission.ControlStaffPermission).IsSuccess);
+            user1.AppointUserToManager(store1, user2);
+            user1.UpdatePermissionsToManager(store1,user2, new List<StorePermission>(new [] {StorePermission.ChangeItemPrice,StorePermission.ControlStaffPermission}));
+            Assert.True(user2.HasPermission(store1, StorePermission.ChangeItemPrice).IsSuccess);
+            Assert.True(user2.HasPermission(store1, StorePermission.ControlStaffPermission).IsSuccess);
+            Assert.False(user2.HasPermission(store1, StorePermission.EditItemDetails).IsSuccess);
+
         }
         [Test]
         public void TestAppointUserToManager()

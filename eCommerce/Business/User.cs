@@ -88,10 +88,6 @@ namespace eCommerce.Business
             return _systemState.Logout(this,toGuestName);
         }
 
-        /**
-         * 
-         * @method 
-         */
         public Result<bool> IsRegistered()
         {
             return Result.Ok(_isRegistered);
@@ -110,7 +106,7 @@ namespace eCommerce.Business
             return _systemState.OpenStore(this, store);
         }
         
-        /// <TEST> UserTest.TestAddItemToCart </TEST>
+        /// <TEST>  </TEST>
         /// <UC> 'Add product to basket' </UC>
         /// <REQ> 2.7 </REQ>
         /// <summary>
@@ -123,7 +119,7 @@ namespace eCommerce.Business
             return _myCart.AddItemToCart(this, item);
         }
 
-        /// <TEST> UserTest.TestAddItemToCart </TEST>
+        /// <TEST>  </TEST>
         /// <UC> 'View shopping cart' </UC>
         /// <REQ> 2.8 </REQ>
         /// <summary>
@@ -135,7 +131,7 @@ namespace eCommerce.Business
             return Result.Ok<ICart>(_myCart);
         }
 
-        /// <TEST> UserTest.TestEditCart </TEST>
+        /// <TEST>  </TEST>
         /// <UC> 'Edit shopping cart' </UC>
         /// <REQ> 2.8 </REQ>
         /// <summary>
@@ -240,6 +236,12 @@ namespace eCommerce.Business
         //InBusiness
         
         
+        /// <TEST> UserTest.TestHasPermissions </TEST>
+        /// <UC> 'Change management permission for sub-manger' </UC>
+        /// <REQ> 5.1 </REQ>
+        /// <summary>
+        ///  checks if user has the required permission. 
+        /// </summary>
         public Result HasPermission(IStore store, StorePermission storePermission)
         {
             return _systemState.HasPermission(this, store, storePermission);
