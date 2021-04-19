@@ -6,8 +6,15 @@ namespace eCommerce.Business
 {
     public class ManagerAppointment
     {
-        public IUser User { get; set; }
+        public IUser User { get; }
         private ConcurrentDictionary<StorePermission,bool> _permissions;
+
+        public ManagerAppointment(IUser user)
+        {
+            this.User = user;
+            this._permissions = new ConcurrentDictionary<StorePermission, bool>();
+        }
+        
         public Result AddPermissions(StorePermission permission)
         {
             if(_permissions.TryAdd(permission, true))
