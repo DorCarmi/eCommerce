@@ -15,7 +15,15 @@ namespace Tests
     [TestFixture]
     public class AcceptanceTests
     {
-        private IMarketFacade _market;  //TODO check with Netanel about adding an admin as a requirement for building a facade
+        private IMarketFacade _market; 
+        private enum categories
+        {
+            system,
+            registeredUsers,
+            stores,
+            products,
+            transactions
+        }
         
         [SetUp]
         public void SetUp()
@@ -211,7 +219,7 @@ namespace Tests
             new string[]{"dairy", "milk", "Tara"}, (double)6.2)] // edit price
         [Test]
         public void TestEditItemInStoreSuccess(string name, string storeName, int amount, string category, string[] tags,
-            double price)  //TODO change facade to reflect the function editing any part of an item
+            double price)  
         {
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -331,7 +339,7 @@ namespace Tests
          * Req - 4.3
          */
         [TestCase("Yossi11", "qwerty123", "The Polite Frog", "singerMermaid")]
-        [TestCase("Yossi11",  "qwerty123", "Yossi's Store", "Yossi11")]
+        [TestCase("Yossi11",  "qwerty123", "Yossi's Store", "Yossi11")] //TODO check with other co-owners too
         [TestCase("Yossi11",   "qwerty123", "Yossi's Store", "Tamir123")]
         [TestCase("singerMermaid", "130452abc", "Yossi's Store", "Liorwork")]
         [Test]
@@ -350,7 +358,7 @@ namespace Tests
          */
         [TestCase("Yossi's Store", "singerMermaid")]
         [TestCase("Yossi's Store", "Liorwork")]
-        [Test] //TODO add appointment of an already existing co-owner
+        [Test]
         public void TestAppointCoOwnerFailureLogic(string storeName, string username)
         {
             string token = _market.Connect();
@@ -398,7 +406,7 @@ namespace Tests
          */
         [TestCase("Yossi's Store", "singerMermaid")]
         [TestCase("Yossi's Store", "Liorwork")]
-        [Test] //TODO add appointment of an already existing co-owner
+        [Test]
         public void TestAppointManagerFailureLogic(string storeName, string username)
         {
             string token = _market.Connect();
@@ -441,7 +449,7 @@ namespace Tests
             _market.Disconnect(token);  
         }
         /*
-         * UC - Save products in a shopping cart
+         * UC - Save items in a shopping cart
          * Req - 2.7
          */
         [TestCase("Tara milk", "Yossi's store", 3)]
@@ -457,12 +465,12 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC - Save products in a shopping cart
+         * UC - Save items in a shopping cart
          * Req - 2.7
          */
         [TestCase("Tnuva cream cheese", "Yossi's store", 3)]
         [TestCase("Tara milk", "Yossi's store", -3)]
-        [Test]
+        [Test] //TODO check what the expected result for adding more items to the cart than the store has in stock
         public void TestAddItemToCartFailure(string itemId, string storeName, int amount)
         { 
             string token = _market.Connect();
@@ -495,10 +503,9 @@ namespace Tests
          * UC - Edit shopping cart
          * Req - 2.8 
          */
-        [TestCase("Tara milk", "Yossi's store", 9)]
         [TestCase("Tnuva cream cheese", "Yossi's store", 3)]
         [TestCase("Tara milk", "dancing dragon", 0)]
-        [TestCase("Tara milk", "Yossi's store", 15)]
+        //TODO recheck this [TestCase("Tara milk", "Yossi's store", 15)]
         [Test]
         public void EditItemAmountOfCartFailure(string itemId, string storeName, int amount)
         {
@@ -524,7 +531,7 @@ namespace Tests
         *
         * 
         */
-       //[Test]
+       //[Test] //TODO complete
        //public void TestPurchaseCart() {}
        /*
         * UC - Open a store
@@ -546,7 +553,7 @@ namespace Tests
         * Req - 3.2
         */
        [TestCase("Yossi11", "qwerty123","~~~Yossi's store jr")]
-       [TestCase("singerMermaid", "130452abc", "Yossi's store")]
+       [TestCase("singerMermaid", "130452abc", "Yossi's Store")]
        [Test]
        public void TestOpenStoreFailure(string member, string password, string storeName)
        { string token = _market.Connect();
@@ -554,6 +561,18 @@ namespace Tests
           // Result result = _market.OpenStore(login.Value, storeName);
            //Assert.True(result.IsFailure);
            _market.Logout(login.Value);
+           _market.Disconnect(token);
+       }
+       /*
+        * UC - Open a store
+        * Req - 3.2
+        */
+       [TestCase("Yossi's Store jr")]
+       [Test]
+       public void TestOpenStoreFailureGuest(string storeName)
+       { string token = _market.Connect();
+           // Result result = _market.OpenStore(token, storeName);
+           //Assert.True(result.IsFailure);
            _market.Disconnect(token);
        }
        /*
