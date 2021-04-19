@@ -79,7 +79,7 @@ namespace eCommerce.Business
 
         public Result<Item> GetItem(string itemId)
         {
-            return this._inventory.GetItem(itemId);
+            return _inventory.GetItem(itemId);
         }
 
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)

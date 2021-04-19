@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
 using eCommerce.Auth;
 using eCommerce.Common;
 using NUnit.Framework;
@@ -19,11 +21,15 @@ namespace Tests.Business
     public class UserAuthMock : IUserAuth
     {
 
+        // token to name
         private ConcurrentDictionary<string, string> _connectedGuests;
+        // username to auth
         private ConcurrentDictionary<string, AuthData> _registeredUsers;
+        //token to name
         private ConcurrentDictionary<string, string> _loggedInUsers;
 
         private ConcurrentIdGenerator _token;
+        private Mutex _isLoginMutex;
 
         public UserAuthMock()
         {
@@ -31,6 +37,7 @@ namespace Tests.Business
             _registeredUsers = new ConcurrentDictionary<string, AuthData>();
             _loggedInUsers = new ConcurrentDictionary<string, string>();
             _token = new ConcurrentIdGenerator(0);
+            _isLoginMutex = new Mutex();
         }
 
         public string Connect()
@@ -57,13 +64,21 @@ namespace Tests.Business
 
         public Result<string> Login(string username, string password, AuthUserRole role)
         {
+            _isLoginMutex.WaitOne();
             if (IsLoggedIn(username))
             {
+                _isLoginMutex.ReleaseMutex();
                 return Result.Fail<string>("User already logged in");
             }
 
             string tokenStr = _token.MoveNext().ToString();
-            _loggedInUsers.TryAdd(tokenStr, username);
+            if (!_loggedInUsers.TryAdd(tokenStr, username))
+            {
+                _isLoginMutex.ReleaseMutex();
+                return Result.Fail<string>("User already logged in");
+            }
+            _isLoginMutex.ReleaseMutex();
+
             return Result.Ok(tokenStr);
         }
 
@@ -85,15 +100,16 @@ namespace Tests.Business
 
         public bool IsLoggedIn(string username)
         {
+            bool loggedIn = false;
             foreach (var user in _loggedInUsers.Values)
             {
                 if(user.Equals(username))
                 {
-                    return true;
+                    loggedIn = true;
+                    break;
                 }
             }
-
-            return false;
+            return loggedIn;
         }
 
         public bool IsValidToken(string token)

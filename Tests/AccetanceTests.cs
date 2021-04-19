@@ -601,10 +601,10 @@ namespace Tests
         * Req- 6.4
         */
        [Test]
-       public void TestAdminGetPurchaseHistoryStoreSuccess(string admin, string password)
+       public void TestAdminGetPurchaseHistoryStoreSuccess(string admin, string password, string storeID)
        { string token = _market.Connect();
            Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
-           Result result = _market.AdminGetPurchaseHistoryStore(login.Value,);
+           Result result = _market.AdminGetPurchaseHistoryStore(login.Value,storeID);
            Assert.True(result.IsSuccess, result.Error);
            _market.Logout(login.Value);
            _market.Disconnect(token);
@@ -614,10 +614,10 @@ namespace Tests
         * Req- 6.4
         */
        [Test]
-       public void TestAdminGetPurchaseHistoryStoreFailure(string admin, string password)
+       public void TestAdminGetPurchaseHistoryStoreFailure(string admin, string password,string storeID)
        { string token = _market.Connect();
            Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
-           Result result = _market.AdminGetPurchaseHistoryStore(login.Value);
+           Result result = _market.AdminGetPurchaseHistoryStore(login.Value,storeID);
            Assert.True(result.IsFailure);
            _market.Logout(login.Value);
            _market.Disconnect(token);

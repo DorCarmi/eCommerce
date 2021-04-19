@@ -189,6 +189,8 @@ namespace eCommerce.Business
             }
         }
 
+        
+
         public Result RemoveItem(IUser user, ItemInfo newItem)
         {
             if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
