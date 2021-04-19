@@ -28,16 +28,15 @@ namespace eCommerce.Business.Service
         
         public static UserToSystemState ServiceUserRoleToSystemState(ServiceUserRole role)
         {
-            // TODO implement
             switch (role)
             {
                 case ServiceUserRole.Member:
                 {
-                    throw new NotImplementedException();
+                    return Member.State;
                 }
                 case ServiceUserRole.Admin:
                 {
-                    throw new NotImplementedException();
+                    return Admin.State;
                 }
             }
 

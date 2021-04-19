@@ -79,7 +79,7 @@ namespace eCommerce.Business
 
         public Result<Item> GetItem(string itemId)
         {
-            throw new NotImplementedException();
+            return _inventory.GetItem(itemId);
         }
 
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)

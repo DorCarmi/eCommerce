@@ -177,6 +177,17 @@ namespace eCommerce.Business
             return Result.Fail<Item>("Couldn't find item in store's inventory");
         }
 
+        public Result<Item> GetItem(string itemId)
+        {
+            _nameToItem.TryGetValue(itemId, out var item);
+            if (item == null)
+            {
+                return Result.Fail<Item>("Item doesnt exists");
+            }
+
+            return Result.Ok(item);
+        }
+
         public Result RemoveItem(IUser user, ItemInfo newItem)
         {
             if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
