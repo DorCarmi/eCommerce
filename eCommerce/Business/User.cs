@@ -34,6 +34,7 @@ namespace eCommerce.Business
             _systemState = Guest.State;
             _myCart = new Cart(this);
             _isRegistered = false;
+            dataLock = new object();
         }
 
         public User(UserToSystemState systemState, MemberData memberData)
@@ -63,6 +64,7 @@ namespace eCommerce.Business
             _appointedOwners = new ConcurrentDictionary<IStore, IList<OwnerAppointment>>();
             _appointedManagers = new ConcurrentDictionary<IStore, IList<ManagerAppointment>>();
             _transHistory = new UserTransactionHistory();
+            dataLock = new object();
         }
 
 
@@ -137,6 +139,21 @@ namespace eCommerce.Business
         public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permissions)
         {
             return _systemState.UpdatePermissionsToManager(this, store, user, permissions);
+        }
+
+        Result<IList<PurchaseRecord>> IUser.GetUserPurchaseHistory(IStore store)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IStore store, IUser otherUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        Result<IList<PurchaseRecord>> IUser.GetStorePurchaseHistory(IStore store)
+        {
+            throw new NotImplementedException();
         }
 
 

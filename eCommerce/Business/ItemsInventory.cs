@@ -82,6 +82,12 @@ namespace eCommerce.Business
                 if (this._nameToItem.ContainsKey(itemInfo.name) || this._nameToAquiredItem.ContainsKey(itemInfo.name))
                 {
                     return Result.Fail("Item already exist in store");
+                } else if(itemInfo.pricePerUnit <= 0)
+                {
+                    return Result.Fail("Price need to be positive");
+                } else if (itemInfo.amount < 0)
+                {
+                    return Result.Fail("Amount need to be not negative");
                 }
                 else
                 {

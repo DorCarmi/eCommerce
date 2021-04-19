@@ -84,9 +84,68 @@ namespace eCommerce.Business
         {
             return _userManager.Logout(token);
         }
-        
+
+        public Result<StoreDto> GetStore(string token, string storeId)
+        {
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<StoreDto>(userAndStoreRes.Error);
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+            IList<IItem> storeItems = new List<IItem>();
+            foreach (var item in store.GetAllItems())
+            {
+                storeItems.Add(item.ShowItem());
+            }
+
+            return Result.Ok(new StoreDto(storeId, storeItems));
+        }
+
+        public Result<IEnumerable<IItem>> GetAllStoreItems(string token, string storeId)
+        {
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<IEnumerable<IItem>>(userAndStoreRes.Error);
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+            IList<IItem> storeItems = new List<IItem>();
+            foreach (var item in store.GetAllItems())
+            {
+                storeItems.Add(item.ShowItem());
+            }
+
+            return Result.Ok<IEnumerable<IItem>>(storeItems);
+            
+        }
+
+        public Result<IItem> GetItem(string token, string storeId, string itemId)
+        {
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<IItem>(userAndStoreRes.Error);
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+            Result<Item> itemRes = store.GetItem(itemId);
+            if (itemRes.IsFailure)
+            {
+                return Result.Fail<IItem>(itemRes.Error);
+            }
+
+            return Result.Ok<IItem>(itemRes.Value.ShowItem());
+
+        }
+
         //<CNAME>SearchForProducts</CNAME>
-        public Result<IEnumerable<IItem>> SearchForProduct(string token, string query)
+        public Result<IEnumerable<IItem>> SearchForItem(string token, string query)
         {
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
@@ -94,14 +153,48 @@ namespace eCommerce.Business
                 return Result.Fail<IEnumerable<IItem>>(userRes.Error);
             }
 
-            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForProduct(query));
-        }
-        
-        public Result<IEnumerable<IItem>> SearchForStore(string token, string query)
-        {
-            throw new NotImplementedException();
+            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItem(query));
         }
 
+        public Result<IEnumerable<IItem>> SearchForItemByPriceRange(string token, string query, double @from = 0, double to = Double.MaxValue)
+        {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<IEnumerable<IItem>>(userRes.Error);
+            }
+
+            if (to < from)
+            {
+                to = from;
+            }
+            
+            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItemByPrice(query, from, to));
+        }
+
+        public Result<IEnumerable<IItem>> SearchForItemByCategory(string token, string query, string category)
+        {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<IEnumerable<IItem>>(userRes.Error);
+            }
+
+            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItemByCategory(query, category));
+        }
+
+        public Result<IEnumerable<string>> SearchForStore(string token, string query)
+        {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<IEnumerable<string>>(userRes.Error);
+            }
+
+            return Result.Ok(_storeRepository.SearchForStore(query));
+        }
+        
+        //<CNAME>ItemsToStore</CNAME>
         public Result AddNewItemToStore(string token, IItem item)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
@@ -114,7 +207,9 @@ namespace eCommerce.Business
 
             return store.AddItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
         }
-
+        
+        
+        //<CNAME>UpdateItemsStock</CNAME>
         public Result EditItemInStore(string token, IItem item)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
@@ -128,7 +223,8 @@ namespace eCommerce.Business
             return store.EditItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
 
         }
-
+        
+        //<CNAME>ItemsInStore</CNAME>
         public Result RemoveProductFromStore(string token, string storeId, string productId)
         {
             // TODO verify 
@@ -206,7 +302,6 @@ namespace eCommerce.Business
 
             return user.UpdatePermissionsToManager(store, managerUser, permissions);
         }
-        
         //<CNAME>RemoveManagerPermissions</CNAME>
         public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
             IList<StorePermission> permissions)
@@ -215,6 +310,7 @@ namespace eCommerce.Business
         }
         
         
+
         //<CNAME:GetStoreStaff</CNAME>
         public Result<IList<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId)
         {
@@ -259,7 +355,8 @@ namespace eCommerce.Business
 
             return Result.Ok<IList<IPurchaseHistory>>((IList<IPurchaseHistory>) purchaseHistoryRes.Value);
         }
-
+        
+        //<CNAME>AddItemToCart</CNAME>
         public Result AddItemToCart(string token, string productId, string storeId, int amount)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -281,6 +378,7 @@ namespace eCommerce.Business
             return user.AddItemToCart(newItemInfo);
         }
 
+        //<CNAME>EditCart</CNAME>   
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -294,7 +392,8 @@ namespace eCommerce.Business
             // TODO implement store and user
             return null;
         }
-
+        
+        //<CNAME>GetCart</CNAME>
         public Result<CartDto> GetCart(string token)
         {
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
@@ -338,7 +437,8 @@ namespace eCommerce.Business
             ICart cart = cartRes.Value;
             return cart.CalculatePricesForCart();
         }
-
+        
+        //<CNAME>BuyWholeCart</CNAME>
         public Result PurchaseCart(string token)
         {
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
@@ -363,7 +463,8 @@ namespace eCommerce.Business
 
             return Result.Ok();
         }
-
+        
+        //<CNAME>OpenStore</CNAME>
         public Result OpenStore(string token, string storeName, IItem item)
         {
             // TODO check with user and store
@@ -406,7 +507,7 @@ namespace eCommerce.Business
 
         //<CNAME>AdminGetAllUserHistory</CNAME>
 
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId)
+        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string ofUserId)
         {
             throw new NotImplementedException();
         }

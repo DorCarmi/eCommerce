@@ -118,8 +118,8 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Invalid username or password");
             }
 
-            _connectedUsers.Remove(guestRes.Value, out var guestUser);
-            if (!_connectedUsers.TryAdd(username, user))
+            _connectedUsers.Remove(guestToken, out var guestUser);
+            if (!_connectedUsers.TryAdd(authLoginRes.Value, user))
             {
                 _auth.Logout(authLoginRes.Value);
                 return Result.Fail<string>("User already logged in");
@@ -149,8 +149,8 @@ namespace eCommerce.Business
             string newGuestToken = _auth.Connect();
             string newGuestUsername = _auth.GetData(newGuestToken).Value.Username;
             
-            _connectedUsers.Remove(user.Username, out var tuser);
-            _connectedUsers.TryAdd(newGuestUsername, new User(newGuestUsername));
+            _connectedUsers.Remove(token, out var tuser);
+            _connectedUsers.TryAdd(newGuestToken, new User(newGuestUsername));
             
             return Result.Ok(newGuestToken);
         }
