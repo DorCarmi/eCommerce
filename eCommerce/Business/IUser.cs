@@ -7,6 +7,8 @@ namespace eCommerce.Business
 {
     public interface IUser
     {
+        public string Username { get; }
+
         //Facade
         public Result OpenStore(IStore store);
         public Result AddItemToCart(ItemInfo item);
@@ -16,26 +18,24 @@ namespace eCommerce.Business
         public Result AppointUserToOwner(IStore store, IUser user);
         public Result AppointUserToManager(IStore store, IUser user);
         
-        public Result<OwnerAppointment> MakeOwner(IStore store);
-        public Result<ManagerAppointment> MakeManager(IStore store);
-
         public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permissions);
+        public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission);
 
-        // TODO implement
-        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IStore store);
-        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IStore store, IUser otherUser);
-
-        public Result<IList<PurchaseRecord>>  GetStorePurchaseHistory(IStore store);
-
+        
+        public Result<IList<IUser>> GetAllStoreStakeholders(IStore store);
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory();
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IUser otherUser);
+        public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(IStore store);
         
         
         //InBusiness
         public Result HasPermission(IStore store, StorePermission storePermission);
-        public Result EnterBasketToHistory(IBasket basket);
-        
-        // Added
-        public string Username { get; }
+        public Result EnterRecordToHistory(PurchaseRecord record);
 
+        public Result<OwnerAppointment> MakeOwner(IStore store);
+        public Result<ManagerAppointment> MakeManager(IStore store);
+
+        
 
 
 

@@ -22,11 +22,25 @@ namespace eCommerce.Business
             }  
         }
         
+        /// <TEST> UserTest.TestGetStoreHistory </TEST>
+        /// <UC> 'Admin requests for store history' </UC>
+        /// <REQ> 6.4 </REQ>
+        /// <summary>
+        ///  if 'storePermission' is 'GetStoreHistory',
+        ///   returns all purchase-records of the store. 
+        /// </summary>
         public override Result HasPermission(User user, IStore store, StorePermission storePermission)
         {
             if (Permissions.Contains(storePermission))
                 return Result.Ok();
             return user.HasPermission(Member.State, store,storePermission);
         }
+
+        public override Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, IUser otherUser)
+        {
+            return otherUser.GetUserPurchaseHistory();
+        }
+
+
     }
 }

@@ -11,10 +11,10 @@ namespace Tests.Mokups
         public string storeName { get; set; }
         public Item item;
         public ICart cart;
+
         public mokStore(string storeName)
         {
             this.storeName = storeName;
-            this.item = item;
         }
         
         public IList<Item> GetAllItems()
@@ -87,29 +87,48 @@ namespace Tests.Mokups
             throw new System.NotImplementedException();
         }
 
+        public Result UpdateStock_AddItems(ItemInfo newItem, IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result UpdateStock_SubtractItems(ItemInfo newItem, IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result RemoveItemToStore(ItemInfo newItem, IUser user)
         {
             throw new System.NotImplementedException();
         }
 
+        public Result RemoveItemToStore(string itemID, IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MokStore: Appointed new Owner: "+user.Username);
+            return Result.Ok();
         }
 
         public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MokStore: Appointed new Manager: "+user.Username);
+            return Result.Ok();
         }
 
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MokStore: Getting Purchase History (its empty..)");
+            return Result.Ok<IList<PurchaseRecord>>(new List<PurchaseRecord>());
         }
 
         public Result EnterBasketToHistory(IBasket basket)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MokStore: Entered Basket to History.");
+            return  Result.Ok();
         }
 
         public string GetStoreName()
@@ -124,12 +143,14 @@ namespace Tests.Mokups
 
         public bool TryAddNewCartToStore(Cart cart)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MokStore: Added New Cart To Store");
+            return true;
         }
 
         public Result ConnectNewBasketToStore(Basket newBasket)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MockStore: Connected new basket to store");
+            return Result.Ok();
         }
 
         public bool CheckConnectionToCart(ICart cart)
@@ -140,6 +161,36 @@ namespace Tests.Mokups
         public Result<double> CheckDiscount(Basket basket)
         {
             throw new System.NotImplementedException();
+        }
+
+        public Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result UpdatePurchaseStrategies(IUser user, PurchaseStrategyName purchaseStrategy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
         }
     }
 }

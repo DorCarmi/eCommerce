@@ -176,6 +176,20 @@ namespace eCommerce.Business
 
             return Result.Fail<Item>("Couldn't find item in store's inventory");
         }
+        
+        public Result<Item> GetItem(string itemID)
+        {
+            if(this._nameToItem.ContainsKey(itemID))
+            {
+                return Result.Ok<Item>(this._nameToItem[itemID]);
+            }
+            else
+            {
+                return Result.Fail<Item>("Item doens't exist in store's inventory");
+            }
+        }
+
+        
 
         public Result RemoveItem(IUser user, ItemInfo newItem)
         {
@@ -186,6 +200,25 @@ namespace eCommerce.Business
                     this._itemsInStore.Remove(_nameToItem[newItem.name]);
                     this._nameToItem.Remove(newItem.name);
                     return Result.Ok();
+                }
+                else
+                {
+                    return Result.Fail("Item doesn't exist in store");
+                }
+            }
+            else
+            {
+                return Result.Fail("User doesn't have permission to add item to store");
+            }
+        }
+
+        public Result SubtractItems(IUser user, string newItemName, int newItemAmount)
+        {
+            if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
+            {
+                if (this._nameToItem.ContainsKey(newItemName))
+                {
+                    return this._nameToItem[newItemName].AddItems(user, newItemAmount);
                 }
                 else
                 {
