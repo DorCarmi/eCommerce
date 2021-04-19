@@ -177,5 +177,27 @@ namespace Tests.Business
                 numberOfUsersLoggedIn,
                 $"All the users should have been able to login but {numberOfUsersLoggedIn} succeeded");
         }
+
+        [Test]
+        public void LoginLogoutInARow()
+        {
+            string username = "user";
+            string password = "password";
+            MemberInfo memberInfo = new MemberInfo(username, "email@email.com", "user", DateTime.Now, "Sea street 1");
+
+            
+            string token = _userManager.Connect();
+            Result registrationRes = _userManager.Register(token, memberInfo, password);
+            Assert.True(registrationRes.IsSuccess, registrationRes.Error);
+            
+            for (int i = 0; i < 3; i++)
+            {
+                Result<string> loginTokenRes = _userManager.Login(token, username, password, ServiceUserRole.Member);
+                Assert.True(loginTokenRes.IsSuccess, loginTokenRes.Error);
+                Result<string> logoutTokenRes = _userManager.Logout(loginTokenRes.Value);
+                Assert.True(logoutTokenRes.IsSuccess, logoutTokenRes.Error);
+                token = logoutTokenRes.Value;
+            }
+        }
     }
 }
