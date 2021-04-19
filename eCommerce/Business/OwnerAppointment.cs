@@ -14,8 +14,15 @@ namespace eCommerce.Business
         {
             this.User = user;
             this._permissions = new ConcurrentDictionary<StorePermission, bool>();
-            //add permissions
-            
+            InitPermissions();
+        }
+
+        public void InitPermissions()
+        {
+            foreach (var storePermission in Enum.GetValues<StorePermission>())
+            {
+                _permissions.TryAdd(storePermission, true);
+            }
         }
 
         public Result AddPermissions(StorePermission permission)

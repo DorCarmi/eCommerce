@@ -715,7 +715,7 @@ namespace eCommerce.Business
             throw new NotImplementedException();
         }
         
-        
+        //<CNAME>GetStoreHistory</CNAME>
         public Result<IList<IPurchaseHistory>> GetPurchaseHistoryOfStore(string token, string storeId)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);

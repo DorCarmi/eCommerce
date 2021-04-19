@@ -47,6 +47,7 @@ namespace eCommerce.Business
             this.storeName = storeName;
             this.category = category;
             this.keyWords = new List<string>();
+            this.pricePerUnit = pricePerUnit;
             foreach (var word in keyWords)
             {
                 if (word == null)
