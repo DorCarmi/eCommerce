@@ -238,7 +238,8 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    return this._inventory.AddExistingItem(user, newItem.name, newItem.amount);
+                    return Result.Fail("Item already exist in store");
+                    //return this._inventory.AddExistingItem(user, newItem.name, newItem.amount);
                 }
             }
         }

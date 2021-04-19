@@ -56,7 +56,7 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    keyWords.Add(String.Copy(word));
+                    this.keyWords.Add(String.Copy(word));
                 }
                 
             }
