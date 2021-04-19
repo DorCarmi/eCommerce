@@ -20,10 +20,6 @@ namespace Tests
         [SetUp]
         public void SetUp()
         {
-            /* _market = MarketFacade.CreateInstanceForTests(UserAuth.GetInstance(), new RegisteredUsersRepository(), new StoreRepository());
-             * you are using UserAuth.GetInstance() and the test are parallel so when your logged in with a user other tests
-             * cant login.
-             */
             _market = MarketFacade.CreateInstanceForTests(UserAuth.CreateInstanceForTests(new TRegisteredUserRepo()), new RegisteredUsersRepository(), new StoreRepository());
             MemberInfo yossi = new MemberInfo("Yossi11","yossi@gmail.com", "Yossi Park", DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             MemberInfo shiran = new MemberInfo("singerMermaid","shiran@gmail.com", "Shiran Moris", DateTime.ParseExact("25/06/2008", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Rabin 14");
@@ -315,7 +311,7 @@ namespace Tests
             _market.Disconnect(token); 
         }
         /*
-         * UC //TODO check for usecase (was missing)
+         * UC - Appoint user to be store co-owner
          * Req - 4.3
          */
         [TestCase("Yossi's Store", "singerMermaid")]
@@ -331,7 +327,7 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC //TODO check for usecase (was missing)
+         * UC - Appoint user to be store co-owner
          * Req - 4.3
          */
         [TestCase("Yossi11", "qwerty123", "The Polite Frog", "singerMermaid")]
@@ -349,7 +345,7 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC //TODO check for usecase (was missing)
+         * UC - Appoint user to be store co-owner
          * Req - 4.3
          */
         [TestCase("Yossi's Store", "singerMermaid")]
@@ -363,7 +359,7 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC //TODO rename UC
+         * UC - Appoint Manager
          * Req - 4.5
          */
         [TestCase("Yossi's Store", "singerMermaid")]
@@ -379,7 +375,7 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC //TODO rename UC
+         * UC - Appoint Manager
          * Req - 4.5
          */
         [TestCase("Yossi11", "qwerty123", "The Polite Frog", "singerMermaid")]
@@ -397,7 +393,7 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC //TODO rename UC
+         * UC - Appoint Manager
          * Req - 4.5
          */
         [TestCase("Yossi's Store", "singerMermaid")]
@@ -414,12 +410,217 @@ namespace Tests
         //TODO add permission tests once permissions are known
         
         /*
-         * UC - ?
+         * UC - Store Owner requests for purchase history for the store
          * Req - 4.11
          */
-        public void TestGetPurchaseHistoryOfStoreSuccess()
+        [TestCase("Yossi's Store", "Yossi11", "qwerty123")]
+        [Test]
+        public void TestGetPurchaseHistoryOfStoreSuccess(string storeName, string owner, string password)
         {
-            
+            string token = _market.Connect();
+            Result<string> login = _market.Login(token, owner, password, ServiceUserRole.Member);
+            Result result = _market.GetPurchaseHistoryOfStore(login.Value, storeName);
+            Assert.True(result.IsSuccess, "failed to get purchase history of " + storeName + ": " + result.Error);
+            token = _market.Logout(login.Value).Value;
+            _market.Disconnect(token);  
         }
+        /*
+         * UC - Store Owner requests for purchase history for the store
+         * Req - 4.11
+         */
+        [TestCase("dancing dragon", "Yossi11", "qwerty123")]
+        [TestCase("Yossi's Store", "singerMermaid", "130452abc")]
+        [Test]
+        public void TestGetPurchaseHistoryOfStoreFailure(string storeName, string owner, string password)
+        {
+            string token = _market.Connect();
+            Result<string> login = _market.Login(token, owner, password, ServiceUserRole.Member);
+            Result result = _market.GetPurchaseHistoryOfStore(login.Value, storeName);
+            Assert.True(result.IsFailure, "getting purchase history for " + storeName + " was suppose to fail!");
+            token = _market.Logout(login.Value).Value;
+            _market.Disconnect(token);  
+        }
+        /*
+         * UC - Save products in a shopping cart
+         * Req - 2.7
+         */
+        [TestCase("Tara milk", "Yossi's store", 3)]
+        [TestCase("Tara milk", "Yossi's store", 10)]
+        [Test]
+        public void TestAddItemToCartSuccess(string itemId, string storeName, int amount)
+        { 
+            string token = _market.Connect();
+            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result result = _market.AddItemToCart(login.Value, itemId, storeName, amount);
+            Assert.True(result.IsSuccess, "failed to add  " + " from " + storeName + " to cart: " + result.Error);
+            token = _market.Logout(login.Value).Value;
+            _market.Disconnect(token);
+        }
+        /*
+         * UC - Save products in a shopping cart
+         * Req - 2.7
+         */
+        [TestCase("Tnuva cream cheese", "Yossi's store", 3)]
+        [TestCase("Tara milk", "Yossi's store", -3)]
+        [Test]
+        public void TestAddItemToCartFailure(string itemId, string storeName, int amount)
+        { 
+            string token = _market.Connect();
+            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result result = _market.AddItemToCart(login.Value, itemId, storeName, amount);
+            Assert.True(result.IsFailure, "action was suppose to fail! " + itemId);
+            token = _market.Logout(login.Value).Value;
+            _market.Disconnect(token);
+        }
+        /*
+         * UC - Edit shopping cart
+         * Req - 2.8 
+         */
+        [TestCase("Tara milk", "Yossi's store", 9)]
+        [TestCase("Tara milk", "Yossi's store", 3)]
+        [TestCase("Tara milk", "Yossi's store", 0)]
+        [TestCase("Tara milk", "Yossi's store", -6)]
+        [Test]
+        public void EditItemAmountOfCart(string itemId, string storeName, int amount)
+        {
+            string token = _market.Connect();
+            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result result = _market.AddItemToCart(login.Value, itemId, storeName, 5);
+            result = _market.EditItemAmountOfCart(login.Value, itemId, storeName, amount);
+            Assert.True(result.IsSuccess, "failed to edit item: " + result.Error);
+            token = _market.Logout(login.Value).Value;
+            _market.Disconnect(token);
+        }
+        /*
+         * UC - Edit shopping cart
+         * Req - 2.8 
+         */
+        [TestCase("Tara milk", "Yossi's store", 9)]
+        [TestCase("Tnuva cream cheese", "Yossi's store", 3)]
+        [TestCase("Tara milk", "dancing dragon", 0)]
+        [TestCase("Tara milk", "Yossi's store", 15)]
+        [Test]
+        public void EditItemAmountOfCartFailure(string itemId, string storeName, int amount)
+        {
+            string token = _market.Connect();
+            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result result = _market.AddItemToCart(login.Value, itemId, storeName, 5);
+            result = _market.EditItemAmountOfCart(login.Value, itemId, storeName, amount);
+            Assert.True(result.IsFailure, "item changes were suppose to fail");
+            token = _market.Logout(login.Value).Value;
+            _market.Disconnect(token);
+        }
+        /*
+         *
+         * //TODO find good tests 
+         */
+        //public void TestGetCart(){}
+        /*
+         *
+         * 
+         */
+       // public void TestGetPurchaseCartPrice() {}
+       /*
+        *
+        * 
+        */
+       //[Test]
+       //public void TestPurchaseCart() {}
+       /*
+        * UC - Open a store
+        * Req - 3.2
+        */
+       [TestCase("Yossi11", "qwerty123","Yossi's store jr")]
+       [TestCase("singerMermaid", "130452abc", "dancing dragon")]
+       [Test]
+       public void TestOpenStoreSuccess(string member, string password, string storeName)
+       { string token = _market.Connect();
+           Result<string> login = _market.Login(token, member, password, ServiceUserRole.Member);
+           //Result result = _market.OpenStore(login.Value, storeName);
+           //Assert.True(result.IsSuccess, result.Error);
+           _market.Logout(login.Value);
+           _market.Disconnect(token);
+       }
+       /*
+        * UC - Open a store
+        * Req - 3.2
+        */
+       [TestCase("Yossi11", "qwerty123","~~~Yossi's store jr")]
+       [TestCase("singerMermaid", "130452abc", "Yossi's store")]
+       [Test]
+       public void TestOpenStoreFailure(string member, string password, string storeName)
+       { string token = _market.Connect();
+           Result<string> login = _market.Login(token, member, password, ServiceUserRole.Member);
+          // Result result = _market.OpenStore(login.Value, storeName);
+           //Assert.True(result.IsFailure);
+           _market.Logout(login.Value);
+           _market.Disconnect(token);
+       }
+       /*
+        * UC - Review purchase history
+        * Req - 3.7
+        */
+       [TestCase("Yossi11", "qwerty123")]
+       [TestCase("singerMermaid", "130452abc")]
+       [Test]
+       public void TestGetPurchaseHistorySuccess(string member, string password)
+       { string token = _market.Connect();
+           Result<string> login = _market.Login(token, member, password, ServiceUserRole.Member);
+           Result result = _market.GetPurchaseHistory(login.Value);
+           Assert.True(result.IsSuccess, result.Error);
+           _market.Logout(login.Value);
+           _market.Disconnect(token);
+       }
+       /*
+        * UC - Admin requests for user's purchase history 
+        * Req- 6.4
+        */
+       [Test]
+       public void TestAdminGetPurchaseHistorySuccess(string admin, string password,string member)
+       { string token = _market.Connect();
+           Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
+           Result result = _market.AdminGetPurchaseHistoryUser(login.Value,member);
+           Assert.True(result.IsSuccess, result.Error);
+           _market.Logout(login.Value);
+           _market.Disconnect(token);
+       }
+       /*
+        * UC - Admin requests for user's purchase history 
+        * Req- 6.4
+        */
+       public void TestAdminGetPurchaseHistoryFailure(string admin, string password,string member)
+       { string token = _market.Connect();
+           Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
+           Result result = _market.AdminGetPurchaseHistoryUser(login.Value,member);
+           Assert.True(result.IsFailure);
+           _market.Logout(login.Value);
+           _market.Disconnect(token);
+       }
+       /*
+        * UC - Admin requests for store history  
+        * Req- 6.4
+        */
+       [Test]
+       public void TestAdminGetPurchaseHistoryStoreSuccess(string admin, string password)
+       { string token = _market.Connect();
+           Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
+           Result result = _market.AdminGetPurchaseHistoryStore(login.Value,);
+           Assert.True(result.IsSuccess, result.Error);
+           _market.Logout(login.Value);
+           _market.Disconnect(token);
+       }
+       /*
+        * UC - Admin requests for store history  
+        * Req- 6.4
+        */
+       [Test]
+       public void TestAdminGetPurchaseHistoryStoreFailure(string admin, string password)
+       { string token = _market.Connect();
+           Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
+           Result result = _market.AdminGetPurchaseHistoryStore(login.Value);
+           Assert.True(result.IsFailure);
+           _market.Logout(login.Value);
+           _market.Disconnect(token);
+       }
     }
 }

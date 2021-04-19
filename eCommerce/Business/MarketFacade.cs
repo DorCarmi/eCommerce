@@ -231,15 +231,16 @@ namespace eCommerce.Business
             return Result.Ok<IList<StaffPermission>>(staffPermission);
         }
         //<CNAME>AdminGetAllUserHistory</CNAME>
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId)
-         {
-             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string ofUserId)
+        {
+            var userAndStoreRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
              if (userAndStoreRes.IsFailure)
              {
                  return Result.Fail<IList<IPurchaseHistory>>(userAndStoreRes.Error);
              }
-             IUser user = userAndStoreRes.Value.Item1;
-             IStore store = userAndStoreRes.Value.Item2;
+
+
+             IUser user = userAndStoreRes.Value;
 
              var ofUser=_userManager.GetUser(ofUserId);
              if (ofUser.IsFailure)

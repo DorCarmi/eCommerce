@@ -137,7 +137,7 @@ namespace eCommerce.Business.Service
         /// <param name="storeId">The store id</param>
         /// <param name="ofUserId">The user id</param>
         /// <returns>The history purchase</returns>
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string storeId, string ofUserId);
+        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string ofUserId);
         
         /// <summary>
         /// Get the history purchase of a store
@@ -145,7 +145,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <returns>The history purchase</returns>
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId);
+        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeID);
         
         
         #endregion
