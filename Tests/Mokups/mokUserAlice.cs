@@ -60,21 +60,6 @@ namespace Tests.Mokups
         {
             throw new System.NotImplementedException();
         }
-        
-        public Result<IStore> OpenNewStore(StoreInfo storeInfo)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result AddItemToCart(Item item)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result<Cart> GetCartInfo()
-        {
-            throw new System.NotImplementedException();
-        }
 
         public Result EditCart(ItemInfo info)
         {
@@ -87,6 +72,11 @@ namespace Tests.Mokups
         }
 
         public Result AppointUserToManager(IStore store, IUser user)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result EnterRecordToHistory(PurchaseRecord record)
         {
             throw new System.NotImplementedException();
         }
@@ -106,27 +96,22 @@ namespace Tests.Mokups
             throw new System.NotImplementedException();
         }
 
-        public Result AddPermissionsToManager(IStore store, IUser user, StorePermission permission)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store)
         {
             throw new System.NotImplementedException();
         }
 
-        public Result<IBasket> GetUserPurchaseHistory(IStore store)
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory()
         {
             throw new System.NotImplementedException();
         }
 
-        public Result<IBasket> GetStorePurchaseHistory(IStore store)
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IUser otherUser)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(IStore store)
         {
             throw new System.NotImplementedException();
         }
@@ -134,11 +119,6 @@ namespace Tests.Mokups
         public Result HasPermission(IStore store, StorePermission storePermission)
         {
             return Result.Ok();
-        }
-
-        public Result EnterBasketToHistory(IBasket basket)
-        {
-            throw new System.NotImplementedException();
         }
 
         public string Username { get; }
