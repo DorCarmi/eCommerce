@@ -28,16 +28,15 @@ namespace eCommerce.Business.Service
         
         public static UserToSystemState ServiceUserRoleToSystemState(ServiceUserRole role)
         {
-            // TODO implement
             switch (role)
             {
                 case ServiceUserRole.Member:
                 {
-                    throw new NotImplementedException();
+                    return Member.State;
                 }
                 case ServiceUserRole.Admin:
                 {
-                    throw new NotImplementedException();
+                    return Admin.State;
                 }
             }
 
@@ -45,7 +44,7 @@ namespace eCommerce.Business.Service
             throw new NotImplementedException();
         }
         
-        public static ItemInfo ProductDtoToProductInfo(IItem itemDto)
+        public static ItemInfo ItemDtoToProductInfo(IItem itemDto)
         {
             List<string> keywords = new List<string>();
             IEnumerator<string> enumerator = itemDto.KeyWords.GetEnumerator();
@@ -62,6 +61,15 @@ namespace eCommerce.Business.Service
                 keywords,
                 (int)itemDto.PricePerUnit);
             return null;
+        }
+
+        public static BasketDto IBasketToBasketDto(IBasket basket)
+        {
+            return new BasketDto(
+                basket.GetStoreName(),
+                basket.GetAllItems().Value,
+                basket.GetTotalPrice().Value
+            );
         }
     }
 }

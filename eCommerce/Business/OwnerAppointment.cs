@@ -7,7 +7,7 @@ namespace eCommerce.Business
 {
     public class OwnerAppointment
     {
-        public IUser User { get;}
+        public IUser User { get; set; }
         private ConcurrentDictionary<StorePermission,bool> _permissions;
 
         public OwnerAppointment(IUser user)
@@ -25,7 +25,6 @@ namespace eCommerce.Business
 
         public Result HasPermission(StorePermission permission)
         {
-            
             if(_permissions.ContainsKey(permission))
                 return Result.Ok();
             return Result.Fail("Owner does not have the required permission");

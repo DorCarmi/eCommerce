@@ -11,10 +11,10 @@ namespace eCommerce.Business.Service
         
         public string Category { get; set; }
         public ReadOnlyCollection<string> KeyWords { get; set; }
-        public float PricePerUnit { get; set; }
+        public double PricePerUnit { get; set; }
 
         public ItemDto(string productName, string storeName, int amount,
-            string category, ReadOnlyCollection<string> keyWords, float pricePerUnit)
+            string category, ReadOnlyCollection<string> keyWords, double pricePerUnit)
         {
             ItemName = productName;
             StoreName = storeName;
