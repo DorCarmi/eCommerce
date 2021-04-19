@@ -96,6 +96,11 @@ namespace Tests.Mokups
             throw new System.NotImplementedException();
         }
 
+        public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store)
         {
             throw new System.NotImplementedException();

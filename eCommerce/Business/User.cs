@@ -177,7 +177,12 @@ namespace eCommerce.Business
         {
             return _systemState.UpdatePermissionsToManager(this, store, user, permissions);
         }
-        
+
+        public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store)
         {
             //@TODO_SHARON:: find out if this means all of apointed-by's. might need adjustments on Store side.

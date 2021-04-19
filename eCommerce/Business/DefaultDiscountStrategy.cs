@@ -28,7 +28,7 @@ namespace eCommerce.Business
 
             if (totalPrice > 500)
             {
-                return Result.Ok(totalPrice * 0.9);
+                return Result.Ok<double>(totalPrice * 0.9);
             }
             else
             {
