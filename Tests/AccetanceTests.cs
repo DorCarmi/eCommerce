@@ -27,7 +27,7 @@ namespace Tests
             _market.Register(token, shiran, "130452abc");
             _market.Register(token, lior, "987654321");
             Result<string> yossiLogInResult = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            string storeName = "yossi's store";
+            string storeName = "Yossi's store";
             IItem product = new ItemDto("Tara milk", storeName, 10, "dairy",
                 new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
             _market.OpenStore(yossiLogInResult.Value, storeName, product);
@@ -309,7 +309,7 @@ namespace Tests
             _market.Disconnect(token); 
         }
         /*
-         * UC //TODO check for usecase (was missing)
+         * UC - Appoint user to be store co-owner
          * Req - 4.3
          */
         [TestCase("Yossi's Store", "singerMermaid")]
@@ -325,7 +325,7 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC //TODO check for usecase (was missing)
+         * UC - Appoint user to be store co-owner
          * Req - 4.3
          */
         [TestCase("Yossi11", "qwerty123", "The Polite Frog", "singerMermaid")]
@@ -343,7 +343,7 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC //TODO check for usecase (was missing)
+         * UC - Appoint user to be store co-owner
          * Req - 4.3
          */
         [TestCase("Yossi's Store", "singerMermaid")]
@@ -357,7 +357,7 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC //TODO rename UC
+         * UC - Appoint Manager
          * Req - 4.5
          */
         [TestCase("Yossi's Store", "singerMermaid")]
@@ -373,7 +373,7 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC //TODO rename UC
+         * UC - Appoint Manager
          * Req - 4.5
          */
         [TestCase("Yossi11", "qwerty123", "The Polite Frog", "singerMermaid")]
@@ -391,7 +391,7 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         * UC //TODO rename UC
+         * UC - Appoint Manager
          * Req - 4.5
          */
         [TestCase("Yossi's Store", "singerMermaid")]
@@ -408,7 +408,7 @@ namespace Tests
         //TODO add permission tests once permissions are known
         
         /*
-         * UC - ?
+         * UC - Store Owner requests for purchase history for the store
          * Req - 4.11
          */
         [TestCase("Yossi's Store", "Yossi11", "qwerty123")]
@@ -423,7 +423,7 @@ namespace Tests
             _market.Disconnect(token);  
         }
         /*
-         * UC - ?
+         * UC - Store Owner requests for purchase history for the store
          * Req - 4.11
          */
         [TestCase("dancing dragon", "Yossi11", "qwerty123")]
@@ -471,8 +471,8 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         *
-         * 
+         * UC - Edit shopping cart
+         * Req - 2.8 
          */
         [TestCase("Tara milk", "Yossi's store", 9)]
         [TestCase("Tara milk", "Yossi's store", 3)]
@@ -490,8 +490,8 @@ namespace Tests
             _market.Disconnect(token);
         }
         /*
-         *
-         * 
+         * UC - Edit shopping cart
+         * Req - 2.8 
          */
         [TestCase("Tara milk", "Yossi's store", 9)]
         [TestCase("Tnuva cream cheese", "Yossi's store", 3)]
@@ -525,8 +525,8 @@ namespace Tests
        //[Test]
        //public void TestPurchaseCart() {}
        /*
-        *
-        * 
+        * UC - Open a store
+        * Req - 3.2
         */
        [TestCase("Yossi11", "qwerty123","Yossi's store jr")]
        [TestCase("singerMermaid", "130452abc", "dancing dragon")]
@@ -540,8 +540,8 @@ namespace Tests
            _market.Disconnect(token);
        }
        /*
-        *
-        * 
+        * UC - Open a store
+        * Req - 3.2
         */
        [TestCase("Yossi11", "qwerty123","~~~Yossi's store jr")]
        [TestCase("singerMermaid", "130452abc", "Yossi's store")]
@@ -555,8 +555,8 @@ namespace Tests
            _market.Disconnect(token);
        }
        /*
-        *
-        * 
+        * UC - Review purchase history
+        * Req - 3.7
         */
        [TestCase("Yossi11", "qwerty123")]
        [TestCase("singerMermaid", "130452abc")]
@@ -569,6 +569,10 @@ namespace Tests
            _market.Logout(login.Value);
            _market.Disconnect(token);
        }
+       /*
+        * UC - Admin requests for user's purchase history 
+        * Req- 6.4
+        */
        [Test]
        public void TestAdminGetPurchaseHistorySuccess(string admin, string password,string member)
        { string token = _market.Connect();
@@ -578,6 +582,10 @@ namespace Tests
            _market.Logout(login.Value);
            _market.Disconnect(token);
        }
+       /*
+        * UC - Admin requests for user's purchase history 
+        * Req- 6.4
+        */
        public void TestAdminGetPurchaseHistoryFailure(string admin, string password,string member)
        { string token = _market.Connect();
            Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
@@ -586,6 +594,10 @@ namespace Tests
            _market.Logout(login.Value);
            _market.Disconnect(token);
        }
+       /*
+        * UC - Admin requests for store history  
+        * Req- 6.4
+        */
        [Test]
        public void TestAdminGetPurchaseHistoryStoreSuccess(string admin, string password, string store)
        { string token = _market.Connect();
@@ -595,6 +607,10 @@ namespace Tests
            _market.Logout(login.Value);
            _market.Disconnect(token);
        }
+       /*
+        * UC - Admin requests for store history  
+        * Req- 6.4
+        */
        [Test]
        public void TestAdminGetPurchaseHistoryStoreFailure(string admin, string password, string store)
        { string token = _market.Connect();
