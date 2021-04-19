@@ -25,6 +25,10 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Register a new user to the system as a member.
         /// </summary>
+        ///<Test>
+        ///TestRegisterToSystemSuccess
+        ///TestRegisterToSystemFailure
+        ///</Test>
         /// <param name="token">The Authorization token</param>
         /// <param name="memberInfoDto">The user information</param>
         /// <param name="password">The user password</param>
@@ -34,6 +38,10 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Log in to the system
         /// </summary>
+        /// <Test>
+        ///TestLoginSuccess
+        /// TestLoginFailure
+        /// </Test>
         /// <param name="guestToken">The guest Authorization token</param>
         /// <param name="username">The user name</param>
         /// <param name="password">The user password</param>
@@ -44,6 +52,10 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Logout a user form the system.
         /// </summary>
+        /// <Test>
+        ///TestLogoutSuccess
+        ///TestLogoutFailure
+        /// </Test>
         /// <param name="token">Authorization token</param>
         /// <returns>New guest Authorization token</returns>
         public Result<string> Logout(string token);
@@ -51,6 +63,9 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Get the purchase history of the user 
         /// </summary>
+        ///
+        ///
+        /// 
         /// <param name="token">Authorization token</param>
         /// <returns>The purchase history</returns>
         public Result<IList<IPurchaseHistory>> GetPurchaseHistory(string token);
@@ -58,6 +73,11 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Appoint a user as a coOwner to the store
         /// </summary>
+        /// <Test>
+        /// TestAppointCoOwnerSuccess
+        /// TestAppointCoOwnerFailureInvalid
+        /// TestAppointCoOwnerFailureLogic
+        /// </Test>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <param name="appointedUserId">The appointment user</param>
@@ -67,6 +87,11 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Appoint a user as a new manager to the sore 
         /// </summary>
+        /// <Test>
+        /// TestAppointManagerSuccess
+        /// TestAppointManagerFailureInvalid
+        /// TestAppointManagerFailureLogic
+        /// </Test>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <param name="appointedManagerUserId">The appointment manager</param>
@@ -254,6 +279,11 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Add new item to the sore
         /// </summary>
+        /// <Test>
+        /// TestAddNewItemToStoreSuccess
+        /// TestAddNewItemToStoreFailureInput
+        /// TestAddNewItemToStoreFailureAccess
+        /// </Test>
         /// <param name="token">Authorization token</param>
         /// <param name="item">The new item</param>
         /// <returns>Result of the item addition</returns>
@@ -262,6 +292,11 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Remove item from store
         /// </summary>
+        /// <Test>
+        /// TestRemoveProductFromStoreSuccess
+        /// TestRemoveProductFromStoreFailureInvalid
+        /// TestRemoveProductFromStoreFailureLogic
+        /// </Test>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The sore id</param>
         /// <param name="productId">The product id</param>
@@ -271,6 +306,11 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Edit the item
         /// </summary>
+        /// <Test>
+        /// TestEditItemInStoreSuccess
+        /// TestEditItemInStoreFailureInvalid
+        /// TestEditItemInStoreFailureLogic
+        /// </Test>
         /// <param name="token">Authorization token</param>
         /// <param name="item">The new item</param>
         /// <returns>Result of the edit</returns>
