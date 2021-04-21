@@ -87,7 +87,7 @@ namespace Tests.AuthTests
                 string uname = $"{username}{i}";
                 string upassword = $"{password}{i}";
                 loginTasks[i] = new Task<Result<string>>(
-                    () => _auth.Login(uname, upassword, AuthUserRole.Member));
+                    () => _auth.Authenticate(uname, upassword, AuthUserRole.Member));
             }
 
             TaskTestUtils.RunTasks(loginTasks);

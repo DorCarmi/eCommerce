@@ -35,13 +35,8 @@ namespace eCommerce.Business
         public Result<OwnerAppointment> MakeOwner(IStore store);
         public Result<ManagerAppointment> MakeManager(IStore store);
 
-        
 
-
-
-
-
-
+        public UserToSystemState GetState();
     }
 
     

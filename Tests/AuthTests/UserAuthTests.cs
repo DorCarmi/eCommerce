@@ -128,7 +128,7 @@ namespace Tests.AuthTests
         {
             foreach (var user in _registeredUsers)
             {
-                Result<string> loginRes = _userAuth.Login(user.Username, user.Password, AuthUserRole.Member);
+                Result<string> loginRes = _userAuth.Authenticate(user.Username, user.Password, AuthUserRole.Member);
                 Assert.True(loginRes.IsSuccess,
                             $"Registered user {user.Username} wasn't able to login\nError: {loginRes.Error}");
 
