@@ -14,7 +14,7 @@ namespace eCommerce.Auth
         
         /// <summary>
         /// Authenticate the username password.
-        /// If valid generate a token for that user.
+        /// The user need to be registered.
         /// </summary>
         /// <param name="username">The user name</param>
         /// <param name="password">The user password</param>

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using System.Threading;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -12,8 +13,8 @@ namespace eCommerce.Business
     public class UserManager
     {
         private IUserAuth _auth;
-        // Token to user
-        private ConcurrentDictionary<string, IUser> _connectedUsers;
+
+        private ConnectedUsersRepo _connectedUsersRepo;
         private IRepository<IUser> _registeredUsersRepo;
         private ConcurrentDictionary<string, IUser> _admins;
 
@@ -23,7 +24,7 @@ namespace eCommerce.Business
         public UserManager(IUserAuth auth, IRepository<IUser> registeredUsersRepo)
         {
             _auth = auth;
-            _connectedUsers = new ConcurrentDictionary<string, IUser>();
+            _connectedUsersRepo = new ConnectedUsersRepo();
             // TODO get the initialze id value from DB
             _concurrentIdGenerator = new ConcurrentIdGenerator(0);
             _registeredUsersRepo = registeredUsersRepo;
@@ -36,20 +37,26 @@ namespace eCommerce.Business
             string token = _auth.GenerateToken(guestUsername);
 
             IUser newUser = CreateGuestUser(guestUsername);
-            _connectedUsers.TryAdd(token, newUser);
+            _connectedUsersRepo.TryConnectedUser(guestUsername, token, newUser);
             return token;
         }
         
         public void Disconnect(string token)
         {
-            _connectedUsers.Remove(token, out var userTuple);
+            if (!_connectedUsersRepo.TryGetConnectedUser(token, out var user))
+            {
+                // usage of  invalid token
+                return;
+            }
+
+            _connectedUsersRepo.RemoveConnectedUserFromToken(token);
             if (!_auth.IsValidToken(token))
             {
                 // log it
                 return;
             }
             
-            if (userTuple == null)
+            if (user == null)
             {
                 // user using old token
             }
@@ -58,7 +65,7 @@ namespace eCommerce.Business
         public Result Register(string token, MemberInfo memberInfo, string password)
         {
             
-            if (!_connectedUsers.ContainsKey(token))
+            if (!_connectedUsersRepo.TryGetConnectedUser(token, out var user))
             {
                 return Result.Fail("Need to be connected or logged in");
             }
@@ -66,7 +73,7 @@ namespace eCommerce.Business
             if (!_auth.IsValidToken(token))
             {
                 // log it old token
-                _connectedUsers.Remove(token, out var user);
+                _connectedUsersRepo.RemoveConnectedUserFromToken(token);
                 return Result.Fail("Invalid token");
             }
             
@@ -110,11 +117,11 @@ namespace eCommerce.Business
         {
             if (!_auth.IsValidToken(guestToken))
             {
-                _connectedUsers.Remove(guestToken, out var tuser);
+                _connectedUsersRepo.RemoveConnectedUserFromToken(guestToken);
                 return Result.Fail<string>("Invalid token");
             }
 
-            if (!_connectedUsers.TryGetValue(guestToken, out var guestUser) || guestUser.GetState() != Guest.State)
+            if (!_connectedUsersRepo.TryGetConnectedUser(guestToken, out var guestUser) || guestUser.GetState() != Guest.State)
             {
                 return Result.Fail<string>("Not connected or not guest");
             }
@@ -137,22 +144,24 @@ namespace eCommerce.Business
             {
                 
             }
-            
-            _connectedUsers.Remove(guestToken, out var tguestUser);
-            if (!_connectedUsers.TryAdd(loginToken, user))
+
+            if (!_connectedUsersRepo.TryConnectedUser(username, loginToken, user))
             {
                 //Error in token generation
                 return Result.Fail<string>("Error");
             }
+
+            _connectedUsersRepo.RemoveConnectedUserFromToken(guestToken);
+
             
             return Result.Ok(loginToken);
         }
         
         public Result<string> Logout(string token)
         {
-            if (!_auth.IsValidToken(token) || !_connectedUsers.TryGetValue(token, out IUser user))
+            if (!(_connectedUsersRepo.TryGetConnectedUser(token, out var user) && _auth.IsValidToken(token)))
             {
-                // TODO log it
+                _connectedUsersRepo.RemoveConnectedUserFromToken(token);
                 return Result.Fail<string>("Invalid token");
             }
 
@@ -161,13 +170,8 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Guest can disconnect not to logout");
             }
 
-            string newGuestToken = Connect();
-            string newGuestUsername = _auth.GetData(newGuestToken).Value.Username;
-            
-            _connectedUsers.Remove(token, out var tuser);
-            _connectedUsers.TryAdd(newGuestToken, new User(newGuestUsername));
-            
-            return Result.Ok(newGuestToken);
+            _connectedUsersRepo.RemoveConnectedUserFromToken(token);
+            return Result.Ok(Connect());
         }
 
         public Result<IUser> GetUserIfConnectedOrLoggedIn(string token)
@@ -177,7 +181,7 @@ namespace eCommerce.Business
                 return Result.Fail<IUser>("Invalid token");
             }
 
-            if (!_connectedUsers.TryGetValue(token, out var user))
+            if (!_connectedUsersRepo.TryGetConnectedUser(token, out var user))
             {
                 return Result.Fail<IUser>("User not connected or loggedin");
             }
@@ -200,18 +204,6 @@ namespace eCommerce.Business
             }
 
             return Result.Ok(user);
-        }
-        
-        private IUser GetConnectedUserOrNull(string username)
-        {
-            _connectedUsers.TryGetValue(username, out var user);
-            if (user == null)
-            {
-                // TODO log it
-                return null;
-            }
-
-            return user;
         }
 
         private IUser CreateGuestUser(string guestName)

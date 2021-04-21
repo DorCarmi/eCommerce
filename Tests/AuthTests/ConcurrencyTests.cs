@@ -20,11 +20,12 @@ namespace Tests.AuthTests
         }
 
         [Test]
-        public async Task ConcurrentConnectTest()
+        public async Task ConcurrentGenerateTokenTest()
         {
+            ConcurrentIdGenerator idGenerator = new ConcurrentIdGenerator(0);
             const int numberOfTasks = 10;
             string[] tokens = await TaskTestUtils.CreateAndRunTasks(
-                () => _auth.Connect(),
+                () => _auth.GenerateToken(idGenerator.MoveNext().ToString()),
                 numberOfTasks);
             
             ISet<string> usernames = new HashSet<string>();
@@ -63,52 +64,6 @@ namespace Tests.AuthTests
             Assert.AreEqual(1,
                 registeredSuccessfully,
                 $"Only one task should has been able to register but {registeredSuccessfully} succeeded");
-        }
-        
-        [Test]
-        public async Task ConcurrentLoginFewUsersTest()
-        {
-            const int numberOfTasks = 5;
-            string username = "user";
-            string password = "password";
-
-            for (int i = 0; i < numberOfTasks; i++)
-            {
-                Result registerRes = _auth.Register($"{username}{i}", $"{password}{i}");
-                if (registerRes.IsFailure)
-                {
-                    Assert.Fail("The registration of the user didnt work");
-                }
-            }
-
-            Task<Result<string>>[] loginTasks = new Task<Result<string>>[numberOfTasks];
-            for (int i = 0; i < numberOfTasks; i++)
-            {
-                string uname = $"{username}{i}";
-                string upassword = $"{password}{i}";
-                loginTasks[i] = new Task<Result<string>>(
-                    () => _auth.Authenticate(uname, upassword, AuthUserRole.Member));
-            }
-
-            TaskTestUtils.RunTasks(loginTasks);
-            Result<string>[] loginRes = await Task.WhenAll(loginTasks);
-
-            int numberOfUsersLoggedIn = 0;
-            foreach (var loginTokenRes in loginRes)
-            {
-                if (loginTokenRes.IsSuccess)
-                {
-                    numberOfUsersLoggedIn++;
-                }
-                else
-                {
-                    Console.WriteLine(loginTokenRes.Error);
-                }
-            }
-            
-            Assert.AreEqual(numberOfTasks,
-                numberOfUsersLoggedIn,
-                $"All the users should have been able to login but {numberOfUsersLoggedIn} succeeded");
         }
     }
 }

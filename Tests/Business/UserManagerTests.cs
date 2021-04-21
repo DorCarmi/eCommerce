@@ -96,9 +96,10 @@ namespace Tests.Business
                 $"Only one task should has been able to register but {registeredSuccessfully} succeeded");
         }
 
-        [Test, Repeat(2)]
+        [Test]
         public async Task ConcurrentLoginSameUserTest()
         {
+            Console.WriteLine("A1");
             const int numberOfTasks = 5;
             string password = "passwrod1"; 
             string token = _userManager.Connect();
@@ -109,6 +110,7 @@ namespace Tests.Business
                 Assert.Fail("The registration of the user didnt work");
             }
 
+            Console.WriteLine("A1");
             Result[] loginRes = await TaskTestUtils.CreateAndRunTasks(
                 () => _userManager.Login(token, memberInfo.Username, password, ServiceUserRole.Member),
                 numberOfTasks);
@@ -132,7 +134,6 @@ namespace Tests.Business
         {
             const int numberOfTasks = 5;
             string username = "user";
-
             string password = "password";
 
             string[] guestTokens = new string[numberOfTasks];
