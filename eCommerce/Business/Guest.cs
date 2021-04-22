@@ -70,13 +70,29 @@ namespace eCommerce.Business
             return Result.Fail("Illegal action for guest (Update-Store-Permissions-From-User).");
         }
 
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user)
+        {
+            return Result.Fail<IList<PurchaseRecord>>("Illegal action for guest (get-purchase-history).");
+            
+        }
+
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, IUser otherUser)
+        {
+            return Result.Fail<IList<PurchaseRecord>>("Illegal action for guest (get-other-user's-purchase-history).");
+        }
+
+        public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(User user, IStore store)
+        {
+            return Result.Fail<IList<PurchaseRecord>>("Illegal action for guest (get-Store-purchase-history).");
+        }
+
 
         public Result HasPermission(User user, IStore store, StorePermission storePermission)
         {
             return Result.Fail("Guest has no permissions in a store.");
         }
 
-        public Result EnterBasketToHistory(User user, IBasket basket)
+        public Result EnterRecordToHistory(User user, PurchaseRecord record)
         {
             return Result.Fail("Guest has no transaction-history.");
         }

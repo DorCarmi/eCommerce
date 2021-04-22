@@ -14,22 +14,13 @@ namespace eCommerce.Business
         {
             this.User = user;
             this._permissions = new ConcurrentDictionary<StorePermission, bool>();
-            //add permissions
-        }
-
-        public Result AddPermissions(StorePermission permission)
-        {
-            if(_permissions.TryAdd(permission, true))
-                return Result.Ok();
-            return Result.Fail("Owner already has permission");
-        }
-        
-        public Result RemovePermission(StorePermission permission)
-        {
-            bool btrue;
-            if (_permissions.TryRemove(permission, out btrue))
-                return Result.Ok();
-            return Result.Fail("Owner does not have the given permission");
+            _permissions.TryAdd(StorePermission.GetStoreHistory,true);
+            _permissions.TryAdd(StorePermission.AddItemToStore,true);
+            _permissions.TryAdd(StorePermission.ChangeItemPrice,true);
+            _permissions.TryAdd(StorePermission.EditItemDetails,true);
+            _permissions.TryAdd(StorePermission.EditStorePolicy,true);
+            _permissions.TryAdd(StorePermission.ChangeItemStrategy,true);
+            _permissions.TryAdd(StorePermission.ControlStaffPermission,true);
         }
 
         public Result HasPermission(StorePermission permission)

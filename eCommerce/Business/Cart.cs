@@ -72,20 +72,20 @@ namespace eCommerce.Business
         }
 
 
-        public Result CalculatePricesForCart()
+        public Result<double> CalculatePricesForCart()
         {
             foreach (var storeBasket in _baskets)
             {
                 var currAns = storeBasket.Key.CalculateBasketPrices(storeBasket.Value);
                 if (currAns.IsFailure)
                 {
-                    return currAns;
+                    return Result.Fail<double>(currAns.Error);
                 }
 
                 double currBasketPrice = storeBasket.Value.GetTotalPrice().GetValue();
                 this._totalPrice += currBasketPrice;
             }
-            return Result.Ok();
+            return Result.Ok(_totalPrice);
         }
 
         public double GetCurrentCartPrice()
@@ -94,51 +94,12 @@ namespace eCommerce.Business
         }
         
 
-        public Result<PurchaseInfo> BuyWholeCart(IUser user)
+        public Result BuyWholeCart(IUser user, PaymentInfo paymentInfo)
         {
-
             this._performTransaction = new Transaction(this);
-            List<ItemInfo> items = new List<ItemInfo>();
-            double totalPrice = 0;
-            if (user == this._cartHolder)
-            {
-                foreach (var basket in _baskets)
-                {
-                    if (!basket.Value.BuyWholeBasket().IsFailure)
-                    {
-                        var resPrice = basket.Value.GetTotalPrice();
-                        if (!resPrice.IsFailure)
-                        {
-                            totalPrice += resPrice.GetValue();
-                            var resItems = basket.Value.GetAllItems();
-                            if (!resItems.IsFailure)
-                            {
-                                items.AddRange(resItems.GetValue());
-                            }
-                            else
-                            {
-                                return Result.Fail<PurchaseInfo>("Error getting all items from basket to buy");
-                            }
-                            
-                        }
-                        else
-                        {
-                            return Result.Fail<PurchaseInfo>("Error getting total price from basket to buy");
-                        }
-                    }
-                    return Result.Fail<PurchaseInfo>("Error trying to buy all items from basket");
-                }
-
-                return Result.Ok(new PurchaseInfo(items, totalPrice, user));
-            }
-            else
-            {
-                return Result.Fail<PurchaseInfo>("Only cart holder can edit cart");
-            }
+            var result=_performTransaction.BuyWholeCart(paymentInfo);
+            return result;
         }
-
-        
-
         public IList<IBasket> GetBaskets()
         {
             return this._baskets.Values.ToList();
