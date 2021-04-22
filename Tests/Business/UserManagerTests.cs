@@ -99,7 +99,6 @@ namespace Tests.Business
         [Test]
         public async Task ConcurrentLoginSameUserTest()
         {
-            Console.WriteLine("A1");
             const int numberOfTasks = 5;
             string password = "passwrod1"; 
             string token = _userManager.Connect();
@@ -110,9 +109,8 @@ namespace Tests.Business
                 Assert.Fail("The registration of the user didnt work");
             }
 
-            Console.WriteLine("A1");
             Result[] loginRes = await TaskTestUtils.CreateAndRunTasks(
-                () => _userManager.Login(token, memberInfo.Username, password, ServiceUserRole.Member),
+                () =>  _userManager.Login(token, memberInfo.Username, password, ServiceUserRole.Member),
                 numberOfTasks);
 
             int registeredSuccessfully = 0;
@@ -126,7 +124,43 @@ namespace Tests.Business
 
             Assert.AreEqual(1,
                 registeredSuccessfully,
-                $"Only one task should has been able to login but {registeredSuccessfully} succeeded");
+                $"All logging in should have been successful but {registeredSuccessfully} succeeded");
+        }
+        
+        [Test]
+        public async Task ConcurrentLoginSameUserDifferentGuestsTest()
+        {
+            const int numberOfTasks = 5;
+            string password = "passwrod1"; 
+            string token = _userManager.Connect();
+            MemberInfo memberInfo = new MemberInfo("user1", "email@email.com", "user", DateTime.Now, "Sea street 1");
+            Result registerRes = _userManager.Register(token, memberInfo, password);
+            if (registerRes.IsFailure)
+            {
+                Assert.Fail("The registration of the user didnt work");
+            }
+            _userManager.Disconnect(token);
+
+            Result[] loginRes = await TaskTestUtils.CreateAndRunTasks(
+                () =>
+                {
+                    string token = _userManager.Connect();
+                    return _userManager.Login(token, memberInfo.Username, password, ServiceUserRole.Member);
+                },
+                numberOfTasks);
+
+            int registeredSuccessfully = 0;
+            foreach (var res in loginRes)
+            {
+                if (res.IsSuccess)
+                {
+                    registeredSuccessfully++;
+                }
+            }
+
+            Assert.AreEqual(numberOfTasks,
+                registeredSuccessfully,
+                $"All logging in should have been successful but {registeredSuccessfully} succeeded");
         }
 
         [Test]
