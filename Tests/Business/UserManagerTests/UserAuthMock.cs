@@ -9,9 +9,7 @@ namespace Tests.Business.UserManagerTests
     /// <summary>
     /// <para>Implementation of concurrent.</para>
     /// <para>
-    /// Assume Role in login is valid <br/>
-    /// Assume password is valid <br/>
-    /// Assume logout token is of login user
+    /// Assume Token is valid <br/>
     /// </para>
     /// </summary>
     public class UserAuthMock : IUserAuth
@@ -21,116 +19,59 @@ namespace Tests.Business.UserManagerTests
         private ConcurrentDictionary<string, string> _connectedGuests;
         // username to auth
         private ConcurrentDictionary<string, AuthData> _registeredUsers;
-        //token to name
-        private ConcurrentDictionary<string, string> _loggedInUsers;
+        //name to password
+        private ConcurrentDictionary<string, string> _passwords;
 
-        private ConcurrentIdGenerator _token;
-        private Mutex _isLoginMutex;
-
+        private ConcurrentIdGenerator _idGenerator;
+        
         public UserAuthMock()
         {
             _connectedGuests = new ConcurrentDictionary<string, string>();
             _registeredUsers = new ConcurrentDictionary<string, AuthData>();
-            _loggedInUsers = new ConcurrentDictionary<string, string>();
-            _token = new ConcurrentIdGenerator(0);
-            _isLoginMutex = new Mutex();
-        }
-
-        public string Connect()
-        {
-            string tokenStr = _token.MoveNext().ToString();
-            _connectedGuests.TryAdd(tokenStr, $"Guest{tokenStr}");
-            return tokenStr;
-        }
-
-        public void Disconnect(string token)
-        {
-            _connectedGuests.Remove(token, out var tstring );
+            _passwords = new ConcurrentDictionary<string, string>();
+            _idGenerator = new ConcurrentIdGenerator(0);
         }
 
         public Result Register(string username, string password)
         {
-            if (!_registeredUsers.TryAdd(username, new AuthData(username, "Member")))
+            if (!_registeredUsers.TryAdd(username, new AuthData(username)))
             {
                 return Result.Fail<string>("Username already exists");
             }
 
+            _passwords.TryAdd(username, password);
             return Result.Ok();
         }
 
-        public Result<string> Login(string username, string password, AuthUserRole role)
+        public Result Authenticate(string username, string password)
         {
-            _isLoginMutex.WaitOne();
-            if (IsLoggedIn(username))
+            if (!(_registeredUsers.ContainsKey(username) && _passwords.TryGetValue(username, out var userPassword)))
             {
-                _isLoginMutex.ReleaseMutex();
-                return Result.Fail<string>("User already logged in");
+                return Result.Fail("Invalid username or password");
             }
 
-            string tokenStr = _token.MoveNext().ToString();
-            if (!_loggedInUsers.TryAdd(tokenStr, username))
+            if (!userPassword.Equals(password))
             {
-                _isLoginMutex.ReleaseMutex();
-                return Result.Fail<string>("User already logged in");
+                return Result.Fail("Invalid username or password");
             }
-            _isLoginMutex.ReleaseMutex();
 
-            return Result.Ok(tokenStr);
-        }
-
-        public Result Logout(string token)
-        {
-            _loggedInUsers.Remove(token, out var tstring );
             return Result.Ok();
         }
 
-        public bool IsConnected(string token)
+        public string GenerateToken(string username)
         {
-            return _connectedGuests.ContainsKey(token);
-        }
-
-        public bool IsRegistered(string username)
-        {
-            return _registeredUsers.ContainsKey(username);
-        }
-
-        public bool IsLoggedIn(string username)
-        {
-            bool loggedIn = false;
-            foreach (var user in _loggedInUsers.Values)
-            {
-                if(user.Equals(username))
-                {
-                    loggedIn = true;
-                    break;
-                }
-            }
-            return loggedIn;
+            return $"{username}*{_idGenerator.MoveNext().ToString()}";
         }
 
         public bool IsValidToken(string token)
         {
-            return long.TryParse(token, out var tokenNumber);
+            return GetData(token).IsSuccess;
         }
-
-        public string RoleToString(AuthUserRole role)
-        {
-            return role.ToString();
-        }
+        
 
         public Result<AuthData> GetData(string token)
         {
-            if (_connectedGuests.TryGetValue(token, out var guestName))
-            {
-                return Result.Ok(new AuthData(guestName, "Guest"));
-            }
-
-            if (!_loggedInUsers.TryGetValue(token, out var username))
-            {
-                return Result.Fail<AuthData>("Not logged in");
-            }
-            _registeredUsers.TryGetValue(username, out var userAuth);
-            return Result.Ok(userAuth);
+            return Result.Ok(new AuthData(token.Split("*")[0]));
         }
     }
 }

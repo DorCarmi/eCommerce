@@ -91,6 +91,11 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
+        public UserToSystemState GetState()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permission)
         {
             throw new System.NotImplementedException();

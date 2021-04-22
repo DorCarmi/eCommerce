@@ -232,6 +232,11 @@ namespace eCommerce.Business
             return _systemState.MakeManager(this, store);
         }
 
+        public UserToSystemState GetState()
+        {
+            return _systemState;
+        }
+
 
         //InBusiness
         
