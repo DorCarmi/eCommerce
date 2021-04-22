@@ -16,4 +16,8 @@
       <ProjectReference Include="..\eCommerce\eCommerce.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Business\UserTests" />
+    </ItemGroup>
+
 </Project>

@@ -8,7 +8,7 @@ using eCommerce.Business.Service;
 using eCommerce.Common;
 using NUnit.Framework;
 
-namespace Tests
+namespace Tests.AcceptanceTests
 {
     [TestFixture]
     public class AcceptanceTests

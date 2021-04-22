@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using eCommerce.Business;
 using eCommerce.Business.Service;
-using eCommerce.Common;
 using NUnit.Framework;
-using Tests.Mokups;
+using Tests.Business.Mokups;
 
-namespace Tests
+namespace Tests.Business.StoreTests
 {
     public class ItemTest
     {
