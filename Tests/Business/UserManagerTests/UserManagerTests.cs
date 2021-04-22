@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
-using Microsoft.AspNetCore.Identity;
 using NUnit.Framework;
 
-namespace Tests.Business
+namespace Tests.Business.UserManagerTests
 {
     [TestFixture]
     public class UserManagerTests

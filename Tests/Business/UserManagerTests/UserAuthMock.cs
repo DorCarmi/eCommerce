@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading;
 using eCommerce.Auth;
 using eCommerce.Common;
-using NUnit.Framework;
 
-namespace Tests.Business
+namespace Tests.Business.UserManagerTests
 {
     /// <summary>
     /// <para>Implementation of concurrent.</para>

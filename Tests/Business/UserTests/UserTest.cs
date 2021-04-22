@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using eCommerce;
 using eCommerce.Business;
 using NUnit.Framework;
-using Tests.Mokups;
+using Tests.Business.Mokuprps;
+using Tests.Business.Mokups;
 
-namespace Tests
+namespace Tests.Business.UserTests
 {
     public class UserTest
     {

@@ -4,7 +4,7 @@ using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
-namespace Tests.Mokups
+namespace Tests.Business.Mokups
 {
     public class mokStore: IStore
     {

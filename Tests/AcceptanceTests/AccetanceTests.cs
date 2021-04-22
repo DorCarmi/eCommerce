@@ -10,7 +10,7 @@ using NUnit.Framework;
 using Tests.AuthTests;
 using Tests.Business;
 
-namespace Tests
+namespace Tests.AcceptanceTests
 {
     [TestFixture]
     public class AcceptanceTests

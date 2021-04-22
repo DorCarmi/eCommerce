@@ -3,7 +3,7 @@ using eCommerce;
 using eCommerce.Business;
 using eCommerce.Common;
 
-namespace Tests.Mokups
+namespace Tests.Business.Mokups
 {
     public class mokCart : ICart
     {

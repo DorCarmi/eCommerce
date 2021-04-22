@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
-using Microsoft.AspNetCore.Identity;
 using NUnit.Framework;
 
-namespace Tests
+namespace Tests.Business
 {
     [TestFixture]
     public class UserStoreIntegration

@@ -1,7 +1,7 @@
 ﻿using eCommerce.Business;
 using eCommerce.Business.Service;
 
-namespace Tests.Mokups
+namespace Tests.Business.Mokuprps
 {
     public class MokBasket : Basket
     {
