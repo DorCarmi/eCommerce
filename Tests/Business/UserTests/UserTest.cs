@@ -5,7 +5,6 @@ using eCommerce;
 using eCommerce.Business;
 using NUnit.Framework;
 using Tests.Business.Mokups;
-using Tests.Mokups;
 
 namespace Tests
 {
