@@ -17,7 +17,7 @@ namespace eCommerce.Service
             Records = new List<SPurchaseRecord>();
             foreach (var record in records)
             {
-                Records.Add(new SPurchaseRecord(record));
+                Records.Add(new SPurchaseRecord(record, record.Username));
             }
         }
     }

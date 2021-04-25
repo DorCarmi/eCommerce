@@ -68,7 +68,7 @@ namespace eCommerce.Service
 
         public Result<SPurchaseHistory> AdminGetPurchaseHistoryStore(string token, string storeId)
         {
-            Result<IList<PurchaseRecord>> purchaseRecordRes = _marketFacade.GetPurchaseHistoryOfStore(token, storeId);
+            Result<IList<PurchaseRecord>> purchaseRecordRes = _marketFacade.AdminGetPurchaseHistoryStore(token, storeId);
             if (purchaseRecordRes.IsFailure)
             {
                 return Result.Fail<SPurchaseHistory>(purchaseRecordRes.Error);

@@ -95,5 +95,48 @@ namespace eCommerce.Service
         {
             return _marketFacade.GetItem(token, storeId, itemId);
         }
+
+        public Result OpenStore(string token, string storeName, IItem item)
+        {
+            return _marketFacade.OpenStore(token, storeName, item);
+        }
+
+        public Result AddNewItemToStore(string token, IItem item)
+        {
+            return _marketFacade.AddNewItemToStore(token, item);
+        }
+
+        public Result RemoveItemFromStore(string token, string storeId, string itemId)
+        {
+            return _marketFacade.RemoveItemFromStore(token, storeId, itemId);
+        }
+
+        public Result EditItemInStore(string token, IItem item)
+        {
+            return _marketFacade.EditItemInStore(token, item);
+        }
+
+        public Result UpdateStock_AddItems(string token, IItem item)
+        {
+            //TODO: do we need it there is an edit function
+            throw new NotImplementedException();
+        }
+
+        public Result UpdateStock_SubtractItems(string token, IItem item)
+        {
+            //TODO: do we need it there is an edit function
+            throw new NotImplementedException();
+        }
+
+        public Result<SPurchaseHistory> GetPurchaseHistoryOfStore(string token, string storeId)
+        { 
+            Result<IList<PurchaseRecord>> purchaseRecordRes = _marketFacade.GetPurchaseHistoryOfStore(token, storeId);
+            if (purchaseRecordRes.IsFailure)
+            {
+                return Result.Fail<SPurchaseHistory>(purchaseRecordRes.Error);
+            }
+
+            return Result.Ok(new SPurchaseHistory(purchaseRecordRes.Value));
+        }
     }
 }

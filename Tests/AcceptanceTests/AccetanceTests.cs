@@ -285,7 +285,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
-            Result removeItemResult = _market.RemoveProductFromStore(yossiLogin.Value, storeName, productName);
+            Result removeItemResult = _market.RemoveItemFromStore(yossiLogin.Value, storeName, productName);
             Assert.True(removeItemResult.IsSuccess, "failed to remove item " + productName + ": " + removeItemResult.Error);
             token = _market.Logout(yossiLogin.Value).Value;
             _market.Disconnect(token); 
@@ -301,7 +301,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
-            Result removeItemResult = _market.RemoveProductFromStore(yossiLogin.Value, storeName, productName);
+            Result removeItemResult = _market.RemoveItemFromStore(yossiLogin.Value, storeName, productName);
             Assert.True(removeItemResult.IsFailure, "product removal was suppose to fail");
             token = _market.Logout(yossiLogin.Value).Value;
             _market.Disconnect(token); 
@@ -315,7 +315,7 @@ namespace Tests.AcceptanceTests
         public void TestRemoveProductFromStoreFailureLogic(string storeName, string productName)
         {
             string token = _market.Connect();
-            Result removeItemResult = _market.RemoveProductFromStore(token, storeName, productName);
+            Result removeItemResult = _market.RemoveItemFromStore(token, storeName, productName);
             Assert.True(removeItemResult.IsFailure, "product removal was suppose to fail due to user not being logged in");
             _market.Disconnect(token); 
         }

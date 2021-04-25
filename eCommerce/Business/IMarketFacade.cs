@@ -295,7 +295,7 @@ namespace eCommerce.Business
         /// <param name="storeId">The sore id</param>
         /// <param name="productId">The product id</param>
         /// <returns>Result of the product removal</returns>
-        public Result RemoveProductFromStore(string token, string storeId, string productId);
+        public Result RemoveItemFromStore(string token, string storeId, string productId);
         
         /// <summary>
         /// Edit the item

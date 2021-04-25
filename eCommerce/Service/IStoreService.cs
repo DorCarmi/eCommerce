@@ -74,5 +74,66 @@ namespace eCommerce.Service
         /// <param name="itemId">The item id</param>
         /// <returns>The item information</returns>
         public Result<IItem> GetItem(string token, string storeId, string itemId);
+        
+        // ========== Store management ========== //
+
+        /// <summary>
+        /// Open a new store for the user.
+        /// The name need to be unique
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeName">The store name</param>
+        /// <param name="item">The start product of a sotre</param>
+        /// <returns>Result of the request</returns>
+        public Result OpenStore(string token, string storeName, IItem item);
+        
+        /// <summary>
+        /// Add new item to the sore
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="item">The new item</param>
+        /// <returns>Result of the item addition</returns>
+        public Result AddNewItemToStore(string token,  IItem item);
+        
+        /// <summary>
+        /// Remove item from store
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The sore id</param>
+        /// <param name="itemId">The item id</param>
+        /// <returns>Result of the product removal</returns>
+        public Result RemoveItemFromStore(string token, string storeId, string itemId);
+        
+        /// <summary>
+        /// Edit the item
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="item">The new item</param>
+        /// <returns>Result of the edit</returns>
+        public Result EditItemInStore(string token, IItem item);
+        
+        /// <summary>
+        /// Add items amount
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="item">The item</param>
+        /// <returns>Result of updating the amount (adding)</returns>
+        public Result UpdateStock_AddItems(string token, IItem item);
+        
+        /// <summary>
+        /// Add items amount
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="item">The item</param>
+        /// <returns>Result of updating the amount (subtract)</returns>
+        public Result UpdateStock_SubtractItems(string token, IItem item);
+
+        /// <summary>
+        /// Return all the purchase history of a store
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <returns>List of the purchase history in a store</returns>
+        public Result<SPurchaseHistory> GetPurchaseHistoryOfStore(string token, string storeId);
     }
 }

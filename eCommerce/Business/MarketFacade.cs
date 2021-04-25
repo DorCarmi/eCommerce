@@ -494,9 +494,8 @@ namespace eCommerce.Business
         }
         
         //<CNAME>ItemsInStore</CNAME>
-        public Result RemoveProductFromStore(string token, string storeId, string itemID)
+        public Result RemoveItemFromStore(string token, string storeId, string itemId)
         {
-            
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
@@ -505,7 +504,7 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
 
-            return store.RemoveItemToStore(itemID, user);
+            return store.RemoveItemToStore(itemId, user);
         }
 
         public Result EditItemInStore(string token, IItem item)
