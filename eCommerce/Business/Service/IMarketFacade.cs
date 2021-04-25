@@ -47,7 +47,7 @@ namespace eCommerce.Business.Service
         /// <param name="password">The user password</param>
         /// <param name="role">The user role</param>
         /// <returns>Authorization token</returns>
-        public Result<string> Login(string guestToken ,string username, string password, ServiceUserRole role);
+        public Result<string> Login(string guestToken ,string username, string password, UserToSystemState role);
         
         /// <summary>
         /// Logout a user form the system.
@@ -149,9 +149,7 @@ namespace eCommerce.Business.Service
         
         
         #endregion
-
-
-
+        
         #region ItemsAndStores
 
         /// <summary>

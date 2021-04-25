@@ -1,31 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using eCommerce.Auth;
-using Microsoft.Extensions.Logging.EventSource;
+using eCommerce.Business;
+using eCommerce.Business.Service;
 
-namespace eCommerce.Business.Service
+namespace eCommerce.Service
 {
     public class DtoUtils
     {
-        public static AuthUserRole ServiceUserRoleToAuthUserRole(ServiceUserRole role)
-        {
-            switch (role)
-            {
-                case ServiceUserRole.Member:
-                {
-                    return AuthUserRole.Member;
-                }
-                case ServiceUserRole.Admin:
-                {
-                    return AuthUserRole.Admin;
-                }
-            }
-
-            // TODO log if it gets here
-            return AuthUserRole.Member;
-        }
-        
         public static UserToSystemState ServiceUserRoleToSystemState(ServiceUserRole role)
         {
             switch (role)

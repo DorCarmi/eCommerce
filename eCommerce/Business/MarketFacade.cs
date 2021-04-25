@@ -7,7 +7,9 @@ using System.Security.Authentication;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using eCommerce.Service;
 using Microsoft.IdentityModel.Tokens;
+using ServiceUserRole = eCommerce.Business.Service.ServiceUserRole;
 
 namespace eCommerce.Business
 {
@@ -77,7 +79,7 @@ namespace eCommerce.Business
         }
 
         // <CNAME>Login</CNAME>
-        public Result<string> Login(string guestToken, string username, string password, ServiceUserRole role)
+        public Result<string> Login(string guestToken, string username, string password, UserToSystemState role)
         {
             return _userManager.Login(guestToken, username, password, role);
         }
