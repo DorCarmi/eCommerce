@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using eCommerce.Business;
 
-namespace eCommerce.Business.Service
+namespace eCommerce.Service
 {
     public class StaffPermission
     {

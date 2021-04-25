@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using eCommerce.Business.Service;
 using eCommerce.Common;
 
-namespace eCommerce.Business.Service
+namespace eCommerce.Business
 {
     public interface IMarketFacade
     {
@@ -47,7 +47,7 @@ namespace eCommerce.Business.Service
         /// <param name="password">The user password</param>
         /// <param name="role">The user role</param>
         /// <returns>Authorization token</returns>
-        public Result<string> Login(string guestToken ,string username, string password, ServiceUserRole role);
+        public Result<string> Login(string guestToken ,string username, string password, UserToSystemState role);
         
         /// <summary>
         /// Logout a user form the system.
@@ -63,12 +63,9 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Get the purchase history of the user 
         /// </summary>
-        ///
-        ///
-        /// 
         /// <param name="token">Authorization token</param>
         /// <returns>The purchase history</returns>
-        public Result<IList<IPurchaseHistory>> GetPurchaseHistory(string token);
+        public Result<IList<PurchaseRecord>> GetPurchaseHistory(string token);
         
         /// <summary>
         /// Appoint a user as a coOwner to the store
@@ -120,15 +117,16 @@ namespace eCommerce.Business.Service
         /// <returns>Result of the remove</returns>
         public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
             IList<StorePermission> permissions);
-        
-        
+
+
         /// <summary>
         /// Get all the staff of the store and their permissions
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
         /// <returns>List of all the staff and their permissions</returns>
-        public Result<IList<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId);
+        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(string token,
+            string storeId);
 
         /// <summary>
         /// Get the history purchase of a user
@@ -137,7 +135,7 @@ namespace eCommerce.Business.Service
         /// <param name="storeId">The store id</param>
         /// <param name="ofUserId">The user id</param>
         /// <returns>The history purchase</returns>
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string ofUserId);
+        public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryUser(string token, string ofUserId);
         
         /// <summary>
         /// Get the history purchase of a store
@@ -145,13 +143,11 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <returns>The history purchase</returns>
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeID);
+        public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryStore(string token, string storeID);
         
         
         #endregion
-
-
-
+        
         #region ItemsAndStores
 
         /// <summary>
@@ -195,7 +191,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <returns>The store information</returns>
-        public Result<StoreDto> GetStore(string token, string storeId);
+        public Result<IStore> GetStore(string token, string storeId);
         
         /// <summary>
         /// Get all the store items
@@ -218,8 +214,6 @@ namespace eCommerce.Business.Service
         
         // ========== Store ========== //
         
-        // TODO requirement 2.5, 2.6
-
         #region UserBuyingFromStores
         
         /// <summary>
@@ -246,7 +240,7 @@ namespace eCommerce.Business.Service
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The user cart</returns>
-        public Result<CartDto> GetCart(string token);
+        public Result<ICart> GetCart(string token);
 
         /// <summary>
         /// Return the total price of the cart(after discounts)
@@ -301,7 +295,7 @@ namespace eCommerce.Business.Service
         /// <param name="storeId">The sore id</param>
         /// <param name="productId">The product id</param>
         /// <returns>Result of the product removal</returns>
-        public Result RemoveProductFromStore(string token, string storeId, string productId);
+        public Result RemoveItemFromStore(string token, string storeId, string productId);
         
         /// <summary>
         /// Edit the item
@@ -338,7 +332,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
         /// <returns>List of the purchase history in a store</returns>
-        public Result<IList<IPurchaseHistory>> GetPurchaseHistoryOfStore(string token, string storeId);
+        public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId);
         
 
         #endregion

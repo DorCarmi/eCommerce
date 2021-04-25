@@ -108,7 +108,8 @@ namespace eCommerce.Business
             return _auth.Register(username, password);
         }
         
-        public Result<string> Login(string guestToken, string username, string password, ServiceUserRole role)
+        // TODO: use the role here, how user that is admin can log in as member
+        public Result<string> Login(string guestToken, string username, string password, UserToSystemState role)
         {
             if (!_auth.IsValidToken(guestToken))
             {

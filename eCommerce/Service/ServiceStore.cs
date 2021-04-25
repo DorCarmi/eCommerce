@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using eCommerce.Business.Service;
 
-namespace eCommerce.Business.Service
+namespace eCommerce.Service
 {
-    public class StoreDto
+    public class ServiceStore
     {
         public string StoreName { get; }
         public IList<IItem> Items { get; }
 
-        public StoreDto(string storeName, IList<IItem> items)
+        public ServiceStore(string storeName, IList<IItem> items)
         {
             StoreName = storeName;
             Items = items;
