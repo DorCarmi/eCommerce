@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Auth;
@@ -196,29 +197,18 @@ namespace eCommerce.Business
             return Result.Ok();
         }
         //<CNAME:GetStoreStaff</CNAME>
-        public Result<IList<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId)
+        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(string token,
+            string storeId)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
-                return Result.Fail<IList<StaffPermission>>(userAndStoreRes.Error);
+                return Result.Fail<IList<Tuple<string, IList<StorePermission>>>>(userAndStoreRes.Error);
             }
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
 
-            var staffPermission = new List<StaffPermission>();
-            var tuplePermissionRes = store.GetStoreStaffAndTheirPermissions(user);
-            if (tuplePermissionRes.IsFailure)
-            {
-                return Result.Fail<IList<StaffPermission>>(tuplePermissionRes.Error);
-            }
-            
-            foreach (var (item1, item2) in tuplePermissionRes.Value)
-            {
-                staffPermission.Add(new StaffPermission(item1, item2));
-            }
-
-            return Result.Ok<IList<StaffPermission>>(staffPermission);
+            return store.GetStoreStaffAndTheirPermissions(user);
         }
         //<CNAME>AdminGetAllUserHistory</CNAME>
         public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryUser(string token, string ofUserId)
@@ -307,23 +297,17 @@ namespace eCommerce.Business
             return Result.Ok(_storeRepository.SearchForStore(query));
         }
         
-        public Result<StoreDto> GetStore(string token, string storeId)
+        public Result<IStore> GetStore(string token, string storeId)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
-                return Result.Fail<StoreDto>(userAndStoreRes.Error);
+                return Result.Fail<IStore>(userAndStoreRes.Error);
             }
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
 
-            IList<IItem> storeItems = new List<IItem>();
-            foreach (var item in store.GetAllItems())
-            {
-                storeItems.Add(item.ShowItem());
-            }
-
-            return Result.Ok(new StoreDto(storeId, storeItems));
+            return Result.Ok(store);
         } 
         public Result<IEnumerable<IItem>> GetAllStoreItems(string token, string storeId)
         {

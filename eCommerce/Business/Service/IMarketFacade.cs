@@ -117,15 +117,16 @@ namespace eCommerce.Business.Service
         /// <returns>Result of the remove</returns>
         public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
             IList<StorePermission> permissions);
-        
-        
+
+
         /// <summary>
         /// Get all the staff of the store and their permissions
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
         /// <returns>List of all the staff and their permissions</returns>
-        public Result<IList<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId);
+        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(string token,
+            string storeId);
 
         /// <summary>
         /// Get the history purchase of a user
@@ -190,7 +191,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <returns>The store information</returns>
-        public Result<StoreDto> GetStore(string token, string storeId);
+        public Result<IStore> GetStore(string token, string storeId);
         
         /// <summary>
         /// Get all the store items
