@@ -391,29 +391,16 @@ namespace eCommerce.Business
             return null;
         }
         //<CNAME>GetCart</CNAME>
-        public Result<CartDto> GetCart(string token)
+        public Result<ICart> GetCart(string token)
         {
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
-                return Result.Fail<CartDto>(userRes.Error);
+                return Result.Fail<ICart>(userRes.Error);
             }
             IUser user = userRes.Value;
 
-            Result<ICart> cartRes = user.GetCartInfo();
-            if (cartRes.IsFailure)
-            {
-                return Result.Fail<CartDto>(cartRes.Error);
-            }
-
-            ICart cart = cartRes.Value;
-            var baskets = new List<BasketDto>();
-            foreach (var basket in cart.GetBaskets())
-            {
-                baskets.Add(DtoUtils.IBasketToBasketDto(basket));
-            }
-
-            return Result.Ok<CartDto>(new CartDto(baskets));
+            return user.GetCartInfo();
         }
         
         public Result<double> GetPurchaseCartPrice(string token)

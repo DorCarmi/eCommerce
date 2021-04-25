@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using eCommerce.Business.Service;
 using eCommerce.Common;
-using eCommerce.Service;
 
-namespace eCommerce.Business.Service
+namespace eCommerce.Business
 {
     public interface IMarketFacade
     {
@@ -214,8 +214,6 @@ namespace eCommerce.Business.Service
         
         // ========== Store ========== //
         
-        // TODO requirement 2.5, 2.6
-
         #region UserBuyingFromStores
         
         /// <summary>
@@ -242,7 +240,7 @@ namespace eCommerce.Business.Service
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The user cart</returns>
-        public Result<CartDto> GetCart(string token);
+        public Result<ICart> GetCart(string token);
 
         /// <summary>
         /// Return the total price of the cart(after discounts)

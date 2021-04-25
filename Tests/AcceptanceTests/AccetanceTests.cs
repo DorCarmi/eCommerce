@@ -6,6 +6,7 @@ using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using eCommerce.Service;
 using NUnit.Framework;
 using Tests.AuthTests;
 using Tests.Business;
@@ -38,7 +39,7 @@ namespace Tests.AcceptanceTests
             _market.Register(token, lior, "987654321");
             Result<string> yossiLogInResult = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             string storeName = "Yossi's Store";
-            IItem product = new ItemDto("Tara milk", storeName, 10, "dairy",
+            IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
             _market.OpenStore(yossiLogInResult.Value, storeName, product);
             token = _market.Logout(yossiLogInResult.Value).Value;
@@ -151,7 +152,7 @@ namespace Tests.AcceptanceTests
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result addItemResult = _market.AddNewItemToStore(yossiLogin.Value,
-                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(addItemResult.IsSuccess, "failed to add items: " + addItemResult.Error);
             token = _market.Logout(yossiLogin.Value).Value;
             _market.Disconnect(token);
@@ -175,7 +176,7 @@ namespace Tests.AcceptanceTests
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result addItemResult = _market.AddNewItemToStore(yossiLogin.Value,
-                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(addItemResult.IsFailure, "item addition was suppose to fail");
             token = _market.Logout(yossiLogin.Value).Value;
             _market.Disconnect(token);
@@ -194,7 +195,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _market.Connect();
             Result addItemResult = _market.AddNewItemToStore(token,
-                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(addItemResult.IsFailure, "Item Addition was suppose to fail");
             token = _market.Logout(token).Value;
             _market.Disconnect(token);
@@ -224,7 +225,7 @@ namespace Tests.AcceptanceTests
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result editItemResult = _market.EditItemInStore(yossiLogin.Value,
-                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(editItemResult.IsSuccess, "failed to edit item: " + editItemResult.Error);
             token = _market.Logout(yossiLogin.Value).Value;
             _market.Disconnect(token);
@@ -252,7 +253,7 @@ namespace Tests.AcceptanceTests
             string token = _market.Connect();
             Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result editItemResult = _market.EditItemInStore(yossiLogin.Value,
-                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item");
             token = _market.Logout(yossiLogin.Value).Value;
             _market.Disconnect(token);
@@ -271,7 +272,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _market.Connect();
             Result editItemResult = _market.EditItemInStore(token,
-                new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(editItemResult.IsFailure, "should not succeed since no user is logged in");
             _market.Disconnect(token);
         }

@@ -44,14 +44,5 @@ namespace eCommerce.Service
                 (int)itemDto.PricePerUnit);
             return null;
         }
-
-        public static BasketDto IBasketToBasketDto(IBasket basket)
-        {
-            return new BasketDto(
-                basket.GetStoreName(),
-                basket.GetAllItems().Value,
-                basket.GetTotalPrice().Value
-            );
-        }
     }
 }
