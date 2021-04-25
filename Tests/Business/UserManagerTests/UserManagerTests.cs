@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using eCommerce.Business;
-using eCommerce.Business.Service;
 using eCommerce.Common;
+using eCommerce.Service;
 using NUnit.Framework;
 
 namespace Tests.Business.UserManagerTests
@@ -108,7 +108,7 @@ namespace Tests.Business.UserManagerTests
             }
 
             Result[] loginRes = await TaskTestUtils.CreateAndRunTasks(
-                () =>  _userManager.Login(token, memberInfo.Username, password, ServiceUserRole.Member),
+                () =>  _userManager.Login(token, memberInfo.Username, password, Member.State),
                 numberOfTasks);
 
             int registeredSuccessfully = 0;
@@ -143,7 +143,7 @@ namespace Tests.Business.UserManagerTests
                 () =>
                 {
                     string token = _userManager.Connect();
-                    return _userManager.Login(token, memberInfo.Username, password, ServiceUserRole.Member);
+                    return _userManager.Login(token, memberInfo.Username, password, Member.State);
                 },
                 numberOfTasks);
 
@@ -187,7 +187,7 @@ namespace Tests.Business.UserManagerTests
                 string upassword = $"{password}{i}";
                 string token = guestTokens[i];
                 loginTasks[i] = new Task<Result<string>>(
-                    () => _userManager.Login(token, uname, upassword, ServiceUserRole.Member));
+                    () => _userManager.Login(token, uname, upassword, Member.State));
             }
 
             TaskTestUtils.RunTasks(loginTasks);
@@ -225,7 +225,7 @@ namespace Tests.Business.UserManagerTests
             
             for (int i = 0; i < 3; i++)
             {
-                Result<string> loginTokenRes = _userManager.Login(token, username, password, ServiceUserRole.Member);
+                Result<string> loginTokenRes = _userManager.Login(token, username, password, Member.State);
                 Assert.True(loginTokenRes.IsSuccess, loginTokenRes.Error);
                 Result<string> logoutTokenRes = _userManager.Logout(loginTokenRes.Value);
                 Assert.True(logoutTokenRes.IsSuccess, logoutTokenRes.Error);

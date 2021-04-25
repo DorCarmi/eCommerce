@@ -1,4 +1,5 @@
-﻿using eCommerce.Business;
+﻿using eCommerce.Auth;
+using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -8,9 +9,22 @@ namespace eCommerce.Service
     {
         private IMarketFacade _marketFacade;
         
+        internal AuthService(IMarketFacade marketFacade)
+        {
+            _marketFacade = MarketFacade.GetInstance();
+        }
+        
         public AuthService()
         {
             _marketFacade = MarketFacade.GetInstance();
+        }
+
+        static AuthService CreateUserServiceForTests(IUserAuth userAuth,
+            IRepository<IUser> registeredUsersRepo,
+            StoreRepository storeRepo)
+        {
+            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(userAuth, registeredUsersRepo, storeRepo);
+            return new AuthService(marketFacade);
         }
         
         public string Connect()

@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using eCommerce.Common;
+using eCommerce.Service;
 
 namespace eCommerce.Business.Service
 {
@@ -63,12 +63,9 @@ namespace eCommerce.Business.Service
         /// <summary>
         /// Get the purchase history of the user 
         /// </summary>
-        ///
-        ///
-        /// 
         /// <param name="token">Authorization token</param>
         /// <returns>The purchase history</returns>
-        public Result<IList<IPurchaseHistory>> GetPurchaseHistory(string token);
+        public Result<IList<PurchaseRecord>> GetPurchaseHistory(string token);
         
         /// <summary>
         /// Appoint a user as a coOwner to the store
@@ -137,7 +134,7 @@ namespace eCommerce.Business.Service
         /// <param name="storeId">The store id</param>
         /// <param name="ofUserId">The user id</param>
         /// <returns>The history purchase</returns>
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string ofUserId);
+        public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryUser(string token, string ofUserId);
         
         /// <summary>
         /// Get the history purchase of a store
@@ -145,7 +142,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <returns>The history purchase</returns>
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeID);
+        public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryStore(string token, string storeID);
         
         
         #endregion
@@ -336,7 +333,7 @@ namespace eCommerce.Business.Service
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
         /// <returns>List of the purchase history in a store</returns>
-        public Result<IList<IPurchaseHistory>> GetPurchaseHistoryOfStore(string token, string storeId);
+        public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId);
         
 
         #endregion

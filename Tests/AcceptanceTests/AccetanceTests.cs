@@ -36,7 +36,7 @@ namespace Tests.AcceptanceTests
             _market.Register(token, yossi, "qwerty123");
             _market.Register(token, shiran, "130452abc");
             _market.Register(token, lior, "987654321");
-            Result<string> yossiLogInResult = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             string storeName = "Yossi's Store";
             IItem product = new ItemDto("Tara milk", storeName, 10, "dairy",
                 new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
@@ -87,7 +87,7 @@ namespace Tests.AcceptanceTests
         public void TestLoginSuccess(string username, string password)
         {
             string token = _market.Connect();
-            Result<string> result = _market.Login(token, username, password, ServiceUserRole.Member);
+            Result<string> result = _market.Login(token, username, password, Member.State);
             Assert.True(result.IsSuccess, result.Error);
             _market.Disconnect(token);
         }
@@ -102,7 +102,7 @@ namespace Tests.AcceptanceTests
         public void TestLoginFailure(string username, string password)
         {
             string token = _market.Connect();
-            Result<string> result = _market.Login(token, username, password, ServiceUserRole.Member);
+            Result<string> result = _market.Login(token, username, password, Member.State);
             Assert.True(result.IsFailure, "username: " + username + " | password: " + password + "| was suppose to fail!");
             _market.Disconnect(token);
         }
@@ -114,11 +114,11 @@ namespace Tests.AcceptanceTests
         public void TestLogoutSuccess()
         {
             string token = _market.Connect();
-            Result<string> result = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> result = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             result = _market.Logout(result.Value);
             Assert.True(result.IsSuccess, "logout failed");
             token = result.Value;
-            result = _market.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            result = _market.Login(token, "singerMermaid", "130452abc", Member.State);
             result = _market.Logout(result.Value);
             Assert.True(result.IsSuccess, "logout failed");
             _market.Disconnect(result.Value);
@@ -131,7 +131,7 @@ namespace Tests.AcceptanceTests
         public void TestLogoutFailure()
         {
             string token = _market.Connect();
-            Result<string> result = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> result = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result<string> falseResult = _market.Logout(token);
             Assert.True(falseResult.IsFailure, "logout failed");
             _market.Disconnect(result.Value);
@@ -149,7 +149,7 @@ namespace Tests.AcceptanceTests
             double price)
         {
             string token = _market.Connect();
-            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result addItemResult = _market.AddNewItemToStore(yossiLogin.Value,
                 new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(addItemResult.IsSuccess, "failed to add items: " + addItemResult.Error);
@@ -173,7 +173,7 @@ namespace Tests.AcceptanceTests
             double price)
         {
             string token = _market.Connect();
-            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result addItemResult = _market.AddNewItemToStore(yossiLogin.Value,
                 new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(addItemResult.IsFailure, "item addition was suppose to fail");
@@ -222,7 +222,7 @@ namespace Tests.AcceptanceTests
             double price)  
         {
             string token = _market.Connect();
-            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result editItemResult = _market.EditItemInStore(yossiLogin.Value,
                 new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(editItemResult.IsSuccess, "failed to edit item: " + editItemResult.Error);
@@ -250,7 +250,7 @@ namespace Tests.AcceptanceTests
             double price)
         {
             string token = _market.Connect();
-            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result editItemResult = _market.EditItemInStore(yossiLogin.Value,
                 new ItemDto(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item");
@@ -283,7 +283,7 @@ namespace Tests.AcceptanceTests
         public void TestRemoveProductFromStoreSuccess(string storeName, string productName)
         {
             string token = _market.Connect();
-            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result removeItemResult = _market.RemoveProductFromStore(yossiLogin.Value, storeName, productName);
             Assert.True(removeItemResult.IsSuccess, "failed to remove item " + productName + ": " + removeItemResult.Error);
             token = _market.Logout(yossiLogin.Value).Value;
@@ -299,7 +299,7 @@ namespace Tests.AcceptanceTests
         public void TestRemoveProductFromStoreFailureInvalid(string storeName, string productName)
         {
             string token = _market.Connect();
-            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result removeItemResult = _market.RemoveProductFromStore(yossiLogin.Value, storeName, productName);
             Assert.True(removeItemResult.IsFailure, "product removal was suppose to fail");
             token = _market.Logout(yossiLogin.Value).Value;
@@ -328,7 +328,7 @@ namespace Tests.AcceptanceTests
         public void TestAppointCoOwnerSuccess(string storeName, string username)
         {
             string token = _market.Connect();
-            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result result = _market.AppointCoOwner(yossiLogin.Value, storeName, username);
             Assert.True(result.IsSuccess, "failed to appoint " + username + ": " + result.Error);
             token = _market.Logout(yossiLogin.Value).Value;
@@ -346,7 +346,7 @@ namespace Tests.AcceptanceTests
         public void TestAppointCoOwnerFailureInvalid(string appointer, string appointerPassword,  string storeName, string username)
         {
             string token = _market.Connect();
-            Result<string>login = _market.Login(token, appointer, appointerPassword, ServiceUserRole.Member);
+            Result<string>login = _market.Login(token, appointer, appointerPassword, Member.State);
             Result result = _market.AppointCoOwner(login.Value, storeName, username);
             Assert.True(result.IsFailure, "Appointing " + username + " was expected to fail!");
             token = _market.Logout(login.Value).Value;
@@ -376,7 +376,7 @@ namespace Tests.AcceptanceTests
         public void TestAppointManagerSuccess(string storeName, string username)
         {
             string token = _market.Connect();
-            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
             Result result = _market.AppointManager(yossiLogin.Value, storeName, username);
             Assert.True(result.IsSuccess, "failed to appoint " + username + ": " + result.Error);
             token = _market.Logout(yossiLogin.Value).Value;
@@ -394,7 +394,7 @@ namespace Tests.AcceptanceTests
         public void TestAppointManagerFailureInvalid(string appointer, string appointerPassword,  string storeName, string username)
         {
             string token = _market.Connect();
-            Result<string>login = _market.Login(token, appointer, appointerPassword, ServiceUserRole.Member);
+            Result<string>login = _market.Login(token, appointer, appointerPassword, Member.State);
             Result result = _market.AppointManager(login.Value, storeName, username);
             Assert.True(result.IsFailure, "Appointing " + username + " was expected to fail!");
             token = _market.Logout(login.Value).Value;
@@ -426,7 +426,7 @@ namespace Tests.AcceptanceTests
         public void TestGetPurchaseHistoryOfStoreSuccess(string storeName, string owner, string password)
         {
             string token = _market.Connect();
-            Result<string> login = _market.Login(token, owner, password, ServiceUserRole.Member);
+            Result<string> login = _market.Login(token, owner, password, Member.State);
             Result result = _market.GetPurchaseHistoryOfStore(login.Value, storeName);
             Assert.True(result.IsSuccess, "failed to get purchase history of " + storeName + ": " + result.Error);
             token = _market.Logout(login.Value).Value;
@@ -442,7 +442,7 @@ namespace Tests.AcceptanceTests
         public void TestGetPurchaseHistoryOfStoreFailure(string storeName, string owner, string password)
         {
             string token = _market.Connect();
-            Result<string> login = _market.Login(token, owner, password, ServiceUserRole.Member);
+            Result<string> login = _market.Login(token, owner, password, Member.State);
             Result result = _market.GetPurchaseHistoryOfStore(login.Value, storeName);
             Assert.True(result.IsFailure, "getting purchase history for " + storeName + " was suppose to fail!");
             token = _market.Logout(login.Value).Value;
@@ -458,7 +458,7 @@ namespace Tests.AcceptanceTests
         public void TestAddItemToCartSuccess(string itemId, string storeName, int amount)
         { 
             string token = _market.Connect();
-            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", Member.State);
             Result result = _market.AddItemToCart(login.Value, itemId, storeName, amount);
             Assert.True(result.IsSuccess, "failed to add  " + " from " + storeName + " to cart: " + result.Error);
             token = _market.Logout(login.Value).Value;
@@ -474,7 +474,7 @@ namespace Tests.AcceptanceTests
         public void TestAddItemToCartFailure(string itemId, string storeName, int amount)
         { 
             string token = _market.Connect();
-            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", Member.State);
             Result result = _market.AddItemToCart(login.Value, itemId, storeName, amount);
             Assert.True(result.IsFailure, "action was suppose to fail! " + itemId);
             token = _market.Logout(login.Value).Value;
@@ -492,7 +492,7 @@ namespace Tests.AcceptanceTests
         public void EditItemAmountOfCart(string itemId, string storeName, int amount)
         {
             string token = _market.Connect();
-            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", Member.State);
             Result result = _market.AddItemToCart(login.Value, itemId, storeName, 5);
             result = _market.EditItemAmountOfCart(login.Value, itemId, storeName, amount);
             Assert.True(result.IsSuccess, "failed to edit item: " + result.Error);
@@ -510,7 +510,7 @@ namespace Tests.AcceptanceTests
         public void EditItemAmountOfCartFailure(string itemId, string storeName, int amount)
         {
             string token = _market.Connect();
-            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", Member.State);
             Result result = _market.AddItemToCart(login.Value, itemId, storeName, 5);
             result = _market.EditItemAmountOfCart(login.Value, itemId, storeName, amount);
             Assert.True(result.IsFailure, "item changes were suppose to fail");
@@ -542,7 +542,7 @@ namespace Tests.AcceptanceTests
        [Test]
        public void TestOpenStoreSuccess(string member, string password, string storeName)
        { string token = _market.Connect();
-           Result<string> login = _market.Login(token, member, password, ServiceUserRole.Member);
+           Result<string> login = _market.Login(token, member, password, Member.State);
            //Result result = _market.OpenStore(login.Value, storeName);
            //Assert.True(result.IsSuccess, result.Error);
            _market.Logout(login.Value);
@@ -557,7 +557,7 @@ namespace Tests.AcceptanceTests
        [Test]
        public void TestOpenStoreFailure(string member, string password, string storeName)
        { string token = _market.Connect();
-           Result<string> login = _market.Login(token, member, password, ServiceUserRole.Member);
+           Result<string> login = _market.Login(token, member, password, Member.State);
           // Result result = _market.OpenStore(login.Value, storeName);
            //Assert.True(result.IsFailure);
            _market.Logout(login.Value);
@@ -584,7 +584,7 @@ namespace Tests.AcceptanceTests
        [Test]
        public void TestGetPurchaseHistorySuccess(string member, string password)
        { string token = _market.Connect();
-           Result<string> login = _market.Login(token, member, password, ServiceUserRole.Member);
+           Result<string> login = _market.Login(token, member, password, Member.State);
            Result result = _market.GetPurchaseHistory(login.Value);
            Assert.True(result.IsSuccess, result.Error);
            _market.Logout(login.Value);
@@ -597,7 +597,7 @@ namespace Tests.AcceptanceTests
        [Test]
        public void TestAdminGetPurchaseHistorySuccess(string admin, string password,string member)
        { string token = _market.Connect();
-           Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
+           Result<string> login = _market.Login(token, admin, password, Admin.State);
            Result result = _market.AdminGetPurchaseHistoryUser(login.Value,member);
            Assert.True(result.IsSuccess, result.Error);
            _market.Logout(login.Value);
@@ -609,7 +609,7 @@ namespace Tests.AcceptanceTests
         */
        public void TestAdminGetPurchaseHistoryFailure(string admin, string password,string member)
        { string token = _market.Connect();
-           Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
+           Result<string> login = _market.Login(token, admin, password, Admin.State);
            Result result = _market.AdminGetPurchaseHistoryUser(login.Value,member);
            Assert.True(result.IsFailure);
            _market.Logout(login.Value);
@@ -622,7 +622,7 @@ namespace Tests.AcceptanceTests
        [Test]
        public void TestAdminGetPurchaseHistoryStoreSuccess(string admin, string password, string storeID)
        { string token = _market.Connect();
-           Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
+           Result<string> login = _market.Login(token, admin, password, Admin.State);
            Result result = _market.AdminGetPurchaseHistoryStore(login.Value,storeID);
            Assert.True(result.IsSuccess, result.Error);
            _market.Logout(login.Value);
@@ -635,7 +635,7 @@ namespace Tests.AcceptanceTests
        [Test]
        public void TestAdminGetPurchaseHistoryStoreFailure(string admin, string password,string storeID)
        { string token = _market.Connect();
-           Result<string> login = _market.Login(token, admin, password, ServiceUserRole.Admin);
+           Result<string> login = _market.Login(token, admin, password, Admin.State);
            Result result = _market.AdminGetPurchaseHistoryStore(login.Value,storeID);
            Assert.True(result.IsFailure);
            _market.Logout(login.Value);

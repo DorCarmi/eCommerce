@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Authentication;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using eCommerce.Service;
-using Microsoft.IdentityModel.Tokens;
-using ServiceUserRole = eCommerce.Business.Service.ServiceUserRole;
 
 namespace eCommerce.Business
 {
@@ -91,12 +86,12 @@ namespace eCommerce.Business
         }
         
         //<CNAME>PersonalPurchaseHistory</CNAME>
-        public Result<IList<IPurchaseHistory>> GetPurchaseHistory(string token)
+        public Result<IList<PurchaseRecord>> GetPurchaseHistory(string token)
         {
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
-                return Result.Fail<IList<IPurchaseHistory>>(userRes.Error);
+                return Result.Fail<IList<PurchaseRecord>>(userRes.Error);
             }
             IUser user = userRes.Value;
 
@@ -104,17 +99,10 @@ namespace eCommerce.Business
 
             if (result.IsFailure)
             {
-                return Result.Fail<IList<IPurchaseHistory>>(result.Error);
+                return Result.Fail<IList<PurchaseRecord>>(result.Error);
             }
 
-            List<IPurchaseHistory> lstHistory = new List<IPurchaseHistory>();
-            var records = result.Value;
-            foreach (var purchaseRecord in records)
-            {
-                lstHistory.Add(purchaseRecord);
-            }
-
-            return Result.Ok<IList<IPurchaseHistory>>(lstHistory);
+            return result;
         }
         
          //<CNAME>AppointCoOwner</CNAME>
@@ -233,12 +221,12 @@ namespace eCommerce.Business
             return Result.Ok<IList<StaffPermission>>(staffPermission);
         }
         //<CNAME>AdminGetAllUserHistory</CNAME>
-        public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryUser(string token, string ofUserId)
+        public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryUser(string token, string ofUserId)
         {
             var userAndStoreRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
              if (userAndStoreRes.IsFailure)
              {
-                 return Result.Fail<IList<IPurchaseHistory>>(userAndStoreRes.Error);
+                 return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
              }
 
 
@@ -247,39 +235,24 @@ namespace eCommerce.Business
              var ofUser=_userManager.GetUser(ofUserId);
              if (ofUser.IsFailure)
              {
-                 return Result.Fail<IList<IPurchaseHistory>>(ofUser.Error);
+                 return Result.Fail<IList<PurchaseRecord>>(ofUser.Error);
              }
 
-             var res= user.GetUserPurchaseHistory(ofUser.Value);
-             
-             List<IPurchaseHistory> lstHistory = new List<IPurchaseHistory>();
-             var records = res.Value;
-             foreach (var purchaseRecord in records)
-             {
-                 lstHistory.Add(purchaseRecord);
-             }
-             return Result.Ok<IList<IPurchaseHistory>>(lstHistory);
-         }
+             return user.GetUserPurchaseHistory(ofUser.Value);
+        }
          
          //<CNAME>AdminGetStoreHistory</CNAME>
-         public Result<IList<IPurchaseHistory>> AdminGetPurchaseHistoryStore(string token, string storeId)
+         public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryStore(string token, string storeId)
          {
              Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
              if (userAndStoreRes.IsFailure)
              {
-                 return Result.Fail<IList<IPurchaseHistory>>(userAndStoreRes.Error);
+                 return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
              }
              IUser user = userAndStoreRes.Value.Item1;
              IStore store = userAndStoreRes.Value.Item2;
 
-             var res=user.GetStorePurchaseHistory(store);
-             List<IPurchaseHistory> lstHistory = new List<IPurchaseHistory>();
-             var records = res.Value;
-             foreach (var purchaseRecord in records)
-             {
-                 lstHistory.Add(purchaseRecord);
-             }
-             return Result.Ok<IList<IPurchaseHistory>>(lstHistory);
+             return user.GetStorePurchaseHistory(store);
          }
         #endregion
 
@@ -719,12 +692,12 @@ namespace eCommerce.Business
         }
         
         //<CNAME>GetStoreHistory</CNAME>
-        public Result<IList<IPurchaseHistory>> GetPurchaseHistoryOfStore(string token, string storeId)
+        public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
-                return Result.Fail<IList<IPurchaseHistory>>(userAndStoreRes.Error);
+                return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
             }
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
@@ -732,10 +705,10 @@ namespace eCommerce.Business
             Result<IList<PurchaseRecord>> purchaseHistoryRes = store.GetPurchaseHistory(user);
             if (purchaseHistoryRes.IsFailure)
             {
-                return Result.Fail<IList<IPurchaseHistory>>(purchaseHistoryRes.Error);
+                return Result.Fail<IList<PurchaseRecord>>(purchaseHistoryRes.Error);
             }
 
-            return Result.Ok<IList<IPurchaseHistory>>((IList<IPurchaseHistory>) purchaseHistoryRes.Value);
+            return Result.Ok<IList<PurchaseRecord>>((IList<PurchaseRecord>) purchaseHistoryRes.Value);
         }
         #endregion
 
