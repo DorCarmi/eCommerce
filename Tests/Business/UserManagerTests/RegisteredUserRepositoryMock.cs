@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using eCommerce.Business;
 using eCommerce.Common;
 
-namespace Tests.Business
+namespace Tests.Business.UserManagerTests
 {
     public class RegisteredUserRepositoryMock : IRepository<IUser>
     {

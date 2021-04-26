@@ -10,6 +10,6 @@ namespace eCommerce.Business.Service
         public int Amount { get; }
         public string Category { get; }
         public ReadOnlyCollection<string> KeyWords { get; }
-        public float PricePerUnit { get; }
+        public double PricePerUnit { get; }
     }
 }

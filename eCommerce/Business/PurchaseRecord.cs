@@ -1,13 +1,16 @@
 ﻿using System;
 using eCommerce.Business.Service;
+using eCommerce.Service;
 
 namespace eCommerce.Business
 {
-    public class PurchaseRecord : IPurchaseHistory
+    public class PurchaseRecord
     {
         private StoreInfo _storeInfo;
         private BasketInfo _basketInfo;
         private DateTime _dateTime;
+        // TODO add username
+        private string _username;
         public PurchaseRecord(IStore store, IBasket basket, DateTime now)
         {
             this._storeInfo = new StoreInfo(store);
@@ -30,7 +33,7 @@ namespace eCommerce.Business
             return _dateTime;
         }
 
-
+        public string Username { get => _username; }
         public string StoreId { get => _storeInfo.GetStoreName(); }
         public BasketInfo BasketInfo { get => _basketInfo; }
         public DateTime PurchaseTime { get => _dateTime; }

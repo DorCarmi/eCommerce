@@ -3,7 +3,7 @@ using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
-namespace Tests.Mokups
+namespace Tests.Business.Mokups
 {
     public class mokUserAlice : IUser
     {
@@ -91,7 +91,17 @@ namespace Tests.Mokups
             throw new System.NotImplementedException();
         }
 
+        public UserToSystemState GetState()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permission)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission)
         {
             throw new System.NotImplementedException();
         }

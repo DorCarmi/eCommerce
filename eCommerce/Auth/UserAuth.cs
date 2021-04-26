@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
+using System.Security.Claims; 
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -18,34 +18,17 @@ namespace eCommerce.Auth
 
         private Mutex _hashMutex;
         private readonly SHA256 _sha256;
-
-        private ConcurrentIdGenerator _concurrentIdGenerator;
         
         private IRegisteredUserRepo _userRepo;
 
         private UserAuth(IRegisteredUserRepo repo)
         {
             _jwtAuth = new JWTAuth("keykeykeykeykeyekeykey");
-            // TODO get the initialze id value from DB
-            _concurrentIdGenerator = new ConcurrentIdGenerator(0);
 
             _hashMutex = new Mutex();
             _sha256 = SHA256.Create();
             
             _userRepo = repo;
-            InitOneAdmin();
-        }
-
-        private void InitOneAdmin()
-        {
-            Register("Admin", "Admin");
-            User adminUser = _userRepo.GetUserOrNull("Admin");
-            if (adminUser == null)
-            {
-                throw new Exception("There isnt at least one admin in the system");
-            }
-
-            adminUser.AddRole(AuthUserRole.Admin);
         }
 
         public static UserAuth GetInstance()
@@ -56,17 +39,6 @@ namespace eCommerce.Auth
         public static UserAuth CreateInstanceForTests(IRegisteredUserRepo userRepo)
         {
             return new UserAuth(userRepo);
-        }
-        
-        public string Connect()
-        {
-            string guestUsername = GenerateGuestUsername();
-            string token = GenerateToken(new AuthData(guestUsername, RoleToString(AuthUserRole.Guest)));
-            return token;
-        }
-
-        public void Disconnect(string token)
-        {
         }
 
         public Result Register(string username, string password)
@@ -83,7 +55,6 @@ namespace eCommerce.Auth
             }
             
             User newUser = new User(username, HashPassword(password));
-            newUser.AddRole(AuthUserRole.Member);
 
             if (!_userRepo.Add(newUser))
             {
@@ -92,33 +63,26 @@ namespace eCommerce.Auth
             return Result.Ok();
         }
 
-        public Result<string> Login(string username, string password, AuthUserRole role)
+        public Result Authenticate(string username, string password)
         {
-            if (role.Equals(AuthUserRole.Guest))
-            {
-                return Result.Fail<string>("Invalid role in log in");
-            }
-            
             User user = _userRepo.GetUserOrNull(username);
-            Result canLogInRes = CanLogIn(user, password, role);
+            Result canLogInRes = CanLogIn(user, password);
             if (canLogInRes.IsFailure)
             {
-                return Result.Fail<string>(canLogInRes.Error);
-            }
-
-            string token = GenerateToken(new AuthData(user.Username, RoleToString(role)));
-            return Result.Ok(token);
-        }
-        
-        public Result Logout(string token)
-        {
-            Result<AuthData> authData = GetData(token);
-            if (authData.IsFailure)
-            {
-                return Result.Fail<string>(authData.Error);
+                return Result.Fail(canLogInRes.Error);
             }
 
             return Result.Ok();
+        }
+
+        public string GenerateToken(string username)
+        {
+            Claim[] claims = new Claim[]
+            {
+                new Claim(AuthClaimTypes.Username, username)
+            };
+            
+            return _jwtAuth.GenerateToken(claims);
         }
 
         public bool IsRegistered(string username)
@@ -139,7 +103,7 @@ namespace eCommerce.Auth
                 return Result.Fail<AuthData>("Token is not valid");
             }
             
-            AuthData data = new AuthData(null, null);
+            AuthData data = new AuthData(null);
             if (!FillAuthData(claims, data) || !data.AllDataIsNotNull())
             {
                 return Result.Fail<AuthData>("Token have missing or redundant data");
@@ -173,11 +137,6 @@ namespace eCommerce.Auth
                         data.Username = claim.Value;
                         break;
                     }
-                    case AuthClaimTypes.Role:
-                    {
-                        data.Role = claim.Value;
-                        break;
-                    }
                     default:
                         // TODO check the other expected types
                         break;
@@ -201,27 +160,6 @@ namespace eCommerce.Auth
             _hashMutex.ReleaseMutex();
             return hashedPassword;
         }
-        
-        private string GenerateToken(AuthData authData)
-        {
-            List<Claim> claims = new List<Claim>()
-            {
-                new Claim(AuthClaimTypes.Username, authData.Username),
-                new Claim(AuthClaimTypes.Role, authData.Role)
-            };
-            
-            return _jwtAuth.GenerateToken(claims.ToArray());
-        }
-
-        private long GetAndIncrementGuestId()
-        {
-            return _concurrentIdGenerator.MoveNext();
-        }
-        
-        private string GenerateGuestUsername()
-        {
-            return $"_{RoleToString(AuthUserRole.Guest)}{GetAndIncrementGuestId():D}";
-        }
 
         private Result RegistrationsPolicy(string username, string password)
         {
@@ -243,9 +181,9 @@ namespace eCommerce.Auth
             return errMessage == null ? Result.Ok() : Result.Fail(errMessage);
         }
 
-        private Result CanLogIn(User user, string password, AuthUserRole role)
+        private Result CanLogIn(User user, string password)
         {
-            if (user == null || !user.HashedPassword.SequenceEqual(HashPassword(password)) || !user.HasRole(role))
+            if (user == null || !user.HashedPassword.SequenceEqual(HashPassword(password)))
             {
                 return Result.Fail("Invalid username or password or role");
             }

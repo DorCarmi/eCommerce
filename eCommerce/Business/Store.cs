@@ -51,7 +51,6 @@ namespace eCommerce.Business
             _transactionHistory = new StoreTransactionHistory(this);
 
             _inventory = new ItemsInventory(this);
-            _inventory.AddNewItem(founder, item);
 
             this._founder = founder;
 
@@ -60,7 +59,7 @@ namespace eCommerce.Business
             _managers = new List<IUser>();
             _managersAppointments = new List<ManagerAppointment>();
             
-
+            _inventory.AddNewItem(founder, item);
             _basketsOfThisStore = new List<IBasket>();
         }
         
@@ -80,7 +79,50 @@ namespace eCommerce.Business
 
         public Result<Item> GetItem(string itemId)
         {
-            throw new NotImplementedException();
+            return _inventory.GetItem(itemId);
+        }
+
+        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
+        {
+            IList<Tuple<string, IList<StorePermission>>> netasCrazyList = new List<Tuple<string, IList<StorePermission>>>();
+            foreach (var manager in _managersAppointments)
+            {
+                List<StorePermission> mangPerm = new List<StorePermission>();
+                foreach (var perm in Enum.GetValues(typeof(StorePermission)).Cast<StorePermission>())
+                {
+                    if (manager.HasPermission(perm).IsSuccess)
+                    {
+                        mangPerm.Add(perm);
+                    }
+                }
+                netasCrazyList.Add(new Tuple<string, IList<StorePermission>>(manager.User.Username,mangPerm));
+            }
+            
+            foreach (var owner in _ownersAppointments)
+            {
+                List<StorePermission> ownerPerm = new List<StorePermission>();
+                foreach (var perm in Enum.GetValues(typeof(StorePermission)).Cast<StorePermission>())
+                {
+                    if (owner.HasPermission(perm).IsSuccess)
+                    {
+                        ownerPerm.Add(perm);
+                    }
+                }
+                netasCrazyList.Add(new Tuple<string, IList<StorePermission>>(owner.User.Username,ownerPerm));
+            }
+            
+            List<StorePermission> foundPerm = new List<StorePermission>();
+            foreach (var perm in Enum.GetValues(typeof(StorePermission)).Cast<StorePermission>())
+            {
+                if (this._founder.HasPermission(this,perm).IsSuccess)
+                {
+                    foundPerm.Add(perm);
+                }
+            }
+            netasCrazyList.Add(new Tuple<string, IList<StorePermission>>(_founder.Username,foundPerm));
+
+
+            return Result.Ok<IList<Tuple<string, IList<StorePermission>>>>(netasCrazyList);
         }
 
         public List<Item> SearchItem(string stringSearch)
@@ -196,7 +238,8 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    return this._inventory.AddExistingItem(user, newItem.name, newItem.amount);
+                    return Result.Fail("Item already exist in store");
+                    //return this._inventory.AddExistingItem(user, newItem.name, newItem.amount);
                 }
             }
         }
@@ -222,10 +265,56 @@ namespace eCommerce.Business
             }
         }
 
+        public Result UpdateStock_AddItems(ItemInfo newItem, IUser user)
+        {
+            if (user.HasPermission(this, StorePermission.AddItemToStore).IsFailure)
+            {
+                return Result.Fail("User has now permission to add items to store");
+            }
+            else
+            {
+                if (this._inventory.GetItem(newItem).IsFailure)
+                {
+                    return Result.Fail("Item doesn't exist in store");
+                }
+                else
+                {
+                    return this._inventory.AddExistingItem(user, newItem.name, newItem.amount);
+                }
+            }
+        }
+
+        public Result UpdateStock_SubtractItems(ItemInfo newItem, IUser user)
+        {
+            if (user.HasPermission(this, StorePermission.AddItemToStore).IsFailure)
+            {
+                return Result.Fail("User has now permission to add items to store");
+            }
+            else
+            {
+                if (this._inventory.GetItem(newItem).IsFailure)
+                {
+                    return Result.Fail("Item doesn't exist in store");
+                }
+                else
+                {
+                    return this._inventory.SubtractItems(user, newItem.name, newItem.amount);
+                }
+            }
+        }
+
         // TODO implement this method
         public Result RemoveItemToStore(string productName, IUser user)
         {
-            throw new NotImplementedException();
+            var res=this._inventory.GetItem(productName);
+            if (res.IsFailure)
+            {
+                return res;
+            }
+            else
+            {
+                return RemoveItemToStore(res.GetValue().ShowItem(), user);
+            }
         }
         
         public Result RemoveItemToStore(ItemInfo newItem, IUser user)
@@ -360,6 +449,56 @@ namespace eCommerce.Business
             }
 
             return Result.Ok(minValue);
+        }
+
+        public Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy)
+        {
+            var res = DefaultPurchaseStrategy.GetPurchaseStrategyByName(purchaseStrategy, this);
+            if (res.IsSuccess)
+            {
+                this._myPurchaseStrategies.Add(res.Value);
+                return Result.Ok();
+            }
+            else
+            {
+                return res;
+            }
+        }
+
+        public Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(IUser user)
+        {
+            List<PurchaseStrategyName> names = new List<PurchaseStrategyName>();
+            foreach (var strategy in this._myPurchaseStrategies)
+            {
+                names.Add(strategy.GetStrategyName());
+            }
+            return Result.Ok<IList<PurchaseStrategyName>>(names);
+        }
+
+        public Result UpdatePurchaseStrategies(IUser user, PurchaseStrategyName purchaseStrategy)
+        {
+            var strategyName = DefaultPurchaseStrategy.GetPurchaseStrategyByName(purchaseStrategy, this);
+            if (strategyName.IsFailure)
+            {
+                return strategyName;
+            }
+            bool ans=this._myPurchaseStrategies.Remove(strategyName.Value);
+            return ans ? Result.Ok() : Result.Fail("Item doesn't exist");
+        }
+
+        public Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -81,7 +81,7 @@ namespace eCommerce.Business
 
         public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(User user, IStore store)
         {
-            return user.GetStoreHistory(store);
+            return user.GetStorePurchaseHistory(store);
         }
 
         public virtual Result HasPermission(User user, IStore store, StorePermission storePermission)

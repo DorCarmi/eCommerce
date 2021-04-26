@@ -6,25 +6,22 @@ namespace eCommerce.Common
 {
     public class ConcurrentIdGenerator
     {
-        private SpinLock _mutex;
-        private bool _lockTaken;
+        private Mutex _mutex;
         private long _id;
 
         public ConcurrentIdGenerator(long startFromId)
         {
-            _mutex = new SpinLock();
-            _lockTaken = false;
+            _mutex = new Mutex();
             _id = startFromId;
         }
         
         public long MoveNext()
         {
             long prevValue = -1;
-            _mutex.Enter(ref _lockTaken);
+            _mutex.WaitOne();
             prevValue = _id;
             _id++;
-            _lockTaken = false;
-            _mutex.Exit();
+            _mutex.ReleaseMutex();
             return prevValue;
         }
     }

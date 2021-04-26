@@ -1,4 +1,4 @@
-﻿namespace eCommerce.Business.Service
+﻿namespace eCommerce.Service
 {
     public enum ServiceUserRole
     {

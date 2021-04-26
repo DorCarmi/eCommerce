@@ -8,8 +8,9 @@ namespace Tests
         public static Task<T[]> CreateAndRunTasks<T>(Func<T> func, int numberOfTasks)
         {
             Task<T>[] tasks = CreateArrayOfTasks(func, numberOfTasks);
+            Console.WriteLine("a");
             RunTasks(tasks);
-
+            Console.WriteLine("a");
             return Task.WhenAll<T>(tasks);
         }
 

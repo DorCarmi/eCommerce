@@ -19,6 +19,7 @@ namespace eCommerce.Business
         public Result AppointUserToManager(IStore store, IUser user);
         
         public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permissions);
+        public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission);
 
         
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store);
@@ -34,13 +35,8 @@ namespace eCommerce.Business
         public Result<OwnerAppointment> MakeOwner(IStore store);
         public Result<ManagerAppointment> MakeManager(IStore store);
 
-        
 
-
-
-
-
-
+        public UserToSystemState GetState();
     }
 
     

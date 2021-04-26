@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using eCommerce.Business.Service;
 
-namespace eCommerce.Business.Service
+namespace eCommerce.Service
 {
-    public class ItemDto : IItem
+    public class SItem : IItem
     {
         public string ItemName { get; set; }
         public string StoreName { get; set; }
@@ -11,10 +11,10 @@ namespace eCommerce.Business.Service
         
         public string Category { get; set; }
         public ReadOnlyCollection<string> KeyWords { get; set; }
-        public float PricePerUnit { get; set; }
+        public double PricePerUnit { get; set; }
 
-        public ItemDto(string productName, string storeName, int amount,
-            string category, ReadOnlyCollection<string> keyWords, float pricePerUnit)
+        public SItem(string productName, string storeName, int amount,
+            string category, ReadOnlyCollection<string> keyWords, double pricePerUnit)
         {
             ItemName = productName;
             StoreName = storeName;

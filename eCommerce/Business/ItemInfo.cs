@@ -46,7 +46,8 @@ namespace eCommerce.Business
             this.name = name;
             this.storeName = storeName;
             this.category = category;
-            keyWords = new List<string>();
+            this.keyWords = new List<string>();
+            this.pricePerUnit = pricePerUnit;
             foreach (var word in keyWords)
             {
                 if (word == null)
@@ -55,7 +56,7 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    keyWords.Add(String.Copy(word));
+                    this.keyWords.Add(String.Copy(word));
                 }
                 
             }
@@ -77,6 +78,6 @@ namespace eCommerce.Business
         public int Amount { get => amount; }
         public string Category { get => category; }
         public ReadOnlyCollection<string> KeyWords { get => new ReadOnlyCollection<string>(keyWords); }
-        public float PricePerUnit { get => pricePerUnit; }
+        public double PricePerUnit { get => pricePerUnit; }
     }
 }

@@ -242,6 +242,19 @@ namespace eCommerce.Business
             }
         }
         
+        
+        public Result SubtractItems(IUser user,int amount)
+        {
+            if (this._amount-amount > 1)
+            {
+                this._amount -= amount;
+                return Result.Ok();
+            }
+            else
+            {
+                return Result.Fail("Bad input- amount can't stay lower than 1");
+            }
+        }
 
         public Result AssignPurchaseStrategy(User user,PurchaseStrategyName purchaseStrategy)
         {

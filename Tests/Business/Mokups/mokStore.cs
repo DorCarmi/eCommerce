@@ -4,7 +4,7 @@ using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
-namespace Tests.Mokups
+namespace Tests.Business.Mokups
 {
     public class mokStore: IStore
     {
@@ -30,6 +30,11 @@ namespace Tests.Mokups
         public Result<Item> GetItem(string itemId)
         {
             throw new System.NotImplementedException();
+        }
+
+        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
+        {
+            throw new NotImplementedException();
         }
 
         public List<Item> SearchItem(string stringSearch)
@@ -82,9 +87,24 @@ namespace Tests.Mokups
             throw new System.NotImplementedException();
         }
 
+        public Result UpdateStock_AddItems(ItemInfo newItem, IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result UpdateStock_SubtractItems(ItemInfo newItem, IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result RemoveItemToStore(ItemInfo newItem, IUser user)
         {
             throw new System.NotImplementedException();
+        }
+
+        public Result RemoveItemToStore(string itemID, IUser user)
+        {
+            throw new NotImplementedException();
         }
 
         public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment)
@@ -141,6 +161,36 @@ namespace Tests.Mokups
         public Result<double> CheckDiscount(Basket basket)
         {
             throw new System.NotImplementedException();
+        }
+
+        public Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result UpdatePurchaseStrategies(IUser user, PurchaseStrategyName purchaseStrategy)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
         }
     }
 }

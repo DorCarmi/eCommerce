@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using eCommerce.Business;
 using eCommerce.Business.Service;
 using NUnit.Framework;
-using Tests.Mokups;
-using Transaction = System.Transactions.Transaction;
+using Tests.Business.Mokups;
 
-namespace Tests
+namespace Tests.Business.StoreTests
 {
     public class BasketTest
     {

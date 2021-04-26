@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using eCommerce.Business.Service;
 
 namespace eCommerce.Business
 {
@@ -18,7 +19,13 @@ namespace eCommerce.Business
             }
 
             this._totalPrice = basket.GetTotalPrice().GetValue();
-
         }
+
+        public IList<ItemInfo> ItemsInBasket
+        {
+            get => _itemsInBasket;
+        }
+
+        public double TotalPrice => _totalPrice;
     }
 }

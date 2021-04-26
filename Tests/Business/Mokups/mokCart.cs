@@ -3,7 +3,7 @@ using eCommerce;
 using eCommerce.Business;
 using eCommerce.Common;
 
-namespace Tests.Mokups
+namespace Tests.Business.Mokups
 {
     public class mokCart : ICart
     {
@@ -17,7 +17,12 @@ namespace Tests.Mokups
             throw new System.NotImplementedException();
         }
 
-        public Result CalculatePricesForCart()
+        public Result<double> CalculatePricesForCart()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result BuyWholeCart(IUser user, PaymentInfo paymentInfo)
         {
             throw new System.NotImplementedException();
         }
