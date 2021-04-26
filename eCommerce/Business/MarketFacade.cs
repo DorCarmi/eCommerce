@@ -6,10 +6,10 @@ using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using eCommerce.Service;
+using NLog;
 
 namespace eCommerce.Business
 {
-    // TODO should be singleton
     // TODO check authException if we should throw them
     public class MarketFacade : IMarketFacade
     {
@@ -18,6 +18,8 @@ namespace eCommerce.Business
                 UserAuth.GetInstance(),
                 new RegisteredUsersRepository(),
                 new StoreRepository());
+
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         private StoreRepository _storeRepository;
         private UserManager _userManager;
