@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -10,10 +11,10 @@ namespace Tests.Mokups
         public string storeName { get; set; }
         public Item item;
         public ICart cart;
+
         public mokStore(string storeName)
         {
             this.storeName = storeName;
-            this.item = item;
         }
         
         public IList<Item> GetAllItems()
@@ -88,22 +89,26 @@ namespace Tests.Mokups
 
         public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MokStore: Appointed new Owner: "+user.Username);
+            return Result.Ok();
         }
 
         public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MokStore: Appointed new Manager: "+user.Username);
+            return Result.Ok();
         }
 
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MokStore: Getting Purchase History (its empty..)");
+            return Result.Ok<IList<PurchaseRecord>>(new List<PurchaseRecord>());
         }
 
         public Result EnterBasketToHistory(IBasket basket)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MokStore: Entered Basket to History.");
+            return  Result.Ok();
         }
 
         public string GetStoreName()
@@ -118,12 +123,14 @@ namespace Tests.Mokups
 
         public bool TryAddNewCartToStore(Cart cart)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MokStore: Added New Cart To Store");
+            return true;
         }
 
         public Result ConnectNewBasketToStore(Basket newBasket)
         {
-            throw new System.NotImplementedException();
+            Console.WriteLine("MockStore: Connected new basket to store");
+            return Result.Ok();
         }
 
         public bool CheckConnectionToCart(ICart cart)
