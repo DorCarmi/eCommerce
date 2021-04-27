@@ -1,4 +1,5 @@
 ﻿import React, { Component } from 'react';
+import { Connect } from "../Api/AuthApi"
 import "./Login.css"
 
 export class Login extends Component {
@@ -7,6 +8,13 @@ export class Login extends Component {
     constructor(props) {
         super(props);
         this.state = { };
+        
+        this.handleConnect = this.handleConnect.bind(this);
+    }
+
+    async handleConnect(){
+        const connectRes = await Connect();
+        console.log(connectRes)
     }
 
     componentDidMount() {
@@ -22,6 +30,10 @@ export class Login extends Component {
                         <input type="password" name="Password" placeholder="Password"/>
                         <input type="submit" value="Login"/>
                     </form>
+                    <div className="RegisterConnect">
+                        <a href="/register">Not registered yet?</a>
+                        <button onClick={this.handleConnect}>Connect</button>
+                    </div>
                 </div>
             </main>
         );
