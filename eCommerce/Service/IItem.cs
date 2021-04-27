@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
-namespace eCommerce.Business.Service
+namespace eCommerce.Service
 {
     public interface IItem
     {
@@ -11,5 +10,6 @@ namespace eCommerce.Business.Service
         public string Category { get; }
         public ReadOnlyCollection<string> KeyWords { get; }
         public double PricePerUnit { get; }
+
     }
 }
