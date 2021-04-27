@@ -188,12 +188,14 @@ namespace eCommerce.Business
         {
             if (!_auth.IsValidToken(token))
             {
+                _logger.Info($"Invalid use of token {token}");
                 _connectedUsers.TryRemove(token, out var tUser);
                 return Result.Fail<IUser>("Invalid token");
             }
 
             if (!_connectedUsers.TryGetValue(token, out var user))
             {
+                _logger.Info($"Usage of old token {token}");
                 return Result.Fail<IUser>("User not connected or logged in");
             }
 
