@@ -1,0 +1,20 @@
+﻿.LoginMain {
+    margin: auto 0 auto 0;
+}
+
+.LoginWindow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.LoginForm {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.LoginForm input {
+    margin: 3px;
+}
