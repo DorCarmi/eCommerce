@@ -45,7 +45,7 @@ namespace eCommerce.Communication
             
             if (authCookie == null && path != null )//_controllersNames.ContainsKey(path))
             {
-                if (!(path.Equals("/login") || path.Equals("/auth/connect", StringComparison.OrdinalIgnoreCase) || path.StartsWith("/static/")))
+                if (!(path.Equals("/login") || path.StartsWith("/auth", StringComparison.OrdinalIgnoreCase) || path.StartsWith("/static/")))
                 {
                     Console.WriteLine($"Redirect {path}");
                     context.Response.StatusCode = 302;

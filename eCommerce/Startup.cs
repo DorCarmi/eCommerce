@@ -29,6 +29,7 @@ namespace eCommerce
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
 
+            //services.AddRouting(options => options.LowercaseUrls = true);
             services.AddCors();
             services.AddSignalR();
         }

@@ -15,7 +15,7 @@ namespace eCommerce.Controllers
         public string Password { get; set; }
         public string Role { get; set; }
     }
-    
+
     [Route("[controller]")]
     public class AuthController : Controller
     {
@@ -27,6 +27,7 @@ namespace eCommerce.Controllers
             _logger = logger;
             _authService = new AuthService();
         }
+
 
         [HttpGet]
         [Route("[action]")]

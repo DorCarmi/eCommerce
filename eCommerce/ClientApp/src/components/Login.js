@@ -56,14 +56,6 @@ export class Login extends Component {
             })
         }
     }
-    
-    setCookie(token){
-        let now = new Date();
-        let time = now.getTime();
-        let expireTime = time + 1000*36000;
-        now.setTime(expireTime);
-        document.cookie = `_auth=${token};expires=${now.toUTCString()};path=/;secure=true;`;
-    }
 
     componentDidMount() {
         //this.populateWeatherData();
