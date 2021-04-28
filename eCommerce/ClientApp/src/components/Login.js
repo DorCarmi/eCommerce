@@ -14,7 +14,19 @@ export class Login extends Component {
 
     async handleConnect(){
         const connectRes = await Connect();
-        console.log(connectRes)
+        if(connectRes){
+            this.setCookie(connectRes)
+        } else {
+            alert("Error")
+        }
+    }
+    
+    setCookie(token){
+        let now = new Date();
+        let time = now.getTime();
+        let expireTime = time + 1000*36000;
+        now.setTime(expireTime);
+        document.cookie = `_auth=${token};expires=${now.toUTCString()};path=/;secure=true;`;
     }
 
     componentDidMount() {
@@ -32,16 +44,10 @@ export class Login extends Component {
                     </form>
                     <div className="RegisterConnect">
                         <a href="/register">Not registered yet?</a>
-                        <button onClick={this.handleConnect}>Connect</button>
+                        <button onClick={this.handleConnect}>Connect as guest</button>
                     </div>
                 </div>
             </main>
         );
-    }
-
-    async populateWeatherData() {
-        const response = await fetch('weatherforecast');
-        const data = await response.json();
-        this.setState({ forecasts: data, loading: false });
     }
 }

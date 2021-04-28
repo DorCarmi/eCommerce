@@ -1,5 +1,6 @@
 using System;
 using System.Net.WebSockets;
+using eCommerce.Communication;
 using eCommerce.SingleR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -51,8 +52,7 @@ namespace eCommerce
             app.UseSpaStaticFiles();
 
             app.UseRouting();
-            
-           
+
             //Websockets
             app.UseCors(builder => builder
                 .WithOrigins("null")
@@ -64,9 +64,11 @@ namespace eCommerce
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}");
                 endpoints.MapHub<MessageHub>("/messageHub");
             });
+            
+            app.UseAuth();
 
             app.UseSpa(spa =>
             {
