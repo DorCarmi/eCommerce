@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Connect } from "../Api/AuthApi"
+import { authApi } from "../Api/AuthApi"
 import "./Login.css"
 
 export class Login extends Component {
@@ -7,17 +7,45 @@ export class Login extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { };
+        this.state = { 
+            loginError: undefined,
+            username: undefined,
+            password: undefined,
+            role: "member"
+        };
         
         this.handleConnect = this.handleConnect.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+
     }
 
     async handleConnect(){
-        const connectRes = await Connect();
+        const connectRes = await authApi.Connect();
         if(connectRes){
-            this.setCookie(connectRes)
+            window.location = connectRes.redirect
         } else {
             alert("Error")
+        }
+    }
+    
+    handleInputChange(event){
+        const target = event.target;
+        this.setState({
+            [target.name]: target.value
+        });
+    }
+    
+    async handleSubmit(event){
+        event.preventDefault();
+        const {username, password, role} = this.state;
+        const data = await authApi.Login(username, password, role)
+        if(data && data.isSuccess){
+            alert("login")
+        } else {
+            this.setState({
+                loginError: data.error
+            })
         }
     }
     
@@ -37,9 +65,14 @@ export class Login extends Component {
         return (
             <main class="LoginMain">
                 <div class="LoginWindow">
-                    <form class="LoginForm">
-                        <input type="text" name="Username" placeholder="Username"/>
-                        <input type="password" name="Password" placeholder="Password"/>
+                    <form class="LoginForm" onSubmit={this.handleSubmit}>
+                        {this.state.loginError ? <div class="CenterItemContainer"><label>{this.state.loginError}</label></div> : null}
+                        <input type="text" name="username" value={this.state.username} onChange={this.handleInputChange} placeholder="Username" required/>
+                        <input type="password" name="password" value={this.state.password} onChange={this.handleInputChange} placeholder="Password" required/>
+                        <select value={this.state.role} onChange={this.handleInputChange}>
+                            <option value="member">Member</option>
+                            <option value="admin">Admin</option>
+                        </select>
                         <input type="submit" value="Login"/>
                     </form>
                     <div className="RegisterConnect">

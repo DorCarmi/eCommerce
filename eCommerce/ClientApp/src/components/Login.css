@@ -17,7 +17,14 @@
 }
 
 .LoginForm input {
-    margin: 3px;
+    margin: 5px;
+}
+.LoginForm select {
+    margin: 5px;
+}
+
+.LoginForm label {
+    color: red;
 }
 
 .RegisterConnect {
@@ -38,5 +45,11 @@
 
 .RegisterConnect button {
     grid-row: 2;
+    align-items: center;
+}
+
+.CenterItemContainer {
+    display: flex;
+    margin: 0 auto;
     align-items: center;
 }

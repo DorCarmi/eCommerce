@@ -48,7 +48,7 @@ namespace eCommerce.Communication
             
             if (authCookie == null && path != null )//_controllersNames.ContainsKey(path))
             {
-                if (!(path.Equals("/login") || path.StartsWith("/static/")))
+                if (!(path.Equals("/login") || path.Equals("/auth/connect") || path.StartsWith("/static/")))
                 {
                     Console.WriteLine($"Redirect {path}");
                     context.Response.StatusCode = 302;
@@ -56,7 +56,8 @@ namespace eCommerce.Communication
                     return;
                 }
             }
-            
+
+            context.Items["authToken"] = authCookie;
             Console.WriteLine($"Don't redirect {path}");
             await _next(context);
 

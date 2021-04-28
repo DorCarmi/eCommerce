@@ -60,6 +60,8 @@ namespace eCommerce
                 .AllowAnyMethod()
                 .AllowCredentials());
 
+            app.UseAuth();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -68,8 +70,6 @@ namespace eCommerce
                 endpoints.MapHub<MessageHub>("/messageHub");
             });
             
-            app.UseAuth();
-
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
