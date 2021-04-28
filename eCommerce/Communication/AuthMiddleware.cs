@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eCommerce.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Routing;
 
 namespace eCommerce.Communication
 {
@@ -48,7 +45,7 @@ namespace eCommerce.Communication
             
             if (authCookie == null && path != null )//_controllersNames.ContainsKey(path))
             {
-                if (!(path.Equals("/login") || path.Equals("/auth/connect") || path.StartsWith("/static/")))
+                if (!(path.Equals("/login") || path.Equals("/auth/connect", StringComparison.OrdinalIgnoreCase) || path.StartsWith("/static/")))
                 {
                     Console.WriteLine($"Redirect {path}");
                     context.Response.StatusCode = 302;

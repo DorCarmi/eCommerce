@@ -39,12 +39,20 @@ export class Login extends Component {
     async handleSubmit(event){
         event.preventDefault();
         const {username, password, role} = this.state;
-        const data = await authApi.Login(username, password, role)
-        if(data && data.isSuccess){
-            alert("login")
+        const loginRedirectAndRes = await authApi.Login(username, password, role);
+        if(loginRedirectAndRes) {
+            const loginRes = loginRedirectAndRes.data;
+
+            if (loginRes && loginRes.isSuccess) {
+                window.location = loginRedirectAndRes.redirect
+            } else {
+                this.setState({
+                    loginError: loginRes.error
+                })
+            }
         } else {
             this.setState({
-                loginError: data.error
+                loginError: "You need to be a guest"
             })
         }
     }
@@ -69,7 +77,7 @@ export class Login extends Component {
                         {this.state.loginError ? <div class="CenterItemContainer"><label>{this.state.loginError}</label></div> : null}
                         <input type="text" name="username" value={this.state.username} onChange={this.handleInputChange} placeholder="Username" required/>
                         <input type="password" name="password" value={this.state.password} onChange={this.handleInputChange} placeholder="Password" required/>
-                        <select value={this.state.role} onChange={this.handleInputChange}>
+                        <select value={this.state.role} onChange={this.handleInputChange} required>
                             <option value="member">Member</option>
                             <option value="admin">Admin</option>
                         </select>

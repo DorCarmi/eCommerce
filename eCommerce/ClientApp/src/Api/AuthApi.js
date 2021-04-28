@@ -6,9 +6,9 @@ const instance = axios.create(
     {withCredentials : true}
 );
 
-export class ConnectData {
-    constructor(token, redirectLocation) {
-        this.token = token;
+export class RedirectWithData {
+    constructor(data, redirectLocation) {
+        this.data = data;
         this.redirect = redirectLocation
     }
 }
@@ -18,7 +18,7 @@ export class authApi {
         return instance.get(CONNECT_PATH)
             .then(res => {
                 let data = res.data;
-                return new ConnectData(data, res.headers['redirectto'])
+                return new RedirectWithData(data, res.headers['redirectto'])
             })
             .catch(res => undefined);
     }
@@ -31,7 +31,10 @@ export class authApi {
                 role: role
             })
             .then(res => {
-                return new Result(res.data)
+                return new RedirectWithData(
+                    new Result(res.data),
+                    res.headers['redirectto']
+                );
             })
             .catch(res => undefined);
     }

@@ -52,8 +52,14 @@ namespace eCommerce.Controllers
         {
             if (Enum.TryParse<ServiceUserRole>(loginInfo.Role, true, out var serviceRole))
             {
-                return _authService.Login((string) HttpContext.Items["authToken"], 
+                Result<string> loginRes = _authService.Login((string) HttpContext.Items["authToken"],
                     loginInfo.Username, loginInfo.Password, serviceRole);
+                if (loginRes.IsSuccess)
+                {
+                    Response.Headers.Add("RedirectTo", "/");
+                }
+                
+                return loginRes;
             }
 
             return Result.Fail<string>("Invalid role");
