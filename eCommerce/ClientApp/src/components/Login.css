@@ -1,11 +1,17 @@
 ﻿.LoginMain {
-    margin: auto 0 auto 0;
+    display: flex;
+    margin: 200px 0;
 }
 
 .LoginWindow {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     border: solid 1px blueviolet;
+    border-radius: 20px;
+    box-shadow: 12px 12px 2px 1px #b0b1b7;
+    margin: 0 auto;
+    padding: 50px;
+    flex-flow: column;
+    
 }
 
 .LoginForm {
@@ -29,23 +35,20 @@
     color: red;
 }
 
-.RegisterConnect {
-    grid-column-start: 2;
-    grid-column-end: 2;
+.ConnectRegister {
     display: grid;
-    grid-template-rows: 1fr 1fr;
-    border-left: solid 1px #1b6ec2;
-    padding: 10px;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
 }
 
-.RegisterConnect a {
-    grid-row: 1;
+.ConnectRegister a {
+    grid-row: 2;
     display: flex;
     margin: 0 auto;
     align-items: center;
 }
 
-.RegisterConnect button {
+.ConnectRegister input {
     grid-row: 2;
     align-items: center;
 }

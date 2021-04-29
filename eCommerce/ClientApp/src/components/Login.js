@@ -14,19 +14,8 @@ export class Login extends Component {
             role: "member"
         };
         
-        this.handleConnect = this.handleConnect.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-
-    }
-
-    async handleConnect(){
-        const connectRes = await authApi.Connect();
-        if(connectRes){
-            window.location = connectRes.redirect
-        } else {
-            alert("Error")
-        }
     }
     
     handleInputChange(event){
@@ -69,16 +58,15 @@ export class Login extends Component {
                         {this.state.loginError ? <div class="CenterItemContainer"><label>{this.state.loginError}</label></div> : null}
                         <input type="text" name="username" value={this.state.username} onChange={this.handleInputChange} placeholder="Username" required/>
                         <input type="password" name="password" value={this.state.password} onChange={this.handleInputChange} placeholder="Password" required/>
-                        <select value={this.state.role} onChange={this.handleInputChange} required>
+                        <select name="role" value={this.state.role} onChange={this.handleInputChange} required>
                             <option value="member">Member</option>
                             <option value="admin">Admin</option>
                         </select>
-                        <input type="submit" value="Login"/>
+                        <div className="ConnectRegister">
+                            <a href="/register">Create new account</a>
+                            <input type="submit" value="Login"/>
+                        </div>
                     </form>
-                    <div className="RegisterConnect">
-                        <a href="/register">Not registered yet?</a>
-                        <button onClick={this.handleConnect}>Connect as guest</button>
-                    </div>
                 </div>
             </main>
         );

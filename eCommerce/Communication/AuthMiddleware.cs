@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eCommerce.Controllers;
+using eCommerce.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
@@ -14,6 +15,7 @@ namespace eCommerce.Communication
         
         private readonly RequestDelegate _next;
         private readonly IDictionary<string, bool> _controllersNames;
+        private readonly IAuthService _authService;
         
         
         public AuthMiddleware(RequestDelegate next,
@@ -21,6 +23,7 @@ namespace eCommerce.Communication
         {
             _next = next;
             _controllersNames = new Dictionary<string, bool>();
+            _authService = new AuthService();
             
              var controllers = provider.ActionDescriptors.Items.Where(
                  ad => ad.AttributeRouteInfo != null).Select(
@@ -43,21 +46,23 @@ namespace eCommerce.Communication
             var authCookie = context.Request.Cookies[AUTH_COOKIE];
             var path = context.Request.Path.Value;
             
-            if (authCookie == null && path != null )//_controllersNames.ContainsKey(path))
+            if (authCookie == null && path != null )
             {
-                if (!(path.Equals("/login") || path.StartsWith("/auth", StringComparison.OrdinalIgnoreCase) || path.StartsWith("/static/")))
+                string token = _authService.Connect();
+                context.Response.Cookies.Append("_auth", token, new CookieOptions()
                 {
-                    Console.WriteLine($"Redirect {path}");
-                    context.Response.StatusCode = 302;
-                    context.Response.Redirect("/login");
-                    return;
-                }
+                    Path = "/",
+                    Secure = true,
+                    MaxAge = TimeSpan.FromDays(5),
+                    Domain = context.Request.PathBase.Value,
+                    Expires = DateTimeOffset.Now.AddDays(5),
+                    HttpOnly = true
+                });
+                authCookie = token;
             }
 
             context.Items["authToken"] = authCookie;
-            Console.WriteLine($"Don't redirect {path}");
             await _next(context);
-
         }
     }
 }
