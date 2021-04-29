@@ -1,9 +1,11 @@
 using System;
+using System.Net;
 using System.Net.WebSockets;
 using eCommerce.Communication;
 using eCommerce.SingleR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +32,13 @@ namespace eCommerce
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
 
             //services.AddRouting(options => options.LowercaseUrls = true);
-            services.AddCors();
+            services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
+            {
+                builder
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .WithOrigins("null");
+            }));
             services.AddSignalR();
         }
 
@@ -48,6 +56,7 @@ namespace eCommerce
                 app.UseHsts();
             }
 
+            app.UseCors("CorsPolicy");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
@@ -68,7 +77,10 @@ namespace eCommerce
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}");
-                endpoints.MapHub<MessageHub>("/messageHub");
+                endpoints.MapHub<MessageHub>("/messageHub", options =>
+                {
+                    options.Transports = HttpTransportType.WebSockets;
+                });
             });
             
             app.UseSpa(spa =>
