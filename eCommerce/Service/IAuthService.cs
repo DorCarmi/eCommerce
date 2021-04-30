@@ -24,7 +24,7 @@ namespace eCommerce.Service
         ///TestRegisterToSystemFailure
         ///</Test>
         /// <param name="token">The Authorization token</param>
-        /// <param name="memberInfoDto">The user information</param>
+        /// <param name="memberInfo">The user information</param>
         /// <param name="password">The user password</param>
         /// <returns>Successful Result if the user has been successfully registered</returns>
         public Result Register(string token, MemberInfo memberInfo, string password);

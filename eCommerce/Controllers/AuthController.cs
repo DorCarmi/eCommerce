@@ -4,7 +4,6 @@ using eCommerce.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
 
 namespace eCommerce.Controllers
 {
@@ -15,6 +14,18 @@ namespace eCommerce.Controllers
         public string Password { get; set; }
         public string Role { get; set; }
     }
+    
+    public class MemberInfo : Business.MemberInfo
+    {
+        public string Password { get; set; }
+
+        public MemberInfo(string username, string email, string name, DateTime birthday, string address, string password) : base(username, email, name, birthday, address)
+        {
+            this.Password = password;
+        }
+    }
+
+
 
     [Route("[controller]")]
     public class AuthController : Controller
@@ -46,7 +57,7 @@ namespace eCommerce.Controllers
             Response.Headers.Add("RedirectTo", "/");
             return token;
         }
-        
+
         [HttpPost]
         [Route("[action]")]
         public Result<string> Login([FromBody] LoginInfo loginInfo)
@@ -66,5 +77,29 @@ namespace eCommerce.Controllers
             return Result.Fail<string>("Invalid role");
         }
         
+        [HttpPost]
+        [Route("[action]")]
+        public Result Register([FromBody] MemberInfo memberInfo)
+        {
+            Result registerRes = _authService.Register((string) HttpContext.Items["authToken"],
+                memberInfo, memberInfo.Password);
+            if (registerRes.IsSuccess)
+            {
+                Response.Headers.Add("RedirectTo", "/");
+            }
+            /* if (Enum.TryParse<ServiceUserRole>(memberInfo.D, true, out var serviceRole))
+             {
+                 Result<string> loginRes = _authService.Login((string) HttpContext.Items["authToken"],
+                     loginInfo.Username, loginInfo.Password, serviceRole);
+                 if (loginRes.IsSuccess)
+                 {
+                     Response.Headers.Add("RedirectTo", "/");
+                 }
+                 
+                 return loginRes;
+             }*/
+
+            return registerRes;
+        }
     }
 }

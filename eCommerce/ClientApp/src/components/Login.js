@@ -1,8 +1,10 @@
 ﻿import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import { authApi } from "../Api/AuthApi"
 import "./Login.css"
+import {Link} from "react-router-dom";
 
-export class Login extends Component {
+class Login extends Component {
     static displayName = Login.name;
 
     constructor(props) {
@@ -11,11 +13,16 @@ export class Login extends Component {
             loginError: undefined,
             username: undefined,
             password: undefined,
-            role: "member"
+            role: "member",
         };
         
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    redirectToHome = (path) => {
+        const { history } = this.props;
+        if(history) history.push(path);
     }
     
     handleInputChange(event){
@@ -33,7 +40,8 @@ export class Login extends Component {
             const loginRes = loginRedirectAndRes.data;
 
             if (loginRes && loginRes.isSuccess) {
-                window.location = loginRedirectAndRes.redirect
+                this.props.setLoginState(username)
+                this.redirectToHome(loginRedirectAndRes.redirect)
             } else {
                 this.setState({
                     loginError: loginRes.error
@@ -51,6 +59,7 @@ export class Login extends Component {
     }
     
     render() {
+        const {redirectTo} = this.state
         return (
             <main class="LoginMain">
                 <div class="LoginWindow">
@@ -63,7 +72,7 @@ export class Login extends Component {
                             <option value="admin">Admin</option>
                         </select>
                         <div className="ConnectRegister">
-                            <a href="/register">Create new account</a>
+                            <Link to="/register">Create new account</Link>
                             <input class="action" type="submit" value="Login"/>
                         </div>
                     </form>
@@ -72,3 +81,5 @@ export class Login extends Component {
         );
     }
 }
+
+export default withRouter(Login);

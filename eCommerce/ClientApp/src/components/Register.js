@@ -1,8 +1,9 @@
 ﻿import React, { Component } from 'react';
 import { authApi } from "../Api/AuthApi"
 import "./Register.css"
+import {withRouter} from "react-router-dom";
 
-export class Register extends Component {
+class Register extends Component {
     static displayName = Register.name;
 
     constructor(props) {
@@ -20,6 +21,11 @@ export class Register extends Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
+
+    redirectToHome = (path) => {
+        const { history } = this.props;
+        if(history) history.push(path);
+    }
     
     handleInputChange(event){
         const target = event.target;
@@ -31,22 +37,22 @@ export class Register extends Component {
     async handleSubmit(event){
         event.preventDefault();
         const {username, password, email, name, address, birthday} = this.state;
-        /* loginRedirectAndRes = await authApi.Login(username, password, role);
-        if(loginRedirectAndRes) {
-            const loginRes = loginRedirectAndRes.data;
+        const registerRedirectAndRes = await authApi.Register(username, password, email, name, address, birthday);
+        if(registerRedirectAndRes) {
+            const registerRes = registerRedirectAndRes.data;
 
-            if (loginRes && loginRes.isSuccess) {
-                window.location = loginRedirectAndRes.redirect
+            if (registerRes && registerRes.isSuccess) {
+                this.redirectToHome(registerRedirectAndRes.redirect)
             } else {
                 this.setState({
-                    loginError: loginRes.error
+                    registrationError: registerRes.error
                 })
             }
         } else {
             this.setState({
-                loginError: "You need to be a guest"
+                registrationError: "Error"
             })
-        }*/
+        }
     }
 
     componentDidMount() {
@@ -77,3 +83,5 @@ export class Register extends Component {
         );
     }
 }
+
+export default withRouter(Register);
