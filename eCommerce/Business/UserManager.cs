@@ -52,7 +52,11 @@ namespace eCommerce.Business
             if (!_auth.IsValidToken(token))
             {
                 _logger.Warn($"Invalid token {token}");
-                _connectedUsers.TryRemove(token, out var tuser);
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tuser);
+                }
+
                 return;
             }
 
@@ -68,7 +72,11 @@ namespace eCommerce.Business
             if (!_auth.IsValidToken(token))
             {
                 _logger.Warn($"Invalid token {token}");
-                _connectedUsers.TryRemove(token, out var tuser);
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tuser);
+                }
+
                 return Result.Fail("Invalid token");
             }
 
@@ -121,7 +129,11 @@ namespace eCommerce.Business
             if (!_auth.IsValidToken(guestToken))
             {
                 _logger.Warn($"Invalid token {guestToken}");
-                _connectedUsers.TryRemove(guestToken, out var tUser);
+                if (guestToken != null)
+                {
+                    _connectedUsers.TryRemove(guestToken, out var tUser);
+                }
+
                 return Result.Fail<string>("Invalid token");
             }
 
@@ -163,7 +175,11 @@ namespace eCommerce.Business
             if (!_auth.IsValidToken(token))
             {
                 _logger.Warn($"Invalid token {token}");
-                _connectedUsers.TryRemove(token, out var tUser);
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tUser);
+                }
+
                 return Result.Fail<string>("Invalid token");
             }
             
@@ -183,13 +199,33 @@ namespace eCommerce.Business
             
             return Result.Ok(Connect());
         }
+        
+        public bool IsUserConnected(string token)
+        {
+            if (!_auth.IsValidToken(token))
+            {
+                _logger.Info($"Invalid use of token {token}");
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tUser);
+                }
+
+                return false;
+            }
+
+            return _connectedUsers.TryGetValue(token, out var user);
+        }
 
         public Result<IUser> GetUserIfConnectedOrLoggedIn(string token)
         {
             if (!_auth.IsValidToken(token))
             {
                 _logger.Info($"Invalid use of token {token}");
-                _connectedUsers.TryRemove(token, out var tUser);
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tUser);
+                }
+
                 return Result.Fail<IUser>("Invalid token");
             }
 

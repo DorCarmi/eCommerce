@@ -53,5 +53,10 @@ namespace eCommerce.Service
         {
             return _marketFacade.Logout(token);
         }
+
+        public bool IsUserConnected(string token)
+        {
+            return _marketFacade.IsUserConnected(token);
+        }
     }
 }
