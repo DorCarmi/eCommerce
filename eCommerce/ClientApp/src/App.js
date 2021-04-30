@@ -12,7 +12,6 @@ export default class App extends Component {
   
   constructor(props) {
       super(props)
-      alert("a")
       this.state = {
           isLoggedIn: false,
           username: undefined

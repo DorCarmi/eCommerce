@@ -46,7 +46,7 @@ namespace eCommerce.Communication
             var authCookie = context.Request.Cookies[AUTH_COOKIE];
             var path = context.Request.Path.Value;
             
-            if (authCookie == null && path != null )
+            if ((authCookie == null && path != null) || !_authService.IsUserConnected(authCookie))
             {
                 string token = _authService.Connect();
                 context.Response.Cookies.Append("_auth", token, new CookieOptions()

@@ -199,6 +199,22 @@ namespace eCommerce.Business
             
             return Result.Ok(Connect());
         }
+        
+        public bool IsUserConnected(string token)
+        {
+            if (!_auth.IsValidToken(token))
+            {
+                _logger.Info($"Invalid use of token {token}");
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tUser);
+                }
+
+                return false;
+            }
+
+            return _connectedUsers.TryGetValue(token, out var user);
+        }
 
         public Result<IUser> GetUserIfConnectedOrLoggedIn(string token)
         {

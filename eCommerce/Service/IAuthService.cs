@@ -53,5 +53,7 @@ namespace eCommerce.Service
         /// <param name="token">Authorization token</param>
         /// <returns>New guest Authorization token</returns>
         public Result<string> Logout(string token);
+
+        public bool IsUserConnected(string token);
     }
 }
