@@ -36,7 +36,7 @@ namespace eCommerce.Business
         
         private List<IBasket> _basketsOfThisStore;
 
-        public Store(String name, IUser founder, ItemInfo item)
+        public Store(String name, IUser founder)
         {
             this._storeName = name;
 
@@ -59,7 +59,6 @@ namespace eCommerce.Business
             _managers = new List<IUser>();
             _managersAppointments = new List<ManagerAppointment>();
             
-            _inventory.AddNewItem(founder, item);
             _basketsOfThisStore = new List<IBasket>();
         }
         

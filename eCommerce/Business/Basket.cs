@@ -148,5 +148,11 @@ namespace eCommerce.Business
                 return Result.Fail<ItemInfo>("Item doens't exist in basket, you can add it if you want");
             }
         }
+
+        public BasketInfo GetBasketInfo()
+        {
+            BasketInfo basketInfo = new BasketInfo(this);
+            return basketInfo;
+        }
     }
 }

@@ -5,13 +5,14 @@ using eCommerce.Common;
 
 namespace Tests.Business.Mokups
 {
-    public class mokUserAlice : IUser
+    public class mokUser : IUser
     {
         private bool isLoggedIn = false;
-        private string userName = "ALICE";
+        private string userName;
 
-        public mokUserAlice()
+        public mokUser(string username)
         {
+            this.Username = username;
         }
 
         public Result Login(UserToSystemState systemState)

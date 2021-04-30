@@ -41,5 +41,10 @@ namespace Tests.Business.Mokups
         {
             throw new System.NotImplementedException();
         }
+
+        public CartInfo GetCartInfo()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

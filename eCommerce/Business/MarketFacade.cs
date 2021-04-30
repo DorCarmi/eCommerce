@@ -465,7 +465,7 @@ namespace eCommerce.Business
             }
             IUser user = userRes.Value;
 
-            IStore newStore = new Store(storeName, user, DtoUtils.ItemDtoToProductInfo(item));
+            IStore newStore = new Store(storeName, user);
             if (!_storeRepository.Add(newStore))
             {
                 return Result.Fail("Store name taken");

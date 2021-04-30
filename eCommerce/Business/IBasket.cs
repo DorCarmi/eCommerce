@@ -16,5 +16,6 @@ namespace eCommerce.Business
         Result SetTotalPrice();
         public string GetStoreName();
         public Result<ItemInfo> GetItem(IUser user, string itemName);
+        public BasketInfo GetBasketInfo();
     }
 }

@@ -45,6 +45,7 @@ namespace eCommerce.Business
             CopyKeyWords(info.keyWords);
             this._purchaseStrategy = new DefaultPurchaseStrategy(_belongsToStore);
             this._pricePerUnit = info.pricePerUnit;
+            this._belongsToStore = info.GetStore().Value;
         }
 
         private void CopyKeyWords(IList<string> words)

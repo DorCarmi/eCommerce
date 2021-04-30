@@ -37,7 +37,7 @@ namespace Tests.Business
         {
             MemberInfo memberInfo = new MemberInfo("User1", "email@email.com", "TheUser", DateTime.Now, "The sea 1");
             _user = new User(Member.State, memberInfo);
-            _store = new Store(STORE_NAME, _user, _itemInfos[0]);
+            _store = new Store(STORE_NAME, _user);
             _user.OpenStore(_store);
 
         }

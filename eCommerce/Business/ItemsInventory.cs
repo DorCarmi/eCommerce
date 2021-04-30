@@ -168,7 +168,7 @@ namespace eCommerce.Business
         {
             foreach (var curItem in _itemsInStore)
             {
-                if (curItem.GetName().Equals(item))
+                if (curItem.GetName().Equals(item.name))
                 {
                     return Result.Ok(curItem);
                 }
@@ -193,6 +193,7 @@ namespace eCommerce.Business
 
         public Result RemoveItem(IUser user, ItemInfo newItem)
         {
+            
             if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
             {
                 if (this._nameToItem.ContainsKey(newItem.name))

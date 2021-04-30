@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using eCommerce.Business.Service;
+using eCommerce.Common;
 
 namespace eCommerce.Business
 {
@@ -15,6 +16,7 @@ namespace eCommerce.Business
         public int pricePerUnit;
         private Item theItem;
         private double discountFactor;
+        private IStore _store;
 
         public ItemInfo(int amount, string name, string storeName, string category,int pricePerUnit, List<string> keyWords,Item theItem)
         {
@@ -63,9 +65,48 @@ namespace eCommerce.Business
             this.theItem = null;
         }
 
-        public IStore GetStore()
+        public ItemInfo(ItemInfo itemInf)
         {
-            return theItem.GetStore();
+            this.amount = itemInf.amount;
+            this.category = itemInf.category;
+            this.name = itemInf.name;
+            this.discountFactor = itemInf.discountFactor;
+            this.keyWords = new List<string>();
+            foreach (var keyWord in itemInf.keyWords)
+            {
+                this.keyWords.Add(keyWord);
+            }
+
+            this.storeName = itemInf.storeName;
+            this.theItem = itemInf.theItem;
+            this.pricePerUnit = itemInf.pricePerUnit;
+        }
+        
+
+        public Result<IStore> GetStore()
+        {
+            if (this._store == null)
+            {
+                return Result.Fail<IStore>("No store assigned to item");
+            }
+            else
+            {
+                return Result.Ok(this._store);
+            }
+            
+        }
+
+        public Result AssignStoreToItem(IStore store)
+        {
+            if (store.GetStoreName().Equals(this.storeName))
+            {
+                this._store = store;
+                return Result.Ok();
+            }
+            else
+            {
+                return Result.Fail("Store assigned doesn't match item's store name");
+            }
         }
 
         public void ApplyUniqueDiscountOnProduct(double discountFactor)
