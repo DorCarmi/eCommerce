@@ -64,7 +64,7 @@ export class Login extends Component {
                         </select>
                         <div className="ConnectRegister">
                             <a href="/register">Create new account</a>
-                            <input type="submit" value="Login"/>
+                            <input class="action" type="submit" value="Login"/>
                         </div>
                     </form>
                 </div>
