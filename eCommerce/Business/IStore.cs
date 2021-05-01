@@ -17,6 +17,8 @@ namespace eCommerce.Business.Service
         public IList<Item> GetAllItems();
 
         public Result<Item> GetItem(ItemInfo item);
+
+        public Result TryGetItems(ItemInfo item);
         
         // TODO implement
         public Result<Item> GetItem(string itemId);
@@ -60,8 +62,8 @@ namespace eCommerce.Business.Service
 
         public String GetStoreName();
         bool CheckWithPolicy(PurchaseStrategyName purchaseStrategy);
-        bool TryAddNewCartToStore(Cart cart);
-        Result ConnectNewBasketToStore(Basket newBasket);
+        bool TryAddNewCartToStore(ICart cart);
+        Result ConnectNewBasketToStore(IBasket newBasket);
         bool CheckConnectionToCart(ICart cart);
         Result<double> CheckDiscount(Basket basket);
         Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy);

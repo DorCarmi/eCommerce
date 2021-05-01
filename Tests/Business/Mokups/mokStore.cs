@@ -27,6 +27,11 @@ namespace Tests.Business.Mokups
             return Result.Ok<Item>(this.item);
         }
 
+        public Result TryGetItems(ItemInfo item)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<Item> GetItem(string itemId)
         {
             throw new System.NotImplementedException();
@@ -141,13 +146,13 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public bool TryAddNewCartToStore(Cart cart)
+        public bool TryAddNewCartToStore(ICart cart)
         {
             Console.WriteLine("MokStore: Added New Cart To Store");
             return true;
         }
 
-        public Result ConnectNewBasketToStore(Basket newBasket)
+        public Result ConnectNewBasketToStore(IBasket newBasket)
         {
             Console.WriteLine("MockStore: Connected new basket to store");
             return Result.Ok();

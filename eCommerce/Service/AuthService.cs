@@ -1,4 +1,5 @@
-﻿using eCommerce.Auth;
+﻿using System;
+using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -34,6 +35,11 @@ namespace eCommerce.Service
 
         public void Disconnect(string token)
         {
+            // var arr=Enum.GetValues(typeof(StorePermission));
+            // foreach (var a in arr)
+            // {
+            //     a.ToString();
+            // }
             _marketFacade.Disconnect(token);
         }
 

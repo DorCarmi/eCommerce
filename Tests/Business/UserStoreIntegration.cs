@@ -82,5 +82,20 @@ namespace Tests.Business
             IList<Item> searchRes = _store.SearchItemWithCategoryFilter("Orange", _itemInfos[2].category);
             Assert.AreEqual(1, searchRes.Count);
         }
+
+        [Test]
+        public void AppointUsersTest()
+        {
+            User alice = new User(new MemberInfo("Alice","email@gmail.com",
+                "mycooluser",DateTime.Now,"Rager 16, Beer Sheva" ));
+            Store store = new Store("FOX", alice);
+            alice.OpenStore(store);
+
+            User bob = new User(new MemberInfo("Bob", "bob@gmail.com",
+                "coolbob", DateTime.Now, "Maccabi"));
+            var res = alice.AppointUserToManager(store, bob);
+            Assert.True(res.IsSuccess);
+
+        }
     }
 }

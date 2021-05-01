@@ -1,10 +1,17 @@
 ﻿using System.Collections.Generic;
+using eCommerce.Business.CombineRules;
+using eCommerce.Business.DiscountPoliciesCombination;
 using eCommerce.Common;
 
 namespace eCommerce.Business
 {
     public class DefaultDiscountStrategy: DiscountStrategy
     {
+        private CompositeComponent<DiscountRule> rules;
+
+        public DefaultDiscountStrategy()
+        {
+        }
         public Result<double> GetTotalPrice(IBasket basket)
         {
             if (basket.GetTotalPrice().GetValue() > 500)

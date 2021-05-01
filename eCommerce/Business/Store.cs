@@ -185,6 +185,11 @@ namespace eCommerce.Business
             
         }
 
+        public Result TryGetItems(ItemInfo item)
+        {
+            return this._inventory.TryGetItems(item);
+        }
+
         public Result FinishPurchaseOfBasket(IBasket basket)
         {
             foreach (var item in basket.GetAllItems().GetValue())
@@ -382,7 +387,7 @@ namespace eCommerce.Business
             return this._myPurchasePolicy.checkStrategy(purchaseStrategy);
         }
 
-        public bool TryAddNewCartToStore(Cart cart)
+        public bool TryAddNewCartToStore(ICart cart)
         {
             bool ans=true;
             foreach (var basket in this._basketsOfThisStore)
@@ -397,21 +402,30 @@ namespace eCommerce.Business
 
         }
 
-        public Result ConnectNewBasketToStore(Basket newBasket)
+        public Result ConnectNewBasketToStore(IBasket newBasket)
         {
-            foreach (var basket in _basketsOfThisStore)
+            if (_basketsOfThisStore.Count == 0)
             {
-                if (basket.GetCart() == newBasket.GetCart())
-                {
-                    return Result.Fail("Two baskets for the same store in cart");
-                }
-                else
-                {
-                    this._basketsOfThisStore.Add(newBasket);
-
-                }
+                this._basketsOfThisStore.Add(newBasket);
+                return Result.Ok();
             }
-            return Result.Ok();
+            else
+            {
+                foreach (var basket in _basketsOfThisStore)
+                {
+                    if (basket.GetCart() == newBasket.GetCart())
+                    {
+                        return Result.Fail("Two baskets for the same store in cart");
+                    }
+                    else
+                    {
+                        this._basketsOfThisStore.Add(newBasket);
+
+                    }
+                }
+
+                return Result.Ok();
+            }
         }
 
         public bool CheckConnectionToCart(ICart cart)
@@ -430,7 +444,7 @@ namespace eCommerce.Business
         public Result<double> CheckDiscount(Basket basket)
         {
             //No double discounts
-            double minValue = basket.GetTotalPrice().GetValue();
+            double minValue = basket.GetTotalPrice().Value;
             foreach (var strategy in this._myDiscountStrategies)
             {
                 var price = strategy.GetTotalPrice(basket);

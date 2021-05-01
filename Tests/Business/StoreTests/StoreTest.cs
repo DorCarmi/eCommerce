@@ -4,11 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using eCommerce.Adapters;
 using eCommerce.Business;
 using eCommerce.Business.Service;
+using eCommerce.Common;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
 using Tests.Business.Mokups;
+using Tests.Service;
 
 namespace Tests.Business.StoreTests
 {
@@ -25,6 +28,9 @@ namespace Tests.Business.StoreTests
             Alice = new mokUser("Alice");
             Bob = new mokUser("Bob");
             this.MyStore = new Store("Alenby", Alice);
+            SupplyProxy.AssignSupplyService(new mokSupplyService());
+            PaymentProxy.AssignPaymentService(new mokPaymentService());
+            
         }
         
         [SetUp]
@@ -64,6 +70,7 @@ namespace Tests.Business.StoreTests
         }
         
         [Test]
+        [Order(0)]
         public void TestItemsInStore()
         {
             Assert.AreEqual(0,MyStore.GetAllItems().Count);
@@ -102,21 +109,61 @@ namespace Tests.Business.StoreTests
             Assert.AreEqual(item1b.category, item1res2.Value.GetCategory().getName());
             Assert.AreEqual(item1b.pricePerUnit, item1res2.Value.GetPricePerUnit());
             Assert.AreNotEqual(0,item1b.keyWords.Count);
+            
+            Assert.Greater(MyStore.SearchItem("IPho").Count  ,0);
+            Assert.Greater(MyStore.SearchItem("Phone").Count ,0);
+            Assert.Greater(MyStore.SearchItem("Comp").Count  ,0);
+            Assert.Greater(MyStore.SearchItem("puters").Count,0 );
+            
+            Assert.Greater(MyStore.SearchItemWithCategoryFilter("IPho","Computers").Count  ,0);
+            Assert.AreEqual(MyStore.SearchItemWithCategoryFilter("Phone","Else").Count ,0);
 
-            //MyStore.EditItemToStore()
-            //MyStore.RemoveItemToStore()
-            //MyStore.SearchItemWithCategoryFilter()
-            //MyStore.SearchItemWithPriceFilter()
+            Assert.Greater(MyStore.SearchItemWithPriceFilter("IPho",1000,10000).Count  ,0);
+            Assert.AreEqual(MyStore.SearchItemWithPriceFilter("Phone",1000,1500).Count ,0);
+            
+            
+            var resRemove=MyStore.RemoveItemToStore(item1, Alice);
+            Assert.AreEqual(true,resRemove.IsSuccess);
+            Assert.AreEqual(false,MyStore.GetItem(item1).IsSuccess);
+            
         }
         
+        [Test]
         public void TestItemsStock()
         {
-            //MyStore.UpdateStock_AddItems()
-            //MyStore.UpdateStock_SubtractItems()
+            MyStore.AddItemToStore(item2, Alice);
+            Assert.AreEqual(item2.amount, MyStore.GetItem(item2).Value.GetAmount());
+
+            MyStore.UpdateStock_AddItems(item2, Alice);
+            Assert.AreEqual(2*item2.amount, MyStore.GetItem(item2).Value.GetAmount());
+            
+            MyStore.UpdateStock_SubtractItems(item2, Alice);
+            Assert.AreEqual(item2.amount, MyStore.GetItem(item2).Value.GetAmount());
+            
+            var resSubtract=MyStore.UpdateStock_SubtractItems(item2, Alice);
+            Assert.AreEqual(false,resSubtract.IsSuccess);
+
+            item2.amount -= 1;
+            resSubtract=MyStore.UpdateStock_SubtractItems(item2, Alice);
+            Assert.AreEqual(true,resSubtract.IsSuccess);
+            Assert.AreEqual(1, MyStore.GetItem(item2).Value.GetAmount());
         }
         
+        [Test]
         public void TestPurchaseProcess()
         {
+            
+            MyStore.AddItemToStore(item2, Alice);
+            ICart cart = new Cart(Alice);
+            item2.amount = 10;
+            cart.AddItemToCart(Alice, item2);
+            
+            Assert.AreEqual(true,cart.BuyWholeCart(Alice,
+                new PaymentInfo("Alice", "369852147", "7894789478947894", "05/23", "123",
+                    "Even Gavirol 30, TLV, Israel")).IsSuccess);
+
+            //Assert.AreEqual(true,MyStore.FinishPurchaseOfBasket(basket));
+
             //MyStore.CatchAllBasketProducts()
             //MyStore.CalculateBasketPrices()
             //MyStore.FinishPurchaseOfBasket()
@@ -126,7 +173,7 @@ namespace Tests.Business.StoreTests
 
         public void TestStoreInfoAndPolicy()
         {
-            //MyStore.GetStoreName()
+            Assert.AreEqual("Alenby",MyStore.GetStoreName());
             //MyStore.CheckWithPolicy()
             //MyStore.UpdatePurchaseStrategies()
             //MyStore.AddPurchaseStrategyToStore()
@@ -135,15 +182,33 @@ namespace Tests.Business.StoreTests
             //MyStore.RemovePurchaseStrategyToStoreItem()
             
         }
-
+        
+        [Test]
         public void TestBasketsInStore()
         {
-            //MyStore.ConnectNewBasketToStore()
+            MyStore.AddItemToStore(item2, Alice);
+            ICart cart = new Cart(Alice);
+            Assert.AreEqual(false, MyStore.CheckConnectionToCart(cart));
+            Assert.AreEqual(true,MyStore.TryAddNewCartToStore(cart));
+            IBasket basket = new Basket(cart, MyStore);
+            var resBasket=MyStore.ConnectNewBasketToStore(basket);
+            Assert.AreEqual(true,resBasket.IsSuccess);
+            resBasket = MyStore.ConnectNewBasketToStore(basket);
+            Assert.AreEqual(false,resBasket.IsSuccess);
+            Assert.AreEqual(true, MyStore.CheckConnectionToCart(cart));
             //MyStore.CheckConnectionToCart()
             //MyStore.AddBasketToStore()
-            //MyStore.CalculateBasketPrices()
-            //MyStore.GetStorePurchaseStrategy()
-            //MyStore.TryAddNewCartToStore()
+            item2.amount = 5;
+            var resAddItemToBasket=basket.AddItemToBasket(Alice, item1);
+            Assert.AreEqual(false,resAddItemToBasket.IsSuccess);
+            resAddItemToBasket=basket.AddItemToBasket(Alice, item2);
+            Assert.AreEqual(true,resAddItemToBasket.IsSuccess);
+
+            MyStore.CalculateBasketPrices(basket);
+            Assert.AreEqual(true,basket.GetTotalPrice().IsSuccess);
+            Assert.AreEqual(item2.amount*item2.pricePerUnit*0.9 ,basket.GetTotalPrice().Value);
+
+            Assert.AreEqual(false,MyStore.TryAddNewCartToStore(cart));
         }
 
         public void TestHistory()

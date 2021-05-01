@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace eCommerce.Business
 {
@@ -91,7 +92,7 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    var newItem = new Item(itemInfo);
+                    var newItem = new Item(itemInfo,_belongsToStore);
                     this._itemsInStore.Add(newItem);
                     this._nameToItem.Add(itemInfo.name, newItem);
                     return Result.Ok();
@@ -177,6 +178,26 @@ namespace eCommerce.Business
             return Result.Fail<Item>("Couldn't find item in store's inventory");
         }
         
+        public Result TryGetItems(ItemInfo item)
+        {
+            foreach (var curItem in _itemsInStore)
+            {
+                if (curItem.GetName().Equals(item.name))
+                {
+                    if (curItem.GetAmount() - item.amount < 1)
+                    {
+                        return Result.Fail("Not enough items in store");
+                    }
+                    else
+                    {
+                        return Result.Ok();
+                    }
+                }
+            }
+
+            return Result.Fail("Couldn't find item in store's inventory");
+        }
+        
         public Result<Item> GetItem(string itemID)
         {
             if(this._nameToItem.ContainsKey(itemID))
@@ -219,7 +240,7 @@ namespace eCommerce.Business
             {
                 if (this._nameToItem.ContainsKey(newItemName))
                 {
-                    return this._nameToItem[newItemName].AddItems(user, newItemAmount);
+                    return this._nameToItem[newItemName].SubtractItems(user, newItemAmount);
                 }
                 else
                 {

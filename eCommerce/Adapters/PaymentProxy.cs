@@ -5,18 +5,22 @@ namespace eCommerce.Adapters
 {
     public class PaymentProxy : IPaymentAdapter
     {
-        private IPaymentAdapter _adapter;
+        private static IPaymentAdapter _adapter;
 
         public PaymentProxy()
         {
-            _adapter = null;
+        }
+
+        public static void AssignPaymentService(IPaymentAdapter paymentAdapter)
+        {
+            _adapter = paymentAdapter;
         }
         
         public async Task<bool> Charge(double price, string paymentInfoUserName, string paymentInfoIDNumber, string paymentInfoCreditCardNumber, string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)
         {
             if (_adapter == null)
             {
-                await Task.Delay(100);
+                await Task.Delay(5000);
                 return true;
             }
 
