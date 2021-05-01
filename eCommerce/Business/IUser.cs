@@ -22,7 +22,7 @@ namespace eCommerce.Business
         public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission);
 
         
-        public Result<IList<IUser>> GetAllStoreStakeholders(IStore store);
+        // public Result<IList<IUser>> GetAllStoreStakeholders(IStore store);
         public Result<IList<PurchaseRecord>> GetUserPurchaseHistory();
         public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IUser otherUser);
         public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(IStore store);

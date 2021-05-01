@@ -109,13 +109,13 @@ namespace Tests.Mokups
 
         public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment)
         {
-            Console.WriteLine("MokStore: Appointed new Owner: "+user.Username);
+            Console.WriteLine("MokStore: "+user.Username+" Appointed new Owner: "+ownerAppointment.User.Username);
             return Result.Ok();
         }
 
         public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment)
         {
-            Console.WriteLine("MokStore: Appointed new Manager: "+user.Username);
+            Console.WriteLine("MokStore: "+user.Username+" Appointed new Manager: "+managerAppointment.User.Username);
             return Result.Ok();
         }
 
