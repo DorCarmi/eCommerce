@@ -19,5 +19,11 @@
             ThreeDigitsOnBackOfCard = threeDigitsOnBackOfCard;
             FullAddress = fullAddress;
         }
+
+        public override string ToString()
+        {
+            return $"Username: {UserName}\nId number: {IDNumber}\nCredit card: {CreditCardNumber}\n" +
+                   $"Card expiration date: {CreditCardExpirationDate}\nSecurity digits:{ThreeDigitsOnBackOfCard}\n";
+        }
     }
 }

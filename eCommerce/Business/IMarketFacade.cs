@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using eCommerce.Service;
 
 namespace eCommerce.Business
 {
@@ -60,6 +61,8 @@ namespace eCommerce.Business
         /// <returns>New guest Authorization token</returns>
         public Result<string> Logout(string token);
         
+        bool IsUserConnected(string token);
+
         /// <summary>
         /// Get the purchase history of the user 
         /// </summary>
@@ -336,7 +339,5 @@ namespace eCommerce.Business
         
 
         #endregion
-        
-
     }
 }
