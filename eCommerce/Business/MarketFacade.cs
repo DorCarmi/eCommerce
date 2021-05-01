@@ -87,7 +87,12 @@ namespace eCommerce.Business
         {
             return _userManager.Logout(token);
         }
-        
+
+        public bool IsUserConnected(string token)
+        {
+            return _userManager.IsUserConnected(token);
+        }
+
         //<CNAME>PersonalPurchaseHistory</CNAME>
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(string token)
         {
