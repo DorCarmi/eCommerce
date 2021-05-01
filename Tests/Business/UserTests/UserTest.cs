@@ -7,9 +7,9 @@ using eCommerce.Business;
 using eCommerce.Common;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Tests.Mokups;
+using Tests.Business.Mokups;
 
-namespace Tests
+namespace Tests.Business.UserTests
 {
     public class UserTest
     {
