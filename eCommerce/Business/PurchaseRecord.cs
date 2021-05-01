@@ -1,9 +1,10 @@
 ﻿using System;
 using eCommerce.Business.Service;
+using eCommerce.Service;
 
 namespace eCommerce.Business
 {
-    public class PurchaseRecord : IPurchaseHistory
+    public class PurchaseRecord
     {
         private StoreInfo _storeInfo;
         private BasketInfo _basketInfo;
