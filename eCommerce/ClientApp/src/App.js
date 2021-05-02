@@ -32,10 +32,10 @@ export default class App extends Component {
       });
   }
 
-    addStoreHandler(storeName){
-      alert(storeName)
+    addStoreHandler(store){
+      alert(store)
         this.setState({
-            storeList:[...this.state.storeList, storeName]
+            storeList:[...this.state.storeList, store]
         });
     }
 
@@ -46,8 +46,10 @@ export default class App extends Component {
             <Route exact path='/' component={Home} />
             <Route path='/login' component={() => <Login setLoginState={this.setLoginHandler}/>} />
             <Route path='/register' component={Register} />
-            <Route path='/store/:id' exact component={()=><Store/>} />
-            <Route path='/openStore' exact component={OpenStore} />
+              <Route exact path="/store/:id" render={({match}) => (<Store storeId={match.params.id} 
+                                                                          storeList={this.state.storeList} />
+              )} />            
+              <Route path='/openStore' exact component={() => <OpenStore addStoreToState={this.addStoreHandler}/>} />
 
 
           </Layout>

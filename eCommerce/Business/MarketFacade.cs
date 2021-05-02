@@ -518,12 +518,13 @@ namespace eCommerce.Business
                 return Result.Fail("Store name taken");
             }
 
-            if (user.OpenStore(newStore).IsFailure)
+            Result res = user.OpenStore(newStore);
+            if (res.IsFailure)
             {
-                return Result.Fail("Error");
+                _storeRepository.Remove(newStore.GetStoreName());
             }
 
-            return Result.Ok();
+            return res;
         }
         
         //<CNAME>ItemsToStore</CNAME>

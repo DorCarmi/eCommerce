@@ -68,6 +68,15 @@ namespace eCommerce.Controllers
                     loginInfo.Username, loginInfo.Password, serviceRole);
                 if (loginRes.IsSuccess)
                 {
+                    Response.Cookies.Append("_auth", loginRes.Value, new CookieOptions()
+                    {
+                        Path = "/",
+                        Secure = true,
+                        MaxAge = TimeSpan.FromDays(5),
+                        Domain = Request.PathBase.Value,
+                        Expires = DateTimeOffset.Now.AddDays(5),
+                        HttpOnly = true
+                    });
                     Response.Headers.Add("RedirectTo", "/");
                 }
                 

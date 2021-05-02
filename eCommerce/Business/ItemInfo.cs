@@ -78,7 +78,7 @@ namespace eCommerce.Business
         public string StoreName { get => storeName; }
         public int Amount { get => amount; }
         public string Category { get => category; }
-        public ReadOnlyCollection<string> KeyWords { get => new ReadOnlyCollection<string>(keyWords); }
+        public List<string> KeyWords { get => new List<string>(keyWords); }
         public double PricePerUnit { get => pricePerUnit; }
     }
 }

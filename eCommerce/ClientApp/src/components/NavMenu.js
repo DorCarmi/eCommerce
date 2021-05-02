@@ -79,7 +79,7 @@ export class NavMenu extends Component {
                     {storeList.map ((store,index) =>{
                       return(
                         <NavItem>
-                          <NavLink tag={Link} className="text-dark" to={`/store/${index}`}>{store}</NavLink>
+                          <NavLink tag={Link} className="text-dark" to={`/store/${index}`}>{store.storeId}</NavLink>
                         </NavItem>)})}
                    </DropdownButton> : null
                     }

@@ -25,7 +25,7 @@ export class StoreApi {
                 return new Result(res.data)
                 
             })
-            .catch(res => undefined);
+            .catch(res => res);
     }
 
 
