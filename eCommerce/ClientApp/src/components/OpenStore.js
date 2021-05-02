@@ -58,13 +58,13 @@ export default class OpenStore extends Component {
                                 placeholder={'Enter Item Name'} required/>
                         <input type="text" name="storeId" value={this.state.storeId}
                                placeholder={'Enter Store Id'} onChange={this.handleInputChange} required/>
-                        <input type="text" name="amount" value={this.state.amount} onChange={this.handleInputChange}
+                        <input type="number" name="amount" value={this.state.amount} onChange={this.handleInputChange}
                                placeholder={'Enter amount'} required/>
                         <input type="text" name="category" value={this.state.category} onChange={this.handleInputChange}
                                placeholder={'Enter Item Category'} required/>
                         <input type="text" name="keyWords" value={this.state.keyWords} onChange={this.handleInputChange}
                                placeholder={'Enter Item keyWords'} required/>
-                        <input type="text" name="price" value={this.state.price} onChange={this.handleInputChange}
+                        <input type="number" name="price" value={this.state.price} onChange={this.handleInputChange}
                                placeholder={'Enter Item price'} required/>
                         <div className="CenterItemContainer">
                             <input className="action" type="submit" value="submit"/>

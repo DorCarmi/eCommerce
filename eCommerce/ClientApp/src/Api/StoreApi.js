@@ -14,12 +14,12 @@ export class StoreApi {
     static openStore(name,storeId,amount,category,keyWords,price) {
         return instance.post(OPEN_STORE_PATH,
             {
-                ItemName : name,
-                StoreName : storeId,
-                Amount : amount,
-                Category:category,
-                KeyWords:[keyWords],
-                PricePerUnit:price
+                itemName: name,
+                storeName: storeId,
+                amount: amount,
+                category: category,
+                keyWords: [keyWords],
+                pricePerUnit:price
             })
             .then(res => {
                 return new Result(res.data)
