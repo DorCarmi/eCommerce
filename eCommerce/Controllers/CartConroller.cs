@@ -18,7 +18,7 @@ namespace eCommerce.Controllers
 
 
 
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class CartController : Controller
     {
         private readonly ILogger<CartController> _logger;

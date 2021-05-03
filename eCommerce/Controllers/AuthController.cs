@@ -27,7 +27,7 @@ namespace eCommerce.Controllers
 
 
 
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AuthController : Controller
     {
         private readonly ILogger<AuthController> _logger;
