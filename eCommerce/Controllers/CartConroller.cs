@@ -1,4 +1,5 @@
 ﻿using System;
+using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +9,12 @@ using Microsoft.Extensions.Logging;
 namespace eCommerce.Controllers
 {
 
-
+    public class AddOrEditItemData
+    {
+        public string StoreId { get; set; }
+        public string ItemId { get; set; }
+        public int Amount { get; set; }
+    }
 
 
 
@@ -28,36 +34,42 @@ namespace eCommerce.Controllers
         // the route is /Store/OpenStore  
         //removes "Controller" from the class name and add the name of the function as an endpoint 
 
+        [HttpPost]
+        [Route("[action]")]
+        public Result AddItem([FromBody] AddOrEditItemData addItemData)
+        {
+            return _cartService.AddItemToCart((string) HttpContext.Items["authToken"],
+                addItemData.ItemId, addItemData.StoreId, addItemData.Amount);
+        }
+        
+        [HttpPost]
+        [Route("[action]")]
+        public Result EditItemAmount([FromBody] AddOrEditItemData editItemData)
+        {
+            return _cartService.EditItemAmountOfCart((string) HttpContext.Items["authToken"],
+                editItemData.ItemId, editItemData.StoreId, editItemData.Amount);
+        }
+        
         [HttpGet]
         [Route("[action]")]
-        public Result GetCart()
+        public Result<SCart> GetCart()
         {
             return _cartService.GetCart((string) HttpContext.Items["authToken"]);
         }
         
-        // [HttpPost]
-        // [Route("[action]")]
-        // public Result Register([FromBody] MemberInfo memberInfo)
-        // {
-        //     Result registerRes = _authService.Register((string) HttpContext.Items["authToken"],
-        //         memberInfo, memberInfo.Password);
-        //     if (registerRes.IsSuccess)
-        //     {
-        //         Response.Headers.Add("RedirectTo", "/");
-        //     }
-        //     /* if (Enum.TryParse<ServiceUserRole>(memberInfo.D, true, out var serviceRole))
-        //      {
-        //          Result<string> loginRes = _authService.Login((string) HttpContext.Items["authToken"],
-        //              loginInfo.Username, loginInfo.Password, serviceRole);
-        //          if (loginRes.IsSuccess)
-        //          {
-        //              Response.Headers.Add("RedirectTo", "/");
-        //          }
-        //          
-        //          return loginRes;
-        //      }*/
-        //
-        //     return registerRes;
-        // }
+        [HttpGet]
+        [Route("[action]")]
+        public Result<double> GetPurchasePrice()
+        {
+            return _cartService.GetPurchaseCartPrice((string) HttpContext.Items["authToken"]);
+        }
+        
+        [HttpPost]
+        [Route("[action]")]
+        public Result PurchaseCart([FromBody] PaymentInfo paymentInfo)
+        {
+            return _cartService.PurchaseCart((string) HttpContext.Items["authToken"],
+                paymentInfo);
+        }
     }
 }

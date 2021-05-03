@@ -4,8 +4,8 @@ import { authApi } from "../Api/AuthApi"
 import "./Login.css"
 import {Link} from "react-router-dom";
 
-class Login extends Component {
-    static displayName = Login.name;
+class Cart extends Component {
+    static displayName = Cart.name;
 
     constructor(props) {
         super(props);
