@@ -40,6 +40,11 @@ export class NavMenu extends Component {
                   <NavLink tag={Link} className="text-dark" to="/login">{this.props.state.isLoggedIn ? null : "Login"}</NavLink>
                 </NavItem>
 
+                <NavItem>
+                  <NavLink tag={Link} className="text-dark" to="/Cart">
+                    <img src="/Images/cart.png" alt="Cart" class="image"/>
+                  </NavLink>
+                </NavItem>
 
                 {isLoggedIn? <>
                   <DropdownButton id="dropdown-basic-button" title="My Cart">

@@ -5,6 +5,7 @@ import { Home } from './components/Home';
 import Login from "./components/Login";
 import Store from './components/Store'
 import OpenStore from "./components/OpenStore";
+import { Cart } from "./components/Cart"
 import Register from "./components/Register";
 import './custom.css'
 import {BrowserRouter} from "react-router-dom";
@@ -46,6 +47,7 @@ export default class App extends Component {
             <Route exact path='/' component={Home} />
             <Route path='/login' component={() => <Login setLoginState={this.setLoginHandler}/>} />
             <Route path='/register' component={Register} />
+              <Route path='/cart' component={Cart} />
               <Route exact path="/store/:id" render={({match}) => (<Store storeId={match.params.id} 
                                                                           storeList={this.state.storeList} />
               )} />            

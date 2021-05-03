@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <Folder Include="Adapters" />
+      <Folder Include="ClientApp\public\Images" />
     </ItemGroup>
 
     <ItemGroup>
