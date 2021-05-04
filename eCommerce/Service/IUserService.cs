@@ -70,5 +70,12 @@ namespace eCommerce.Service
         /// <param name="storeId">The store id</param>
         /// <returns>The history purchase</returns>
         public Result<SPurchaseHistory> AdminGetPurchaseHistoryStore(string token, string storeID);
+
+        /// <summary>
+        /// Get all the owned store id
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <returns>All the owned store id</returns>
+        public Result<List<string>> GetAllStoreIds(string token);
     }
 }

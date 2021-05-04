@@ -383,9 +383,19 @@ namespace eCommerce.Business
 
             return Result.Ok<IItem>(itemRes.Value.ShowItem());
         }
-        
-        
-        
+
+        public Result<List<string>> GetStoreIds(string token)
+        {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<List<string>>(userRes.Error);
+            }
+            IUser user = userRes.Value;
+
+            return user.GetStoreIds();
+        }
+
         #endregion
 
         #region UserBuyingFromStores

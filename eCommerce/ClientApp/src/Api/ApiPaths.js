@@ -23,4 +23,9 @@ export const ADD_ITEM_TO_CART_PATH = CART_PATH + '/addItem';
 export const EDIT_ITEM_IN_CART_PATH = CART_PATH + '/editItemAmount';
 export const GET_CART_PATH = CART_PATH + '/getCart';
 export const GET_PURCHASE_PRICE_CART_PATH = CART_PATH + "/getPurchasePrice";
-export const PURCHASE_CART_PATH = CART_PATH + "/PurchaseCart"
+export const PURCHASE_CART_PATH = CART_PATH + "/PurchaseCart";
+
+// ========= User ========== //
+
+export const USER_PATH = API_PATH + '/user';
+export const GET_ALL_OWNED_STORES = USER_PATH + '/getALlStoreIds';

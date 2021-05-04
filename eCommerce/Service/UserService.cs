@@ -76,5 +76,10 @@ namespace eCommerce.Service
 
             return Result.Ok(new SPurchaseHistory(purchaseRecordRes.Value));
         }
+
+        public Result<List<string>> GetAllStoreIds(string token)
+        {
+            return _marketFacade.GetStoreIds(token);
+        }
     }
 }

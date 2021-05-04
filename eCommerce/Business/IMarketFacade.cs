@@ -213,6 +213,13 @@ namespace eCommerce.Business
         /// <returns>The item information</returns>
         public Result<IItem> GetItem(string token, string storeId, string itemId);
         
+        /// <summary>
+        /// Get all the store ids of the user owns
+        /// </summary>
+        /// <param name="token">The Authorization token</param>
+        /// <returns>All the owned store ids</returns>
+        public Result<List<string>> GetStoreIds(string token);
+        
         #endregion
         
         // ========== Store ========== //

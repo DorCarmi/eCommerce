@@ -17,7 +17,7 @@ namespace eCommerce.Business
                 return state;  
             }  
         }
-        
+
         public Result Login(User user,UserToSystemState systemState, MemberData memberData)
         {
             return Result.Fail("Illegal action for member (login).");
@@ -31,6 +31,18 @@ namespace eCommerce.Business
         public Result OpenStore(User user,IStore store)
         {
             return user.OpenStore(this, store);
+        }
+
+        public Result<List<string>> GetStoreIds(User user)
+        {
+            List<string> storeIds = new List<string>();
+            
+            foreach (var store in user.StoresOwned.Keys)
+            {
+                storeIds.Add(store.GetStoreName());
+            }
+
+            return Result.Ok(storeIds);
         }
 
 
