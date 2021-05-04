@@ -23,7 +23,6 @@ export default class App extends Component {
       
       this.setLoginHandler = this.setLoginHandler.bind(this);
       this.addStoreHandler = this.addStoreHandler.bind(this);
-
   }
   
   setLoginHandler(username){
@@ -34,26 +33,24 @@ export default class App extends Component {
   }
 
     addStoreHandler(store){
-      alert(store)
+      alert("in app add store handler" + store)
         this.setState({
             storeList:[...this.state.storeList, store]
         });
     }
 
-  render () {
+    render () {
     return (
-        <BrowserRouter>>
+        <BrowserRouter>
           <Layout state={this.state}>
             <Route exact path='/' component={Home} />
             <Route path='/login' component={() => <Login setLoginState={this.setLoginHandler}/>} />
-            <Route path='/register' component={Register} />
+            <Route path='/register' component={Register}/>
               <Route path='/cart' component={Cart} />
               <Route exact path="/store/:id" render={({match}) => (<Store storeId={match.params.id} 
                                                                           storeList={this.state.storeList} />
               )} />            
               <Route path='/openStore' exact component={() => <OpenStore addStoreToState={this.addStoreHandler} history={useHistory()}/>} />
-
-
           </Layout>
         </BrowserRouter>
     );

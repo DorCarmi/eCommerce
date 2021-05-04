@@ -14,7 +14,7 @@ export const ADD_ITEM_TO_STORE_PATH = STORE_PATH + '/addItem';
 export const REMOVE_ITEM_FROM_STORE_PATH = STORE_PATH + '/removeItem';
 export const EDIT_ITEM_IN_STORE_PATH = STORE_PATH + '/editItem';
 export const GET_ITEM_IN_STORE_PATH = STORE_PATH + '/getItem';
-export function GET_ALL_ITEMS_IN_STORE_PATH(storeId){ return STORE_PATH + '/getItem/' + storeId }
+export function GET_ALL_ITEMS_IN_STORE_PATH(storeId){ return STORE_PATH + '/getAllItems/' + storeId }
 
 // ========= Cart ========== //
 

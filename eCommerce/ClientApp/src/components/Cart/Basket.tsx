@@ -16,10 +16,12 @@ export class Basket extends Component<BasketProps> {
 
     renderItem(item: Item) {
         return (
-            <div class="horizontalBorders">
-                <div class="basketItemsContainer">
+            <div className="horizontalBorders">
+                <div className="basketItemsContainer">
                     <label>Item: {item.itemName}</label>
-                    <label>Amount: {item.amount}</label>
+                    <div>
+                        Amount: <input>{item.amount}</input>
+                    </div>
                 </div>
             </div>
         )

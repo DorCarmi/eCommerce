@@ -71,7 +71,7 @@ export class Cart extends Component<{}, CartState> {
             <div>
                 {renderedBaskets}
             </div>
-        )
+        ) 
     }
     
     render() {
