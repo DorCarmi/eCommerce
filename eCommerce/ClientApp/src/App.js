@@ -9,6 +9,7 @@ import { Cart } from "./components/Cart"
 import Register from "./components/Register";
 import './custom.css'
 import {BrowserRouter,useHistory} from "react-router-dom";
+import {UserApi} from "./Api/UserApi";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -31,6 +32,14 @@ export default class App extends Component {
           isLoggedIn: true,
           username: username
       });
+  }
+  async componentDidMount() {
+      const fetchedStoredList = await UserApi.getAllOwnedStoreIds()
+      if (fetchedStoredList && fetchedStoredList.isSuccess) {
+          this.setState({
+              storeList: fetchedStoredList.value
+          })
+      }
   }
 
     addStoreHandler(store){

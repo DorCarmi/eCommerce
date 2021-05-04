@@ -21,14 +21,7 @@ export class NavMenu extends Component {
       isLoggedIn:this.props.state.isLoggedIn
     };
   }
-  async componentDidMount() {
-      const fetchedStoredList = await UserApi.getAllOwnedStoreIds()
-      if (fetchedStoredList && fetchedStoredList.isSuccess) {
-        this.setState({
-          storeList: fetchedStoredList.value
-        })
-      }
-    }
+
 
   toggleNavbar () {
     this.setState({
@@ -37,7 +30,7 @@ export class NavMenu extends Component {
   }
 
   render () {
-    const {isLoggedIn} = this.props.state
+    const {isLoggedIn,storeList} = this.props.state
     return (
       <header>
         <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
@@ -89,7 +82,7 @@ export class NavMenu extends Component {
                   </NavItem> </>: null}
 
                 {/*show stores*/}
-                {isLoggedIn && this.state.storeList && this.state.storeList.length > 0  ?
+                {isLoggedIn &&  storeList.length > 0  ?
                   <DropdownButton id="dropdown-basic-button" title="My Store List">
                     {this.state.storeList.map ((store) =>{
                       return(
