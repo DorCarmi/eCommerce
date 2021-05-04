@@ -7,7 +7,7 @@ import {
     GET_PURCHASE_PRICE_CART_PATH,
     PURCHASE_CART_PATH
 } from "./ApiPaths";
-import {CartData} from "../Data/CartData";
+import {CartData, CartDataType} from "../Data/CartData";
 
 const instance = axios.create(
     {withCredentials : true}
@@ -16,30 +16,26 @@ const instance = axios.create(
 export class CartApi {
 
     static getCart() {
-        return instance.get(GET_CART_PATH)
+        return instance.get<Result<CartDataType>>(GET_CART_PATH)
             .then(res => {
-                res = new Result(res.data)
-                if(res.isSuccess){
-                    res.value = new CartData(res.value)
-                }
                 return res;
             })
     };
 
-    static AddItem(itemId, storeId, amount) {
-        return instance.post(ADD_ITEM_TO_CART_PATH, 
+    static AddItem(itemId: string, storeId: string, amount: number) {
+        return instance.post<Result<any>>(ADD_ITEM_TO_CART_PATH, 
             {
                 itemId: itemId,
                 storeId: storeId,
                 amount: amount
             })
             .then(res => {
-                return new Result(res.data)
+                return res
             })
     };
 
-    static EditItemAmount(itemId, storeId, amount) {
-        return instance.post(EDIT_ITEM_IN_CART_PATH,
+    static EditItemAmount(itemId: string, storeId: string, amount: number) {
+        return instance.post<Result<any>>(EDIT_ITEM_IN_CART_PATH,
             {
                 itemId: itemId,
                 storeId: storeId,
@@ -51,16 +47,16 @@ export class CartApi {
     };
 
     static GetPurchasePrice() {
-        return instance.get(GET_PURCHASE_PRICE_CART_PATH)
+        return instance.get<Result<number>>(GET_PURCHASE_PRICE_CART_PATH)
             .then(res => {
-                return new Result(res.data)
+                return res;
             })
     };
 
-    static PurchasePrice(userName, idNumber, creditCardNumber, 
-                         creditCardExpirationDate, threeDigitsOnBackOfCard, 
-                         fullAddress) {
-        return instance.post(PURCHASE_CART_PATH,
+    static PurchasePrice(userName: string, idNumber: string, creditCardNumber: string, 
+                         creditCardExpirationDate: string, threeDigitsOnBackOfCard: string, 
+                         fullAddress: string) {
+        return instance.post<Result<any>>(PURCHASE_CART_PATH,
             {
                 userName: userName,
                 IDNumber: idNumber,
@@ -70,7 +66,7 @@ export class CartApi {
                 FullAddress: fullAddress
             })
             .then(res => {
-                return new Result(res.data)
+                return res;
             })
     };
 }

@@ -19,7 +19,7 @@ namespace eCommerce.Service
             IList<SBasket> SBaskets = new List<SBasket>();
             foreach (var basket in baskets)
             {
-                SBaskets.Add(new SBasket(basket.GetAllItems().Value as IList<IItem>, basket.GetTotalPrice().Value));
+                SBaskets.Add(new SBasket(basket.GetStoreName() ,basket.GetAllItems().Value as IList<IItem>, basket.GetTotalPrice().Value));
             }
         }
     }

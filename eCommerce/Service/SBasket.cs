@@ -6,17 +6,20 @@ namespace eCommerce.Service
 {
     public class SBasket
     {
+        public string StoreId { get; }
         public IList<IItem> Items { get; }
         public double TotalPrice { get; }
 
-        public SBasket(IList<IItem> items, double totalPrice)
+        public SBasket(string storeId, IList<IItem> items, double totalPrice)
         {
+            StoreId = storeId;
             Items = items;
             TotalPrice = totalPrice;
         }
 
-        internal SBasket(BasketInfo basketInfo)
+        internal SBasket(string storeId, BasketInfo basketInfo)
         {
+            StoreId = storeId;
             Items = new List<IItem>(basketInfo.ItemsInBasket);
             TotalPrice = basketInfo.TotalPrice;
         }
