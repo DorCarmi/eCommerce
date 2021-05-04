@@ -74,7 +74,7 @@ export class StoreApi {
         return instance.get(GET_ALL_ITEMS_IN_STORE_PATH(storeId))
             .then(res => {
                 return new Result(res.data)
-            })
+            }).catch(err => undefined)
     }
     
 }

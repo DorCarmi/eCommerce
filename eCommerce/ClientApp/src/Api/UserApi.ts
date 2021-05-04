@@ -10,12 +10,15 @@ const instance = axios.create(
 
 
 
-export class StoreApi {
+export class UserApi {
     
     static getAllOwnedStoreIds() {
         return instance.get(GET_ALL_OWNED_STORES)
             .then(res => {
                 return new Result<string[]>(res.data)
+            })
+            .catch(err => {
+                return undefined
             })
         }
 }

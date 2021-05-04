@@ -8,7 +8,7 @@ import OpenStore from "./components/OpenStore";
 import { Cart } from "./components/Cart"
 import Register from "./components/Register";
 import './custom.css'
-import {BrowserRouter} from "react-router-dom";
+import {BrowserRouter,useHistory} from "react-router-dom";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -51,7 +51,7 @@ export default class App extends Component {
               <Route exact path="/store/:id" render={({match}) => (<Store storeId={match.params.id} 
                                                                           storeList={this.state.storeList} />
               )} />            
-              <Route path='/openStore' exact component={() => <OpenStore addStoreToState={this.addStoreHandler}/>} />
+              <Route path='/openStore' exact component={() => <OpenStore addStoreToState={this.addStoreHandler} history={useHistory()}/>} />
 
 
           </Layout>

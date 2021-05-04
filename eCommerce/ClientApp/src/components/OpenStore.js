@@ -28,7 +28,7 @@ export default class OpenStore extends Component {
 
     redirectToHome = (path) => {
         const { history } = this.props;
-        if(history) history.push(path);
+        history.push('/path')
     }
 
     async handleSubmit(event){
@@ -37,7 +37,6 @@ export default class OpenStore extends Component {
         const res = await StoreApi.openStore(name,storeId,amount,category,keyWords,price)
         if(res && res.isSuccess) {
             alert('add item succeed')
-            this.props.addStoreToState(this.state)
             this.redirectToHome('/')
         }
         else{
