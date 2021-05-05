@@ -8,6 +8,7 @@ import OpenStore from "./components/OpenStore";
 import { Cart } from "./components/Cart"
 import Register from "./components/Register";
 import './custom.css'
+import AddItem from './components/AddItem'
 import {BrowserRouter,useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 
@@ -48,6 +49,15 @@ export default class App extends Component {
         });
     }
 
+    redirectToHome = (path) => {
+        alert(path)
+        const { history } = this.props;
+        if(history) {
+            alert('succed')
+            history.push(path);
+        }
+    }
+
     render () {
     return (
         <BrowserRouter>
@@ -56,10 +66,11 @@ export default class App extends Component {
             <Route path='/login' component={() => <Login setLoginState={this.setLoginHandler}/>} />
             <Route path='/register' component={Register}/>
               <Route path='/cart' component={Cart} />
-              <Route exact path="/store/:id" render={({match}) => (<Store storeId={match.params.id} 
-                                                                          storeList={this.state.storeList} />
+              <Route exact path="/store/:id" render={({match}) => (<Store  storeId={match.params.id} 
+                                                                          storeList={this.state.storeList} redirect={this.redirectToHome}/>
               )} />            
               <Route path='/openStore' exact component={() => <OpenStore addStoreToState={this.addStoreHandler} history={useHistory()}/>} />
+              <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
           </Layout>
         </BrowserRouter>
     );

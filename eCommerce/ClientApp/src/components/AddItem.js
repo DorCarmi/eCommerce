@@ -6,15 +6,15 @@ import {withRouter} from "react-router-dom";
 
 
 
-class OpenStore extends Component {
-    static displayName = OpenStore.name;
+class AddItem extends Component {
+    static displayName = AddItem.name;
 
     constructor(props) {
         super(props)
         this.state = {
-            name:'',
-            storeId:'',
+            itemName:'',
             amount:undefined,
+            storeId:'',
             category:'',
             keyWords:'',
             price:undefined
@@ -32,7 +32,8 @@ class OpenStore extends Component {
     async handleSubmit(event){
         const {name,storeId,amount,category,keyWords,price} = this.state
         event.preventDefault();
-        const res = await StoreApi.openStore(name,storeId,amount,category,keyWords,price)
+        const res = await StoreApi.addItem({'ItemName':name,'StoreName':this.props.storeId,
+                                                'Category':category,'Amount':amount,'KeyWords':keyWords,'PricePerUnit':price})
         if(res && res.isSuccess) {
             alert('add item succeed')
             // this.props.addStoreToState(storeId);
@@ -56,14 +57,11 @@ class OpenStore extends Component {
             <main className="RegisterMain">
                 <div className="RegisterWindow">
                     <div className="CenterItemContainer">
-                        <h3>Open store</h3>
+                        <h3>Add an Item</h3>
                     </div>
                     <form className="RegisterForm" onSubmit={this.handleSubmit}>
-                        <input type="text" name="storeId" value={this.state.storeId}
-                               placeholder={'Enter Store Id'} onChange={this.handleInputChange} required/>
-                        <h5>Item info:</h5>       
-                        <input type="text" name="name" value={this.state.name} onChange={this.handleInputChange}
-                                placeholder={'Enter Item Name'} required/>
+                        <input type="text" name="itemName" value={this.state.itemName}
+                               placeholder={'Enter Item Name'} onChange={this.handleInputChange} required/>
                         <input type="number" name="amount" value={this.state.amount} onChange={this.handleInputChange}
                                placeholder={'Enter amount'} required/>
                         <input type="text" name="category" value={this.state.category} onChange={this.handleInputChange}
@@ -82,4 +80,4 @@ class OpenStore extends Component {
     }
 }
 
-export default withRouter(OpenStore);
+export default withRouter(AddItem);

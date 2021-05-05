@@ -1,6 +1,9 @@
 ﻿import React, {Component} from "react";
 import {Table} from 'react-bootstrap'
 import {StoreApi} from "../Api/StoreApi";
+import {Link} from "react-router-dom";
+
+
 
 
 export default class Store extends Component {
@@ -23,12 +26,21 @@ export default class Store extends Component {
             })
         }
     }
-
+    redirectToHome = (path) => {
+        alert(path)
+        const { history } = this.props;
+        if(history) {
+            alert('succed')
+            history.push(path);
+        }
+    }
     render() {
-        const {items} = this.state
+        const {items,storeId} = this.state
         if (items.length > 0) {
             return (
-                <Table striped bordered hover>
+                <div>
+                    <Link to={`${storeId}/addItem`}>Add an Item</Link>
+                    <Table striped bordered hover>
                     <thead>
                     <tr>
                         <th>#</th>
@@ -55,10 +67,15 @@ export default class Store extends Component {
                     }
                     </tbody>
                 </Table>
-
+                </div>
             );
         } else {
-            return <div>Error occured while fetching items of this store</div>
+            return <div>
+                <div>
+                 <Link to={`${storeId}/addItem`}>Add an Item</Link>   
+                </div>
+                Empty Store
+            </div>
         }
     }
 }

@@ -84,7 +84,7 @@ export class NavMenu extends Component {
                 {/*show stores*/}
                 {isLoggedIn &&  storeList.length > 0  ?
                   <DropdownButton id="dropdown-basic-button" title="My Store List">
-                    {this.state.storeList.map ((store) =>{
+                    {storeList.map ((store) =>{
                       return(
                         <NavItem>
                           <NavLink tag={Link} className="text-dark" to={`/store/${store}`}>{store}</NavLink>
