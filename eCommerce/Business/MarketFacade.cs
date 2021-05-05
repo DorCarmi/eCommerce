@@ -6,6 +6,7 @@ using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using eCommerce.Service;
+using NLog;
 
 namespace eCommerce.Business
 {
@@ -18,6 +19,8 @@ namespace eCommerce.Business
                 UserAuth.GetInstance(),
                 new RegisteredUsersRepository(),
                 new StoreRepository());
+
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
 
         private StoreRepository _storeRepository;
         private UserManager _userManager;
@@ -85,7 +88,12 @@ namespace eCommerce.Business
         {
             return _userManager.Logout(token);
         }
-        
+
+        public bool IsUserConnected(string token)
+        {
+            return _userManager.IsUserConnected(token);
+        }
+
         //<CNAME>PersonalPurchaseHistory</CNAME>
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(string token)
         {
@@ -100,9 +108,11 @@ namespace eCommerce.Business
 
             if (result.IsFailure)
             {
+                _logger.Error($"Error for user {user.Username} in getting the Purchase history");
                 return Result.Fail<IList<PurchaseRecord>>(result.Error);
             }
 
+            _logger.Info($"User {user.Username} request purchase history");
             return result;
         }
         
@@ -116,6 +126,8 @@ namespace eCommerce.Business
             }
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
+            
+            _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
             
             Result<IUser> appointedUserRes = _userManager.GetUser(appointedUserId);
             if (appointedUserRes.IsFailure)
@@ -138,6 +150,8 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
             
+            _logger.Info($"AppointManager({user.Username}, {store.GetStoreName()}, {appointedManagerUserId})");
+            
             Result<IUser> appointedUserRes = _userManager.GetUser(appointedManagerUserId);
             if (appointedUserRes.IsFailure)
             {
@@ -158,6 +172,8 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
             
+            _logger.Info($"UpdateManagerPermission({user.Username}, {store.GetStoreName()}, {managersUserId}, {permissions})");
+
             Result<IUser> mangerUserRes = _userManager.GetUser(managersUserId);
             if (mangerUserRes.IsFailure)
             {
@@ -179,6 +195,8 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
             
+            _logger.Info($"RemoveManagerPermission({user.Username}, {store.GetStoreName()}, {managersUserId}, {permissions})");
+
             Result<IUser> mangerUserRes = _userManager.GetUser(managersUserId);
             if (mangerUserRes.IsFailure)
             {
@@ -208,6 +226,8 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
 
+            _logger.Info($"GetStoreStaffAndTheirPermissions({user.Username}, {store.GetStoreName()})");
+
             return store.GetStoreStaffAndTheirPermissions(user);
         }
         //<CNAME>AdminGetAllUserHistory</CNAME>
@@ -218,9 +238,10 @@ namespace eCommerce.Business
              {
                  return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
              }
-
-
+             
              IUser user = userAndStoreRes.Value;
+             
+             _logger.Info($"AdminGetPurchaseHistoryUser({user.Username}, {ofUserId})");
 
              var ofUser=_userManager.GetUser(ofUserId);
              if (ofUser.IsFailure)
@@ -242,6 +263,8 @@ namespace eCommerce.Business
              IUser user = userAndStoreRes.Value.Item1;
              IStore store = userAndStoreRes.Value.Item2;
 
+             _logger.Info($"AdminGetPurchaseHistoryStore({user.Username}, {store.GetStoreName()})");
+
              return user.GetStorePurchaseHistory(store);
          }
         #endregion
@@ -255,6 +278,8 @@ namespace eCommerce.Business
             {
                 return Result.Fail<IEnumerable<IItem>>(userRes.Error);
             }
+
+            _logger.Info($"SearchForItem({userRes.Value.Username}, {query})");
 
             return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItem(query));
         }
@@ -272,6 +297,8 @@ namespace eCommerce.Business
                 to = from;
             }
             
+            _logger.Info($"SearchForItemByPriceRange({userRes.Value.Username}, {query}, {from}, {to})");
+
             return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItemByPrice(query, from, to));
         }
 
@@ -283,6 +310,8 @@ namespace eCommerce.Business
                 return Result.Fail<IEnumerable<IItem>>(userRes.Error);
             }
 
+            _logger.Info($"SearchForItemByCategory({userRes.Value.Username}, {query}, {category})");
+
             return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItemByCategory(query, category));
         }
 
@@ -293,6 +322,8 @@ namespace eCommerce.Business
             {
                 return Result.Fail<IEnumerable<string>>(userRes.Error);
             }
+            
+            _logger.Info($"SearchForStore({userRes.Value.Username}, {query})");
 
             return Result.Ok(_storeRepository.SearchForStore(query));
         }
@@ -306,6 +337,8 @@ namespace eCommerce.Business
             }
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
+
+            _logger.Info($"GetStore({user.Username}, {storeId})");
 
             return Result.Ok(store);
         } 
@@ -324,6 +357,8 @@ namespace eCommerce.Business
             {
                 storeItems.Add(item.ShowItem());
             }
+            
+            _logger.Info($"GetAllStoreItems({user.Username}, {storeId})");
 
             return Result.Ok<IEnumerable<IItem>>(storeItems);
             
@@ -344,6 +379,8 @@ namespace eCommerce.Business
             {
                 return Result.Fail<IItem>(itemRes.Error);
             }
+            
+            _logger.Info($"GetItem({user.Username}, {storeId}, {itemId})");
 
             return Result.Ok<IItem>(itemRes.Value.ShowItem());
         }
@@ -365,6 +402,7 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
 
+            _logger.Info($"AddItemToCart({user.Username}, {productId}, {storeId}, {amount})");
 
             Result<Item> itemRes = store.GetItem(productId);
             if (itemRes.IsFailure)
@@ -387,6 +425,8 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
             
+            _logger.Info($"EditItemAmountOfCart({user.Username}, {itemId}, {storeId}, {amount})");
+
             // TODO implement store and user
             return null;
         }
@@ -400,6 +440,8 @@ namespace eCommerce.Business
             }
             IUser user = userRes.Value;
 
+            _logger.Info($"GetCart({user.Username})");
+
             return user.GetCartInfo();
         }
         
@@ -411,6 +453,8 @@ namespace eCommerce.Business
                 return Result.Fail<double>(userRes.Error);
             }
             IUser user = userRes.Value;
+
+            _logger.Info($"GetPurchaseCartPrice({user.Username})");
 
             Result<ICart> cartRes = user.GetCartInfo();
             if (cartRes.IsFailure)
@@ -435,6 +479,8 @@ namespace eCommerce.Business
             }
             IUser user = userRes.Value;
 
+            _logger.Info($"GetPurchaseCartPrice({user.Username} {paymentInfo})");
+            
             Result<ICart> cartRes = user.GetCartInfo();
             if (cartRes.IsFailure)
             {
@@ -464,7 +510,9 @@ namespace eCommerce.Business
                 return Result.Fail(userRes.Error);
             }
             IUser user = userRes.Value;
-
+            
+            _logger.Info($"OpenStore({user.Username} ,{storeName} ,{item})");
+            
             IStore newStore = new Store(storeName, user);
             if (!_storeRepository.Add(newStore))
             {
@@ -490,6 +538,8 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
 
+            _logger.Info($"AddNewItemToStore({user.Username} ,{item})");
+
             return store.AddItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
         }
         
@@ -504,6 +554,8 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
 
+            _logger.Info($"RemoveItemFromStore({user.Username} ,{storeId}, {itemId})");
+
             return store.RemoveItemToStore(itemId, user);
         }
 
@@ -516,6 +568,9 @@ namespace eCommerce.Business
             }
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
+            
+            _logger.Info($"EditItemInStore({user.Username} , {item})");
+
             //public ItemInfo(int amount, string name, string storeName, string category,int pricePerUnit, List<string> keyWords,Item theItem)
             store.EditItemToStore(
                 new ItemInfo(item.Amount, item.ItemName, item.StoreName, item.Category, item.KeyWords.ToList(),
@@ -672,6 +727,8 @@ namespace eCommerce.Business
             IUser user = userAndStoreRes.Value.Item1;
             IStore store = userAndStoreRes.Value.Item2;
 
+            _logger.Info($"GetPurchaseHistoryOfStore({user.Username} , {storeId})");
+
             Result<IList<PurchaseRecord>> purchaseHistoryRes = store.GetPurchaseHistory(user);
             if (purchaseHistoryRes.IsFailure)
             {
@@ -691,9 +748,12 @@ namespace eCommerce.Business
             }
             IUser user = userRes.Value;
             
+            _logger.Info($"GetUserAndStore({user.Username} , {storeId})");
+
             IStore store = _storeRepository.GetOrNull(storeId);
             if (store == null)
             {
+                _logger.Error($"User {user.Username} requested invalid sotre {storeId}");
                 return Result.Fail<Tuple<IUser, IStore>>("Store doesn't exist");
             }
 

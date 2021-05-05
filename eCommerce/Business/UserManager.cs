@@ -8,11 +8,13 @@ using System.Threading;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using NLog;
 
 namespace eCommerce.Business
 {
     public class UserManager
     {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
         private IUserAuth _auth;
         
         // token to user
@@ -40,6 +42,8 @@ namespace eCommerce.Business
 
             IUser newUser = CreateGuestUser(guestUsername);
             _connectedUsers.TryAdd(token, newUser);
+            
+            _logger.Info($"New guest: {guestUsername}");
             return token;
         }
         
@@ -47,8 +51,12 @@ namespace eCommerce.Business
         {
             if (!_auth.IsValidToken(token))
             {
-                // log it
-                _connectedUsers.TryRemove(token, out var tuser);
+                _logger.Warn($"Invalid token {token}");
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tuser);
+                }
+
                 return;
             }
 
@@ -63,8 +71,12 @@ namespace eCommerce.Business
         {
             if (!_auth.IsValidToken(token))
             {
-                // log it old token
-                _connectedUsers.TryRemove(token, out var tuser);
+                _logger.Warn($"Invalid token {token}");
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tuser);
+                }
+
                 return Result.Fail("Invalid token");
             }
 
@@ -88,10 +100,13 @@ namespace eCommerce.Business
             IUser newUser = new User(Member.State, memberInfo.Clone());
             if (!_registeredUsersRepo.Add(newUser))
             {
-                // TODO maybe remove the user form userAuth and log it
+                // TODO maybe remove the user form userAuth
+                _logger.Error($"User {memberInfo.Username} was able to register at Auth but already exists in " +
+                    "the registered user repository");
                 return Result.Fail("User already exists");
             }
 
+            _logger.Info($"User {memberInfo.Username} was registered");
             return Result.Ok();
         }
 
@@ -113,7 +128,12 @@ namespace eCommerce.Business
         {
             if (!_auth.IsValidToken(guestToken))
             {
-                _connectedUsers.TryRemove(guestToken, out var tUser);
+                _logger.Warn($"Invalid token {guestToken}");
+                if (guestToken != null)
+                {
+                    _connectedUsers.TryRemove(guestToken, out var tUser);
+                }
+
                 return Result.Fail<string>("Invalid token");
             }
 
@@ -142,7 +162,7 @@ namespace eCommerce.Business
             
             if (!_connectedUsers.TryAdd(loginToken, user))
             {
-                //Error in token generation
+                _logger.Error($"UserAuth created duplicate toekn(already in connected userses dictionry)");
                 return Result.Fail<string>("Error");
             }
             
@@ -154,7 +174,12 @@ namespace eCommerce.Business
 
             if (!_auth.IsValidToken(token))
             {
-                _connectedUsers.TryRemove(token, out var tUser);
+                _logger.Warn($"Invalid token {token}");
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tUser);
+                }
+
                 return Result.Fail<string>("Invalid token");
             }
             
@@ -163,20 +188,50 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Guest cant logout");
             }
 
-            _connectedUsers.TryRemove(token, out var tUser1);
+            if (!_connectedUsers.TryRemove(token, out var tUser1))
+            {
+                _logger.Error($"User logout error");
+            }
+            else
+            {
+                _logger.Info($"User {tUser1.Username} logout");
+            }
+            
             return Result.Ok(Connect());
+        }
+        
+        public bool IsUserConnected(string token)
+        {
+            if (!_auth.IsValidToken(token))
+            {
+                _logger.Info($"Invalid use of token {token}");
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tUser);
+                }
+
+                return false;
+            }
+
+            return _connectedUsers.TryGetValue(token, out var user);
         }
 
         public Result<IUser> GetUserIfConnectedOrLoggedIn(string token)
         {
             if (!_auth.IsValidToken(token))
             {
-                _connectedUsers.TryRemove(token, out var tUser);
+                _logger.Info($"Invalid use of token {token}");
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tUser);
+                }
+
                 return Result.Fail<IUser>("Invalid token");
             }
 
             if (!_connectedUsers.TryGetValue(token, out var user))
             {
+                _logger.Info($"Usage of old token {token}");
                 return Result.Fail<IUser>("User not connected or logged in");
             }
 
@@ -193,7 +248,6 @@ namespace eCommerce.Business
             IUser user = _registeredUsersRepo.GetOrNull(username);
             if (user == null)
             {
-                // TODO log it 
                 return Result.Fail<IUser>("User doesn't exists");
             }
 
@@ -202,7 +256,6 @@ namespace eCommerce.Business
 
         private IUser CreateGuestUser(string guestName)
         {
-            // TODO update it with user implementation
             return new User(guestName);
         }
         
