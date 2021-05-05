@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using eCommerce.Business.CombineRules;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,7 @@ namespace eCommerce.Business
 
         //Store's issues
         //Discounts and purchases
-        private List<DiscountStrategy> _myDiscountStrategies;
+        private List<DiscountComposite> _myDiscountStrategies;
         private List<PurchaseStrategy> _myPurchaseStrategies;
         private DiscountPolicy _myDiscountPolicy;
         private PurchasePolicy _myPurchasePolicy;
@@ -40,8 +41,8 @@ namespace eCommerce.Business
         {
             this._storeName = name;
 
-            this._myDiscountStrategies = new List<DiscountStrategy>();
-            this._myDiscountStrategies.Add(new DefaultDiscountStrategy());
+            this._myDiscountStrategies = new List<DiscountComposite>();
+            this._myDiscountStrategies.Add(new DefaultDiscount());
             this._myPurchaseStrategies = new List<PurchaseStrategy>();
             this._myPurchaseStrategies.Add(new DefaultPurchaseStrategy(this));
 
@@ -417,13 +418,8 @@ namespace eCommerce.Business
                     {
                         return Result.Fail("Two baskets for the same store in cart");
                     }
-                    else
-                    {
-                        this._basketsOfThisStore.Add(newBasket);
-
-                    }
                 }
-
+                this._basketsOfThisStore.Add(newBasket);
                 return Result.Ok();
             }
         }
@@ -447,7 +443,7 @@ namespace eCommerce.Business
             double minValue = basket.GetTotalPrice().Value;
             foreach (var strategy in this._myDiscountStrategies)
             {
-                var price = strategy.GetTotalPrice(basket);
+                var price = strategy.Get(basket,basket.GetCart().GetUser());
                 if (price.IsFailure)
                 {
                     return price;

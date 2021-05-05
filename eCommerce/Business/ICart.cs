@@ -21,5 +21,7 @@ namespace eCommerce.Business
 
 
         public CartInfo GetCartInfo();
+
+        public IUser GetUser();
     }
 }

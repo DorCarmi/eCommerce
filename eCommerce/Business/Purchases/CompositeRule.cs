@@ -2,7 +2,7 @@
 
 namespace eCommerce.Business
 {
-    public interface CompositeRule : Composite<bool,bool>
+    public interface CompositeRule : Composite<IBasket,IUser>
     {
         
     }

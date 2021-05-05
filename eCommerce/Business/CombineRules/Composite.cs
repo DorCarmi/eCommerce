@@ -2,11 +2,11 @@
 
 namespace eCommerce.Business.CombineRules
 {
-    public interface Composite<T,U,G>
+    public interface Composite<G,T>
     {
-        public void Calculate(IBasket basket);
+ 
 
-        public U Check(G checkItem);
+        public bool Check(G checkItem1, T checkItem2);
 
         
     }

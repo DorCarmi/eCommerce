@@ -23,6 +23,7 @@ namespace Tests.Business.StoreTests
         private ItemInfo item1;
         private ItemInfo item1b;
         private ItemInfo item2;
+        private ItemInfo item3;
         public StoreTest()
         {
             Alice = new mokUser("Alice");
@@ -43,6 +44,8 @@ namespace Tests.Business.StoreTests
             item1b.AssignStoreToItem(MyStore);
             item2 = new ItemInfo(50, "Dell6598", "Alenby", "Tech", new List<string>(), 10000);
             item2.AssignStoreToItem(MyStore);
+            item3 = new ItemInfo(10, "HP200", "Alenby", "Tech", new List<string>(), 10000);
+            item3.AssignStoreToItem(MyStore);
         }
 
         [Test]
@@ -152,23 +155,40 @@ namespace Tests.Business.StoreTests
         [Test]
         public void TestPurchaseProcess()
         {
-            
             MyStore.AddItemToStore(item2, Alice);
             ICart cart = new Cart(Alice);
             item2.amount = 10;
             cart.AddItemToCart(Alice, item2);
             
+            
             Assert.AreEqual(true,cart.BuyWholeCart(Alice,
                 new PaymentInfo("Alice", "369852147", "7894789478947894", "05/23", "123",
                     "Even Gavirol 30, TLV, Israel")).IsSuccess);
 
-            //Assert.AreEqual(true,MyStore.FinishPurchaseOfBasket(basket));
+        }
+        
+        [Test]
+        public void TestFailPurchaseProcess()
+        {
+            
+            MyStore.AddItemToStore(item3, Alice);
+            ICart alicecart = new Cart(Alice);
+            item3.amount = 9;
+            alicecart.AddItemToCart(Alice, item3);
+            
+            
+            IUser bob = new mokUser("Bob");
+            ICart bobcart = new Cart(bob);
+            bobcart.AddItemToCart(bob, item3);
+            
+            Assert.AreEqual("",bobcart.BuyWholeCart(bob,
+                new PaymentInfo("Bob", "369852147", "7894789478947894", "05/23", "123",
+                    "Even Gavirol 30, TLV, Israel")).Error);
+            
+            Assert.AreEqual(false,alicecart.BuyWholeCart(Alice,
+                new PaymentInfo("Alice", "369852147", "7894789478947894", "05/23", "123",
+                    "Even Gavirol 30, TLV, Israel")).IsSuccess);
 
-            //MyStore.CatchAllBasketProducts()
-            //MyStore.CalculateBasketPrices()
-            //MyStore.FinishPurchaseOfBasket()
-            //MyStore.FinishPurchaseOfItems()
-            //MyStore.CheckDiscount()
         }
 
         public void TestStoreInfoAndPolicy()

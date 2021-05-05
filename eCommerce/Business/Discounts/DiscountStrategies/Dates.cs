@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Business.CombineRules;
+using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -20,16 +21,16 @@ namespace eCommerce.Business
             this._datesDiscounts.Add(date,discount);
         }
 
-        public void Calculate(IBasket basket)
+        public void Calculate(IBasket basket, IUser user)
         {
-            var res = CheckCalculation(basket);
+            var res = CheckCalculation(basket,user);
             if (res.IsSuccess)
             {
                 basket.SetTotalPrice(res.Value);
             }
         }
 
-        public bool Check(IBasket basket)
+        public bool Check(IBasket basket, IUser user)
         {
             foreach (var datesDiscount in _datesDiscounts)
             {
@@ -42,12 +43,12 @@ namespace eCommerce.Business
             return false;
         }
 
-        public Result<double> Get(IBasket basket)
+        public Result<double> Get(IBasket basket, IUser user)
         {
             return basket.GetTotalPrice();
         }
 
-        public Result<double> CheckCalculation(IBasket basket)
+        public Result<double> CheckCalculation(IBasket basket, IUser user)
         {
             var totalPrice = basket.GetTotalPrice();
             if (totalPrice.IsFailure)
@@ -70,7 +71,7 @@ namespace eCommerce.Business
             return Result.Ok(minDiscountValue);
         }
 
-        public IList<DiscountInfo> GetDiscountInfo(IStore store)
+        public CombinationDiscountInfoNode GetDiscountInfo(IStore store)
         {
             List<DiscountInfo> discountInfos = new List<DiscountInfo>();
             foreach (var item in this._datesDiscounts)    
@@ -81,7 +82,8 @@ namespace eCommerce.Business
                         DiscountType.Category,"Date = "+item.Key.Date,
                         ItemInfo.AnyItem(store.GetStoreName()), item.Value));
             }
-            return discountInfos;
+
+            return new CombinationDiscountInfoLeaf(discountInfos);
         }
     }
 }

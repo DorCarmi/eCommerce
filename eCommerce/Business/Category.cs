@@ -16,5 +16,10 @@ namespace eCommerce.Business
         {
             return name;
         }
+
+        public bool Equals(Category nc)
+        {
+            return this.name.Equals(nc.name);
+        }
     }
 }

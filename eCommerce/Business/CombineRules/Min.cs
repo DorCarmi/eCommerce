@@ -1,42 +1,57 @@
 ﻿using System.Collections.Generic;
+using eCommerce.Business.Discounts;
+using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Business.CombineRules
 {
-    public class Min : Composite<double,bool>
+    public class Min : DiscountComposite
     {
-        private List<Composite<double, bool>> _composits;
-        private Composite<double, bool> _minComposite;
+        private List<DiscountComposite> _composits;
+        private DiscountComposite _minComposite;
         public Min()
         {
-            _composits = new List<Composite<double, bool>>();
+            _composits = new List<DiscountComposite>();
         }
 
-        public void Add(Composite<double, bool> composite)
+        public void Add(DiscountComposite composite)
         {
             this._composits.Add(composite);
         }
-        public void Calculate(IBasket basket)
+        public void Calculate(IBasket basket,IUser user)
         {
             if (_composits.Count == 0)
             {
                 return;
             }
-            var minRes=FindMin(basket);
+            var minRes=FindMin(basket,user);
             if (minRes.IsSuccess)
             {
                 _minComposite = minRes.Value;
-                _minComposite.Calculate(basket);
+                _minComposite.Calculate(basket, user);
             }
             
         }
 
-        public bool Check(IBasket basket)
+        public CombinationDiscountInfoNode GetDiscountInfo(IStore store)
         {
-            return true;
+            IList<CombinationDiscountInfoNode> nodes = new List<CombinationDiscountInfoNode>();
+
+            foreach (var discountComposite in _composits)
+            {
+                nodes.Add(discountComposite.GetDiscountInfo(store));
+            }
+
+            CombinationDiscountInfoNode combinationDiscountInfo = new CombinationDiscountInfoNode(nodes,Combinations.AND);
+            return combinationDiscountInfo;
         }
 
-        public Result<double> Get(IBasket basket)
+        public bool Check(IBasket basket, IUser user)
+        {
+            return this._composits.Count > 0;
+        }
+
+        public Result<double> Get(IBasket basket,IUser user)
         {
             if (this._minComposite == null)
             {
@@ -46,46 +61,46 @@ namespace eCommerce.Business.CombineRules
                 }
                 else
                 {
-                    Calculate(basket);
-                    return _minComposite.Get(basket);
+                    Calculate(basket,user);
+                    return _minComposite.Get(basket,user);
                 }
             }
             else
             {
-                return _minComposite.Get(basket);
+                return _minComposite.Get(basket,user);
             }
 
         }
 
-        public Result<double> CheckCalculation(IBasket basket)
+        public Result<double> CheckCalculation(IBasket basket,IUser user)
         {
             if (this._composits.Count == 0)
             {
                 return Result.Fail<double>("No discounts to calculate min from");
             }
 
-            var minRes = FindMin(basket);
+            var minRes = FindMin(basket,user);
             if (minRes.IsFailure)
             {
                 return Result.Fail<double>(minRes.Error);
             }
             else
             {
-                return minRes.Value.Get(basket);
+                return minRes.Value.Get(basket,user);
             }
             
         }
 
-        private Result<Composite<double, bool>> FindMin(IBasket basket)
+        private Result<DiscountComposite> FindMin(IBasket basket,IUser user)
         {
-            Composite<double, bool> min_composite = _composits[0];
+            DiscountComposite min_composite = _composits[0];
             double min = 0;
             foreach (var composite in _composits)
             {
-                var temp = composite.CheckCalculation(basket);
+                var temp = composite.CheckCalculation(basket,user);
                 if (temp.IsFailure)
                 {
-                    return Result.Fail<Composite<double, bool>>(temp.Error);
+                    return Result.Fail<DiscountComposite>(temp.Error);
                 }
                 else
                 {

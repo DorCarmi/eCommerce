@@ -3,58 +3,25 @@ using eCommerce.Common;
 
 namespace eCommerce.Business.DiscountPoliciesCombination
 {
-    public class Xor : Composite<double,bool>
+    public class Xor<G,T> : Composite<G,T>
     {
-        private Composite<double,bool> _A;
-        private Composite<double,bool> _B;
-        private Composite<double,bool> _xored;
-        private Rule ruleForTie;
+        private Composite<G,T> _A;
+        private Composite<G,T> _B;
+        private Composite<G,T> _xored;
+        private Rule<G,T> ruleForTie;
 
-        public Xor(Composite<double,bool> A, Composite<double,bool> B, Rule rule)
+        public Xor(Composite<G,T> A, Composite<G,T> B, Rule<G,T> rule)
         {
             this._A = A;
             this._B = B;
             this.ruleForTie = rule;
         }
 
-        public void Calculate(IBasket basket)
+
+        public bool Check(G itemToCheck1, T itemToCheck2)
         {
-            _xored = FindTheXored(basket);
-            _xored.Calculate(basket);
+            return (_A.Check(itemToCheck1,itemToCheck2) || _B.Check(itemToCheck1,itemToCheck2));
         }
 
-        public bool Check(IBasket basket)
-        {
-            return true;
-        }
-
-        public Result<double> Get(IBasket basket)
-        {
-            Calculate(basket);
-            return _xored.Get(basket);
-        }
-
-        public Result<double> CheckCalculation(IBasket basket)
-        {
-            var xored = FindTheXored(basket);
-            return xored.CheckCalculation(basket);
-        }
-
-        private Composite<double, bool> FindTheXored(IBasket basket)
-        {
-            
-            if (_A.Check(basket) && _B.Check(basket))
-            {
-                return ruleForTie.Decide(_A, _B);
-            }
-            else if(_A.Check(basket))
-            {
-                return _A;
-            }
-            else
-            {
-                return _A;
-            }
-        }
     }
 }

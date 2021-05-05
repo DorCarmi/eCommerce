@@ -1,27 +1,23 @@
-﻿using eCommerce.Common;
+﻿using System;
+using eCommerce.Common;
 
 namespace eCommerce.Business.PurchaseRules
 {
     public class Age : CompositeRule
     {
-        public void Calculate(IBasket basket)
-        {
-            return;
-        }
+        private int age;
+        private Compare<double> compare;
 
-        public bool Check(IBasket basket)
+        public Age(int age, Compare<double> compare)
         {
-            basket.
+            this.age = age;
+            this.compare = compare;
         }
-
-        public Result<bool> Get(IBasket basket)
+        
+        public bool Check(IBasket checkItem1, IUser checkItem2)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public Result<bool> CheckCalculation(IBasket basket)
-        {
-            throw new System.NotImplementedException();
+            return compare.GetResult(this.age, (DateTime.Now.Date - checkItem2.MemberInfo.Birthday.Date).Days);
         }
     }
+    
 }

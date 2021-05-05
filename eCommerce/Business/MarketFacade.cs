@@ -47,13 +47,7 @@ namespace eCommerce.Business
 
         public void CreateMainAdmin()
         {
-            MemberInfo adminInfo = new MemberInfo(
-                "_Admin",
-                "Admin@eCommerce.com",
-                "TheAdmin",
-                DateTime.Now, 
-                null);
-            _userManager.AddAdmin(adminInfo, "_Admin");
+            _userManager.CreateMainAdmin();
         }
 
 

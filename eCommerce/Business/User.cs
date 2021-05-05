@@ -12,8 +12,12 @@ namespace eCommerce.Business
         
         private bool _isRegistered;
         private UserToSystemState _systemState;
-        private MemberInfo _memberInfo;
+        private readonly MemberInfo  _memberInfo;
         public string Username {get => _memberInfo.Username;}
+        public MemberInfo MemberInfo
+        {
+            get => _memberInfo;
+        }
         private ICart _myCart;
 
         private Object dataLock;

@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using Microsoft.AspNetCore.Authorization;
 
 namespace eCommerce.Business
 {
     public class Cart : ICart
     {
-        private IUser _cartHolder;
+        private readonly IUser _cartHolder;
         private Transaction _performTransaction;
         
         private Dictionary<IStore, IBasket> _baskets;
@@ -142,6 +143,11 @@ namespace eCommerce.Business
             CalculatePricesForCart();
             CartInfo info = new CartInfo(baskets, this._totalPrice);
             return info;
+        }
+
+        public IUser GetUser()
+        {
+            return this._cartHolder;
         }
     }
 }

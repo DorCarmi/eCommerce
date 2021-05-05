@@ -46,5 +46,10 @@ namespace Tests.Business.Mokups
         {
             throw new System.NotImplementedException();
         }
+
+        public IUser GetUser()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

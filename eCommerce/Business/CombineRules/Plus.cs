@@ -1,40 +1,55 @@
 ﻿using System.Collections.Generic;
+using eCommerce.Business.Discounts;
+using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Business.CombineRules
 {
-    public class Plus : Composite<double,bool>
+    public class Plus : DiscountComposite
     {
-        private List<Composite<double, bool>> _composites;
+        private List<DiscountComposite> _composites;
         public Plus()
         {
-            _composites = new List<Composite<double, bool>>();
+            _composites = new List<DiscountComposite>();
         }
-        public void Calculate(IBasket basket)
+        public void Calculate(IBasket basket,IUser user)
         {
             if (_composites.Count > 0)
             {
                 foreach (var composite in _composites)
                 {
-                    if (composite.Check(basket))
+                    if (composite.Check(basket,user))
                     {
-                        composite.Calculate(basket);
+                        composite.Calculate(basket,user);
                     }
                 }
             }
         }
 
-        public bool Check(IBasket basket)
+        public CombinationDiscountInfoNode GetDiscountInfo(IStore store)
+        {
+            IList<CombinationDiscountInfoNode> nodes = new List<CombinationDiscountInfoNode>();
+
+            foreach (var discountComposite in _composites)
+            {
+                nodes.Add(discountComposite.GetDiscountInfo(store));
+            }
+
+            CombinationDiscountInfoNode combinationDiscountInfo = new CombinationDiscountInfoNode(nodes,Combinations.AND);
+            return combinationDiscountInfo;
+        }
+
+        public bool Check(IBasket basket, IUser user)
         {
             return true;
         }
 
-        public Result<double> Get(IBasket basket)
+        public Result<double> Get(IBasket basket,IUser user)
         {
-            Calculate(basket);
+            Calculate(basket,user);
             if (_composites.Count > 0)
             {
-                return _composites[0].Get(basket);
+                return _composites[0].Get(basket,user);
             }
             else
             {
@@ -42,28 +57,28 @@ namespace eCommerce.Business.CombineRules
             }
         }
 
-        public Result<double> CheckCalculation(IBasket basket)
+        public Result<double> CheckCalculation(IBasket basket,IUser user)
         {
             if (_composites.Count > 0)
             {
-                var startPoint = _composites[0].Get(basket);
+                var startPoint = _composites[0].Get(basket,user);
                 double stratValue = 0;
                 if (startPoint.IsFailure)
                 {
                     return startPoint;
                 }
-                if (Check(basket))
+                if (Check(basket,user))
                 {
                     foreach (var composite in _composites)
                     {
-                        if (composite.Check(basket))
+                        if (composite.Check(basket,user))
                         {
-                            var res = composite.CheckCalculation(basket);
+                            var res = composite.CheckCalculation(basket,user);
                             if (res.IsFailure)
                             {
                                 return res;
                             }
-                            var diff = startPoint.Value - composite.CheckCalculation(basket).Value;
+                            var diff = startPoint.Value - composite.CheckCalculation(basket,user).Value;
                             stratValue = stratValue - diff;
                         }
                     }

@@ -15,6 +15,12 @@ namespace Tests.Business
         private IUser _user;
         private IStore _store;
         private List<ItemInfo> _itemInfos;
+        
+        private IUser alenbyFounder;
+        private IUser alenbyOwner;
+        private IUser alenbyCoOwner;
+        private IUser alenbyManager;
+        private IUser alenbySecondManager;
 
         public UserStoreIntegration()
         {
@@ -40,6 +46,12 @@ namespace Tests.Business
             _store = new Store(STORE_NAME, _user);
             _user.OpenStore(_store);
 
+        }
+
+        [Test]
+        public void OpenStoreTest()
+        {
+            
         }
         
         [Test]

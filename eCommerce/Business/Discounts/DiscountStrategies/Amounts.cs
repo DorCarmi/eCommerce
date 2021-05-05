@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using eCommerce.Business.CombineRules;
+using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -32,11 +33,11 @@ namespace eCommerce.Business
         }
         
 
-        public void Calculate(IBasket basket)
+        public void Calculate(IBasket basket, IUser user)
         {
             if (basket != null)
             {
-                var res = CheckCalculation(basket);
+                var res = CheckCalculation(basket,user);
                 if (res.IsSuccess)
                 {
                     basket.SetTotalPrice(res.Value);
@@ -85,20 +86,20 @@ namespace eCommerce.Business
             return ans;
         }
 
-        public bool Check(IBasket basket)
+        public bool Check(IBasket basket, IUser user)
         {
             return CheckForSpecificItemDiscount(basket) || 
                    CheckForTotalPriceDiscount(basket);
         }
 
-        public Result<double> Get(IBasket basket)
+        public Result<double> Get(IBasket basket, IUser user)
         {
-            Calculate(basket);
+            Calculate(basket,user);
             return basket.GetTotalPrice();
         }
 
 
-        public Result<double> CheckCalculation(IBasket basket)
+        public Result<double> CheckCalculation(IBasket basket, IUser user)
         {
             int totalAmount = 0;
             double totalPrice = 0;
@@ -133,7 +134,7 @@ namespace eCommerce.Business
         }
 
 
-        public IList<DiscountInfo> GetDiscountInfo(IStore store)
+        public CombinationDiscountInfoNode GetDiscountInfo(IStore store)
         {
             List<DiscountInfo> discountInfos = new List<DiscountInfo>();
             foreach (var itemsAndAmount in this._itemsAndAmounts)    
@@ -153,7 +154,7 @@ namespace eCommerce.Business
                         ItemInfo.AnyItem(store.GetStoreName()),totalAmount.GetDiscount() ));
             }
 
-            return discountInfos;
+            return new CombinationDiscountInfoLeaf(discountInfos);
         }
     }
 }

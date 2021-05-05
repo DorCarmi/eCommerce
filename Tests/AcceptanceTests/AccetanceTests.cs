@@ -41,7 +41,7 @@ namespace Tests.AcceptanceTests
             string storeName = "Yossi's Store";
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
-            _market.OpenStore(yossiLogInResult.Value, storeName, product);
+            _market.OpenStore(yossiLogInResult.Value, storeName);
             token = _market.Logout(yossiLogInResult.Value).Value;
             _market.Disconnect(token);
         }

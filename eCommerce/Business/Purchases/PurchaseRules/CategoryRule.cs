@@ -1,23 +1,30 @@
-﻿using eCommerce.Business.CombineRules;
+﻿using System;
+using eCommerce.Business.CombineRules;
 
 namespace eCommerce.Business.PurchaseRules
 {
-    public class Category : CompositeRule<Category>
+    public class CategoryRule : CompositeRule
     {
         private Category category;
         private Compare<double> compare;
 
-        public Category(Category category)
+        public CategoryRule(Category category)
         {
             this.category = category;
             this.compare = compare;
         }
-        
 
-        public bool Check(Category checkItem)
+        public bool Check(IBasket checkItem1, IUser checkItem2)
         {
-            var x = new Equals<Category>();
-            return x.GetResult(this.category, checkItem);
+            foreach (var item in checkItem1.GetAllItems().Value)
+            {
+                if (this.category.getName().Equals(item.category))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

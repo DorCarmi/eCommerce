@@ -1,48 +1,63 @@
 ﻿using System.Collections.Generic;
 using eCommerce.Business.CombineRules;
+using eCommerce.Business.Discounts;
+using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Business.DiscountPoliciesCombination
 {
-    public class Max : Composite<double,bool>
+    public class Max : DiscountComposite
     {
-        private List<Composite<double, bool>> _composits;
-        private Composite<double, bool> _maxComposite;
+        private List<DiscountComposite> _composits;
+        private DiscountComposite _maxComposite;
         public Max()
         {
-            _composits = new List<Composite<double, bool>>();
+            _composits = new List<DiscountComposite>();
         }
 
-        public void Add(Composite<double, bool> composite)
+        public void Add(DiscountComposite composite)
         {
             this._composits.Add(composite);
         }
-        public void Calculate(IBasket basket)
+        public void Calculate(IBasket basket,IUser user)
         {
             if (_composits.Count == 0)
             {
                 return;
             }
-            var maxRes=FindMax(basket);
+            var maxRes=FindMax(basket,user);
             {
                 if (maxRes.IsSuccess)
                 {
                     this._maxComposite = maxRes.Value;
-                    _maxComposite.Calculate(basket);
+                    _maxComposite.Calculate(basket,user);
                 }
             }
         }
-        
 
-        public bool Check(IBasket basket)
+        public CombinationDiscountInfoNode GetDiscountInfo(IStore store)
         {
-            throw new System.NotImplementedException();
+            IList<CombinationDiscountInfoNode> nodes = new List<CombinationDiscountInfoNode>();
+
+            foreach (var discountComposite in _composits)
+            {
+                nodes.Add(discountComposite.GetDiscountInfo(store));
+            }
+
+            CombinationDiscountInfoNode combinationDiscountInfo = new CombinationDiscountInfoNode(nodes,Combinations.AND);
+            return combinationDiscountInfo;
         }
 
 
-        public Result<double> Get(IBasket basket)
+        public bool Check(IBasket basket, IUser user)
         {
-            Calculate(basket);
+            return this._composits.Count > 0;
+        }
+
+
+        public Result<double> Get(IBasket basket,IUser user)
+        {
+            Calculate(basket,user);
             if (this._maxComposite == null)
             {
                 if (_composits.Count == 0)
@@ -51,28 +66,28 @@ namespace eCommerce.Business.DiscountPoliciesCombination
                 }
                 else
                 {
-                    Calculate(basket);
-                    return _maxComposite.Get(basket);
+                    Calculate(basket,user);
+                    return _maxComposite.Get(basket,user);
                 }
             }
             else
             {
-                return _maxComposite.Get(basket);
+                return _maxComposite.Get(basket,user);
             }
 
         }
 
-        public Result<double> CheckCalculation(IBasket basket)
+        public Result<double> CheckCalculation(IBasket basket,IUser user)
         {
             if (this._composits.Count == 0)
             {
                 return Result.Fail<double>("No discounts to calculate max from");
             }
             
-            var maxRes=FindMax(basket);
+            var maxRes=FindMax(basket,user);
             if (maxRes.IsSuccess)
             {
-                return maxRes.Value.Get(basket);
+                return maxRes.Value.Get(basket,user);
             }
             else
             {
@@ -82,16 +97,16 @@ namespace eCommerce.Business.DiscountPoliciesCombination
         }
         
 
-        private Result<Composite<double, bool>> FindMax(IBasket basket)
+        private Result<DiscountComposite> FindMax(IBasket basket,IUser user)
         {
-            Composite<double, bool> max_composite = _composits[0];
+            DiscountComposite max_composite = _composits[0];
             double max = 0;
             foreach (var composite in _composits)
             {
-                var temp=composite.CheckCalculation(basket);
+                var temp=composite.CheckCalculation(basket,user);
                 if (temp.IsFailure)
                 {
-                    return Result.Fail<Composite<double, bool>>(temp.Error);
+                    return Result.Fail<DiscountComposite>(temp.Error);
                 }
                 if (temp.Value > max)
                 {

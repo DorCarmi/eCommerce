@@ -46,7 +46,9 @@ namespace Tests.Business.Mokups
             }
         }
 
-      
+
+        public MemberInfo MemberInfo { get; }
+
         public Result OpenStore(IStore store)
         {
             throw new System.NotImplementedException();

@@ -8,6 +8,7 @@ namespace eCommerce.Business
     public interface IUser
     {
         public string Username { get; }
+        public MemberInfo MemberInfo { get; }
 
         //Facade
         public Result OpenStore(IStore store);

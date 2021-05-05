@@ -219,7 +219,7 @@ namespace eCommerce.Business
 
         public Result FinalizeGetItems(int amount)
         {
-            if (this._amount - amount <= 1)
+            if (this._amount - amount < 1)
             {
                 return Result.Fail("There are no enough items to answer the requested amount");
             }
