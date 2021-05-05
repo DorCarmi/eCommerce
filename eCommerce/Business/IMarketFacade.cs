@@ -271,7 +271,7 @@ namespace eCommerce.Business
         /// <param name="storeName">The store name</param>
         /// <param name="item">The start product of a sotre</param>
         /// <returns>Result of the request</returns>
-        public Result OpenStore(string token, string storeName, IItem item);
+        public Result OpenStore(string token, string storeName);
         
         /// <summary>
         /// Add new item to the sore

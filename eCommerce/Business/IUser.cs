@@ -8,6 +8,7 @@ namespace eCommerce.Business
     public interface IUser
     {
         public string Username { get; }
+        public MemberInfo MemberInfo { get; }
 
         //Facade
         public Result OpenStore(IStore store);
@@ -22,7 +23,7 @@ namespace eCommerce.Business
         public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission);
 
         
-        public Result<IList<IUser>> GetAllStoreStakeholders(IStore store);
+        // public Result<IList<IUser>> GetAllStoreStakeholders(IStore store);
         public Result<IList<PurchaseRecord>> GetUserPurchaseHistory();
         public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(IUser otherUser);
         public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(IStore store);
@@ -37,6 +38,7 @@ namespace eCommerce.Business
 
 
         public UserToSystemState GetState();
+        public Result BuyWholeCart(PaymentInfo paymentInfo);
     }
 
     

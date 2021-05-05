@@ -26,7 +26,17 @@ namespace eCommerce.Business
 
         public Result<ItemInfo> AquireItems(ItemInfo itemInfo)
         {
-            return this._store.GetItem(itemInfo).GetValue().GetItems(itemInfo.amount);
+            var res = this._store.GetItem(itemInfo);
+            if (res.IsFailure)
+            {
+                return Result.Fail<ItemInfo>(res.Error);
+            }
+            else
+            {
+                var resItems=res.GetValue().GetItems(itemInfo.amount);
+                return resItems;
+
+            }
         }
         
         public Result AquireItems(IBasket basket)

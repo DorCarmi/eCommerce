@@ -96,9 +96,9 @@ namespace eCommerce.Service
             return _marketFacade.GetItem(token, storeId, itemId);
         }
 
-        public Result OpenStore(string token, string storeName, IItem item)
+        public Result OpenStore(string token, string storeName)
         {
-            return _marketFacade.OpenStore(token, storeName, item);
+            return _marketFacade.OpenStore(token, storeName);
         }
 
         public Result AddNewItemToStore(string token, IItem item)

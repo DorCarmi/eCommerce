@@ -299,5 +299,16 @@ namespace eCommerce.Business
         {
             return $"_Guest{GetAndIncrementGuestId():D}";
         }
+
+        public void CreateMainAdmin()
+        {
+            MemberInfo adminInfo = new MemberInfo(
+                "_Admin",
+                "Admin@eCommerce.com",
+                "TheAdmin",
+                DateTime.Now, 
+                null);
+            AddAdmin(adminInfo, "_Admin");
+        }
     }
 }
