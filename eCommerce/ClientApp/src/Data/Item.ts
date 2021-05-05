@@ -23,4 +23,16 @@ export class Item implements ItemType{
         this.keyWords = data.keyWords;
         this.pricePerUnit = data.pricePerUnit;
     }
+    
+    static createItem(itemName: string, storeName: string, amount: number,
+        category: string, keyWords: string[], pricePerUnit: number): Item {
+        return new Item({
+            itemName: itemName,
+            storeName: storeName,
+            amount: amount,
+            category: category,
+            keyWords: keyWords,
+            pricePerUnit: pricePerUnit
+        })
+    }
 }

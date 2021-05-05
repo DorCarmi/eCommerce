@@ -3,6 +3,7 @@ import {Form,Button} from 'react-bootstrap'
 import "./Register.css"
 import {StoreApi} from '../Api/StoreApi'
 import {withRouter} from "react-router-dom";
+import {Item} from "../Data/Item";
 
 
 
@@ -30,10 +31,10 @@ class AddItem extends Component {
     }
 
     async handleSubmit(event){
-        const {name,storeId,amount,category,keyWords,price} = this.state
+        const {itemName,amount,category,keyWords,price} = this.state
+        const {storeId} = this.props
         event.preventDefault();
-        const res = await StoreApi.addItem({'ItemName':name,'StoreName':this.props.storeId,
-                                                'Category':category,'Amount':amount,'KeyWords':keyWords,'PricePerUnit':price})
+        const res = await StoreApi.addItem(Item.createItem(itemName, storeId, amount, category, [keyWords], price))
         if(res && res.isSuccess) {
             alert('add item succeed')
             // this.props.addStoreToState(storeId);

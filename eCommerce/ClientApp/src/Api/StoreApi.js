@@ -29,14 +29,17 @@ export class StoreApi {
                 return new Result(res.data)
 
             })
+            .catch(res => undefined)
         }
 
     static addItem(item)
     {
+        alert(item)
         return instance.post(ADD_ITEM_TO_STORE_PATH, item)
             .then(res => {
                 return new Result(res.data)
             })
+            .catch(res => undefined)
     }
 
     static removeItem(storeId, itemId)
@@ -49,6 +52,7 @@ export class StoreApi {
             .then(res => {
                 return new Result(res.data)
             })
+            .catch(res => undefined)
     }
 
     static editItem(item)
@@ -57,6 +61,7 @@ export class StoreApi {
             .then(res => {
                 return new Result(res.data)
             })
+            .catch(res => undefined)
     }
     
     // ========== Store query ========== //
@@ -67,6 +72,7 @@ export class StoreApi {
             .then(res => {
                 return new Result(res.data)
             })
+            .catch(res => undefined)
     }
 
     static getAllItems(storeId)

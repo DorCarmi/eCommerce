@@ -57,10 +57,10 @@ export default class Store extends Component {
                             return (
                                 <tr>
                                     <td>{index + 1}</td>
-                                    <td>{item.name}</td>
+                                    <td>{item.itemName}</td>
                                     <td>{item.category}</td>
                                     <td>{item.amount}</td>
-                                    <td>{item.price}</td>
+                                    <td>{item.pricePerUnit}</td>
                                 </tr>
                             )
                         })

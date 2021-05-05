@@ -37,7 +37,7 @@ namespace eCommerce.Business
             _purchaseStrategy = new DefaultPurchaseStrategy(_belongsToStore);
         }
 
-        public Item(ItemInfo info)
+        public Item(ItemInfo info, IStore store)
         {
             this._name = info.name;
             this._amount = info.amount;
@@ -45,6 +45,7 @@ namespace eCommerce.Business
             CopyKeyWords(info.keyWords);
             this._purchaseStrategy = new DefaultPurchaseStrategy(_belongsToStore);
             this._pricePerUnit = info.pricePerUnit;
+            this._belongsToStore = store;
         }
 
         private void CopyKeyWords(IList<string> words)
