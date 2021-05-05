@@ -61,6 +61,12 @@ export default class Store extends Component {
                                     <td>{item.category}</td>
                                     <td>{item.amount}</td>
                                     <td>{item.pricePerUnit}</td>
+                                    <td>
+                                        <div>
+                                        <Link to={`${storeId}/editItem/${item.itemName}`}>Edit Item</Link>
+                                        </div>
+                                        <button>Remove Item</button>
+                                    </td>
                                 </tr>
                             )
                         })

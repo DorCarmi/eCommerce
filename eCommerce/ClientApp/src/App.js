@@ -9,6 +9,8 @@ import { Cart } from "./components/Cart"
 import Register from "./components/Register";
 import './custom.css'
 import AddItem from './components/AddItem'
+import EditItem from './components/EditItem'
+
 import {BrowserRouter,useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 
@@ -71,6 +73,8 @@ export default class App extends Component {
               )} />            
               <Route path='/openStore' exact component={() => <OpenStore addStoreToState={this.addStoreHandler} history={useHistory()}/>} />
               <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
+              <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
+
           </Layout>
         </BrowserRouter>
     );
