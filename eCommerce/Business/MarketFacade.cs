@@ -10,6 +10,7 @@ using NLog;
 
 namespace eCommerce.Business
 {
+    // TODO should be singleton
     // TODO check authException if we should throw them
     public class MarketFacade : IMarketFacade
     {
