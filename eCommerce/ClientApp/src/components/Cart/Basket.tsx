@@ -2,9 +2,11 @@
 import {BasketData} from "../../Data/CartData";
 import {Item} from "../../Data/Item";
 import "./Basket.css"
+import {BasketItem} from "./BasketItem";
 
 interface BasketProps {
-    basket: BasketData
+    basket: BasketData,
+    handleAmountUpdate: (storeId: string, itemId: string, amount: number) => void
 }
 
 export class Basket extends Component<BasketProps> {
@@ -16,18 +18,10 @@ export class Basket extends Component<BasketProps> {
 
     renderItem(item: Item) {
         return (
-            <div className="horizontalBorders">
-                <div className="basketItemsContainer">
-                    <label>Item: {item.itemName}</label>
-                    <div>
-                        Amount: <input>{item.amount}</input>
-                    </div>
-                </div>
-            </div>
+            <BasketItem item={item} handleAmountUpdate={this.props.handleAmountUpdate}/>
         )
     }
-
-
+    
     renderBasketItems(items: Item[]) {
         return items.map(item => this.renderItem(item))
     }

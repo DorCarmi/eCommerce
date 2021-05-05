@@ -17,9 +17,8 @@ export class CartApi {
 
     static getCart() {
         return instance.get<Result<CartDataType>>(GET_CART_PATH)
-            .then(res => {
-                return res;
-            })
+            .then(res => res.data)
+            .catch(res => undefined)
     };
 
     static AddItem(itemId: string, storeId: string, amount: number) {
@@ -30,8 +29,9 @@ export class CartApi {
                 amount: amount
             })
             .then(res => {
-                return res
+                return res.data
             })
+            .catch(res => undefined)
     };
 
     static EditItemAmount(itemId: string, storeId: string, amount: number) {
@@ -42,15 +42,16 @@ export class CartApi {
                 amount: amount
             })
             .then(res => {
-                return new Result(res.data)
-            })
+                return res.data
+            }).catch(res => undefined)
     };
 
     static GetPurchasePrice() {
         return instance.get<Result<number>>(GET_PURCHASE_PRICE_CART_PATH)
             .then(res => {
-                return res;
+                return res.data;
             })
+            .catch(res => undefined)
     };
 
     static PurchasePrice(userName: string, idNumber: string, creditCardNumber: string, 
@@ -66,7 +67,8 @@ export class CartApi {
                 FullAddress: fullAddress
             })
             .then(res => {
-                return res;
+                return res.data;
             })
+            .catch(res => undefined)
     };
 }

@@ -4,7 +4,7 @@
 }
 
 .basketItemsContainer {
-    display: contents;
+    display: grid;
 }
 
 .basketItemsContainer *{
