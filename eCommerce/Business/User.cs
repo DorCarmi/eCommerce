@@ -249,6 +249,11 @@ namespace eCommerce.Business
             return _systemState;
         }
 
+        public Result BuyWholeCart(PaymentInfo paymentInfo)
+        {
+            return this._myCart.BuyWholeCart(this, paymentInfo);
+        }
+
 
         //InBusiness
         

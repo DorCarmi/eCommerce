@@ -38,6 +38,7 @@ namespace eCommerce.Business
 
 
         public UserToSystemState GetState();
+        public Result BuyWholeCart(PaymentInfo paymentInfo);
     }
 
     

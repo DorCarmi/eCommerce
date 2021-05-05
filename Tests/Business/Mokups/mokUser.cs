@@ -99,6 +99,11 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
+        public Result BuyWholeCart(PaymentInfo paymentInfo)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Result UpdatePermissionsToManager(IStore store, IUser user, IList<StorePermission> permission)
         {
             throw new System.NotImplementedException();

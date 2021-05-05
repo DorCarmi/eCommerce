@@ -404,6 +404,7 @@ namespace eCommerce.Business
             }
             var newItemInfo = itemRes.Value.ShowItem();
             newItemInfo.amount = amount;
+            //newItemInfo.AssignStoreToItem(store);
             return user.AddItemToCart(newItemInfo);
         }
 

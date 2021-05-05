@@ -56,6 +56,10 @@ namespace eCommerce.Business.Service
         public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment);
         public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment);
 
+        public Result<IUser> GetFounder();
+
+        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFiered);
+
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user);
         public Result EnterBasketToHistory(IBasket basket);
 

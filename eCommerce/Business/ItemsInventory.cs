@@ -174,7 +174,6 @@ namespace eCommerce.Business
                     return Result.Ok(curItem);
                 }
             }
-
             return Result.Fail<Item>("Couldn't find item in store's inventory");
         }
         

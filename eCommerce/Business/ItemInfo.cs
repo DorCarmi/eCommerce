@@ -84,6 +84,19 @@ namespace eCommerce.Business
             this.theItem = itemInf.theItem;
             this.pricePerUnit = itemInf.pricePerUnit;
         }
+
+        public Result SetItemToStore(IStore store)
+        {
+            if (store != null)
+            {
+                this._store = store;
+                return Result.Ok();
+            }
+            else
+            {
+                return Result.Fail("Problem assigning store");
+            }
+        }
         
 
         public Result<IStore> GetStore()
