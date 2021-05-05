@@ -151,6 +151,12 @@ namespace eCommerce.Business
             }
             
         }
+        
+        public void SetTotalPrice(double newTotalPrice)
+        {
+            currentPrice = newTotalPrice;
+            
+        }
 
         public string GetStoreName()
         {

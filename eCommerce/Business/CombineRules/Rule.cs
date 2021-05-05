@@ -1,7 +1,7 @@
 ﻿namespace eCommerce.Business.CombineRules
 {
-    public interface Rule : CompositeComponent<bool>
+    public interface Rule
     {
-        public bool GetResult();
+        public Composite<T,U> Decide<T,U>(Composite<T,U> A, Composite<T,U> B);
     }
 }

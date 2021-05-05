@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using eCommerce.Business.Service;
+using eCommerce.Common;
 using eCommerce.Service;
 
 namespace eCommerce.Business
@@ -18,6 +19,8 @@ namespace eCommerce.Business
         private double discountFactor;
         private IStore _store;
 
+        public static ItemInfo AnyItem(string storeName) =>
+            new ItemInfo(0, "ANY", storeName, "ALL", new List<string>(), 0);
         public ItemInfo(int amount, string name, string storeName, string category,int pricePerUnit, List<string> keyWords,Item theItem)
         {
             this.amount = amount;

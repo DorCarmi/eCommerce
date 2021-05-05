@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using eCommerce.Business.CombineRules;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -7,36 +8,34 @@ namespace eCommerce.Business
 {
     public class DiscountPolicy
     {
-        private IList<DiscountRule> _allowedDiscounts;
+        private IList<DiscountComposite> _storeDiscounts;
         private IStore _store;
 
         public DiscountPolicy(IStore store)
         {
             this._store = store;
-            this._allowedDiscounts = new List<DiscountRule>();
-            this._allowedDiscounts.Add(new DiscountRule());
-        }
-        public bool checkDiscount(DiscountRule discountRule)
-        {
-            return _allowedDiscounts.FirstOrDefault(x => x.CheckIfOK(discountRule)) != null;
+            this._storeDiscounts = new List<DiscountComposite>();
+            this._storeDiscounts.Add(new DefaultDiscount());
         }
 
-        public bool CheckBasket(Basket basket)
+        public Result AddDiscountToStore(DiscountComposite discount)
         {
-            //TODO: change to something meaningful
-            return true;
+            this._storeDiscounts.Add(discount);
+            return Result.Ok();
         }
 
-        public Result AddAllowedDiscountRule(User user)
+        public Result RemoveDiscount(DiscountInfo discountInfo)
         {
-            if (user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
+            foreach (var storeDiscount in _storeDiscounts)
             {
-                return Result.Ok();
+                if (discountInfo.Equals(storeDiscount.GetDiscountInfo(_store)))
+                {
+                    _storeDiscounts.Remove(storeDiscount);
+                    return Result.Ok();
+                }
             }
-            else
-            {
-                return Result.Fail("User doesn't have permission to edit store's policy");
-            }
+
+            return Result.Fail("Discount not found");
         }
     }
 }

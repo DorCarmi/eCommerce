@@ -14,6 +14,7 @@ namespace eCommerce.Business
         public Result<IList<ItemInfo>> GetAllItems();
         public ICart GetCart();
         Result SetTotalPrice();
+        public void SetTotalPrice(double newTotalPrice);
         public string GetStoreName();
         public Result<ItemInfo> GetItem(IUser user, string itemName);
         public BasketInfo GetBasketInfo();

@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
-using eCommerce.Business.CombineRules;
 using eCommerce.Common;
 
-namespace eCommerce.Business.DiscountPoliciesCombination
+namespace eCommerce.Business.CombineRules
 {
-    public class Max : Composite<double,bool>
+    public class Min : Composite<double,bool>
     {
         private List<Composite<double, bool>> _composits;
-        private Composite<double, bool> _maxComposite;
-        public Max()
+        private Composite<double, bool> _minComposite;
+        public Min()
         {
             _composits = new List<Composite<double, bool>>();
         }
@@ -23,41 +22,37 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             {
                 return;
             }
-            var maxRes=FindMax(basket);
+            var minRes=FindMin(basket);
+            if (minRes.IsSuccess)
             {
-                if (maxRes.IsSuccess)
-                {
-                    this._maxComposite = maxRes.Value;
-                    _maxComposite.Calculate(basket);
-                }
+                _minComposite = minRes.Value;
+                _minComposite.Calculate(basket);
             }
+            
         }
-        
 
         public bool Check(IBasket basket)
         {
-            throw new System.NotImplementedException();
+            return true;
         }
-
 
         public Result<double> Get(IBasket basket)
         {
-            Calculate(basket);
-            if (this._maxComposite == null)
+            if (this._minComposite == null)
             {
                 if (_composits.Count == 0)
                 {
-                    return Result.Fail<double>("No discounts to calculate max from");
+                    return Result.Fail<double>("No discounts to calculate min from");
                 }
                 else
                 {
                     Calculate(basket);
-                    return _maxComposite.Get(basket);
+                    return _minComposite.Get(basket);
                 }
             }
             else
             {
-                return _maxComposite.Get(basket);
+                return _minComposite.Get(basket);
             }
 
         }
@@ -66,40 +61,41 @@ namespace eCommerce.Business.DiscountPoliciesCombination
         {
             if (this._composits.Count == 0)
             {
-                return Result.Fail<double>("No discounts to calculate max from");
+                return Result.Fail<double>("No discounts to calculate min from");
             }
-            
-            var maxRes=FindMax(basket);
-            if (maxRes.IsSuccess)
+
+            var minRes = FindMin(basket);
+            if (minRes.IsFailure)
             {
-                return maxRes.Value.Get(basket);
+                return Result.Fail<double>(minRes.Error);
             }
             else
             {
-                return Result.Fail<double>(maxRes.Error);
+                return minRes.Value.Get(basket);
             }
             
         }
-        
 
-        private Result<Composite<double, bool>> FindMax(IBasket basket)
+        private Result<Composite<double, bool>> FindMin(IBasket basket)
         {
-            Composite<double, bool> max_composite = _composits[0];
-            double max = 0;
+            Composite<double, bool> min_composite = _composits[0];
+            double min = 0;
             foreach (var composite in _composits)
             {
-                var temp=composite.CheckCalculation(basket);
+                var temp = composite.CheckCalculation(basket);
                 if (temp.IsFailure)
                 {
                     return Result.Fail<Composite<double, bool>>(temp.Error);
                 }
-                if (temp.Value > max)
+                else
                 {
-                    max_composite = composite;
+                    if (temp.Value < min)
+                    {
+                        min_composite = composite;
+                    }
                 }
             }
-
-            return Result.Ok(max_composite);
+            return Result.Ok(min_composite);
         }
     }
 }
