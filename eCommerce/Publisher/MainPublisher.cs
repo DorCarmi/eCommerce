@@ -6,7 +6,7 @@ namespace eCommerce.Publisher
 {
     public class MainPublisher : PublisherObservable
     {
-        private ConcurrentDictionary<string, List<string>> messages;
+        private ConcurrentDictionary<string, ConcurrentQueue<string>> messages;
         private ConcurrentDictionary<string, bool> connected;
 
         private ConcurrentBag<UserObserver> observers;
@@ -21,19 +21,17 @@ namespace eCommerce.Publisher
 
         public void AddMessageToUser(string userid, string message)
         {
-            try
+            if (!this.messages.ContainsKey(userid))
             {
-                this.messages[userid].Add(message);
+                this.messages.TryAdd(userid, new ConcurrentQueue<string>());
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            this.messages[userid].Enqueue(message);
         }
 
         public MainPublisher()
         {
             observers = new ConcurrentBag<UserObserver>();
+            
         }
 
         public void Register(UserObserver userObserver)

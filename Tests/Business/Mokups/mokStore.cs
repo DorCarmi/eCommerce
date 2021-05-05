@@ -124,6 +124,16 @@ namespace Tests.Business.Mokups
             return Result.Ok();
         }
 
+        public Result<IUser> GetFounder()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
         {
             Console.WriteLine("MokStore: Getting Purchase History (its empty..)");

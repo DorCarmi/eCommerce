@@ -44,11 +44,17 @@ namespace eCommerce.SingleR
             await Clients.Others.SendAsync("message", message);
         }
 
-        public async void Notify(string userName, IList<string> message)
+        public async void Notify(string userName, ConcurrentQueue<string> messages)
         {
             foreach (var user in _userToConnection[userName])
             {
-                await Clients.User(user).SendAsync(message[0]);
+                while (!messages.IsEmpty)
+                {
+                    string result;
+                    messages.TryDequeue(out result);
+                    await Clients.User(user).SendAsync(result);
+                }
+                
             }
         }
     }

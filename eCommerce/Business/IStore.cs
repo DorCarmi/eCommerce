@@ -58,7 +58,7 @@ namespace eCommerce.Business.Service
 
         public Result<IUser> GetFounder();
 
-        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFiered);
+        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment);
 
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user);
         public Result EnterBasketToHistory(IBasket basket);

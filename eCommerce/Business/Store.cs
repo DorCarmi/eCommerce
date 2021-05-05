@@ -387,7 +387,7 @@ namespace eCommerce.Business
                 return Result.Fail("User doesn't have permissions to remove staff");
             }
         }
-
+        
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
         {
             return this._transactionHistory.GetHistory(user);
