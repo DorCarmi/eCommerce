@@ -2,6 +2,7 @@
 import {Table} from 'react-bootstrap'
 import {StoreApi} from "../Api/StoreApi";
 import {Link} from "react-router-dom";
+import {Item} from "../Data/Item";
 
 
 
@@ -34,6 +35,24 @@ export default class Store extends Component {
             history.push(path);
         }
     }
+    
+    removeItem = async (storeId,itemId) =>
+    {
+        const res = await StoreApi.removeItem(storeId,itemId)
+
+        if(res && res.isSuccess) {
+            alert('edit item succeed')
+            // this.props.addStoreToState(storeId);
+            this.redirectToHome('/')
+        }
+        else{
+            if(res) {
+                alert(`edit item failed because- ${res.error}`)
+            }
+        }
+
+    }
+    
     render() {
         const {items,storeId} = this.state
         if (items.length > 0) {
@@ -65,7 +84,7 @@ export default class Store extends Component {
                                         <div>
                                         <Link to={`${storeId}/editItem/${item.itemName}`}>Edit Item</Link>
                                         </div>
-                                        <button>Remove Item</button>
+                                        <button onClick={() => this.removeItem(storeId,item.itemName)}>Remove Item</button>
                                     </td>
                                 </tr>
                             )
