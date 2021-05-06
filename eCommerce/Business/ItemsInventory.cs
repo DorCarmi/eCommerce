@@ -168,7 +168,7 @@ namespace eCommerce.Business
         {
             foreach (var curItem in _itemsInStore)
             {
-                if (curItem.GetName().Equals(item))
+                if (curItem.GetName().Equals(item.name))
                 {
                     return Result.Ok(curItem);
                 }

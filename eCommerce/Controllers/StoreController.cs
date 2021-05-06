@@ -49,7 +49,7 @@ namespace eCommerce.Controllers
         
         [HttpPost]
         [Route("[action]")]
-        public Result RemoveItem([FromForm] StoreAndItemId data)
+        public Result RemoveItem([FromBody] StoreAndItemId data)
         {
             return _storeService.RemoveItemFromStore((string) HttpContext.Items["authToken"],
                 data.StoreId, data.ItemId);

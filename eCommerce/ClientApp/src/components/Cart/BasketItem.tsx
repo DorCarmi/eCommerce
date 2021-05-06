@@ -1,5 +1,4 @@
 ﻿import React, {ChangeEvent, Component} from "react";
-import CreatableSelect from 'react-select/creatable';
 import {Item} from "../../Data/Item";
 import "./Basket.css"
 

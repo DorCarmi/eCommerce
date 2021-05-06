@@ -64,6 +64,8 @@ namespace eCommerce.Business
                 && user.GetState() == Guest.State)
             {
                 _connectedUsers.TryRemove(token, out user);
+                _logger.Info($"Guest: {user?.Username} disconnected");
+
             }
         }
 
@@ -166,6 +168,7 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Error");
             }
             
+            _logger.Info($"User {user.Username} logged in. Token {loginToken}");
             return Result.Ok(loginToken);
         }
         
