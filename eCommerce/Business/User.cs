@@ -309,8 +309,7 @@ namespace eCommerce.Business
         {
             // adds store to both Owned-By and Founded-By
             OwnerAppointment owner = new OwnerAppointment(this);
-            // @TODO_SHARON:: add extra founder's permissions to 'owner'
-            
+
             bool res =_storesFounded.TryAdd(store,true) && _storesOwned.TryAdd(store,owner);
             if (res)
             {
