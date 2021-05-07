@@ -241,6 +241,33 @@ namespace eCommerce.Business
             return Result.Ok(user);
         }
         
+        public Result<IUser> GetUserLoggedIn(string token)
+        {
+            if (!_auth.IsValidToken(token))
+            {
+                _logger.Info($"Invalid use of token {token}");
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tUser);
+                }
+
+                return Result.Fail<IUser>("Invalid token");
+            }
+
+            if (!_connectedUsers.TryGetValue(token, out var user))
+            {
+                _logger.Info($"Usage of old token {token}");
+                return Result.Fail<IUser>("User not logged in");
+            }
+
+            if (user.GetState() == Guest.State)
+            {
+                return Result.Fail<IUser>("This is a guest user");
+            }
+            
+            return Result.Ok(user);
+        }
+        
         /// <summary>
         /// Get the user
         /// </summary>

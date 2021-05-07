@@ -29,6 +29,11 @@ namespace eCommerce.Service
             return new UserService(marketFacade);
         }
 
+        public Result<UserBasicInfo> GetUserBasicInfo(string token)
+        {
+            return _marketFacade.GetUserBasicInfo(token);
+        }
+
         public Result<SPurchaseHistory> GetPurchaseHistory(string token)
         {
             Result<IList<PurchaseRecord>> purchaseHistoryRes = _marketFacade.GetPurchaseHistory(token);

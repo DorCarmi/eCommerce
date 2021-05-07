@@ -93,6 +93,24 @@ namespace eCommerce.Business
             return _userManager.IsUserConnected(token);
         }
 
+        public Result<UserBasicInfo> GetUserBasicInfo(string token)
+        {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<UserBasicInfo>(userRes.Error);
+            }
+            IUser user = userRes.Value;
+
+            UserBasicInfo userBasicInfo = new UserBasicInfo(user.Username, true);
+            if (user.GetState() == Guest.State)
+            {
+                userBasicInfo.IsLoggedIn = false;
+            }
+
+            return Result.Ok(userBasicInfo);
+        }
+
         //<CNAME>PersonalPurchaseHistory</CNAME>
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(string token)
         {

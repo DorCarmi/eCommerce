@@ -7,7 +7,14 @@ namespace eCommerce.Service
 {
     public interface IUserService
     {
-               
+
+        /// <summary>
+        /// Get the user basic info
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <returns>Basic user info</returns>
+        public Result<UserBasicInfo> GetUserBasicInfo(string token);
+
         /// <summary>
         /// Get the purchase history of the user 
         /// </summary>

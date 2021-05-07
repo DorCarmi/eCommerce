@@ -36,6 +36,8 @@ export default class App extends Component {
       });
   }
   async componentDidMount() {
+      const userBasicInfo = await UserApi.getUserBasicInfo();
+      console.log(userBasicInfo);
       const fetchedStoredList = await UserApi.getAllOwnedStoreIds()
       if (fetchedStoredList && fetchedStoredList.isSuccess) {
           this.setState({

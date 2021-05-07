@@ -63,6 +63,8 @@ namespace eCommerce.Business
         
         bool IsUserConnected(string token);
 
+        Result<UserBasicInfo> GetUserBasicInfo(string token);
+
         /// <summary>
         /// Get the purchase history of the user 
         /// </summary>
