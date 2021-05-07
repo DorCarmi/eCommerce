@@ -57,4 +57,16 @@ export class authApi {
             })
             .catch(res => undefined);
     }
+
+    static isLoggedIn() {
+        return instance.post(REGISTER_PATH,
+            {})
+            .then(res => {
+                return new RedirectWithData(
+                    new Result(res.data),
+                    res.headers['redirectto']
+                );
+            })
+            .catch(res => false);
+    }
 }
