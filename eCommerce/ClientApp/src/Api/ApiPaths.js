@@ -15,6 +15,9 @@ export const REMOVE_ITEM_FROM_STORE_PATH = STORE_PATH + '/removeItem';
 export const EDIT_ITEM_IN_STORE_PATH = STORE_PATH + '/editItem';
 export const GET_ITEM_IN_STORE_PATH = STORE_PATH + '/getItem';
 export function GET_ALL_ITEMS_IN_STORE_PATH(storeId){ return STORE_PATH + '/getAllItems/' + storeId }
+export const SEARCH_ITEMS_PATH = STORE_PATH + '/search';
+export const SEARCH_STORE_PATH = STORE_PATH + '/searchStore';
+
 
 // ========= Cart ========== //
 

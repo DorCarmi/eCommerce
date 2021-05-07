@@ -4,7 +4,7 @@ import {
     ADD_ITEM_TO_STORE_PATH,
     EDIT_ITEM_IN_STORE_PATH, GET_ALL_ITEMS_IN_STORE_PATH, GET_ITEM_IN_STORE_PATH,
     OPEN_STORE_PATH,
-    REMOVE_ITEM_FROM_STORE_PATH
+    REMOVE_ITEM_FROM_STORE_PATH, SEARCH_ITEMS_PATH, SEARCH_STORE_PATH
 } from "./ApiPaths";
 
 const instance = axios.create(
@@ -78,6 +78,30 @@ export class StoreApi {
     static getAllItems(storeId)
     {
         return instance.get(GET_ALL_ITEMS_IN_STORE_PATH(storeId))
+            .then(res => {
+                return new Result(res.data)
+            }).catch(err => undefined)
+    }
+    
+    static searchItems(query){
+        return instance.get(SEARCH_ITEMS_PATH,
+            {
+                params: {
+                    query: query
+                }
+            })
+            .then(res => {
+                return new Result(res.data)
+            }).catch(err => undefined)
+    }
+
+    static searchStore(query){
+        return instance.get(SEARCH_STORE_PATH,
+            {
+                params: {
+                    query: query
+                }
+            })
             .then(res => {
                 return new Result(res.data)
             }).catch(err => undefined)

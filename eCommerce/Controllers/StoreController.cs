@@ -78,5 +78,21 @@ namespace eCommerce.Controllers
             return _storeService.GetAllStoreItems((string) HttpContext.Items["authToken"],
                     storeId);
         }
+        
+        [HttpGet]
+        [Route("[action]")]
+        public Result<IEnumerable<IItem>> Search(string query)
+        {
+            return _storeService.SearchForItem((string) HttpContext.Items["authToken"],
+                query);
+        }
+        
+        [HttpGet]
+        [Route("[action]")]
+        public Result<IEnumerable<string>> SearchStore(string query)
+        {
+            return _storeService.SearchForStore((string) HttpContext.Items["authToken"],
+                query);
+        }
     }
 }

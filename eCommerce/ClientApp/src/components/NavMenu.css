@@ -25,3 +25,7 @@ html {
 img:hover{
   opacity: 50%;
 }
+
+.labelMargin {
+  margin-top: 10px;
+}

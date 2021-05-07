@@ -13,6 +13,7 @@ import EditItem from './components/EditItem'
 
 import {BrowserRouter,useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
+import {StoreApi} from "./Api/StoreApi";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -35,8 +36,18 @@ export default class App extends Component {
       });
   }
   async componentDidMount() {
+      // remove
       const userBasicInfo = await UserApi.getUserBasicInfo();
       console.log(userBasicInfo.username);
+
+      // remove
+      const searchForItems = await StoreApi.searchItems("a");
+      console.log(searchForItems);
+      
+      // remove
+      const searchForStores = await StoreApi.searchStore("a");
+      console.log(searchForStores);
+      
       const fetchedStoredList = await UserApi.getAllOwnedStoreIds()
       if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
           this.setState({
