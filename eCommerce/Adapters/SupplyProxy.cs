@@ -1,14 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace eCommerce.Adapters
 {
     public class SupplyProxy : ISupplyAdapter
     {
-        private ISupplyAdapter _adapter;
+        private static ISupplyAdapter _adapter;
+        
+        public static void AssignSupplyService(ISupplyAdapter supplyAdapter)
+        {
+            _adapter = supplyAdapter;
+        }
 
         public SupplyProxy()
         {
-            _adapter = null;
+            
         }
 
         public async Task<bool> SupplyProducts(string storeName, string[] itemsNames, string userAddress)

@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eCommerce.Business.Service;
 
 namespace eCommerce.Business
 {
     public class BasketInfo
     {
-        private IList<ItemInfo> _itemsInBasket;
-        private readonly double _totalPrice;
+        public IList<ItemInfo> _itemsInBasket;
+        public readonly double _totalPrice;
+        public String storeName;
         public BasketInfo(IBasket basket)
         {
             var itemsRes = basket.GetAllItems();
@@ -14,11 +16,12 @@ namespace eCommerce.Business
             {
                 foreach (var itemInf in itemsRes.GetValue())
                 {
-                   _itemsInBasket.Add(itemInf);
+                   _itemsInBasket.Add(new ItemInfo(itemInf));
                 }
             }
 
             this._totalPrice = basket.GetTotalPrice().GetValue();
+            this.storeName = basket.GetStoreName();
         }
 
         public IList<ItemInfo> ItemsInBasket

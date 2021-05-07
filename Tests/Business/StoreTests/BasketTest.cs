@@ -36,9 +36,9 @@ namespace Tests.Business.StoreTests
             item1 = new Item(itemName, itemCategory, alenbyStore, itemPrice);
             mokStore mokStore = (mokStore) alenbyStore;
             mokStore.item = item1;
-            alice = new mokUserAlice();
+            alice = new mokUser("Alice");
             info1 = new ItemInfo(0, itemName, storeName, itemCategory.getName(), new List<string>(), itemPrice);
-            alice = new mokUserAlice();
+            alice = new mokUser("Alice");
             cart = new Cart(alice);
             basket = new Basket(cart,alenbyStore);
         }
