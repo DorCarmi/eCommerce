@@ -12,8 +12,12 @@ namespace eCommerce.Business
         
         private bool _isRegistered;
         private UserToSystemState _systemState;
-        private MemberInfo _memberInfo;
+        private readonly MemberInfo  _memberInfo;
         public string Username {get => _memberInfo.Username;}
+        public MemberInfo MemberInfo
+        {
+            get => _memberInfo;
+        }
         private ICart _myCart;
 
         private Object dataLock;
@@ -143,7 +147,15 @@ namespace eCommerce.Business
         {
             return _myCart.EditCartItem(this, info);
         }
-        
+        /// <TEST> UserTest.TestAppointUserToOwner </TEST>
+        /// <UC> 'Nominate member to be store owner' </UC>
+        /// <REQ> 4.5 </REQ>
+        /// <summary>
+        ///  make the user an owner of the given store. 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="store"></param>
+        /// <returns>Result, OK/Fail. </returns>
         public Result AppointUserToOwner(IStore store, IUser user)
         {
             return _systemState.AppointUserToOwner(this, store, user);
@@ -151,7 +163,7 @@ namespace eCommerce.Business
 
         /// <TEST> UserTest.TestAppointUserToManager </TEST>
         /// <UC> 'Nominate member to be store manager' </UC>
-        /// <REQ> 4.4 </REQ>
+        /// <REQ> 4.3 </REQ>
         /// <summary>
         ///  make the user a manager of the given store. 
         /// </summary>
@@ -180,13 +192,13 @@ namespace eCommerce.Business
 
         public Result RemovePermissionsToManager(IStore store, IUser user, StorePermission permission)
         {
-            throw new NotImplementedException();
+            return _systemState.RemovePermissionsToManager(this, store, user, permission);
         }
 
         public Result<IList<IUser>> GetAllStoreStakeholders(IStore store)
         {
             //@TODO_SHARON:: find out if this means all of apointed-by's. might need adjustments on Store side.
-            throw new NotImplementedException();
+            return _systemState.GetAllStoreStakeholders(this, store);
         }
 
         /// <TEST> UserTest.TestUserPurchaseHistory </TEST>
@@ -235,6 +247,11 @@ namespace eCommerce.Business
         public UserToSystemState GetState()
         {
             return _systemState;
+        }
+
+        public Result BuyWholeCart(PaymentInfo paymentInfo)
+        {
+            return this._myCart.BuyWholeCart(this, paymentInfo);
         }
 
 
@@ -347,7 +364,7 @@ namespace eCommerce.Business
                     _appointedOwners[store].Add(newOwner);
                 }
             }//release lock
-            return store.AppointNewOwner(otherUser,newOwner);
+            return store.AppointNewOwner(this,newOwner);
         }
 
         public Result AppointUserToManager(Member member, IStore store, IUser otherUser)
@@ -376,7 +393,7 @@ namespace eCommerce.Business
                     _appointedManagers[store].Add(newManager);
                 }
             }//release lock
-            return store.AppointNewManager(otherUser,newManager);
+            return store.AppointNewManager(this,newManager);
         }
 
         public Result<OwnerAppointment> MakeOwner(Member member, IStore store)
@@ -401,19 +418,6 @@ namespace eCommerce.Business
 
         public Result AddPermissionsToManager(Member member, IStore store, IUser otherUser, StorePermission permission)
         {
-            // if (_appointedOwners.ContainsKey(store))
-            // {
-            //     OwnerAppointment owner = null;
-            //     lock (dataLock)
-            //     {
-            //         owner = _appointedOwners[store].FirstOrDefault((oa) => oa.User == otherUser);
-            //     }
-            //     if (owner != null)
-            //     {
-            //         return owner.AddPermissions(permission);
-            //     }
-            // }
-
             if (_appointedManagers.ContainsKey(store))
             {
                 ManagerAppointment manager = null;
@@ -502,6 +506,14 @@ namespace eCommerce.Business
             return store.GetPurchaseHistory(this);
         }
         
+        public Result<IList<IUser>> GetAllStoreStakeholders(Member member, IStore store)
+        {
+            if(!_storesOwned.ContainsKey(store))
+                return Result.Fail<IList<IUser>>("the User ["+Username+"] is not an owner of the given store ["+store.GetStoreName()+"].");
+            //@TODO_Sharon:: return store.getstakeholders 
+            throw new NotImplementedException();
+        }
+        
     #endregion //Member Functions
         
     
@@ -514,7 +526,8 @@ namespace eCommerce.Business
 
     
     #endregion
-    
+
+   
     }
     
    }

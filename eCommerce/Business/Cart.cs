@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using Microsoft.AspNetCore.Authorization;
 
 namespace eCommerce.Business
 {
     public class Cart : ICart
     {
-        private IUser _cartHolder;
+        private readonly IUser _cartHolder;
         private Transaction _performTransaction;
         
         private Dictionary<IStore, IBasket> _baskets;
@@ -30,20 +31,38 @@ namespace eCommerce.Business
         {
             if (user == this._cartHolder)
             {
-                if (!this._baskets.ContainsKey(item.GetStore()))
+                var storeRes = item.GetStore();
+                if (storeRes.IsFailure)
                 {
-                    if (item.GetStore().TryAddNewCartToStore(this))
-                    {
-                        var newBasket = new Basket(this,item.GetStore());
-                        return item.GetStore().ConnectNewBasketToStore(newBasket);
-                    }
-                    else
-                    {
-                        return Result.Fail("Problem- multiple connection of the same cart to the same store");
-                    }
-                   
+                    return Result.Fail(storeRes.Error);
                 }
-                return this._baskets[item.GetStore()].AddItemToBasket(user,item);
+                else
+                {
+                    if (!this._baskets.ContainsKey(storeRes.Value))
+                    {
+                        if (storeRes.Value.TryAddNewCartToStore(this))
+                        {
+                            var newBasket = new Basket(this, storeRes.Value);
+                            var basketRes=storeRes.Value.ConnectNewBasketToStore(newBasket);
+                            
+                            if (basketRes.IsFailure)
+                            {
+                                return Result.Fail(basketRes.Error);
+                            }
+                            else
+                            {
+                                this._baskets.Add(storeRes.Value,newBasket);
+                            }
+                        }
+                        else
+                        {
+                            return Result.Fail("Problem- multiple connection of the same cart to the same store");
+                        }
+
+                    }
+
+                    return this._baskets[storeRes.Value].AddItemToBasket(user, item);
+                }
 
             }
             else
@@ -56,13 +75,21 @@ namespace eCommerce.Business
         {
             if (user == this._cartHolder)
             {
-                if (this._baskets.ContainsKey(item.GetStore()))
+                var storeRes = item.GetStore();
+                if (storeRes.IsFailure)
                 {
-                    return _baskets[item.GetStore()].EditItemInBasket(user,item);
+                    return Result.Fail(storeRes.Error);
                 }
                 else
                 {
-                    return Result.Fail("No basket exists for the store the item is from");
+                    if (this._baskets.ContainsKey(storeRes.Value))
+                    {
+                        return _baskets[storeRes.Value].EditItemInBasket(user, item);
+                    }
+                    else
+                    {
+                        return Result.Fail("No basket exists for the store the item is from");
+                    }
                 }
             }
             else
@@ -103,6 +130,24 @@ namespace eCommerce.Business
         public IList<IBasket> GetBaskets()
         {
             return this._baskets.Values.ToList();
+        }
+
+        public CartInfo GetCartInfo()
+        {
+            IList<BasketInfo> baskets = new List<BasketInfo>();
+            foreach (var di_basket in _baskets)
+            {
+                baskets.Add(di_basket.Value.GetBasketInfo());
+            }
+
+            CalculatePricesForCart();
+            CartInfo info = new CartInfo(baskets, this._totalPrice);
+            return info;
+        }
+
+        public IUser GetUser()
+        {
+            return this._cartHolder;
         }
     }
 }

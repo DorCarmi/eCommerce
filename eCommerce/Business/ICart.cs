@@ -20,8 +20,8 @@ namespace eCommerce.Business
         public IList<IBasket> GetBaskets();
 
 
+        public CartInfo GetCartInfo();
 
-
-
+        public IUser GetUser();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -11,7 +12,20 @@ namespace eCommerce.Business
         private IDictionary<string, ItemInfo> _nameToItem;
         private IStore _store;
         private ICart _cart;
-        private double _totalPrice;
+        public double RegularTotalPrice=>getRegularTotalPrice();
+
+        private double currentPrice;
+        
+        private double getRegularTotalPrice()
+        {
+            double totalPrice = 0;
+            foreach (var itemInfo in _itemsInBasket)
+            {
+                totalPrice += itemInfo.amount * itemInfo.pricePerUnit;
+            }
+
+            return totalPrice;
+        }
 
         public Basket(ICart cart, IStore store)
         {
@@ -21,7 +35,7 @@ namespace eCommerce.Business
                 this._store = store;
                 this._itemsInBasket = new List<ItemInfo>();
                 this._nameToItem = new Dictionary<string, ItemInfo>();
-                this._totalPrice = 0;
+                this.currentPrice = 0;
             }
             else
             {
@@ -50,16 +64,24 @@ namespace eCommerce.Business
             {
                 return Result.Fail("Item doesn't belong to basket's store");
             }
+
+            var itemRes = this._store.TryGetItems(item);
+            if (itemRes.IsFailure )
+            {
+                return itemRes;
+            }
             
             else if (this._nameToItem.ContainsKey(item.name))
             {
                 this._nameToItem[item.name].amount += item.amount;
+                this.currentPrice = this.getRegularTotalPrice();
                 return Result.Ok();
             }
             else
             {
                 this._nameToItem.Add(item.name,item);
                 this._itemsInBasket.Add(item);
+                this.currentPrice = this.getRegularTotalPrice();
                 return Result.Ok();
             }
         }
@@ -75,6 +97,7 @@ namespace eCommerce.Business
                 if (item.amount == -1)
                 {
                     this._nameToItem.Remove(item.name);
+                    this.currentPrice = this.getRegularTotalPrice();
                     return Result.Ok();
                 }
                 else if (item.amount <= 0)
@@ -84,6 +107,7 @@ namespace eCommerce.Business
                 else
                 {
                     this._nameToItem[item.name].amount = item.amount;
+                    this.currentPrice = this.getRegularTotalPrice();
                     return Result.Ok();
                 }
             }
@@ -100,7 +124,7 @@ namespace eCommerce.Business
 
         public Result<double> GetTotalPrice()
         {
-            return Result.Ok(_totalPrice);
+            return Result.Ok(this.currentPrice);
         }
 
         public Result<IList<ItemInfo>> GetAllItems()
@@ -122,9 +146,15 @@ namespace eCommerce.Business
             }
             else
             {
-                this._totalPrice = res.GetValue();
+                this.currentPrice = res.Value;
                 return Result.Ok();
             }
+            
+        }
+        
+        public void SetTotalPrice(double newTotalPrice)
+        {
+            currentPrice = newTotalPrice;
             
         }
 
@@ -147,6 +177,12 @@ namespace eCommerce.Business
             {
                 return Result.Fail<ItemInfo>("Item doens't exist in basket, you can add it if you want");
             }
+        }
+
+        public BasketInfo GetBasketInfo()
+        {
+            BasketInfo basketInfo = new BasketInfo(this);
+            return basketInfo;
         }
     }
 }
