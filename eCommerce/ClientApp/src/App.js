@@ -22,7 +22,7 @@ export default class App extends Component {
       this.state = {
           isLoggedIn: false,
           storeList:[],
-          username: undefined
+          userName:''
       }
       
       this.setLoginHandler = this.setLoginHandler.bind(this);
@@ -32,15 +32,16 @@ export default class App extends Component {
   setLoginHandler(username){
       this.setState({
           isLoggedIn: true,
-          username: username
       });
   }
   async componentDidMount() {
       const userBasicInfo = await UserApi.getUserBasicInfo();
-      console.log(userBasicInfo);
+      console.log(userBasicInfo.username);
       const fetchedStoredList = await UserApi.getAllOwnedStoreIds()
-      if (fetchedStoredList && fetchedStoredList.isSuccess) {
+      if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
           this.setState({
+              isLoggedIn:userBasicInfo.isLoggedIn,
+              userName:userBasicInfo.username,
               storeList: fetchedStoredList.value
           })
       }

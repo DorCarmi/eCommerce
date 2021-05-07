@@ -27,7 +27,7 @@ export class UserApi {
     static getUserBasicInfo(){
         return instance.get<Result<BasicUserInfo>>(GET_USER_BASIC_INFO_PATH)
             .then(res => {
-                return res.data;
+                return res.data.value;
             })
             .catch(err => {
                 return undefined

@@ -35,7 +35,8 @@ export class NavMenu extends Component {
       <header>
         <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
           <Container>
-            <NavbarBrand tag={Link} to="/">Website {", hello" + this.state.username ? this.state.username : ""}</NavbarBrand>
+            <NavbarBrand tag={Link} to="/">Website </NavbarBrand>
+            <NavbarBrand>{`hello ${this.props.state.userName ? this.props.state.userName : ""}`}</NavbarBrand>
             <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
             <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
               <ul className="navbar-nav flex-grow">
@@ -82,7 +83,7 @@ export class NavMenu extends Component {
                   </NavItem> </>: null}
 
                 {/*show stores*/}
-                {isLoggedIn &&  storeList.length > 0  ?
+                { storeList.length > 0  ?
                   <DropdownButton id="dropdown-basic-button" title="My Store List">
                     {storeList.map ((store) =>{
                       return(
