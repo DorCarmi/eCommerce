@@ -83,6 +83,7 @@ namespace eCommerce.Service
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeName">The store name</param>
+        /// <param name="item">The start product of a store</param>
         /// <returns>Result of the request</returns>
         public Result OpenStore(string token, string storeName);
         
