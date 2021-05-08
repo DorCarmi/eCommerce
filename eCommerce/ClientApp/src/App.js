@@ -16,6 +16,8 @@ import ShowResults from './components/ShowResults'
 import {BrowserRouter,useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 import {StoreApi} from "./Api/StoreApi";
+import {ItemDisplay} from "./components/ItemDisplay";
+import {Item} from "./Data/Item";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -92,6 +94,16 @@ export default class App extends Component {
               <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
               <Route exact path="/showResults/:itemId" render={({match}) => <ShowResults itemId ={match.params.itemId} />} />
 
+              <Route exact path="/itemDisplay" render={() => <ItemDisplay
+                  item={new Item({
+                      itemName: "phone",
+                      storeName: "store1",
+                      amount: 3,
+                      category: "electronics",
+                      keyWords: ["a", "a1"],
+                      pricePerUnit: 3
+                  })}
+                />} />
 
           </Layout>
         </BrowserRouter>
