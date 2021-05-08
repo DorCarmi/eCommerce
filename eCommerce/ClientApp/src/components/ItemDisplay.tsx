@@ -24,8 +24,11 @@ export class ItemDisplay extends Component<ItemDisplayProps, ItemDisplayState> {
     }
 
     handleQuantity(add: number){
+        const {item} = this.props;
         this.setState({
-            quantity: this.state.quantity + add
+            quantity: this.state.quantity + add > item.amount ? item.amount :
+                      this.state.quantity + add < 0 ? 0 : 
+                          this.state.quantity + add
         })
     }
 
