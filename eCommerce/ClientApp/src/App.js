@@ -10,14 +10,13 @@ import Register from "./components/Register";
 import './custom.css'
 import AddItem from './components/AddItem'
 import EditItem from './components/EditItem'
-import ShowResults from './components/ShowResults'
-
 
 import {BrowserRouter,useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 import {StoreApi} from "./Api/StoreApi";
 import {ItemDisplay} from "./components/ItemDisplay";
 import {Item} from "./Data/Item";
+import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -92,18 +91,7 @@ export default class App extends Component {
               <Route path='/openStore' exact component={() => <OpenStore addStoreToState={this.addStoreHandler} history={useHistory()}/>} />
               <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
               <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
-              <Route exact path="/showResults/:itemId" render={({match}) => <ShowResults itemId ={match.params.itemId} />} />
-
-              <Route exact path="/itemDisplay" render={() => <ItemDisplay
-                  item={new Item({
-                      itemName: "phone",
-                      storeName: "store1",
-                      amount: 3,
-                      category: "electronics",
-                      keyWords: ["a", "a1"],
-                      pricePerUnit: 3
-                  })}
-                />} />
+              <Route exact path="/searchItems/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query} />} />
 
           </Layout>
         </BrowserRouter>

@@ -25,3 +25,9 @@
 .cartSection {
     border-top: #b0b1b7 solid 1px;
 }
+
+.itemsDisplay {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}

@@ -77,33 +77,6 @@ export class NavMenu extends Component {
                 </NavItem>
 
                 {isLoggedIn? <>
-                  <DropdownButton id="dropdown-basic-button" title="My Cart">
-                    <NavItem>
-                      <NavLink tag={Link} className="text-dark" to="/GetCart">Get Cart</NavLink>
-                    </NavItem>
-                    
-                    <NavItem>
-                      <NavLink tag={Link} className="text-dark" to="/addItem">Add Item To Cart</NavLink>
-                    </NavItem>
-                    
-                    <NavItem>
-                      <NavLink tag={Link} className="text-dark" to="/EditItemAmountOfCart">Edit Item Amount Of Cart</NavLink>
-                    </NavItem>
-  
-                    <NavItem>
-                      <NavLink tag={Link} className="text-dark" to="/GetPurchaseCartPrice">Get Purchase Cart Price</NavLink>
-                    </NavItem>
-  
-                    <NavItem>
-                    <NavLink tag={Link} className="text-dark" to="/GetPurchaseCartPrice">Get Purchase Cart Price</NavLink>
-                  </NavItem>
-                    
-                    
-                    <NavItem>
-                      <NavLink tag={Link} className="text-dark" to="/PurchaseCart">Purchase Cart</NavLink>
-                    </NavItem>
-  
-                  </DropdownButton>
                   <NavItem> 
                     <NavLink tag={Link} className="text-dark" to="/openStore">Add a Store</NavLink>
                   </NavItem> </>: null}
@@ -122,7 +95,7 @@ export class NavMenu extends Component {
             </Collapse>
             <form className="RegisterForm" onSubmit={this.handleSubmit}>
               <input type="text" name="itemToSearch" value={this.state.itemToSearch} onChange={this.handleInputChange} />
-              <NavLink tag={Link} className="text-dark" to={`/showResults/${this.state.itemToSearch}`}>Search</NavLink>
+              <NavLink tag={Link} className="text-dark" to={`searchItems/${this.state.itemToSearch}`}>Search</NavLink>
             </form>
           </Container>
         </Navbar>
