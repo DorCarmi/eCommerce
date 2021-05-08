@@ -11,6 +11,14 @@ namespace Tests.AcceptanceTests
     [TestFixture]
     public class TestLogin
     {
+        /// <summary>
+        /// <UC>
+        /// Login
+        /// </UC>
+        /// <Req>
+        /// 2.4
+        /// </Req>
+        /// </summary>
         private IAuthService _auth;
 
         [SetUp]

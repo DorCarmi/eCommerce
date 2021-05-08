@@ -9,6 +9,16 @@ using NUnit.Framework;
 
 namespace Tests.AcceptanceTests
 {
+    /// <summary>
+    /// <UC>
+    /// Update product stock- add items
+    /// Update product stock- subtract items
+    /// Update existing product's details
+    /// </UC>
+    /// <Req>
+    /// 4.1
+    /// </Req>
+    /// </summary>
     [TestFixture]
     public class TestEditItemInStore
     {
@@ -31,7 +41,8 @@ namespace Tests.AcceptanceTests
             Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
-            _store.OpenStore(yossiLogInResult.Value, storeName, product);
+            _store.OpenStore(yossiLogInResult.Value, storeName);
+            _store.AddNewItemToStore(yossiLogInResult.Value, product);
             _store.AddNewItemToStore(yossiLogInResult.Value, new SItem("iPhone X", storeName, 35, "smartphones", 
                 new ReadOnlyCollection<string>(new List<string>{"smartphone", "iPhone", "Apple", "Iphone X"}), (double) 5000.99));
             token = _auth.Logout(yossiLogInResult.Value).Value;

@@ -9,6 +9,14 @@ using NUnit.Framework;
 
 namespace Tests.AcceptanceTests
 {
+    /// <summary>
+    /// <UC>
+    /// Open a store
+    /// </UC>
+    /// <Req>
+    /// 3.2
+    /// </Req>
+    /// </summary>
     [TestFixture]
     public class TestOpenStore
     {
@@ -36,11 +44,9 @@ namespace Tests.AcceptanceTests
         [Test]
         public void TestSuccess(string member, string password, string store)
         {
-            IItem _item = new SItem("Tara milk", store, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
             string token = _auth.Connect();
             Result<string> login = _auth.Login(token, member, password, ServiceUserRole.Member);
-            Result result = _store.OpenStore(login.Value, store, _item);
+            Result result = _store.OpenStore(login.Value, store);
             Assert.True(result.IsSuccess, result.Error);
             _auth.Logout(login.Value);
             _auth.Disconnect(token);
@@ -50,16 +56,12 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11", "qwerty123","Yossi's store", "Yossi11", "qwerty123", "dancing dragon")]
         public void TestMultipleSuccess(string firstMember, string firstPassword, string firstStore, string secondMember, string secondPassword, string secondStore)
         {
-            IItem firstItem = new SItem("Tara milk", firstStore, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
-            IItem secondItem = new SItem("Tara milk", secondStore, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
             string token = _auth.Connect();
             Result<string> login = _auth.Login(token, firstMember, firstPassword, ServiceUserRole.Member);
-            _store.OpenStore(login.Value, firstStore, firstItem);
+            _store.OpenStore(login.Value, firstStore);
             token = _auth.Logout(login.Value).Value;
             login = _auth.Login(token, secondMember, secondPassword, ServiceUserRole.Member);
-            Result result = _store.OpenStore(login.Value, secondStore, firstItem);
+            Result result = _store.OpenStore(login.Value, secondStore);
             Assert.True(result.IsSuccess, result.Error);
             token = _auth.Logout(login.Value).Value;
             _auth.Disconnect(token);
@@ -70,11 +72,9 @@ namespace Tests.AcceptanceTests
         [Test]
         public void TestFailureInput(string member, string password, string storeName, string itemStore)
         { 
-            IItem item = new SItem("Tara milk", itemStore, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
             string token = _auth.Connect();
             Result<string> login = _auth.Login(token, member, password, ServiceUserRole.Member);
-            Result result = _store.OpenStore(login.Value, storeName, item);
+            Result result = _store.OpenStore(login.Value, storeName);
             Assert.True(result.IsFailure, "store opening was suppose to fail");
             _auth.Logout(login.Value);
             _auth.Disconnect(token);
@@ -84,16 +84,12 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11", "qwerty123","Yossi's store", "Yossi11", "qwerty123")]
         public void TestFailureAlreadyExists(string firstMember, string firstPassword, string store, string secondMember, string secondPassword)
         {
-            IItem firstItem = new SItem("Tara milk", store, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
-            IItem secondItem = new SItem("Tara milk", store, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
             string token = _auth.Connect();
             Result<string> login = _auth.Login(token, firstMember, firstPassword, ServiceUserRole.Member);
-            _store.OpenStore(login.Value, store, firstItem);
+            _store.OpenStore(login.Value, store);
             token = _auth.Logout(login.Value).Value;
             login = _auth.Login(token, secondMember, secondPassword, ServiceUserRole.Member);
-            Result result = _store.OpenStore(login.Value, store, firstItem);
+            Result result = _store.OpenStore(login.Value, store);
             Assert.True(result.IsFailure, "store name already used. expected fail");
             token = _auth.Logout(login.Value).Value;
             _auth.Disconnect(token);
@@ -104,10 +100,8 @@ namespace Tests.AcceptanceTests
         [Test]
         public void TestFailureInput(string storeName)
         { 
-            IItem item = new SItem("Tara milk", storeName, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
             string token = _auth.Connect();
-            Result result = _store.OpenStore(token, storeName, item);
+            Result result = _store.OpenStore(token, storeName);
             Assert.True(result.IsFailure, "store opening was suppose to fail, user not logged in");
             _auth.Disconnect(token);
         }

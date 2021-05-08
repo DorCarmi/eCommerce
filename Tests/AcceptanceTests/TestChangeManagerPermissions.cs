@@ -9,6 +9,15 @@ using NUnit.Framework;
 
 namespace Tests.AcceptanceTests
 {
+    /// <summary>
+    /// <UC>
+    /// Update management permission for sub-manager
+    /// Remove management permission for sub-manager
+    /// </UC>
+    /// <Req>
+    /// 4.6
+    /// </Req>
+    /// </summary>
     [TestFixture]
     public class TestChangeManagerPermissions
     {
@@ -35,9 +44,7 @@ namespace Tests.AcceptanceTests
             _auth.Register(token, shiran, "130452abc");
             _auth.Register(token, lior, "987654321");
             Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            IItem product = new SItem("Tara milk", store, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
-            _store.OpenStore(yossiLogInResult.Value, store, product);
+            _store.OpenStore(yossiLogInResult.Value, store);
             _user.AppointManager(yossiLogInResult.Value, store, "singerMermaid");
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);

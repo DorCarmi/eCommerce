@@ -8,6 +8,14 @@ using NUnit.Framework;
 
 namespace Tests.AcceptanceTests
 {
+    /// <summary>
+    /// <UC>
+    /// Register to system
+    /// </UC>
+    /// <Req>
+    /// 2.3
+    /// </Req>
+    /// </summary>
     [TestFixture]
     public class TestRegister
     {

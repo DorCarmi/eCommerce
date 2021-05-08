@@ -9,6 +9,15 @@ using NUnit.Framework;
 
 namespace Tests.AcceptanceTests
 {
+    /// <summary>
+    /// <UC>
+    /// Admin requests for user’s Purchase history
+    /// Admin requests for store history 
+    /// </UC>
+    /// <Req>
+    /// 6.4
+    /// </Req>
+    /// </summary>
     [TestFixture]
     public class TestAdminRequestsHistory
     {
@@ -33,7 +42,8 @@ namespace Tests.AcceptanceTests
             string storeName = "Yossi's Store";
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
-            _store.OpenStore(yossiLogInResult.Value, storeName, product);
+            _store.OpenStore(yossiLogInResult.Value, storeName);
+            _store.AddNewItemToStore(yossiLogInResult.Value, product);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }

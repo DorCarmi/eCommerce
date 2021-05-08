@@ -9,6 +9,15 @@ using NUnit.Framework;
 
 namespace Tests.AcceptanceTests
 {
+    /// <summary>
+    /// <UC>
+    /// Add new product to store
+    /// </UC>
+    /// <Req>
+    /// 4.1
+    /// </Req>
+    /// </summary>
+    
     [TestFixture]
     public class TestAddNewItemToStore
     {
@@ -29,9 +38,7 @@ namespace Tests.AcceptanceTests
             _auth.Register(token, yossi, "qwerty123");
             _auth.Register(token, shiran, "130452abc");
             Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            IItem product = new SItem("Tara milk", storeName, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
-            _store.OpenStore(yossiLogInResult.Value, storeName, product);
+            _store.OpenStore(yossiLogInResult.Value, storeName);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
@@ -59,8 +66,6 @@ namespace Tests.AcceptanceTests
             new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) -75.9)]
         [TestCase("Cube Alarm", "the dancing pirate", 5986, "electronics",
             new string[] {"alarm", "electronics", "cube","decorations"}, (double) 65.5)]
-        [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (double)5.8)]
         [Test]      
         public void TestFailureInput(string name, string store, int amount, string category, string[] tags,
             double price)
@@ -91,12 +96,28 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
+        [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
+            new string[]{"dairy", "milk", "Tara"}, (double)5.8)]
+        [Test]      
+        public void TestFailureInputDoubleAddition(string name, string store, int amount, string category, string[] tags,
+            double price)
+        {
+            string token = _auth.Connect();
+            Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            _store.AddNewItemToStore(yossiLogin.Value, new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+            Result addItemResult = _store.AddNewItemToStore(yossiLogin.Value,
+                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+            Assert.True(addItemResult.IsFailure, "item addition was suppose to fail for " + name);
+            token = _auth.Logout(yossiLogin.Value).Value;
+            _auth.Disconnect(token);
+        }
+        
         [TestCase("iPhone X", 35, "smartphones",
             new string[] {"smartphone", "iPhone", "Apple", "Iphone X"}, (double) 5000.99)]
         [TestCase("Gans 356 air Rubik's cube", 178, "games",
             new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) 114.75)]
         [Test]      
-        public void TestFailureLogic(string name, int amount, string category, string[] tags,
+        public void TestFailureLogicNoLogin(string name, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();

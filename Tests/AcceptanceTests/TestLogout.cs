@@ -26,7 +26,14 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        
+        /// <summary>
+        /// <UC>
+        /// Logout
+        /// </UC>
+        /// <Req>
+        /// 3.1
+        /// </Req>
+        /// </summary>
         [Test]
         public void TestSuccess()
         {
