@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
+import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink,Input } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import './NavMenu.css';
 import {Dropdown,DropdownButton} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {UserApi} from '../Api/UserApi'
+import {StoreApi} from "../Api/StoreApi";
 
 
 
@@ -18,8 +19,12 @@ export class NavMenu extends Component {
     this.state = {  
       collapsed: true,
       storeList:[],
-      isLoggedIn:this.props.state.isLoggedIn
+      isLoggedIn:this.props.state.isLoggedIn,
+      itemToSearch:''
     };
+
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
 
@@ -29,14 +34,35 @@ export class NavMenu extends Component {
     });
   }
 
+    handleInputChange(event) {
+      const target = event.target;
+      this.setState({
+        [target.name]: target.value
+      });
+    }
+    
+  
+  
+  handleSubmit(){
+    
+    const searchItem = async () =>
+    {
+      const searchForItems = await StoreApi.searchItems(this.state.itemToSearch);
+      console.log(searchForItems);
+      return searchForItems
+    }
+    
+  }
+
   render () {
     const {isLoggedIn,storeList} = this.props.state
     return (
       <header>
         <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
           <Container>
-            <NavbarBrand tag={Link} to="/">Website </NavbarBrand>
+            <NavbarBrand tag={Link} to="/">Home </NavbarBrand>
             <label className="labelMargin">{`hello ${this.props.state.userName ? this.props.state.userName : ""}`}</label>
+
             <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
             <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
               <ul className="navbar-nav flex-grow">
@@ -94,8 +120,13 @@ export class NavMenu extends Component {
                     }
               </ul>
             </Collapse>
+            <form className="RegisterForm" onSubmit={this.handleSubmit}>
+              <input type="text" name="itemToSearch" value={this.state.itemToSearch} onChange={this.handleInputChange} />
+              <NavLink tag={Link} className="text-dark" to={`/showResults/${this.state.itemToSearch}`}>Search</NavLink>
+            </form>
           </Container>
         </Navbar>
+
       </header>
     );
   }
