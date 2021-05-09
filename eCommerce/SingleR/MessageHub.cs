@@ -20,7 +20,7 @@ namespace eCommerce.SingleR
         private ConcurrentDictionary<string, IList<string>> _userToConnection;
         public MessageHub()
         {
-            _mainPublisher = new MainPublisher();
+            _mainPublisher = MainPublisher.Instance;
             _mainPublisher.Register(this);
             _userToConnection = new ConcurrentDictionary<string, IList<string>>();
         }
@@ -39,7 +39,7 @@ namespace eCommerce.SingleR
         public async Task Message(MessageModel message)
         {
             Console.WriteLine($"Get message {message.Message} from {message.UserName} to {message.ToUser}");
-            MainPublisher mainPublisher = new MainPublisher();
+            MainPublisher mainPublisher = MainPublisher.Instance;
             mainPublisher.Connect(message.UserName);
             await Clients.Others.SendAsync("message", message);
         }

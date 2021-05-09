@@ -19,7 +19,7 @@ namespace Tests.Business.UserTests
         private mokStore store2;
         private User jaren;
         private User GM;
-        private User brandon;
+        private User dillon;
 
 
         [SetUp]
@@ -31,7 +31,7 @@ namespace Tests.Business.UserTests
             store2 = new mokStore("More(!) BasketBall stuff.. buy here");
             jaren = new User(new MemberInfo("Jaren Jackson Jr.", "jjj@mail.com", "Jaren", DateTime.Now, "Memphis"));
             GM = new User(Admin.State,new MemberInfo("GM", "gm@mail.com", "GM", DateTime.Now, "Memphis"));
-            brandon = new User(new MemberInfo("Brandon Clark","bc@mail.com","brandon",DateTime.Now, "Memphis"));
+            dillon = new User(new MemberInfo("Dillon Brooks","db@mail.com","Dillon",DateTime.Now, "Memphis"));
             ja.OpenStore(store1);
 
         }
@@ -122,8 +122,8 @@ namespace Tests.Business.UserTests
         public void TestAppointUserToManager_Concurrent()
         {
             ja.AppointUserToOwner(store1, jaren);
-            var task1 = new Task<Result>( ()=> ja.AppointUserToManager(store1, brandon));
-            var task2 = new Task<Result>( ()=> jaren.AppointUserToManager(store1, brandon));
+            var task1 = new Task<Result>( ()=> ja.AppointUserToManager(store1, dillon));
+            var task2 = new Task<Result>( ()=> jaren.AppointUserToManager(store1, dillon));
             task1.Start();
             task2.Start();
             Assert.True(task1.Result.IsSuccess != task2.Result.IsSuccess);
@@ -149,8 +149,8 @@ namespace Tests.Business.UserTests
         public void TestAppointUserToOwner_Concurrent()
         {
             ja.AppointUserToOwner(store1, jaren);
-            var task1 = new Task<Result>( ()=> ja.AppointUserToOwner(store1, brandon));
-            var task2 = new Task<Result>( ()=> jaren.AppointUserToOwner(store1, brandon));
+            var task1 = new Task<Result>( ()=> ja.AppointUserToOwner(store1, dillon));
+            var task2 = new Task<Result>( ()=> jaren.AppointUserToOwner(store1, dillon));
             task1.Start();
             task2.Start();
             Assert.True(task1.Result.IsSuccess != task2.Result.IsSuccess);
@@ -259,6 +259,46 @@ namespace Tests.Business.UserTests
             Assert.True(task2.Result.IsSuccess);
             Assert.True(task1.Result.Value.Count == task2.Result.Value.Count);
         }
-        
+
+        [Test]
+        public void TestRemoveOwnerFromStore_Pass()
+        {
+            Assert.True(ja.AppointUserToOwner(store1, jaren).IsSuccess);
+            Assert.True(jaren.AppointUserToOwner(store1, dillon).IsSuccess);
+            Assert.True(ja.RemoveOwnerFromStore(store1, jaren).IsSuccess);
+            
+            Assert.True(jaren.HasPermission(store1,StorePermission.ControlStaffPermission).IsFailure);
+            Assert.True(dillon.HasPermission(store1,StorePermission.ControlStaffPermission).IsFailure);
+        }
+
+        [Test]
+        public void TestRemoveOwnerFromStore_Fail()
+        {
+            Assert.False(jaren.RemoveOwnerFromStore(store1, ja).IsSuccess);
+            Assert.False(ja.RemoveOwnerFromStore(store1, jaren).IsSuccess);
+            ja.AppointUserToOwner(store1, jaren);
+            ja.AppointUserToOwner(store1, dillon);
+            Assert.False(dillon.RemoveOwnerFromStore(store1,jaren).IsSuccess);
+            Assert.False(jaren.RemoveOwnerFromStore(store1,dillon).IsSuccess);
+            Assert.False(ja.RemoveOwnerFromStore(store1,tempguy).IsSuccess);
+        }
+        [Test]
+        public void TestRemoveOwnerFromStore_Concurrent()
+        {
+            ja.AppointUserToOwner(store1, jaren);
+            ja.AppointUserToOwner(store1, dillon);
+            var task1 = new Task<Result>( ()=> ja.RemoveOwnerFromStore(store1, jaren));
+            var task2 = new Task<Result>( ()=> ja.RemoveOwnerFromStore(store1, jaren));
+            var task3 = new Task<Result>( ()=> ja.RemoveOwnerFromStore(store1, dillon));
+            var task4 = new Task<Result>( ()=> ja.RemoveOwnerFromStore(store1, dillon));
+            task1.Start();
+            task2.Start();
+            task3.Start();
+            task4.Start();
+            Assert.True(task1.Result.IsSuccess != task2.Result.IsSuccess);
+            Assert.True(task3.Result.IsSuccess != task4.Result.IsSuccess);
+            int ownersCount = ja.AppointedOwners[store1].Count;
+            Assert.True(ownersCount == 0);
+        }
     }
 }

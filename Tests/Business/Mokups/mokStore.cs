@@ -131,7 +131,8 @@ namespace Tests.Business.Mokups
 
         public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("MokStore: "+theOneWhoFires.Username+" removed the Owner: "+theFierd.Username);
+            return Result.Ok();
         }
 
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)

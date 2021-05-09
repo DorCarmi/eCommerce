@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using eCommerce.Publisher;
 
 namespace eCommerce.Business
 {
@@ -147,6 +148,12 @@ namespace eCommerce.Business
         {
             return _myCart.EditCartItem(this, info);
         }
+
+        public Result BuyWholeCart(PaymentInfo paymentInfo)
+        {
+            return this._myCart.BuyWholeCart(this, paymentInfo);
+        }
+      
         /// <TEST> UserTest.TestAppointUserToOwner </TEST>
         /// <UC> 'Nominate member to be store owner' </UC>
         /// <REQ> 4.5 </REQ>
@@ -175,6 +182,20 @@ namespace eCommerce.Business
             return _systemState.AppointUserToManager(this, store, user);
         }
         
+        /// <TEST> UserTest.TestRemoveOwnerFromStore </TEST>
+        /// <UC> 'Remove member from store ownership' </UC> //@TODO_Sharon : make sure use case documentation matches this
+        /// <REQ> 4.4 </REQ>
+        /// <summary>
+        ///  remove the user from being an owner of the given store. 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="store"></param>
+        /// <returns>Result, OK/Fail. </returns>
+        public Result RemoveOwnerFromStore(IStore store, IUser user)
+        {
+            return _systemState.RemoveOwnerFromStore(this, store, user);
+        }
+
         /// <TEST> UserTest.TestUpdatePermissionsToManager </TEST>
         /// <UC> 'Change management permission for sub-manger' </UC>
         /// <REQ> 4.6 </REQ>
@@ -194,13 +215,7 @@ namespace eCommerce.Business
         {
             return _systemState.RemovePermissionsToManager(this, store, user, permission);
         }
-
-        public Result<IList<IUser>> GetAllStoreStakeholders(IStore store)
-        {
-            //@TODO_SHARON:: find out if this means all of apointed-by's. might need adjustments on Store side.
-            return _systemState.GetAllStoreStakeholders(this, store);
-        }
-
+        
         /// <TEST> UserTest.TestUserPurchaseHistory </TEST>
         /// <UC> 'Review purchase history' </UC>
         /// <REQ> 3.7 </REQ>
@@ -211,6 +226,7 @@ namespace eCommerce.Business
         {
             return _systemState.GetUserPurchaseHistory(this);
         }
+        
         /// <TEST> UserTest.TestAdminGetHistory </TEST>
         /// <UC> 'Admin requests for user history' </UC>
         /// <REQ> 6.4 </REQ>
@@ -221,6 +237,7 @@ namespace eCommerce.Business
         {
             return _systemState.GetUserPurchaseHistory(this, otherUser);
         }
+        
         /// <TEST> UserTest.TestGetStoreHistory </TEST>
         /// <UC> 'Member requests for purchase history for the store' </UC>
         /// <REQ> 4.11 </REQ>
@@ -244,20 +261,34 @@ namespace eCommerce.Business
             return _systemState.MakeManager(this, store);
         }
 
+        public Result<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>> RemoveOwner(IStore store)
+        {
+            return _systemState.RemoveOwner(this, store);
+        }
+
+        public Result AnnexStakeholders(IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
+        {
+            return _systemState.AnnexStakeholders(this,store,owners,managers);
+        }
+
+
         public UserToSystemState GetState()
         {
             return _systemState;
         }
 
-        public Result BuyWholeCart(PaymentInfo paymentInfo)
+        public Result PublishMessage(string message)
         {
-            return this._myCart.BuyWholeCart(this, paymentInfo);
+            MainPublisher publisher = MainPublisher.Instance;
+            if (publisher == null)
+                return Result.Fail("user can not access publisher");
+            //@TODO_sharon:: find out whether 'userID' or 'Username' sould be passed
+            publisher.AddMessageToUser(Username, message);
+            return Result.Ok();
         }
 
-
         //InBusiness
-        
-        
+
         /// <TEST> UserTest.TestHasPermissions </TEST>
         /// <UC> 'Change management permission for sub-manger' </UC>
         /// <REQ> 5.1 </REQ>
@@ -283,7 +314,7 @@ namespace eCommerce.Business
 
 
     #region Admin Functions
-    //add necessary functions   
+    
 
     #endregion Admin Functions
     
@@ -415,21 +446,190 @@ namespace eCommerce.Business
             }
             return Result.Fail<ManagerAppointment>("unable to add user \'"+Username+"\' as store Manager");
         }
-
-        public Result AddPermissionsToManager(Member member, IStore store, IUser otherUser, StorePermission permission)
+        
+        public Result RemoveOwnerFromStore(Member member, IStore store,IUser otherUser)
         {
+            if (!_storesOwned.ContainsKey(store)){
+                return Result.Fail("user \'"+Username+"\' is not an owner of the given store.");
+            }
+            if ((!_appointedOwners.ContainsKey(store)) || FindCoOwner(store,otherUser).IsFailure){
+                return Result.Fail("user \'"+Username+"\' did not appoint the owner of the given store \'"+otherUser.Username+"\'.");
+            }
+            var res = otherUser.RemoveOwner(store);
+            if (res.IsFailure)
+            {
+                return res;
+            }
+
+            var coOwnersRes = FindCoOwners(store);
+            if (coOwnersRes.IsSuccess)
+            {
+                var coOwners = coOwnersRes.Value;
+                lock (dataLock)
+                {
+                    coOwners.Remove(res.Value.Item1);
+                }
+            }
+            string failMessage = "";
+            var storeRes = store.RemoveOwnerFromStore(this,otherUser,res.Value.Item1);
+            if (storeRes.IsFailure)
+            {
+                failMessage= failMessage+";\n"+storeRes.Error;
+            }
+            
+            var owners = res.Value.Item2;
+            if (owners != null)
+            {
+                foreach (var owner in owners)
+                {
+                    var coOwnerRes = RemoveOwnerFromStore(member, store, owner.User);
+                    // storeRes = store.RemoveOwnerFromStore(this,owner.User,owner);
+                    if (coOwnerRes.IsFailure)
+                    {
+                        failMessage = failMessage + ";\n" + coOwnerRes.Error;
+                    }
+                }
+            }
+
+            var managers = res.Value.Item3;
+            if (managers != null)
+            {
+                // foreach (var manager in managers)
+                // {
+                //     var coOwnerRes = RemoveOwnerFromStore(member, store, owner.User);
+                //     storeRes = store.RemoveOwnerFromStore(this,owner.User,owner);
+                //      if (coOwnerRes.IsFailure)
+                //      {
+                //          failMessage = failMessage + ";\n" + coOwnerRes.Error;
+                //      }
+                // }                
+            }
+            // founder.AnnexStakeholders(store, owners,managers);
+            if(failMessage != "")
+                return Result.Fail(failMessage);
+            return Result.Ok();
+        }
+        
+        public Result<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>> RemoveOwner(Member member, IStore store)
+        {
+            if (!_storesOwned.ContainsKey(store))
+            {
+                return Result.Fail<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>>("user ["+Username+"] is not an owner of the store ["+store.GetStoreName()+"]");
+            }
+            OwnerAppointment own;
+            IList<OwnerAppointment> coowns;
+            IList<ManagerAppointment> comans;
+            IList<OwnerAppointment> owners = null;
+            IList<ManagerAppointment> managers = null;
+            
+            if(!_storesOwned.TryRemove(store, out own))
+                return Result.Fail<Tuple<OwnerAppointment, IList<OwnerAppointment>, IList<ManagerAppointment>>>("\'"+Username+"\' is not an owner of the store \'"+store.GetStoreName()+"\'");
+            if (_appointedOwners.ContainsKey(store))
+            {
+                owners = _appointedOwners[store];
+                _appointedOwners.TryRemove(store, out coowns);
+            }
             if (_appointedManagers.ContainsKey(store))
             {
-                ManagerAppointment manager = null;
+                managers = _appointedManagers[store];
+                _appointedManagers.TryRemove(store, out comans);
+            }
+            return Result.Ok(new Tuple<OwnerAppointment,IList<OwnerAppointment>,IList<ManagerAppointment>>(own,owners,managers));
+        }
+        
+        public Result AnnexStakeholders(Member member,IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
+        {
+            if (!_storesFounded.ContainsKey(store))
+            {
+                return Result.Fail("user ["+Username+"] is not a founder of the store ["+store.GetStoreName()+"]");;
+            }
+
+            lock (dataLock)
+            {
+                if (owners != null)
+                {
+                    foreach (var owner in owners)
+                    {
+                     
+                        _appointedOwners[store].Add(owner);   
+                    }
+                }
+                if (managers != null && _appointedManagers.ContainsKey(store))
+                {
+                    foreach (var manager in managers)
+                    {
+                     
+                        _appointedManagers[store].Add(manager);   
+                    }
+                }
+            }
+            return Result.Ok();
+        }
+        
+        private Result<ManagerAppointment> FindCoManager(IStore store, IUser otherUser)
+        {
+            ManagerAppointment manager = null;
+            if (_appointedManagers.ContainsKey(store))
+            {
                 lock (dataLock)
                 {
                     manager = _appointedManagers[store].FirstOrDefault((ma) => ma.User == otherUser);
                 }
+            }
 
-                if (manager != null)
+            if (manager == null)
+                return Result.Fail<ManagerAppointment>("user\'"+Username+"\' did not appoint the given manager +\'"+otherUser.Username+"\'");
+            return Result.Ok<ManagerAppointment>(manager);
+        }
+        private Result<OwnerAppointment> FindCoOwner(IStore store, IUser otherUser)
+        {
+            OwnerAppointment owner = null;
+            if (_appointedOwners.ContainsKey(store))
+            {
+                lock (dataLock)
                 {
-                    return manager.AddPermissions(permission);
+                    owner = _appointedOwners[store].FirstOrDefault((ma) => ma.User == otherUser);
                 }
+            }
+
+            if (owner == null)
+                return Result.Fail<OwnerAppointment>("user\'"+Username+"\' did not appoint the given owner +\'"+otherUser.Username+"\'");
+            return Result.Ok<OwnerAppointment>(owner);
+        }
+        private Result<IList<ManagerAppointment>> FindCoManagers(IStore store)
+        {
+            IList<ManagerAppointment> managers = null;
+            if (_appointedManagers.ContainsKey(store))
+            {
+                managers = _appointedManagers[store];
+            }
+
+            if (managers == null)
+                return Result.Fail<IList<ManagerAppointment>>("user\'"+Username+"\' did not appoint anny managers to the given store");
+            return Result.Ok<IList<ManagerAppointment>>(managers);
+        }
+        private Result<IList<OwnerAppointment>> FindCoOwners(IStore store)
+        {
+            IList<OwnerAppointment> owners = null;
+            if (_appointedOwners.ContainsKey(store))
+            {
+                owners = _appointedOwners[store];
+            }
+
+            if (owners == null)
+                return Result.Fail<IList<OwnerAppointment>>("user\'"+Username+"\' did not appoint anny owners to the given store");
+            return Result.Ok<IList<OwnerAppointment>>(owners);
+        }
+
+        
+        public Result AddPermissionsToManager(Member member, IStore store, IUser otherUser, StorePermission permission)
+        {
+            ManagerAppointment manager = null;
+            var res = FindCoManager(store, otherUser);
+            if (res.IsSuccess)
+            {
+                manager = res.Value;
+                return manager.AddPermissions(permission);
             }
             return Result.Fail("user\'"+Username+"\' can not grant permissions to given manager");
         }
@@ -508,26 +708,24 @@ namespace eCommerce.Business
         
         public Result<IList<IUser>> GetAllStoreStakeholders(Member member, IStore store)
         {
-            if(!_storesOwned.ContainsKey(store))
-                return Result.Fail<IList<IUser>>("the User ["+Username+"] is not an owner of the given store ["+store.GetStoreName()+"].");
-            //@TODO_Sharon:: return store.getstakeholders 
             throw new NotImplementedException();
         }
+        
         
     #endregion //Member Functions
         
     
     #region Test Oriented Functions
 
-    public ConcurrentDictionary<IStore, IList<ManagerAppointment>> AppointedManagers => _appointedManagers;
-    public ConcurrentDictionary<IStore, IList<OwnerAppointment>> AppointedOwners => _appointedOwners;
-    public ConcurrentDictionary<IStore, ManagerAppointment> StoresManaged => _storesManaged;
-    public ConcurrentDictionary<IStore, OwnerAppointment> StoresOwned => _storesOwned;
-
-    
+        public ConcurrentDictionary<IStore, IList<ManagerAppointment>> AppointedManagers => _appointedManagers;
+        public ConcurrentDictionary<IStore, IList<OwnerAppointment>> AppointedOwners => _appointedOwners;
+        public ConcurrentDictionary<IStore, ManagerAppointment> StoresManaged => _storesManaged;
+        public ConcurrentDictionary<IStore, OwnerAppointment> StoresOwned => _storesOwned;
+        
     #endregion
 
-   
+
+    
     }
     
-   }
+}
