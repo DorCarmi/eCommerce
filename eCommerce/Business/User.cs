@@ -494,6 +494,7 @@ namespace eCommerce.Business
             var managers = res.Value.Item3;
             if (managers != null)
             {
+                //@TODO_sharon:: remove co-managers from store too!
                 // foreach (var manager in managers)
                 // {
                 //     var coOwnerRes = RemoveOwnerFromStore(member, store, owner.User);
