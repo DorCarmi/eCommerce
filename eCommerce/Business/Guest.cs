@@ -103,7 +103,22 @@ namespace eCommerce.Business
 
         public Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store)
         {
-            return Result.Fail<IList<IUser>>("Guest can not e a store owner.");
+            return Result.Fail<IList<IUser>>("Guest can not view stores stakeholders.");
+        }
+
+        public Result RemoveOwnerFromStore(User user, IStore store, IUser otherUser)
+        {
+            return Result.Fail<IList<IUser>>("Guest can not remove an owner from a store.");
+        }
+
+        public Result<OwnerAppointment> RemoveOwner(User user, IStore store)
+        {
+            return Result.Fail<OwnerAppointment>("Guest can not be an owner of a store.");
+        }
+
+        public Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
+        {
+            return Result.Fail("Guest can not be an founder of a store.");
         }
     }  
 }

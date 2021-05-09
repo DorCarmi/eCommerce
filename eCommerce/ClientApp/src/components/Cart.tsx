@@ -102,6 +102,7 @@ export class Cart extends Component<{}, CartState> {
     
     render() {
         const { cart, errorMessage } = this.state
+        console.log(cart);
         return (
             <main>
                 { cart ?  this.renderCart(cart) : <h1>{errorMessage}</h1>}

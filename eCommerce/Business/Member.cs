@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -109,6 +110,21 @@ namespace eCommerce.Business
         public Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store)
         {
             return user.GetAllStoreStakeholders(this, store);
+        }
+
+        public Result RemoveOwnerFromStore(User user, IStore store, IUser otherUser)
+        {
+            return user.RemoveOwnerFromStore(this, store,otherUser);
+        }
+
+        public Result<OwnerAppointment> RemoveOwner(User user, IStore store)
+        {
+            return user.RemoveOwner(this, store);
+        }
+
+        public Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
+        {
+            return user.AnnexStakeholders(this, store, owners, managers);
         }
     }
 }

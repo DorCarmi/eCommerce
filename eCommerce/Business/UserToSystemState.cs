@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -23,5 +24,8 @@ namespace eCommerce.Business
         Result HasPermission(User user,IStore store, StorePermission storePermission);
         Result EnterRecordToHistory(User user, PurchaseRecord record);
         Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store);
+        Result RemoveOwnerFromStore(User user, IStore store, IUser otherUser);
+        Result<OwnerAppointment> RemoveOwner(User user, IStore store);
+        Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers);
     }
 }

@@ -194,8 +194,10 @@ namespace eCommerce.Business
 
         private ItemInfo GetItemInfo(int amount)
         {
-            return new ItemInfo(amount, this._name, this._belongsToStore.GetStoreName(), this._category.getName(),
+            var info=new ItemInfo(amount, this._name, this._belongsToStore.GetStoreName(), this._category.getName(),
                 this._pricePerUnit,this._keyWords,this);
+            info.AssignStoreToItem(this._belongsToStore);
+            return info;
         }
 
         public Result<ItemInfo> AquireItems(ItemInfo itemInfo)

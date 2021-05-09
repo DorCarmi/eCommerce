@@ -67,18 +67,18 @@ export class NavMenu extends Component {
             <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
               <ul className="navbar-nav flex-grow">
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/login">{isLoggedIn ? null : "Login"}</NavLink>
+                  <NavLink tag={Link} className="text-dark" exact to="/login">{isLoggedIn ? null : "Login"}</NavLink>
                 </NavItem>
 
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/Cart">
+                  <NavLink tag={Link} className="text-dark" exact to="/Cart">
                     <img src="/Images/cart.png" alt="Cart" class="image"/>
                   </NavLink>
                 </NavItem>
 
                 {isLoggedIn? <>
                   <NavItem> 
-                    <NavLink tag={Link} className="text-dark" to="/openStore">Add a Store</NavLink>
+                    <NavLink tag={Link} className="text-dark" exact to="/openStore">Add a Store</NavLink>
                   </NavItem> </>: null}
 
                 {/*show stores*/}
@@ -87,7 +87,7 @@ export class NavMenu extends Component {
                     {storeList.map ((store) =>{
                       return(
                         <NavItem>
-                          <NavLink tag={Link} className="text-dark" to={`/store/${store}`}>{store}</NavLink>
+                          <NavLink tag={Link} className="text-dark" exact to={`/store/${store}`}>{store}</NavLink>
                         </NavItem>)})}
                    </DropdownButton> : null
                     }
@@ -95,7 +95,7 @@ export class NavMenu extends Component {
             </Collapse>
             <form className="RegisterForm" onSubmit={this.handleSubmit}>
               <input type="text" name="itemToSearch" value={this.state.itemToSearch} onChange={this.handleInputChange} />
-              <NavLink tag={Link} className="text-dark" to={`searchItems/${this.state.itemToSearch}`}>Search</NavLink>
+              <NavLink tag={Link} className="text-dark" exact to={`/searchItems/${this.state.itemToSearch}`}>Search</NavLink>
             </form>
           </Container>
         </Navbar>

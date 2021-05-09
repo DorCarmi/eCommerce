@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -84,6 +85,11 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
+        public Result RemoveOwnerFromStore(IStore store, IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result EnterRecordToHistory(PurchaseRecord record)
         {
             throw new System.NotImplementedException();
@@ -97,6 +103,21 @@ namespace Tests.Business.Mokups
         public Result<ManagerAppointment> MakeManager(IStore store)
         {
             throw new System.NotImplementedException();
+        }
+
+        public Result<OwnerAppointment> RemoveOwner(IStore store)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result AnnexStakeholders(IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result PublishMessage(string message)
+        {
+            throw new NotImplementedException();
         }
 
         public UserToSystemState GetState()
