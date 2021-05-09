@@ -105,7 +105,7 @@ namespace eCommerce.Business
             return user.RemoveOwnerFromStore(this, store,otherUser);
         }
 
-        public Result<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>> RemoveOwner(User user, IStore store)
+        public Result<OwnerAppointment> RemoveOwner(User user, IStore store)
         {
             return user.RemoveOwner(this, store);
         }

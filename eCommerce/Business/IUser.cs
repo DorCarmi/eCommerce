@@ -35,7 +35,7 @@ namespace eCommerce.Business
 
         public Result<OwnerAppointment> MakeOwner(IStore store);
         public Result<ManagerAppointment> MakeManager(IStore store);
-        public Result<Tuple<OwnerAppointment,IList<OwnerAppointment>,IList<ManagerAppointment>>> RemoveOwner(IStore store);
+        public Result<OwnerAppointment> RemoveOwner(IStore store);
         public Result AnnexStakeholders(IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers);
 
         public Result PublishMessage(string message);

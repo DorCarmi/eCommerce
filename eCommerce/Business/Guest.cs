@@ -107,9 +107,9 @@ namespace eCommerce.Business
             return Result.Fail<IList<IUser>>("Guest can not remove an owner from a store.");
         }
 
-        public Result<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>> RemoveOwner(User user, IStore store)
+        public Result<OwnerAppointment> RemoveOwner(User user, IStore store)
         {
-            return Result.Fail<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>>("Guest can not be an owner of a store.");
+            return Result.Fail<OwnerAppointment>("Guest can not be an owner of a store.");
         }
 
         public Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)

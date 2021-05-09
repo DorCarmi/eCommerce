@@ -100,7 +100,7 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public Result<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>> RemoveOwner(IStore store)
+        public Result<OwnerAppointment> RemoveOwner(IStore store)
         {
             throw new NotImplementedException();
         }

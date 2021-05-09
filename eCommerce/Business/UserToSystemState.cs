@@ -24,7 +24,7 @@ namespace eCommerce.Business
         Result EnterRecordToHistory(User user, PurchaseRecord record);
         Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store);
         Result RemoveOwnerFromStore(User user, IStore store, IUser otherUser);
-        Result<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>> RemoveOwner(User user, IStore store);
+        Result<OwnerAppointment> RemoveOwner(User user, IStore store);
         Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers);
     }
 }

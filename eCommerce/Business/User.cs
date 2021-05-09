@@ -261,7 +261,7 @@ namespace eCommerce.Business
             return _systemState.MakeManager(this, store);
         }
 
-        public Result<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>> RemoveOwner(IStore store)
+        public Result<OwnerAppointment> RemoveOwner(IStore store)
         {
             return _systemState.RemoveOwner(this, store);
         }
@@ -461,83 +461,15 @@ namespace eCommerce.Business
                 return res;
             }
 
-            var coOwnersRes = FindCoOwners(store);
-            if (coOwnersRes.IsSuccess)
-            {
-                var coOwners = coOwnersRes.Value;
-                lock (dataLock)
-                {
-                    coOwners.Remove(res.Value.Item1);
-                }
-            }
-            string failMessage = "";
-            var storeRes = store.RemoveOwnerFromStore(this,otherUser,res.Value.Item1);
-            if (storeRes.IsFailure)
-            {
-                failMessage= failMessage+";\n"+storeRes.Error;
-            }
-            
-            var owners = res.Value.Item2;
-            if (owners != null)
-            {
-                foreach (var owner in owners)
-                {
-                    var coOwnerRes = RemoveOwnerFromStore(member, store, owner.User);
-                    // storeRes = store.RemoveOwnerFromStore(this,owner.User,owner);
-                    if (coOwnerRes.IsFailure)
-                    {
-                        failMessage = failMessage + ";\n" + coOwnerRes.Error;
-                    }
-                }
-            }
-
-            var managers = res.Value.Item3;
-            if (managers != null)
-            {
-                //@TODO_sharon:: remove co-managers from store too!
-                // foreach (var manager in managers)
-                // {
-                //     var coOwnerRes = RemoveOwnerFromStore(member, store, owner.User);
-                //     storeRes = store.RemoveOwnerFromStore(this,owner.User,owner);
-                //      if (coOwnerRes.IsFailure)
-                //      {
-                //          failMessage = failMessage + ";\n" + coOwnerRes.Error;
-                //      }
-                // }                
-            }
-            // founder.AnnexStakeholders(store, owners,managers);
-            if(failMessage != "")
-                return Result.Fail(failMessage);
-            return Result.Ok();
-        }
-        
-        public Result<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>> RemoveOwner(Member member, IStore store)
-        {
-            if (!_storesOwned.ContainsKey(store))
-            {
-                return Result.Fail<Tuple<OwnerAppointment,IList<OwnerAppointment>, IList<ManagerAppointment>>>("user ["+Username+"] is not an owner of the store ["+store.GetStoreName()+"]");
-            }
-            OwnerAppointment own;
-            IList<OwnerAppointment> coowns;
-            IList<ManagerAppointment> comans;
-            IList<OwnerAppointment> owners = null;
-            IList<ManagerAppointment> managers = null;
-            
-            if(!_storesOwned.TryRemove(store, out own))
-                return Result.Fail<Tuple<OwnerAppointment, IList<OwnerAppointment>, IList<ManagerAppointment>>>("\'"+Username+"\' is not an owner of the store \'"+store.GetStoreName()+"\'");
             if (_appointedOwners.ContainsKey(store))
             {
-                owners = _appointedOwners[store];
-                _appointedOwners.TryRemove(store, out coowns);
+                _appointedOwners[store].Remove(res.Value);
             }
-            if (_appointedManagers.ContainsKey(store))
-            {
-                managers = _appointedManagers[store];
-                _appointedManagers.TryRemove(store, out comans);
-            }
-            return Result.Ok(new Tuple<OwnerAppointment,IList<OwnerAppointment>,IList<ManagerAppointment>>(own,owners,managers));
+            
+    
+            return Result.Ok();
         }
-        
+
         public Result AnnexStakeholders(Member member,IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
             if (!_storesFounded.ContainsKey(store))
@@ -566,7 +498,7 @@ namespace eCommerce.Business
             }
             return Result.Ok();
         }
-        
+
         private Result<ManagerAppointment> FindCoManager(IStore store, IUser otherUser)
         {
             ManagerAppointment manager = null;
@@ -582,6 +514,7 @@ namespace eCommerce.Business
                 return Result.Fail<ManagerAppointment>("user\'"+Username+"\' did not appoint the given manager +\'"+otherUser.Username+"\'");
             return Result.Ok<ManagerAppointment>(manager);
         }
+
         private Result<OwnerAppointment> FindCoOwner(IStore store, IUser otherUser)
         {
             OwnerAppointment owner = null;
@@ -597,32 +530,54 @@ namespace eCommerce.Business
                 return Result.Fail<OwnerAppointment>("user\'"+Username+"\' did not appoint the given owner +\'"+otherUser.Username+"\'");
             return Result.Ok<OwnerAppointment>(owner);
         }
-        private Result<IList<ManagerAppointment>> FindCoManagers(IStore store)
+
+        public Result<OwnerAppointment> RemoveOwner(Member member, IStore store)
         {
-            IList<ManagerAppointment> managers = null;
-            if (_appointedManagers.ContainsKey(store))
+            if (!_storesOwned.ContainsKey(store))
             {
-                managers = _appointedManagers[store];
+                return Result.Fail<OwnerAppointment>("user ["+Username+"] is not an owner of the store ["+store.GetStoreName()+"]");
+            }
+            OwnerAppointment own;
+            IList<OwnerAppointment> coowners;
+            IList<ManagerAppointment> comanagers;
+            
+            
+            string failMessage = "";
+            
+            
+            if (_appointedOwners.ContainsKey(store) && _appointedOwners[store]!=null)
+            {
+                var firedList = new List<OwnerAppointment>(_appointedOwners[store]);
+                foreach (var owner in firedList)
+                {
+                    var res = RemoveOwnerFromStore(member, store, owner.User);
+                    if(res.IsFailure)
+                        failMessage= failMessage+";\n"+res.Error;
+                }
             }
 
-            if (managers == null)
-                return Result.Fail<IList<ManagerAppointment>>("user\'"+Username+"\' did not appoint anny managers to the given store");
-            return Result.Ok<IList<ManagerAppointment>>(managers);
-        }
-        private Result<IList<OwnerAppointment>> FindCoOwners(IStore store)
-        {
-            IList<OwnerAppointment> owners = null;
-            if (_appointedOwners.ContainsKey(store))
+
+            if (_appointedManagers.ContainsKey(store) && _appointedManagers[store]!=null)
             {
-                owners = _appointedOwners[store];
+                var firedList = new List<ManagerAppointment>(_appointedManagers[store]);
+                foreach (var manager in firedList)
+                {
+                    //@TODO_sharon:: remove co-managers from store too!
+                    // var res = RemoveManagerFromStore(member, store, manager.User);
+                    // if(res.IsFailure)
+                    //     failMessage= failMessage+";\n"+res.Error;
+                }
             }
-
-            if (owners == null)
-                return Result.Fail<IList<OwnerAppointment>>("user\'"+Username+"\' did not appoint anny owners to the given store");
-            return Result.Ok<IList<OwnerAppointment>>(owners);
+            
+            _storesOwned.TryRemove(store, out own);
+            _appointedOwners.TryRemove(store, out coowners);
+            _appointedManagers.TryRemove(store, out comanagers);
+            if(failMessage != "")
+                return Result.Fail<OwnerAppointment>(failMessage);
+            return Result.Ok(own);
         }
 
-        
+
         public Result AddPermissionsToManager(Member member, IStore store, IUser otherUser, StorePermission permission)
         {
             ManagerAppointment manager = null;
