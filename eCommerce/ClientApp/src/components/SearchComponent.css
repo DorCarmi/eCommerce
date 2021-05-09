@@ -1,0 +1,27 @@
+﻿.searchContainer {
+    display: flex;
+    margin: 0;
+}
+
+.searchContainer *{
+    margin: 0;
+}
+
+.searchOptions {
+    border-right: none;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    margin: 0;
+    text-align: center;
+    text-align-last: center;
+    -moz-text-align-last: center;
+}
+
+.searchLink {
+    border: #b0b1b7 solid 1px;
+    background: gray;
+    border-left: none;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    margin: 0;
+}

@@ -17,6 +17,11 @@ html {
   box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
+.container * {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
 .image {
   width: 20px;
   height: 20px;
@@ -24,6 +29,12 @@ html {
 
 img:hover{
   opacity: 50%;
+}
+
+.dropdownMenu button {
+  background: white;
+  color: black;
+  border: black;
 }
 
 .labelMargin {

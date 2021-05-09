@@ -14,6 +14,7 @@ import EditItem from './components/EditItem'
 import {BrowserRouter,useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
+import {SearchComponent} from "./components/SearchComponent";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -82,6 +83,7 @@ export default class App extends Component {
               <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
               <Route exact path="/searchItems/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query} />} />
 
+              <Route exact path="/searchItems1" render={() => <SearchComponent />} />
           </Layout>
         </BrowserRouter>
     );

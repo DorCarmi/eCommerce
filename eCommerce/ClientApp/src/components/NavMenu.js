@@ -5,6 +5,7 @@ import './NavMenu.css';
 import {Dropdown,DropdownButton} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {StoreApi} from "../Api/StoreApi";
+import {SearchComponent} from "./SearchComponent";
 
 
 
@@ -59,44 +60,40 @@ export class NavMenu extends Component {
     return (
       <header>
         <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
-          <Container>
-            <NavbarBrand tag={Link} to="/">Home </NavbarBrand>
-            <label className="labelMargin">{`hello ${this.props.state.userName ? this.props.state.userName : ""}`}</label>
+          <Container class="container">
+            <NavbarBrand tag={Link} to="/">Home</NavbarBrand>
+            <label className="labelMargin">{`${this.props.state.userName ? "hello " + this.props.state.userName : ""}`}</label>
 
+            <SearchComponent/>
             <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
             <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
               <ul className="navbar-nav flex-grow">
+                {isLoggedIn ? null : 
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" exact to="/login">{isLoggedIn ? null : "Login"}</NavLink>
-                </NavItem>
+                  <NavLink tag={Link} className="text-dark" exact to="/login">Login</NavLink>
+                </NavItem> }
 
-                <NavItem>
-                  <NavLink tag={Link} className="text-dark" exact to="/Cart">
-                    <img src="/Images/cart.png" alt="Cart" class="image"/>
-                  </NavLink>
-                </NavItem>
-
-                {isLoggedIn? <>
+                {isLoggedIn ? 
                   <NavItem> 
                     <NavLink tag={Link} className="text-dark" exact to="/openStore">Add a Store</NavLink>
-                  </NavItem> </>: null}
+                  </NavItem>: null}
 
-                {/*show stores*/}
                 { storeList.length > 0  ?
-                  <DropdownButton id="dropdown-basic-button" title="My Store List">
-                    {storeList.map ((store) =>{
-                      return(
-                        <NavItem>
-                          <NavLink tag={Link} className="text-dark" exact to={`/store/${store}`}>{store}</NavLink>
-                        </NavItem>)})}
-                   </DropdownButton> : null
+                      <DropdownButton id="dropdown-basic-button" title="My Store List" className="dropdownMenu">
+                        {storeList.map ((store) =>{
+                          return(
+                            <NavItem>
+                              <NavLink tag={Link} className="text-dark" exact to={`/store/${store}`}>{store}</NavLink>
+                            </NavItem>)})}
+                       </DropdownButton> : null
                     }
               </ul>
             </Collapse>
-            <form className="RegisterForm" onSubmit={this.handleSubmit}>
-              <input type="text" name="itemToSearch" value={this.state.itemToSearch} onChange={this.handleInputChange} />
-              <NavLink tag={Link} className="text-dark" exact to={`/searchItems/${this.state.itemToSearch}`}>Search</NavLink>
-            </form>
+            <NavItem>
+              <NavLink tag={Link} className="text-dark" exact to="/Cart">
+                <img src="/Images/cart.png" alt="Cart" class="image"/>
+              </NavLink>
+            </NavItem>
           </Container>
         </Navbar>
 
