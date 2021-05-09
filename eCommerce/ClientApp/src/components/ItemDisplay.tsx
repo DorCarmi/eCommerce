@@ -1,5 +1,6 @@
 ﻿import React, {ChangeEvent, Component} from "react";
 import {Item} from "../Data/Item";
+import {CartApi} from "../Api/CartApi";
 import "./ItemDisplay.css"
 
 interface ItemDisplayProps {
@@ -7,19 +8,25 @@ interface ItemDisplayProps {
 }
 
 interface ItemDisplayState {
-    quantity: number
+    quantity: number,
+    errorMessage: string | undefined
 }
 
 export class ItemDisplay extends Component<ItemDisplayProps, ItemDisplayState> {
     static displayName = ItemDisplay.name;
+    private cartApi: CartApi;
 
     constructor(props: ItemDisplayProps) {
         super(props);
 
         this.state = {
-            quantity: 0
+            quantity: 0,
+            errorMessage: undefined
         }
+        this.cartApi = new CartApi();
+        
         this.handleQuantity = this.handleQuantity.bind(this);
+        this.handleAddToCart = this.handleAddToCart.bind(this);
 
     }
 
@@ -32,13 +39,37 @@ export class ItemDisplay extends Component<ItemDisplayProps, ItemDisplayState> {
         })
     }
 
+    async handleAddToCart(){
+        const {item} = this.props;
+        const addToCartRes = await this.cartApi.AddItem(item.itemName,
+            item.storeName, this.state.quantity);
+        if(addToCartRes){
+            if(addToCartRes.isSuccess) {
+                this.setState({
+                    quantity: 0,
+                    errorMessage: undefined
+                })
+            } else {
+                this.setState({
+                    errorMessage: addToCartRes.error
+                })
+            }
+        } else {
+            this.setState({
+                errorMessage: "Connection error"
+            })
+        }
+    }
+
     renderCartSection(){
+        const { errorMessage } = this.state;
         return (
             <div className="cartSection">
+                {errorMessage ? <label className="label3">{errorMessage}</label> : null}
                 <label>Quantity: {this.state.quantity}</label>
                 <button onClick={() => this.handleQuantity(1)}>+1</button>
                 <button onClick={() => this.handleQuantity(-1)}>-1</button>
-                <button>Add to cart</button>
+                <button className="action" onClick={this.handleAddToCart}>Add to cart</button>
             </div>
         )
     }
