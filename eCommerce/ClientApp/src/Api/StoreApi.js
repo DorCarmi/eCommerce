@@ -27,7 +27,7 @@ export class StoreApi {
             .catch(res => undefined)
         }
         
-    addItem(item)
+   static async addItem(item)
     {
         alert(item)
         return instance.post(ADD_ITEM_TO_STORE_PATH, item)
@@ -101,5 +101,6 @@ export class StoreApi {
                 return new Result(res.data)
             }).catch(err => undefined)
     }
-    
+
+
 }

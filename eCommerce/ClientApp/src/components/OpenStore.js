@@ -2,7 +2,7 @@
 import {Form,Button} from 'react-bootstrap'
 import "./Register.css"
 import {StoreApi} from '../Api/StoreApi'
-import {withRouter} from "react-router-dom";
+import {Redirect, withRouter} from "react-router-dom";
 
 
 
@@ -12,7 +12,8 @@ class OpenStore extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            storeId:''
+            storeId:'',
+            submitted:false
         }
         this.storeApi = new StoreApi();
 
@@ -32,7 +33,12 @@ class OpenStore extends Component {
         if(res && res.isSuccess) {
             alert('add item succeed')
             // this.props.addStoreToState(storeId);
-            this.redirectToHome('/')
+            // this.redirectToHome('/')
+            this.setState({
+                submitted:true
+            })
+            window.location.reload(false);
+
         }
         else{
             alert(`add item failed because- ${res.error}`)
@@ -48,22 +54,26 @@ class OpenStore extends Component {
 
 
     render () {
-        return (
-            <main className="RegisterMain">
-                <div className="RegisterWindow">
-                    <div className="CenterItemContainer">
-                        <h3>Open store</h3>
-                    </div>
-                    <form className="RegisterForm" onSubmit={this.handleSubmit}>
-                        <input type="text" name="storeId" value={this.state.storeId}
-                               placeholder={'Enter Store Id'} onChange={this.handleInputChange} required/>
+        if (this.state.submitted) {
+            return <Redirect to="/"/>
+        } else {
+            return (
+                <main className="RegisterMain">
+                    <div className="RegisterWindow">
                         <div className="CenterItemContainer">
-                            <input className="action" type="submit" value="submit"/>
+                            <h3>Open store</h3>
                         </div>
-                    </form>
-                </div>
-            </main>
-        );
+                        <form className="RegisterForm" onSubmit={this.handleSubmit}>
+                            <input type="text" name="storeId" value={this.state.storeId}
+                                   placeholder={'Enter Store Id'} onChange={this.handleInputChange} required/>
+                            <div className="CenterItemContainer">
+                                <input className="action" type="submit" value="submit"/>
+                            </div>
+                        </form>
+                    </div>
+                </main>
+            );
+        }
     }
 }
 

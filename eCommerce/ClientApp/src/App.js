@@ -28,15 +28,9 @@ export default class App extends Component {
       }
       this.userApi = new UserApi();
       
-      this.setLoginHandler = this.setLoginHandler.bind(this);
       this.addStoreHandler = this.addStoreHandler.bind(this);
   }
   
-  setLoginHandler(username){
-      this.setState({
-          isLoggedIn: true,
-      });
-  }
   async componentDidMount() {
       const userBasicInfo = await this.userApi.getUserBasicInfo();
       console.log(userBasicInfo.username);
@@ -72,7 +66,7 @@ export default class App extends Component {
         <BrowserRouter>
           <Layout state={this.state}>
             <Route exact path='/' component={Home} />
-            <Route path='/login' component={() => <Login setLoginState={this.setLoginHandler}/>} />
+            <Route path='/login' component={() => <Login/>} />
             <Route path='/register' component={Register}/>
               <Route path='/cart' component={Cart} />
               <Route exact path="/store/:id" render={({match}) => (<Store  storeId={match.params.id} 

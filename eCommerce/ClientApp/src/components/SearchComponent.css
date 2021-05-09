@@ -19,7 +19,8 @@
 
 .searchLink {
     border: #b0b1b7 solid 1px;
-    background: gray;
+    background: blue;
+    color:white;
     border-left: none;
     border-bottom-right-radius: 5px;
     border-top-right-radius: 5px;
