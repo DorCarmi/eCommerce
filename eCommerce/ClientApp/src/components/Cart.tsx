@@ -10,6 +10,7 @@ interface CartState {
 
 export class Cart extends Component<{}, CartState> {
     static displayName = Cart.name;
+    private cartApi: CartApi;
 
     constructor(props: any) {
         super(props);
@@ -17,12 +18,13 @@ export class Cart extends Component<{}, CartState> {
             errorMessage: undefined,
             cart: undefined
         };
+        this.cartApi = new CartApi();
         
         this.handleAmountUpdate = this.handleAmountUpdate.bind(this);
     }
     
     async handleAmountUpdate(storeId: string, itemId: string, amount: number){
-        const updateRes = await CartApi.EditItemAmount(itemId, storeId, amount);
+        const updateRes = await this.cartApi.EditItemAmount(itemId, storeId, amount);
         if(!updateRes || updateRes.isFailure){
             this.setState({
                 errorMessage: `Error in update: ${updateRes?.error}`,
@@ -37,7 +39,7 @@ export class Cart extends Component<{}, CartState> {
     }
 
     async getCart(){
-        let cartRes = await CartApi.getCart();
+        let cartRes = await this.cartApi.getCart();
         if(!cartRes || cartRes.isFailure){
             this.setState({
                 errorMessage: `Error when getting cart: ${cartRes?.error}`,

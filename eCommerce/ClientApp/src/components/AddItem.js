@@ -20,6 +20,7 @@ class AddItem extends Component {
             keyWords:'',
             price:undefined
         }
+        this.storeApi = new StoreApi();
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -34,7 +35,7 @@ class AddItem extends Component {
         const {itemName,amount,category,keyWords,price} = this.state
         const {storeId} = this.props
         event.preventDefault();
-        const res = await StoreApi.addItem(Item.createItem(itemName, storeId, amount, category, [keyWords], price))
+        const res = await this.storeApi.addItem(Item.createItem(itemName, storeId, amount, category, [keyWords], price))
         if(res && res.isSuccess) {
             alert('add item succeed')
             // this.props.addStoreToState(storeId);

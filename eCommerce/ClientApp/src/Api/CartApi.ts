@@ -15,13 +15,13 @@ const instance = axios.create(
 
 export class CartApi {
 
-    static getCart() {
+    getCart() {
         return instance.get<Result<CartDataType>>(GET_CART_PATH)
             .then(res => res.data)
             .catch(res => undefined)
     };
 
-    static AddItem(itemId: string, storeId: string, amount: number) {
+    AddItem(itemId: string, storeId: string, amount: number) {
         return instance.post<Result<any>>(ADD_ITEM_TO_CART_PATH, 
             {
                 itemId: itemId,
@@ -34,7 +34,7 @@ export class CartApi {
             .catch(res => undefined)
     };
 
-    static EditItemAmount(itemId: string, storeId: string, amount: number) {
+    EditItemAmount(itemId: string, storeId: string, amount: number) {
         return instance.post<Result<any>>(EDIT_ITEM_IN_CART_PATH,
             {
                 itemId: itemId,
@@ -46,7 +46,7 @@ export class CartApi {
             }).catch(res => undefined)
     };
 
-    static GetPurchasePrice() {
+    GetPurchasePrice() {
         return instance.get<Result<number>>(GET_PURCHASE_PRICE_CART_PATH)
             .then(res => {
                 return res.data;
@@ -54,7 +54,7 @@ export class CartApi {
             .catch(res => undefined)
     };
 
-    static PurchasePrice(userName: string, idNumber: string, creditCardNumber: string, 
+    PurchasePrice(userName: string, idNumber: string, creditCardNumber: string, 
                          creditCardExpirationDate: string, threeDigitsOnBackOfCard: string, 
                          fullAddress: string) {
         return instance.post<Result<any>>(PURCHASE_CART_PATH,

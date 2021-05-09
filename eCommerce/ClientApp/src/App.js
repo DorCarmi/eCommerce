@@ -13,9 +13,6 @@ import EditItem from './components/EditItem'
 
 import {BrowserRouter,useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
-import {StoreApi} from "./Api/StoreApi";
-import {ItemDisplay} from "./components/ItemDisplay";
-import {Item} from "./Data/Item";
 import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
 
 export default class App extends Component {
@@ -28,6 +25,7 @@ export default class App extends Component {
           storeList:[],
           userName:''
       }
+      this.userApi = new UserApi();
       
       this.setLoginHandler = this.setLoginHandler.bind(this);
       this.addStoreHandler = this.addStoreHandler.bind(this);
@@ -39,19 +37,10 @@ export default class App extends Component {
       });
   }
   async componentDidMount() {
-      // remove
-      const userBasicInfo = await UserApi.getUserBasicInfo();
+      const userBasicInfo = await this.userApi.getUserBasicInfo();
       console.log(userBasicInfo.username);
-
-      // remove
-      const searchForItems = await StoreApi.searchItems("a");
-      console.log(searchForItems);
       
-      // remove
-      const searchForStores = await StoreApi.searchStore("a");
-      console.log(searchForStores);
-      
-      const fetchedStoredList = await UserApi.getAllOwnedStoreIds()
+      const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
       if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
           this.setState({
               isLoggedIn:userBasicInfo.isLoggedIn,

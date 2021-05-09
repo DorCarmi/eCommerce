@@ -19,7 +19,8 @@ class EditItem extends Component {
             keyWords:'',
             price:undefined
         }
-
+        this.storeApi = new StoreApi();
+        
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -33,7 +34,7 @@ class EditItem extends Component {
         const {amount,category,keyWords,price} = this.state
         const {itemId,storeId} = this.props
         event.preventDefault();
-        const res = await StoreApi.editItem(Item.createItem(itemId, storeId, amount, category, [keyWords], price))
+        const res = await this.storeApi.editItem(Item.createItem(itemId, storeId, amount, category, [keyWords], price))
 
         if(res && res.isSuccess) {
             alert('edit item succeed')

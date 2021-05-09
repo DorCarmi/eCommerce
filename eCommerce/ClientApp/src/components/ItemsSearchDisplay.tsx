@@ -14,16 +14,18 @@ interface ItemsSearchDisplayState {
 
 export class ItemSearchDisplay extends Component<ItemsSearchDisplayProps, ItemsSearchDisplayState> {
     static displayName = ItemSearchDisplay.name;
+    private storeApi: StoreApi;
 
     constructor(props: ItemsSearchDisplayProps) {
         super(props);
         this.state = {
             items: undefined
         }
+        this.storeApi = new StoreApi();
     }
 
     async componentDidMount() {
-        const searchForItems = await StoreApi.searchItems(this.props.itemQuery);
+        const searchForItems = await this.storeApi.searchItems(this.props.itemQuery);
 
         if (searchForItems && searchForItems.isSuccess) {
             this.setState({

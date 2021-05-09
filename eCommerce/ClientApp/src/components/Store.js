@@ -17,10 +17,11 @@ export default class Store extends Component {
             storeId: storeId,
             items: []
         }
+        this.storeApi = new StoreApi();
     }
 
     async componentDidMount() {
-        const fetchedItems = await StoreApi.getAllItems(this.state.storeId)
+        const fetchedItems = await this.storeApi.getAllItems(this.state.storeId)
         if (fetchedItems && fetchedItems.isSuccess) {
             this.setState({
                 items: fetchedItems.value
@@ -38,7 +39,7 @@ export default class Store extends Component {
     
     removeItem = async (storeId,itemId) =>
     {
-        const res = await StoreApi.removeItem(storeId,itemId)
+        const res = await this.storeApi.removeItem(storeId,itemId)
 
         if(res && res.isSuccess) {
             alert('edit item succeed')

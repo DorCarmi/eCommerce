@@ -19,6 +19,7 @@ class OpenStore extends Component {
             keyWords:'',
             price:undefined
         }
+        this.storeApi = new StoreApi();
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -32,7 +33,7 @@ class OpenStore extends Component {
     async handleSubmit(event){
         const {name,storeId,amount,category,keyWords,price} = this.state
         event.preventDefault();
-        const res = await StoreApi.openStore(name,storeId,amount,category,keyWords,price)
+        const res = await this.storeApi.openStore(name,storeId,amount,category,keyWords,price)
         if(res && res.isSuccess) {
             alert('add item succeed')
             // this.props.addStoreToState(storeId);

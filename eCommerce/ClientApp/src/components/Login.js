@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { authApi } from "../Api/AuthApi"
+import { AuthApi } from "../Api/AuthApi"
 import "./Login.css"
 import {Link} from "react-router-dom";
 
@@ -15,6 +15,7 @@ class Login extends Component {
             password: undefined,
             role: "member",
         };
+        this.authApi = new AuthApi();
         
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -35,7 +36,7 @@ class Login extends Component {
     async handleSubmit(event){
         event.preventDefault();
         const {username, password, role} = this.state;
-        const loginRedirectAndRes = await authApi.Login(username, password, role);
+        const loginRedirectAndRes = await this.authApi.Login(username, password, role);
         if(loginRedirectAndRes) {
             const loginRes = loginRedirectAndRes.data;
 

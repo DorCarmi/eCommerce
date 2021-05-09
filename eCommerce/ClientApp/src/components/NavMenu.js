@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import './NavMenu.css';
 import {Dropdown,DropdownButton} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {UserApi} from '../Api/UserApi'
 import {StoreApi} from "../Api/StoreApi";
 
 
@@ -22,6 +21,7 @@ export class NavMenu extends Component {
       isLoggedIn:this.props.state.isLoggedIn,
       itemToSearch:''
     };
+    this.storeApi = new StoreApi();
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -47,7 +47,7 @@ export class NavMenu extends Component {
     
     const searchItem = async () =>
     {
-      const searchForItems = await StoreApi.searchItems(this.state.itemToSearch);
+      const searchForItems = await this.storeApi.searchItems(this.state.itemToSearch);
       console.log(searchForItems);
       return searchForItems
     }

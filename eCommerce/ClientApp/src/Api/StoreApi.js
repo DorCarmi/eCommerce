@@ -15,7 +15,7 @@ const instance = axios.create(
 
 export class StoreApi {
     
-    static openStore(name,storeId,amount,category,keyWords,price) {
+    openStore(name,storeId,amount,category,keyWords,price) {
         return instance.post(OPEN_STORE_PATH,
             {
                 itemName: name,
@@ -31,8 +31,8 @@ export class StoreApi {
             })
             .catch(res => undefined)
         }
-
-    static addItem(item)
+        
+    addItem(item)
     {
         alert(item)
         return instance.post(ADD_ITEM_TO_STORE_PATH, item)
@@ -42,7 +42,7 @@ export class StoreApi {
             .catch(res => undefined)
     }
 
-    static removeItem(storeId, itemId)
+    removeItem(storeId, itemId)
     {
         return instance.post(REMOVE_ITEM_FROM_STORE_PATH, 
             {
@@ -55,7 +55,7 @@ export class StoreApi {
             .catch(res => undefined)
     }
 
-    static editItem(item)
+    editItem(item)
     {
         return instance.post(EDIT_ITEM_IN_STORE_PATH, item)
             .then(res => {
@@ -66,7 +66,7 @@ export class StoreApi {
     
     // ========== Store query ========== //
 
-    static getItem(storeId, itemId)
+    getItem(storeId, itemId)
     {
         return instance.get(GET_ITEM_IN_STORE_PATH)
             .then(res => {
@@ -75,7 +75,7 @@ export class StoreApi {
             .catch(res => undefined)
     }
 
-    static getAllItems(storeId)
+    getAllItems(storeId)
     {
         return instance.get(GET_ALL_ITEMS_IN_STORE_PATH(storeId))
             .then(res => {
@@ -83,7 +83,7 @@ export class StoreApi {
             }).catch(err => undefined)
     }
     
-    static searchItems(query){
+    searchItems(query){
         return instance.get(SEARCH_ITEMS_PATH,
             {
                 params: {
@@ -95,7 +95,7 @@ export class StoreApi {
             }).catch(err => undefined)
     }
 
-    static searchStore(query){
+    searchStore(query){
         return instance.get(SEARCH_STORE_PATH,
             {
                 params: {

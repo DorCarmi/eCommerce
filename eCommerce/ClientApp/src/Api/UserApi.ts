@@ -10,11 +10,9 @@ const instance = axios.create(
     {withCredentials : true}
 );
 
-
-
 export class UserApi {
     
-    static getAllOwnedStoreIds() {
+    getAllOwnedStoreIds() {
         return instance.get(GET_ALL_OWNED_STORES)
             .then(res => {
                 return new Result<string[]>(res.data)
@@ -24,7 +22,7 @@ export class UserApi {
             })
     }
         
-    static getUserBasicInfo(){
+    getUserBasicInfo(){
         return instance.get<Result<BasicUserInfo>>(GET_USER_BASIC_INFO_PATH)
             .then(res => {
                 return res.data.value;
