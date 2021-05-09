@@ -17,7 +17,6 @@ namespace eCommerce.Business
 
         public int GetTotalPrice()
         {
-            
             return _pricePerUnit * _amount;
         }
 
@@ -42,6 +41,7 @@ namespace eCommerce.Business
             this._name = info.name;
             this._amount = info.amount;
             this._category = new Category(info.category);
+            this._belongsToStore = store;
             CopyKeyWords(info.keyWords);
             this._purchaseStrategy = new DefaultPurchaseStrategy(_belongsToStore);
             this._pricePerUnit = info.pricePerUnit;
@@ -219,7 +219,7 @@ namespace eCommerce.Business
 
         public Result FinalizeGetItems(int amount)
         {
-            if (this._amount - amount <= 1)
+            if (this._amount - amount < 1)
             {
                 return Result.Fail("There are no enough items to answer the requested amount");
             }
@@ -246,7 +246,7 @@ namespace eCommerce.Business
         
         public Result SubtractItems(IUser user,int amount)
         {
-            if (this._amount-amount > 1)
+            if (this._amount-amount >= 1)
             {
                 this._amount -= amount;
                 return Result.Ok();

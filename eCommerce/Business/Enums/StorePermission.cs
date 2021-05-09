@@ -8,6 +8,7 @@
         EditItemDetails,
         GetStoreHistory,
         EditStorePolicy,
-        ControlStaffPermission
+        ControlStaffPermission,
+        RemoveStoreStaff
     }
 }

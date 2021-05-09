@@ -105,5 +105,10 @@ namespace eCommerce.Business
         {
             return user.EnterRecordToHistory(this, record);
         }
+
+        public Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store)
+        {
+            return user.GetAllStoreStakeholders(this, store);
+        }
     }
 }

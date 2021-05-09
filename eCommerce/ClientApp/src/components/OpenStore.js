@@ -12,12 +12,7 @@ class OpenStore extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            name:'',
-            storeId:'',
-            amount:undefined,
-            category:'',
-            keyWords:'',
-            price:undefined
+            storeId:''
         }
         this.storeApi = new StoreApi();
 
@@ -33,7 +28,7 @@ class OpenStore extends Component {
     async handleSubmit(event){
         const {name,storeId,amount,category,keyWords,price} = this.state
         event.preventDefault();
-        const res = await this.storeApi.openStore(name,storeId,amount,category,keyWords,price)
+        const res = await this.storeApi.openStore(storeId)
         if(res && res.isSuccess) {
             alert('add item succeed')
             // this.props.addStoreToState(storeId);
@@ -62,17 +57,6 @@ class OpenStore extends Component {
                     <form className="RegisterForm" onSubmit={this.handleSubmit}>
                         <input type="text" name="storeId" value={this.state.storeId}
                                placeholder={'Enter Store Id'} onChange={this.handleInputChange} required/>
-                        <h5>Item info:</h5>       
-                        <input type="text" name="name" value={this.state.name} onChange={this.handleInputChange}
-                                placeholder={'Enter Item Name'} required/>
-                        <input type="number" name="amount" value={this.state.amount} onChange={this.handleInputChange}
-                               placeholder={'Enter amount'} required/>
-                        <input type="text" name="category" value={this.state.category} onChange={this.handleInputChange}
-                               placeholder={'Enter Item Category'} required/>
-                        <input type="text" name="keyWords" value={this.state.keyWords} onChange={this.handleInputChange}
-                               placeholder={'Enter Item keyWords'} required/>
-                        <input type="number" name="price" value={this.state.price} onChange={this.handleInputChange}
-                               placeholder={'Enter Item price'} required/>
                         <div className="CenterItemContainer">
                             <input className="action" type="submit" value="submit"/>
                         </div>

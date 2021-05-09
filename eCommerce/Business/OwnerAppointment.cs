@@ -14,13 +14,18 @@ namespace eCommerce.Business
         {
             this.User = user;
             this._permissions = new ConcurrentDictionary<StorePermission, bool>();
-            _permissions.TryAdd(StorePermission.GetStoreHistory,true);
-            _permissions.TryAdd(StorePermission.AddItemToStore,true);
-            _permissions.TryAdd(StorePermission.ChangeItemPrice,true);
-            _permissions.TryAdd(StorePermission.EditItemDetails,true);
-            _permissions.TryAdd(StorePermission.EditStorePolicy,true);
-            _permissions.TryAdd(StorePermission.ChangeItemStrategy,true);
-            _permissions.TryAdd(StorePermission.ControlStaffPermission,true);
+
+            foreach (var permission in Enum.GetValues(typeof(StorePermission)))
+            {
+                _permissions.TryAdd((StorePermission)permission,true);
+            }
+            // _permissions.TryAdd(StorePermission.GetStoreHistory,true);
+            // _permissions.TryAdd(StorePermission.AddItemToStore,true);
+            // _permissions.TryAdd(StorePermission.ChangeItemPrice,true);
+            // _permissions.TryAdd(StorePermission.EditItemDetails,true);
+            // _permissions.TryAdd(StorePermission.EditStorePolicy,true);
+            // _permissions.TryAdd(StorePermission.ChangeItemStrategy,true);
+            // _permissions.TryAdd(StorePermission.ControlStaffPermission,true);
         }
 
         public Result HasPermission(StorePermission permission)

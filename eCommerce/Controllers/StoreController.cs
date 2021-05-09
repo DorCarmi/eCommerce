@@ -9,6 +9,11 @@ using Microsoft.Extensions.Logging;
 namespace eCommerce.Controllers
 {
 
+    public class StoreName
+    {
+        public string StoreId { get; set; }
+    }
+    
     public class StoreAndItemId
     {
         public string StoreId { get; set; }
@@ -33,10 +38,10 @@ namespace eCommerce.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public Result OpenStore([FromBody] SItem itemInfo)
+        public Result OpenStore([FromBody] StoreName storeName)
         {
             return _storeService.OpenStore((string) HttpContext.Items["authToken"],
-                itemInfo.StoreName, itemInfo);
+                storeName.StoreId);
         }
 
         [HttpPost]

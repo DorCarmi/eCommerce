@@ -101,5 +101,9 @@ namespace eCommerce.Business
             return Result.Fail("Guest has no transaction-history.");
         }
 
+        public Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store)
+        {
+            return Result.Fail<IList<IUser>>("Guest can not e a store owner.");
+        }
     }  
 }

@@ -17,6 +17,8 @@ namespace eCommerce.Business.Service
         public IList<Item> GetAllItems();
 
         public Result<Item> GetItem(ItemInfo item);
+
+        public Result TryGetItems(ItemInfo item);
         
         // TODO implement
         public Result<Item> GetItem(string itemId);
@@ -54,14 +56,18 @@ namespace eCommerce.Business.Service
         public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment);
         public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment);
 
+        public Result<IUser> GetFounder();
+
+        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment);
+
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user);
         public Result EnterBasketToHistory(IBasket basket);
 
 
         public String GetStoreName();
         bool CheckWithPolicy(PurchaseStrategyName purchaseStrategy);
-        bool TryAddNewCartToStore(Cart cart);
-        Result ConnectNewBasketToStore(Basket newBasket);
+        bool TryAddNewCartToStore(ICart cart);
+        Result ConnectNewBasketToStore(IBasket newBasket);
         bool CheckConnectionToCart(ICart cart);
         Result<double> CheckDiscount(Basket basket);
         Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy);

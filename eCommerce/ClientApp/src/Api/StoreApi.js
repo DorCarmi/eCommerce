@@ -15,15 +15,10 @@ const instance = axios.create(
 
 export class StoreApi {
     
-    openStore(name,storeId,amount,category,keyWords,price) {
-        return instance.post(OPEN_STORE_PATH,
+    openStore(storeId) {
+        return instance.post(OPEN_STORE_PATH, 
             {
-                itemName: name,
-                storeName: storeId,
-                amount: amount,
-                category: category,
-                keyWords: [keyWords],
-                pricePerUnit: price
+                storeId: storeId
             })
             .then(res => {
                 return new Result(res.data)

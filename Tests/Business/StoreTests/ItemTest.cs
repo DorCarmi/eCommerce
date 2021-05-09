@@ -22,7 +22,7 @@ namespace Tests.Business.StoreTests
         private string itemName2 = "IPhone5.5";
         private int itemPrice2 = 3000;
         private Category itemCategory2 = new Category("AppleProducts");
-        private mokUserAlice alice;
+        private mokUser alice;
         
 
         private IStore alenbyStore;
@@ -36,7 +36,7 @@ namespace Tests.Business.StoreTests
             item1 = new Item(itemName, itemCategory, alenbyStore, itemPrice);
             mokStore mokStore = (mokStore) alenbyStore;
             mokStore.item = item1;
-            alice = new mokUserAlice();
+            alice = new mokUser("Alice");
             info1 = new ItemInfo(0, itemName, storeName, itemCategory.getName(), new List<string>(), itemPrice);
         }
 

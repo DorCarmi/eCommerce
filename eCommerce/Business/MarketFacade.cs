@@ -10,6 +10,7 @@ using NLog;
 
 namespace eCommerce.Business
 {
+    // TODO should be singleton
     // TODO check authException if we should throw them
     public class MarketFacade : IMarketFacade
     {
@@ -47,13 +48,7 @@ namespace eCommerce.Business
 
         public void CreateMainAdmin()
         {
-            MemberInfo adminInfo = new MemberInfo(
-                "_Admin",
-                "Admin@eCommerce.com",
-                "TheAdmin",
-                DateTime.Now, 
-                null);
-            _userManager.AddAdmin(adminInfo, "_Admin");
+            _userManager.CreateMainAdmin();
         }
 
 
@@ -438,6 +433,7 @@ namespace eCommerce.Business
             }
             var newItemInfo = itemRes.Value.ShowItem();
             newItemInfo.amount = amount;
+            //newItemInfo.AssignStoreToItem(store);
             return user.AddItemToCart(newItemInfo);
         }
 
@@ -528,7 +524,7 @@ namespace eCommerce.Business
 
         #region StoreManage
         //<CNAME>OpenStore</CNAME>
-        public Result OpenStore(string token, string storeName, IItem item)
+        public Result OpenStore(string token, string storeName)
         {
             // TODO check with user and store
             Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
@@ -538,9 +534,9 @@ namespace eCommerce.Business
             }
             IUser user = userRes.Value;
             
-            _logger.Info($"OpenStore({user.Username} ,{storeName} ,{item})");
+            _logger.Info($"OpenStore({user.Username})");
             
-            IStore newStore = new Store(storeName, user, DtoUtils.ItemDtoToProductInfo(item));
+            IStore newStore = new Store(storeName, user);
             if (!_storeRepository.Add(newStore))
             {
                 return Result.Fail("Store name taken");

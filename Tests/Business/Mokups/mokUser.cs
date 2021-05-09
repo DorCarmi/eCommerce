@@ -5,13 +5,14 @@ using eCommerce.Common;
 
 namespace Tests.Business.Mokups
 {
-    public class mokUserAlice : IUser
+    public class mokUser : IUser
     {
         private bool isLoggedIn = false;
-        private string userName = "ALICE";
+        private string userName;
 
-        public mokUserAlice()
+        public mokUser(string username)
         {
+            this.Username = username;
         }
 
         public Result Login(UserToSystemState systemState)
@@ -45,8 +46,15 @@ namespace Tests.Business.Mokups
             }
         }
 
-      
+
+        public MemberInfo MemberInfo { get; }
+
         public Result OpenStore(IStore store)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result<List<string>> GetStoreIds()
         {
             throw new System.NotImplementedException();
         }
@@ -92,6 +100,11 @@ namespace Tests.Business.Mokups
         }
 
         public UserToSystemState GetState()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Result BuyWholeCart(PaymentInfo paymentInfo)
         {
             throw new System.NotImplementedException();
         }

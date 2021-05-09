@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using eCommerce.Business.CombineRules;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,7 @@ namespace eCommerce.Business
 
         //Store's issues
         //Discounts and purchases
-        private List<DiscountStrategy> _myDiscountStrategies;
+        private List<DiscountComposite> _myDiscountStrategies;
         private List<PurchaseStrategy> _myPurchaseStrategies;
         private DiscountPolicy _myDiscountPolicy;
         private PurchasePolicy _myPurchasePolicy;
@@ -36,12 +37,12 @@ namespace eCommerce.Business
         
         private List<IBasket> _basketsOfThisStore;
 
-        public Store(String name, IUser founder, ItemInfo item)
+        public Store(String name, IUser founder)
         {
             this._storeName = name;
 
-            this._myDiscountStrategies = new List<DiscountStrategy>();
-            this._myDiscountStrategies.Add(new DefaultDiscountStrategy());
+            this._myDiscountStrategies = new List<DiscountComposite>();
+            this._myDiscountStrategies.Add(new DefaultDiscount());
             this._myPurchaseStrategies = new List<PurchaseStrategy>();
             this._myPurchaseStrategies.Add(new DefaultPurchaseStrategy(this));
 
@@ -59,7 +60,6 @@ namespace eCommerce.Business
             _managers = new List<IUser>();
             _managersAppointments = new List<ManagerAppointment>();
             
-            _inventory.AddNewItem(founder, item);
             _basketsOfThisStore = new List<IBasket>();
         }
         
@@ -184,6 +184,11 @@ namespace eCommerce.Business
             }
             return Result.Ok();
             
+        }
+
+        public Result TryGetItems(ItemInfo item)
+        {
+            return this._inventory.TryGetItems(item);
         }
 
         public Result FinishPurchaseOfBasket(IBasket basket)
@@ -363,6 +368,26 @@ namespace eCommerce.Business
             }
         }
 
+        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFired, OwnerAppointment ownerAppointment)
+        {
+            if (theOneWhoFires.HasPermission(this, StorePermission.RemoveStoreStaff).IsSuccess)
+            {
+                if (this._ownersAppointments.Contains(ownerAppointment))
+                {
+                    this._ownersAppointments.Remove(ownerAppointment);
+                    return Result.Ok();
+                }
+                else
+                {
+                    return Result.Fail("Owner appointed not record in store");
+                }
+            }
+            else
+            {
+                return Result.Fail("User doesn't have permissions to remove staff");
+            }
+        }
+        
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
         {
             return this._transactionHistory.GetHistory(user);
@@ -383,7 +408,7 @@ namespace eCommerce.Business
             return this._myPurchasePolicy.checkStrategy(purchaseStrategy);
         }
 
-        public bool TryAddNewCartToStore(Cart cart)
+        public bool TryAddNewCartToStore(ICart cart)
         {
             bool ans=true;
             foreach (var basket in this._basketsOfThisStore)
@@ -398,21 +423,25 @@ namespace eCommerce.Business
 
         }
 
-        public Result ConnectNewBasketToStore(Basket newBasket)
+        public Result ConnectNewBasketToStore(IBasket newBasket)
         {
-            foreach (var basket in _basketsOfThisStore)
+            if (_basketsOfThisStore.Count == 0)
             {
-                if (basket.GetCart() == newBasket.GetCart())
-                {
-                    return Result.Fail("Two baskets for the same store in cart");
-                }
-                else
-                {
-                    this._basketsOfThisStore.Add(newBasket);
-
-                }
+                this._basketsOfThisStore.Add(newBasket);
+                return Result.Ok();
             }
-            return Result.Ok();
+            else
+            {
+                foreach (var basket in _basketsOfThisStore)
+                {
+                    if (basket.GetCart() == newBasket.GetCart())
+                    {
+                        return Result.Fail("Two baskets for the same store in cart");
+                    }
+                }
+                this._basketsOfThisStore.Add(newBasket);
+                return Result.Ok();
+            }
         }
 
         public bool CheckConnectionToCart(ICart cart)
@@ -431,10 +460,10 @@ namespace eCommerce.Business
         public Result<double> CheckDiscount(Basket basket)
         {
             //No double discounts
-            double minValue = basket.GetTotalPrice().GetValue();
+            double minValue = basket.GetTotalPrice().Value;
             foreach (var strategy in this._myDiscountStrategies)
             {
-                var price = strategy.GetTotalPrice(basket);
+                var price = strategy.Get(basket,basket.GetCart().GetUser());
                 if (price.IsFailure)
                 {
                     return price;
@@ -499,6 +528,12 @@ namespace eCommerce.Business
         public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
         {
             throw new NotImplementedException();
+        }
+
+
+        public Result<IUser> GetFounder()
+        {
+            return Result.Ok(this._founder);
         }
     }
 }

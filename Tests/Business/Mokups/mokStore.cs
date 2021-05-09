@@ -27,6 +27,11 @@ namespace Tests.Business.Mokups
             return Result.Ok<Item>(this.item);
         }
 
+        public Result TryGetItems(ItemInfo item)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<Item> GetItem(string itemId)
         {
             throw new System.NotImplementedException();
@@ -109,14 +114,24 @@ namespace Tests.Business.Mokups
 
         public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment)
         {
-            Console.WriteLine("MokStore: Appointed new Owner: "+user.Username);
+            Console.WriteLine("MokStore: "+user.Username+" Appointed new Owner: "+ownerAppointment.User.Username);
             return Result.Ok();
         }
 
         public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment)
         {
-            Console.WriteLine("MokStore: Appointed new Manager: "+user.Username);
+            Console.WriteLine("MokStore: "+user.Username+" Appointed new Manager: "+managerAppointment.User.Username);
             return Result.Ok();
+        }
+
+        public Result<IUser> GetFounder()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment)
+        {
+            throw new NotImplementedException();
         }
 
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
@@ -141,13 +156,13 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public bool TryAddNewCartToStore(Cart cart)
+        public bool TryAddNewCartToStore(ICart cart)
         {
             Console.WriteLine("MokStore: Added New Cart To Store");
             return true;
         }
 
-        public Result ConnectNewBasketToStore(Basket newBasket)
+        public Result ConnectNewBasketToStore(IBasket newBasket)
         {
             Console.WriteLine("MockStore: Connected new basket to store");
             return Result.Ok();

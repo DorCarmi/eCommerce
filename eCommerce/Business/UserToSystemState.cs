@@ -22,5 +22,6 @@ namespace eCommerce.Business
         public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(User user, IStore store);
         Result HasPermission(User user,IStore store, StorePermission storePermission);
         Result EnterRecordToHistory(User user, PurchaseRecord record);
+        Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store);
     }
 }
