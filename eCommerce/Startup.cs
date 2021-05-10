@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using System.Net.WebSockets;
 using eCommerce.Communication;
-using eCommerce.SingleR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Connections;

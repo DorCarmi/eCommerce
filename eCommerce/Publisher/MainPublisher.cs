@@ -18,6 +18,11 @@ namespace eCommerce.Publisher
                 NotifyAll();
             }
         }
+        
+        public void Disconnect(string userId)
+        {
+            connected.TryRemove(userId, out var tstring);
+        }
 
         public void AddMessageToUser(string userid, string message)
         {
