@@ -1,6 +1,9 @@
 ﻿.searchContainer {
-    display: flex;
-    margin: 0;
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: 1fr 10fr 1fr;
+    width: 90%;
+    padding: 0 10px;
 }
 
 .searchContainer *{
@@ -18,8 +21,14 @@
 }
 
 .searchLink {
+    margin: 0;
+}
+
+.imageFitSize {
+    width: 32px;
+    height: 32px;
     border: #b0b1b7 solid 1px;
-    background: blue;
+    background: #1b6ec2;
     color:white;
     border-left: none;
     border-bottom-right-radius: 5px;

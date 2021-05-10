@@ -59,42 +59,47 @@ export class NavMenu extends Component {
     const {isLoggedIn,storeList} = this.props.state
     return (
       <header>
-        <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
-          <Container class="container">
-            <NavbarBrand tag={Link} to="/">Home</NavbarBrand>
-            <label className="labelMargin">{`${this.props.state.userName ? "hello " + this.props.state.userName : ""}`}</label>
-
-            <SearchComponent/>
-            <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
-            <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
-              <ul className="navbar-nav flex-grow">
-                {isLoggedIn ? null : 
-                <NavItem>
-                  <NavLink tag={Link} className="text-dark" exact to="/login">Login</NavLink>
-                </NavItem> }
-
-                {isLoggedIn ? 
-                  <NavItem> 
-                    <NavLink tag={Link} className="text-dark" exact to="/openStore">Add a Store</NavLink>
-                  </NavItem>: null}
-
-                { storeList.length > 0  ?
-                      <DropdownButton id="dropdown-basic-button" title="My Store List" className="dropdownMenu">
-                        {storeList.map ((store) =>{
-                          return(
-                            <NavItem>
-                              <NavLink tag={Link} className="text-dark" exact to={`/store/${store}`}>{store}</NavLink>
-                            </NavItem>)})}
-                       </DropdownButton> : null
-                    }
-              </ul>
-            </Collapse>
-            <NavItem>
+        <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" expand="md" light>
+          <div className="containerNavBar">
+            <div className="navBarDiv">
+              <NavbarBrand tag={Link} to="/">Home</NavbarBrand>
+              <label className="labelMargin">{`${this.props.state.userName ? "hello " + this.props.state.userName : ""}`}</label>
+            </div>
+            
+            <div className="navBarSearch">
+              <SearchComponent/>
+            </div>
+            
+            <div className="navBarDiv">
+              <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
+              <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
+                <ul className="navbar-nav flex-grow">
+                  {isLoggedIn ? null : 
+                  <NavItem>
+                    <NavLink tag={Link} className="text-dark" exact to="/login">Login</NavLink>
+                  </NavItem> }
+  
+                  {isLoggedIn ? 
+                    <NavItem> 
+                      <NavLink tag={Link} className="text-dark" exact to="/openStore">Add a Store</NavLink>
+                    </NavItem>: null}
+  
+                  { storeList.length > 0  ?
+                        <DropdownButton id="dropdown-basic-button" title="My Store List" className="dropdownMenu">
+                          {storeList.map ((store) =>{
+                            return(
+                              <NavItem>
+                                <NavLink tag={Link} className="text-dark" exact to={`/store/${store}`}>{store}</NavLink>
+                              </NavItem>)})}
+                         </DropdownButton> : null
+                      }
+                </ul>
+              </Collapse>
               <NavLink tag={Link} className="text-dark" exact to="/Cart">
                 <img src="/Images/cart.png" alt="Cart" class="image"/>
               </NavLink>
-            </NavItem>
-          </Container>
+            </div>
+          </div>
         </Navbar>
 
       </header>

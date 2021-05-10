@@ -1,6 +1,7 @@
 ﻿import React, {ChangeEvent, Component} from 'react';
 import "./SearchComponent.css";
 import {Link} from "react-router-dom";
+import {NavLink} from "reactstrap";
 
 
 export class SearchComponent extends Component {
@@ -29,7 +30,11 @@ export class SearchComponent extends Component {
                     <option>Item</option>
                 </select>
                 <input placeholder="Search" value={this.state.searchQuery} onChange={this.handleInputChange}/>
-                <Link className="searchLink" exact to={`/searchItems/${this.state.searchQuery}`}>Search</Link>
+                <Link className="searchLink" exact to={`/searchItems/${this.state.searchQuery}`}>
+                    <div className="imageDiv">
+                        <img src="/Images/search.png" alt="Search" className="imageFitSize"/>
+                    </div>
+                </Link>
             </div>
         )
     }

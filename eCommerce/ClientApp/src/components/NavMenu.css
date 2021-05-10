@@ -17,14 +17,24 @@ html {
   box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
-.container * {
-  margin-left: 3px;
-  margin-right: 3px;
+.containerNavBar {
+  display: grid;
+  grid-auto-flow: column;
+  width: 100%;
+}
+
+.navBarDiv {
+  display: flex;
+}
+
+.navBarSearch {
+  display: flow-root;
+  margin: 0 auto;
 }
 
 .image {
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
 }
 
 img:hover{
@@ -37,6 +47,7 @@ img:hover{
   border: black;
 }
 
-.labelMargin {
+.labelMargin{
+  text-align: center;
   margin-top: 10px;
 }
