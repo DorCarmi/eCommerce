@@ -55,6 +55,11 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
+        public Result<List<string>> GetStoreIds()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Result AddItemToCart(ItemInfo item)
         {
             throw new System.NotImplementedException();

@@ -74,10 +74,8 @@ namespace eCommerce
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}");
-                endpoints.MapHub<MessageHub>("/messageHub", options =>
+                endpoints.MapControllers();
+                    endpoints.MapHub<MessageHub>("/messageHub", options =>
                 {
                     options.Transports = HttpTransportType.WebSockets;
                 });

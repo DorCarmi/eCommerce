@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using eCommerce.Business.Service;
 
 namespace eCommerce.Service
@@ -10,13 +11,13 @@ namespace eCommerce.Service
         public int Amount { get; set; }
         
         public string Category { get; set; }
-        public ReadOnlyCollection<string> KeyWords { get; set; }
+        public List<string> KeyWords { get; set; }
         public double PricePerUnit { get; set; }
 
-        public SItem(string productName, string storeName, int amount,
-            string category, ReadOnlyCollection<string> keyWords, double pricePerUnit)
+        public SItem(string itemName, string storeName, int amount,
+            string category, List<string> keyWords, double pricePerUnit)
         {
-            ItemName = productName;
+            ItemName = itemName;
             StoreName = storeName;
             Amount = amount;
             Category = category;

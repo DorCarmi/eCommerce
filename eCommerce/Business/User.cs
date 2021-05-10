@@ -110,7 +110,12 @@ namespace eCommerce.Business
         {
             return _systemState.OpenStore(this, store);
         }
-        
+
+        public Result<List<string>> GetStoreIds()
+        {
+            return _systemState.GetStoreIds(this);
+        }
+
         /// <TEST>  </TEST>
         /// <UC> 'Add product to basket' </UC>
         /// <REQ> 2.7 </REQ>
@@ -672,12 +677,12 @@ namespace eCommerce.Business
         
     
     #region Test Oriented Functions
+    
+    public ConcurrentDictionary<IStore, IList<ManagerAppointment>> AppointedManagers => _appointedManagers;
+    public ConcurrentDictionary<IStore, IList<OwnerAppointment>> AppointedOwners => _appointedOwners;
+    public ConcurrentDictionary<IStore, ManagerAppointment> StoresManaged => _storesManaged;
+    public ConcurrentDictionary<IStore, OwnerAppointment> StoresOwned => _storesOwned;
 
-        public ConcurrentDictionary<IStore, IList<ManagerAppointment>> AppointedManagers => _appointedManagers;
-        public ConcurrentDictionary<IStore, IList<OwnerAppointment>> AppointedOwners => _appointedOwners;
-        public ConcurrentDictionary<IStore, ManagerAppointment> StoresManaged => _storesManaged;
-        public ConcurrentDictionary<IStore, OwnerAppointment> StoresOwned => _storesOwned;
-        
     #endregion
 
 

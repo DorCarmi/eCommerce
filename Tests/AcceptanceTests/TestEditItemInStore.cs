@@ -40,11 +40,11 @@ namespace Tests.AcceptanceTests
             _auth.Register(token, shiran, "130452abc");
             Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
-                new ReadOnlyCollection<string>(new List<string>{"dairy", "milk", "Tara"}), (double)5.4);
+                new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             _store.OpenStore(yossiLogInResult.Value, storeName);
             _store.AddNewItemToStore(yossiLogInResult.Value, product);
             _store.AddNewItemToStore(yossiLogInResult.Value, new SItem("iPhone X", storeName, 35, "smartphones", 
-                new ReadOnlyCollection<string>(new List<string>{"smartphone", "iPhone", "Apple", "Iphone X"}), (double) 5000.99));
+                new List<string>{"smartphone", "iPhone", "Apple", "Iphone X"}, (double) 5000.99));
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
@@ -68,7 +68,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result editItemResult = _store.EditItemInStore(yossiLogin.Value,
-                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsSuccess, "failed to edit item: " + editItemResult.Error);
             token = _auth.Logout(yossiLogin.Value).Value;
             _auth.Disconnect(token);
@@ -91,7 +91,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result editItemResult = _store.EditItemInStore(yossiLogin.Value,
-                new SItem(name, store, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, store, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item");
             token = _auth.Logout(yossiLogin.Value).Value;
             _auth.Disconnect(token);
@@ -106,7 +106,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             Result<string> login = _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
             Result editItemResult = _store.EditItemInStore(login.Value,
-                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item, user doesn't own the store");
             token = _auth.Logout(login.Value).Value;
             _auth.Disconnect(token);
@@ -120,7 +120,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result editItemResult = _store.EditItemInStore(token,
-                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail. user is not logged in");
             _auth.Disconnect(token);
         }

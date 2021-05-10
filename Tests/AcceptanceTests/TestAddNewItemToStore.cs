@@ -54,7 +54,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result addItemResult = _store.AddNewItemToStore(yossiLogin.Value,
-                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(addItemResult.IsSuccess, "failed to add item: " + name + "|error: " + addItemResult.Error);
             token = _auth.Logout(yossiLogin.Value).Value;
             _auth.Disconnect(token);
@@ -73,7 +73,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result addItemResult = _store.AddNewItemToStore(yossiLogin.Value,
-                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(addItemResult.IsFailure, "item addition was suppose to fail for " + name);
             token = _auth.Logout(yossiLogin.Value).Value;
             _auth.Disconnect(token);
@@ -90,7 +90,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             Result<string> login = _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
             Result addItemResult = _store.AddNewItemToStore(login.Value,
-                new SItem(name, store, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, store, amount, category, new List<string>(tags), price));
             Assert.True(addItemResult.IsFailure, "item addition was suppose to fail for " + name + ", since the user does not own the store.");
             token = _auth.Logout(login.Value).Value;
             _auth.Disconnect(token);
@@ -104,9 +104,9 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            _store.AddNewItemToStore(yossiLogin.Value, new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+            _store.AddNewItemToStore(yossiLogin.Value, new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Result addItemResult = _store.AddNewItemToStore(yossiLogin.Value,
-                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(addItemResult.IsFailure, "item addition was suppose to fail for " + name);
             token = _auth.Logout(yossiLogin.Value).Value;
             _auth.Disconnect(token);
@@ -122,7 +122,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result addItemResult = _store.AddNewItemToStore(token,
-                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(addItemResult.IsFailure, "item addition was suppose to fail for " + name + ", since the user is not logged in.");
             _auth.Disconnect(token);
         }

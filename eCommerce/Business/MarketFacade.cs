@@ -88,6 +88,24 @@ namespace eCommerce.Business
             return _userManager.IsUserConnected(token);
         }
 
+        public Result<UserBasicInfo> GetUserBasicInfo(string token)
+        {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<UserBasicInfo>(userRes.Error);
+            }
+            IUser user = userRes.Value;
+
+            UserBasicInfo userBasicInfo = new UserBasicInfo(user.Username, true);
+            if (user.GetState() == Guest.State)
+            {
+                userBasicInfo.IsLoggedIn = false;
+            }
+
+            return Result.Ok(userBasicInfo);
+        }
+
         //<CNAME>PersonalPurchaseHistory</CNAME>
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(string token)
         {
@@ -378,9 +396,19 @@ namespace eCommerce.Business
 
             return Result.Ok<IItem>(itemRes.Value.ShowItem());
         }
-        
-        
-        
+
+        public Result<List<string>> GetStoreIds(string token)
+        {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<List<string>>(userRes.Error);
+            }
+            IUser user = userRes.Value;
+
+            return user.GetStoreIds();
+        }
+
         #endregion
 
         #region UserBuyingFromStores
@@ -514,12 +542,13 @@ namespace eCommerce.Business
                 return Result.Fail("Store name taken");
             }
 
-            if (user.OpenStore(newStore).IsFailure)
+            Result res = user.OpenStore(newStore);
+            if (res.IsFailure)
             {
-                return Result.Fail("Error");
+                _storeRepository.Remove(newStore.GetStoreName());
             }
 
-            return Result.Ok();
+            return res;
         }
         
         //<CNAME>ItemsToStore</CNAME>
