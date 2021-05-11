@@ -15,7 +15,7 @@ export class Layout extends Component {
             display: 'flex',
             position: 'relative'
         }}>
-            {state.isLoggedIn ? <SideBarMenu/> : null}
+            {state.isLoggedIn ? <SideBarMenu storeList={state.storeList}/> : null}
             <Container>
               {this.props.children}
             </Container>

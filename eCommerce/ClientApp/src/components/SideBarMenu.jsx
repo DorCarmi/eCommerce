@@ -1,43 +1,50 @@
 ﻿import React, {Component} from "react";
-import {Menu, MenuItem, ProSidebar, SidebarContent, SidebarHeader} from "react-pro-sidebar";
+import {Menu, MenuItem, ProSidebar, SidebarContent, SidebarHeader, SubMenu} from "react-pro-sidebar";
 import "./SideBarMenu.css"
+import {Link} from "react-router-dom";
+import {NavItem, NavLink} from "reactstrap";
 
 export class SideBarMenu extends Component {
     static displayName = SideBarMenu.name;
 
+    constructor(props) {
+        super(props);
+    }
+    
+    renderStoreListMenu() {
+        const { storeList } = this.props;
+        if(storeList.length === 0) {
+            return null;
+        }
+        
+        return (
+            <SubMenu title="My stores">
+                {storeList.map ((store) =>
+                    (
+                        <MenuItem>
+                            <NavLink tag={Link} exact to={`/store/${store}`}>{store}</NavLink>
+                        </MenuItem>
+                    )
+                )}
+            </SubMenu>
+        )
+    }
+    
     render() {
         return (
-            <ProSidebar
-            breakPoint="md"
-            style={{
-                height: '100%',
-                width: '270px',
-                backgroundColor: '#e1e1e1'
-            }}>
+            <ProSidebar breakPoint="md" className="sideBarContainer">
                 <SidebarHeader>
-                    <div
-                        style={{
-                            padding: '24px',
-                            textTransform: 'uppercase',
-                            fontWeight: 'bold',
-                            fontSize: 14,
-                            letterSpacing: '1px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                        }}
-                    >
-                        "hello"
+                    <div className="sideBarHeaderContainer">
+                        Managment Panel
                     </div>
                 </SidebarHeader>
     
                 <SidebarContent>
-                    <Menu iconShape="circle">
-                        <MenuItem
-                            suffix={<span className="badge red">A</span>}
-                        >
-                            dashboard
+                    <Menu className="menuLayout">
+                        <MenuItem>
+                            <NavLink tag={Link} exact to="/openStore">Create new store</NavLink>
                         </MenuItem>
+                        {this.renderStoreListMenu()}
                     </Menu>
                 </SidebarContent>
         </ProSidebar>)
