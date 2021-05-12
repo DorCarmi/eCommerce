@@ -57,14 +57,15 @@ export class CartApi {
     PurchasePrice(userName: string, idNumber: string, creditCardNumber: string, 
                          creditCardExpirationDate: string, threeDigitsOnBackOfCard: string, 
                          fullAddress: string) {
+        console.log(`username: ${userName}`)
         return instance.post<Result<any>>(PURCHASE_CART_PATH,
             {
                 userName: userName,
-                IDNumber: idNumber,
-                CreditCardNumber: creditCardNumber,
-                CreditCardExpirationDate: creditCardExpirationDate,
-                ThreeDigitsOnBackOfCard: threeDigitsOnBackOfCard,
-                FullAddress: fullAddress
+                idNumber: idNumber,
+                creditCardNumber: creditCardNumber,
+                creditCardExpirationDate: creditCardExpirationDate,
+                threeDigitsOnBackOfCard: threeDigitsOnBackOfCard,
+                fullAddress: fullAddress
             })
             .then(res => {
                 return res.data;

@@ -15,6 +15,7 @@ import {BrowserRouter,useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
 import {SearchComponent} from "./components/SearchComponent";
+import {PurchaseCart} from "./components/Cart/PurchaseCart";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -38,9 +39,11 @@ export default class App extends Component {
       
       const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
       if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
+          console.log(userBasicInfo.username);
+
           this.setState({
-              isLoggedIn:userBasicInfo.isLoggedIn,
-              userName:userBasicInfo.username,
+              isLoggedIn: userBasicInfo.isLoggedIn,
+              userName: userBasicInfo.username,
               storeList: fetchedStoredList.value
           })
       }
@@ -69,22 +72,25 @@ export default class App extends Component {
     }
 
     render () {
-    return (
+        return (
         <BrowserRouter>
           <Layout state={this.state}>
             <Route exact path='/' component={Home} />
             <Route exact path='/login' component={() => <Login isLoggedIn={this.state.isLoggedIn} loginUpdateHandler={this.updateLoginHandler}/>} />
             <Route exact path='/register' component={Register}/>
-              <Route exact path='/cart' component={Cart} />
-              <Route exact path="/store/:id" render={({match}) => (<Store  storeId={match.params.id} 
-                                                                          storeList={this.state.storeList} redirect={this.redirectToHome}/>
-              )} />            
-              <Route exact path='/openStore' component={() => <OpenStore addStoreToState={this.addStoreHandler}/>} />
-              <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
-              <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
-              <Route exact path="/searchItems/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query} />} />
-
-              <Route exact path="/searchItems1" render={() => <SearchComponent />} />
+            
+            <Route exact path='/cart' component={Cart} />
+            <Route exact path='/purchaseCart' component={() => <PurchaseCart username={this.state.userName}/>} />
+            
+            <Route exact path="/store/:id" render={({match}) => (<Store  storeId={match.params.id} 
+                                                                        storeList={this.state.storeList} redirect={this.redirectToHome}/>
+            )} />            
+            <Route exact path='/openStore' component={() => <OpenStore addStoreToState={this.addStoreHandler}/>} />
+            <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
+            <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
+            <Route exact path="/searchItems/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query} />} />
+    
+            <Route exact path="/searchItems1" render={() => <SearchComponent />} />
           </Layout>
         </BrowserRouter>
     );

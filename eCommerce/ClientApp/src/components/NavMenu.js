@@ -42,8 +42,6 @@ export class NavMenu extends Component {
       });
     }
     
-  
-  
   handleSubmit(){
     
     const searchItem = async () =>
