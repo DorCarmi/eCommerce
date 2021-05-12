@@ -2,10 +2,13 @@
 import {CartApi} from "../Api/CartApi";
 import {Basket} from "./Cart/Basket";
 import {CartData} from "../Data/CartData";
+import {Redirect} from "react-router-dom";
 
 interface CartState {
     errorMessage: string | undefined,
-    cart: CartData | undefined
+    cart: CartData | undefined,
+    totalPrice: number,
+    redirectToPurchase: boolean,
 }
 
 export class Cart extends Component<{}, CartState> {
@@ -16,11 +19,14 @@ export class Cart extends Component<{}, CartState> {
         super(props);
         this.state = {
             errorMessage: undefined,
-            cart: undefined
+            cart: undefined,
+            totalPrice: 0,
+            redirectToPurchase: false
         };
         this.cartApi = new CartApi();
         
         this.handleAmountUpdate = this.handleAmountUpdate.bind(this);
+        this.handleCartPurchase = this.handleCartPurchase.bind(this);
     }
     
     async handleAmountUpdate(storeId: string, itemId: string, amount: number){
@@ -32,81 +38,83 @@ export class Cart extends Component<{}, CartState> {
             });
             return;
         }
+        
+        await this.updateTotalCartPrice()
     }
     
-    async componentDidMount() {
-        await this.getCart();
-    }
+    async updateTotalCartPrice(){
+        let cartTotalPriceRes = await this.cartApi.GetPurchasePrice();
 
-    async getCart(){
-        let cartRes = await this.cartApi.getCart();
-        if(!cartRes || cartRes.isFailure){
+        if(!cartTotalPriceRes || cartTotalPriceRes.isFailure){
             this.setState({
-                errorMessage: `Error when getting cart: ${cartRes?.error}`,
-                cart: undefined
+                errorMessage: `Error: ${cartTotalPriceRes?.error}`,
+                cart: undefined,
+                totalPrice: 0
             });
             return;
         }
 
         this.setState({
-            cart: cartRes.value
+            totalPrice: cartTotalPriceRes.value
+        })
+    }
+    
+    async componentDidMount() {
+        await this.getCart();
+        await this.updateTotalCartPrice();
+    }
+
+    async getCart(){
+        let cartRes = await this.cartApi.getCart();
+        
+        if(!cartRes || cartRes.isFailure){
+            this.setState({
+                errorMessage: `Error: ${cartRes?.error}`,
+                cart: undefined,
+                totalPrice: 0,
+            });
+            return;
+        }
+
+        this.setState({
+            cart: cartRes.value,
         })
     }
 
-    /*async componentDidMount() {
-        const item1 = new Item({
-            itemName: "phone",
-            storeName: "store1",
-            amount: 3,
-            category: "electronics",
-            keyWords: ["a", "a1"],
-            pricePerUnit: 3
-        })
-
-        const item2 = new Item({
-            itemName: "watermelon",
-            storeName: "store2",
-            amount: 3,
-            category: "sweat",
-            keyWords: ["a", "a1"],
-            pricePerUnit: 10
-        })
-        
-        const basket1 = new BasketData({
-            storeId: "store1",
-            items: [item1],
-            totalPrice: 9
-        })
-
-        const basket2 = new BasketData({
-            storeId: "store2",
-            items: [item1, item2],
-            totalPrice: 9
-        })
-        const cart = new CartData({baskets: [basket1, basket2]});
-        
+    async handleCartPurchase() {
         this.setState({
-            cart: cart
+            redirectToPurchase: true
         })
-    }*/
-
+    }
+    
     renderCart(cart: CartData){
         const renderedBaskets = cart.baskets.map(basket => <Basket basket={basket} handleAmountUpdate={this.handleAmountUpdate}/> );
         
         return (
             <div>
                 {renderedBaskets.length == 0 ? <h4 className="None">Empty cart</h4> : renderedBaskets}
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    marginTop: "10px"
+                }}>
+                    <h3>Total price: {this.state.totalPrice}</h3>
+                    <button className="action" style={{margin: "auto"}}
+                        onClick={this.handleCartPurchase}>Purchse cart</button>
+                </div>
             </div>
+            
         ) 
     }
     
     render() {
-        const { cart, errorMessage } = this.state
-        console.log(cart);
+        const { cart, errorMessage, redirectToPurchase } = this.state
         return (
-            <main>
+            redirectToPurchase ? 
+                <Redirect exact to="purchaseCart">Purchase cart</Redirect> :
+                <main>
                 { cart ?  this.renderCart(cart) : <h1>{errorMessage}</h1>}
-            </main>
+                </main>
         );
     }
 }

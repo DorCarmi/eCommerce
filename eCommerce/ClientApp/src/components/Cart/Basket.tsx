@@ -30,7 +30,7 @@ export class Basket extends Component<BasketProps> {
         const basket = this.props.basket;
         return (
             <div>
-                <h3>{basket.storeId}</h3>
+                <h3>Store: {basket.storeId}</h3>
                 {this.renderBasketItems(basket.items)}
             </div>
         );

@@ -42,7 +42,7 @@ namespace eCommerce.Controllers
                 addItemData.ItemId, addItemData.StoreId, addItemData.Amount);
         }
         
-        [HttpPost]
+        [HttpPut]
         [Route("[action]")]
         public Result EditItemAmount([FromBody] AddOrEditItemData editItemData)
         {

@@ -450,8 +450,14 @@ namespace eCommerce.Business
             
             _logger.Info($"EditItemAmountOfCart({user.Username}, {itemId}, {storeId}, {amount})");
 
-            // TODO implement store and user
-            return null;
+            Result<Item> itemRes = store.GetItem(itemId);
+            if (itemRes.IsFailure)
+            {
+                return itemRes;
+            }
+            var itemInfo = itemRes.Value.ShowItem();
+            itemInfo.amount = amount;
+            return user.EditCart(itemInfo);
         }
         //<CNAME>GetCart</CNAME>
         public Result<ICart> GetCart(string token)

@@ -78,21 +78,6 @@ export class NavMenu extends Component {
                   <NavItem>
                     <NavLink tag={Link} className="text-dark" exact to="/login">Login</NavLink>
                   </NavItem> }
-  
-                  {isLoggedIn ? 
-                    <NavItem> 
-                      <NavLink tag={Link} className="text-dark" exact to="/openStore">Add a Store</NavLink>
-                    </NavItem>: null}
-  
-                  { storeList.length > 0  ?
-                        <DropdownButton id="dropdown-basic-button" title="My Store List" className="dropdownMenu">
-                          {storeList.map ((store) =>{
-                            return(
-                              <NavItem>
-                                <NavLink tag={Link} className="text-dark" exact to={`/store/${store}`}>{store}</NavLink>
-                              </NavItem>)})}
-                         </DropdownButton> : null
-                      }
                 </ul>
               </Collapse>
               <NavLink tag={Link} className="text-dark" exact to="/Cart">

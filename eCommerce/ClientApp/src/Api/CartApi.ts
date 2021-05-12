@@ -35,7 +35,7 @@ export class CartApi {
     };
 
     EditItemAmount(itemId: string, storeId: string, amount: number) {
-        return instance.post<Result<any>>(EDIT_ITEM_IN_CART_PATH,
+        return instance.put<Result<any>>(EDIT_ITEM_IN_CART_PATH,
             {
                 itemId: itemId,
                 storeId: storeId,
