@@ -5,8 +5,6 @@ import {StoreApi} from '../Api/StoreApi'
 import {withRouter} from "react-router-dom";
 import {Item} from "../Data/Item";
 
-
-
 class AddItem extends Component {
     static displayName = AddItem.name;
 
@@ -37,8 +35,7 @@ class AddItem extends Component {
         const res = await StoreApi.addItem(Item.createItem(itemName, storeId, amount, category, [keyWords], price))
         if(res && res.isSuccess) {
             alert('add item succeed')
-            // this.props.addStoreToState(storeId);
-            this.redirectToHome('/')
+            this.redirectToHome(`/store/${storeId}`)
         }
         else{
             alert(`add item failed because- ${res.error}`)

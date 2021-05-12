@@ -3,8 +3,8 @@ import { withRouter } from 'react-router-dom';
 import { AuthApi } from "../Api/AuthApi"
 import "./Login.css"
 import {Link,Redirect} from "react-router-dom";
-import App from "../App"
-class Login extends Component {
+
+export class Login extends Component {
     static displayName = Login.name;
 
     constructor(props) {
@@ -14,18 +14,12 @@ class Login extends Component {
             username: undefined,
             password: undefined,
             role: "member",
-            submitted:false
+            submitted: this.props.isLoggedIn
         };
         this.authApi = new AuthApi();
         
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-    }
-    
-
-    redirectToHome = (path) => {
-        const { history } = this.props;
-        if(history) history.push(path);
     }
     
     handleInputChange(event){
@@ -43,15 +37,7 @@ class Login extends Component {
             const loginRes = loginRedirectAndRes.data;
 
             if (loginRes && loginRes.isSuccess) {
-                // this.redirectToHome(loginRedirectAndRes.redirect)
-                // return <Redirect to="/" />
-                this.setState({
-                    submitted:true
-                })
-                window.location.reload(false);
-
-
-
+                this.props.loginUpdateHandler(username)
             } else {
                 this.setState({
                     loginError: loginRes.error
@@ -63,7 +49,7 @@ class Login extends Component {
             })
         }
     }
-
+    
     componentDidMount() {
         //this.populateWeatherData();
     }
@@ -71,11 +57,12 @@ class Login extends Component {
     render() {
         const {redirectTo} = this.state
         if (this.state.submitted) {
-            return <Redirect to="/"/>
+            return <Redirect exact to="/"/>
         } else {
             return (
                 <main class="LoginMain">
                     <div class="LoginWindow">
+                        <h3>Login</h3>
                         <form class="LoginForm" onSubmit={this.handleSubmit}>
                             {this.state.loginError ?
                                 <div class="CenterItemContainer"><label>{this.state.loginError}</label></div> : null}
@@ -98,5 +85,3 @@ class Login extends Component {
         }
     }
 }
-
-export default withRouter(Login);

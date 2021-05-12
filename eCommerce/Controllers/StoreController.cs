@@ -69,11 +69,11 @@ namespace eCommerce.Controllers
         }
         
         [HttpGet]
-        [Route("[action]")]
-        public Result<IItem> GetItem([FromBody] StoreAndItemId data)
+        [Route("{storeId}/{itemId}")]
+        public Result<IItem> GetItem(string storeId, string itemId)
         {
             return _storeService.GetItem((string) HttpContext.Items["authToken"],
-                data.StoreId, data.ItemId);
+                storeId, itemId);
         }
         
         [HttpGet]

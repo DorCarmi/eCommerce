@@ -4,41 +4,30 @@ import "./Register.css"
 import {StoreApi} from '../Api/StoreApi'
 import {Redirect, withRouter} from "react-router-dom";
 
-
-
-class OpenStore extends Component {
+export class OpenStore extends Component {
     static displayName = OpenStore.name;
 
     constructor(props) {
         super(props)
         this.state = {
             storeId:'',
-            submitted:false
+            submitted: false
         }
         this.storeApi = new StoreApi();
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
     }
-
-    redirectToHome = (path) => {
-        const { history } = this.props;
-        if(history) history.push(path);
-    }
-
+    
     async handleSubmit(event){
         const {name,storeId,amount,category,keyWords,price} = this.state
         event.preventDefault();
         const res = await this.storeApi.openStore(storeId)
         if(res && res.isSuccess) {
-            alert('add item succeed')
-            // this.props.addStoreToState(storeId);
-            // this.redirectToHome('/')
+            this.props.addStoreToState(storeId);
             this.setState({
-                submitted:true
+                submitted: true
             })
-            window.location.reload(false);
-
         }
         else{
             alert(`add item failed because- ${res.error}`)
@@ -51,11 +40,10 @@ class OpenStore extends Component {
             [target.name]: target.value
         });
     }
-
-
+    
     render () {
         if (this.state.submitted) {
-            return <Redirect to="/"/>
+            return <Redirect exact to="/"/>
         } else {
             return (
                 <main className="RegisterMain">
@@ -76,5 +64,3 @@ class OpenStore extends Component {
         }
     }
 }
-
-export default withRouter(OpenStore);

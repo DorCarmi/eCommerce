@@ -92,16 +92,18 @@ export class Cart extends Component<{}, CartState> {
         
         return (
             <div>
-                {renderedBaskets.length == 0 ? <h4 className="None">Empty cart</h4> : renderedBaskets}
-                <div style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    marginTop: "10px"
-                }}>
-                    <h3>Total price: {this.state.totalPrice}</h3>
-                    <button className="action" style={{margin: "auto"}}
-                        onClick={this.handleCartPurchase}>Purchse cart</button>
-                </div>
+                {renderedBaskets.length == 0 ? <h4 className="None">Empty cart</h4> : 
+                    renderedBaskets.concat(
+                        <div style={{
+                            display: "grid",
+                            gridTemplateColumns: "1fr 1fr",
+                            marginTop: "10px"
+                        }}>
+                            <h3>Total price: {this.state.totalPrice}</h3>
+                            <button className="action" style={{margin: "auto"}}
+                                    onClick={this.handleCartPurchase}>Purchse cart</button>
+                        </div>
+                    )}
             </div>
             
         ) 

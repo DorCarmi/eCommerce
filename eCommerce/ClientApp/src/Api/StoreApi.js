@@ -63,7 +63,7 @@ export class StoreApi {
 
     getItem(storeId, itemId)
     {
-        return instance.get(GET_ITEM_IN_STORE_PATH)
+        return instance.get(GET_ITEM_IN_STORE_PATH(storeId, itemId))
             .then(res => {
                 return new Result(res.data)
             })
