@@ -45,8 +45,11 @@ export class PurchaseCart extends Component<PurchaseCartProps, PurchaseCartState
         event.preventDefault();
         const {idNumber, creditCardNumber,
             creditCardExpirationDate, threeDigitsOnBackOfCard, fullAddress} = this.state
-        console.log("a")
+
         if(creditCardNumber && threeDigitsOnBackOfCard) {
+            this.setState({
+                message: "Purchasing.."
+            })
             const purchaseRes = await this.cartApi.PurchasePrice(
                 this.props.username, idNumber, creditCardNumber.toString(),
                 creditCardExpirationDate, threeDigitsOnBackOfCard.toString(), fullAddress
@@ -64,7 +67,7 @@ export class PurchaseCart extends Component<PurchaseCartProps, PurchaseCartState
                 message: "Successful purchase"
             })
             
-            setTimeout(() => this.setState({submitted: true}), 1000);
+            setTimeout(() => this.setState({submitted: true}), 2000);
         }
     }
     
@@ -94,7 +97,11 @@ export class PurchaseCart extends Component<PurchaseCartProps, PurchaseCartState
                         <div className="CenterItemContainer">
                             <h3>Purchase cart</h3>
                         </div>
-                        {message.length > 0 ? <h5>{message}</h5> : null}
+                        {message.length > 0 ?
+                            <div className="CenterItemContainer">
+                                <h5 className="cr_purple">{message}</h5>
+                            </div> :
+                            null}
                         <form className="Form" onSubmit={this.handleSubmit}>
                             <input type="text" name="idNumber" value={this.state.idNumber}
                                    placeholder={'ID number'} onChange={this.handleInputChangeString} required/>

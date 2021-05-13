@@ -58,7 +58,7 @@ export default class App extends Component {
     async updateLoginHandler(username){
       this.setState({
           isLoggedIn: true,
-          username: username
+          userName: username
       })
     }
     

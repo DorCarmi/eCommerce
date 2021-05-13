@@ -16,8 +16,6 @@ namespace eCommerce.Controllers
         public int Amount { get; set; }
     }
 
-
-
     [Route("api/[controller]")]
     public class CartController : Controller
     {
