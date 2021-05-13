@@ -42,8 +42,6 @@ export class NavMenu extends Component {
       });
     }
     
-  
-  
   handleSubmit(){
     
     const searchItem = async () =>
@@ -59,7 +57,7 @@ export class NavMenu extends Component {
     const {isLoggedIn,storeList} = this.props.state
     return (
       <header>
-        <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" expand="md" light>
+        <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow" expand="md" light>
           <div className="containerNavBar">
             <div className="navBarDiv">
               <NavbarBrand tag={Link} to="/">Home</NavbarBrand>
@@ -78,21 +76,6 @@ export class NavMenu extends Component {
                   <NavItem>
                     <NavLink tag={Link} className="text-dark" exact to="/login">Login</NavLink>
                   </NavItem> }
-  
-                  {isLoggedIn ? 
-                    <NavItem> 
-                      <NavLink tag={Link} className="text-dark" exact to="/openStore">Add a Store</NavLink>
-                    </NavItem>: null}
-  
-                  { storeList.length > 0  ?
-                        <DropdownButton id="dropdown-basic-button" title="My Store List" className="dropdownMenu">
-                          {storeList.map ((store) =>{
-                            return(
-                              <NavItem>
-                                <NavLink tag={Link} className="text-dark" exact to={`/store/${store}`}>{store}</NavLink>
-                              </NavItem>)})}
-                         </DropdownButton> : null
-                      }
                 </ul>
               </Collapse>
               <NavLink tag={Link} className="text-dark" exact to="/Cart">

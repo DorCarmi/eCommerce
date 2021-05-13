@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { Home } from './components/Home';
-import Login from "./components/Login";
+import { Login } from "./components/Login";
 import Store from './components/Store'
-import OpenStore from "./components/OpenStore";
+import {OpenStore} from "./components/OpenStore";
 import { Cart } from "./components/Cart"
 import Register from "./components/Register";
 import './custom.css'
@@ -15,6 +15,7 @@ import {BrowserRouter,useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
 import {SearchComponent} from "./components/SearchComponent";
+import {PurchaseCart} from "./components/Cart/PurchaseCart";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -29,6 +30,7 @@ export default class App extends Component {
       this.userApi = new UserApi();
       
       this.addStoreHandler = this.addStoreHandler.bind(this);
+      this.updateLoginHandler = this.updateLoginHandler.bind(this);
   }
   
   async componentDidMount() {
@@ -37,21 +39,29 @@ export default class App extends Component {
       
       const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
       if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
+          console.log(userBasicInfo.username);
+
           this.setState({
-              isLoggedIn:userBasicInfo.isLoggedIn,
-              userName:userBasicInfo.username,
+              isLoggedIn: userBasicInfo.isLoggedIn,
+              userName: userBasicInfo.username,
               storeList: fetchedStoredList.value
           })
       }
   }
 
     addStoreHandler(store){
-      alert("in app add store handler" + store)
         this.setState({
             storeList:[...this.state.storeList, store]
         });
     }
 
+    async updateLoginHandler(username){
+      this.setState({
+          isLoggedIn: true,
+          userName: username
+      })
+    }
+    
     redirectToHome = (path) => {
         alert(path)
         const { history } = this.props;
@@ -62,22 +72,25 @@ export default class App extends Component {
     }
 
     render () {
-    return (
+        return (
         <BrowserRouter>
           <Layout state={this.state}>
             <Route exact path='/' component={Home} />
-            <Route path='/login' component={() => <Login/>} />
-            <Route path='/register' component={Register}/>
-              <Route path='/cart' component={Cart} />
-              <Route exact path="/store/:id" render={({match}) => (<Store  storeId={match.params.id} 
-                                                                          storeList={this.state.storeList} redirect={this.redirectToHome}/>
-              )} />            
-              <Route path='/openStore' exact component={() => <OpenStore addStoreToState={this.addStoreHandler} history={useHistory()}/>} />
-              <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
-              <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
-              <Route exact path="/searchItems/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query} />} />
-
-              <Route exact path="/searchItems1" render={() => <SearchComponent />} />
+            <Route exact path='/login' component={() => <Login isLoggedIn={this.state.isLoggedIn} loginUpdateHandler={this.updateLoginHandler}/>} />
+            <Route exact path='/register' component={Register}/>
+            
+            <Route exact path='/cart' component={Cart} />
+            <Route exact path='/purchaseCart' component={() => <PurchaseCart username={this.state.userName}/>} />
+            
+            <Route exact path="/store/:id" render={({match}) => (<Store  storeId={match.params.id} 
+                                                                        storeList={this.state.storeList} redirect={this.redirectToHome}/>
+            )} />            
+            <Route exact path='/openStore' component={() => <OpenStore addStoreToState={this.addStoreHandler}/>} />
+            <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
+            <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
+            <Route exact path="/searchItems/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query} />} />
+    
+            <Route exact path="/searchItems1" render={() => <SearchComponent />} />
           </Layout>
         </BrowserRouter>
     );

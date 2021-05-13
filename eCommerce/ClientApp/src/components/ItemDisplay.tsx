@@ -9,7 +9,8 @@ interface ItemDisplayProps {
 
 interface ItemDisplayState {
     quantity: number,
-    errorMessage: string | undefined
+    errorMessage: string | undefined,
+    successMessage: string | undefined
 }
 
 export class ItemDisplay extends Component<ItemDisplayProps, ItemDisplayState> {
@@ -21,7 +22,8 @@ export class ItemDisplay extends Component<ItemDisplayProps, ItemDisplayState> {
 
         this.state = {
             quantity: 0,
-            errorMessage: undefined
+            errorMessage: undefined,
+            successMessage: undefined
         }
         this.cartApi = new CartApi();
         
@@ -47,25 +49,30 @@ export class ItemDisplay extends Component<ItemDisplayProps, ItemDisplayState> {
             if(addToCartRes.isSuccess) {
                 this.setState({
                     quantity: 0,
-                    errorMessage: undefined
+                    errorMessage: undefined,
+                    successMessage: "Item has been added"
                 })
             } else {
                 this.setState({
-                    errorMessage: addToCartRes.error
+                    errorMessage: addToCartRes.error,
+                    successMessage: undefined
                 })
             }
         } else {
             this.setState({
-                errorMessage: "Connection error"
+                errorMessage: "Connection error",
+                successMessage: undefined
             })
         }
     }
 
     renderCartSection(){
-        const { errorMessage } = this.state;
+        const { errorMessage, successMessage } = this.state;
         return (
             <div className="cartSection">
-                {errorMessage ? <label className="label3">{errorMessage}</label> : null}
+                {errorMessage ? <label className="label3">{errorMessage}</label> : 
+                 successMessage ? <label className="label4">{successMessage}</label> :
+                 null}
                 <label>Quantity: {this.state.quantity}</label>
                 <button onClick={() => this.handleQuantity(1)}>+1</button>
                 <button onClick={() => this.handleQuantity(-1)}>-1</button>

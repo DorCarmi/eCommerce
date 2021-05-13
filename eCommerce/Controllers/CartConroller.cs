@@ -16,8 +16,6 @@ namespace eCommerce.Controllers
         public int Amount { get; set; }
     }
 
-
-
     [Route("api/[controller]")]
     public class CartController : Controller
     {
@@ -42,7 +40,7 @@ namespace eCommerce.Controllers
                 addItemData.ItemId, addItemData.StoreId, addItemData.Amount);
         }
         
-        [HttpPost]
+        [HttpPut]
         [Route("[action]")]
         public Result EditItemAmount([FromBody] AddOrEditItemData editItemData)
         {

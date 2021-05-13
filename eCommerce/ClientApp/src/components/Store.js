@@ -83,7 +83,7 @@ export default class Store extends Component {
                                     <td>{item.pricePerUnit}</td>
                                     <td>
                                         <div>
-                                        <Link to={`${storeId}/editItem/${item.itemName}`}>Edit Item</Link>
+                                        <Link exact to={`${storeId}/editItem/${item.itemName}`}>Edit Item</Link>
                                         </div>
                                         <button onClick={() => this.removeItem(storeId,item.itemName)}>Remove Item</button>
                                     </td>

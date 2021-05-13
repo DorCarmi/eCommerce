@@ -5,8 +5,6 @@ import {StoreApi} from '../Api/StoreApi'
 import {withRouter} from "react-router-dom";
 import {Item} from "../Data/Item";
 
-
-
 class EditItem extends Component {
     static displayName = EditItem.name;
 
@@ -14,7 +12,6 @@ class EditItem extends Component {
         super(props)
         this.state = {
             amount:undefined,
-            storeId:'',
             category:'',
             keyWords:'',
             price:undefined
@@ -38,8 +35,7 @@ class EditItem extends Component {
 
         if(res && res.isSuccess) {
             alert('edit item succeed')
-            // this.props.addStoreToState(storeId);
-            this.redirectToHome('/')
+            this.redirectToHome(`/store/${storeId}`)
         }
         else{
             alert(`edit item failed because- ${res.error}`)
@@ -52,6 +48,20 @@ class EditItem extends Component {
             [target.name]: target.value
         });
     }
+    
+    /*async componentDidMount() {
+        const {itemId, storeId} = this.props
+        let itemRes = await this.storeApi.getItem(storeId, itemId);
+        if(itemRes && itemRes.isSuccess){
+            let item = itemRes.value;
+            this.setState({
+                amount: item.amount,
+                category: item.category,
+                keyWords: item.keyWords.join(", "),
+                price: item.pricePerUnit
+            })
+        }
+    }*/
 
 
     render () {
