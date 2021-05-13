@@ -4,9 +4,6 @@ import {StoreApi} from "../Api/StoreApi";
 import {Link} from "react-router-dom";
 import {Item} from "../Data/Item";
 
-
-
-
 export default class Store extends Component {
     static displayName = Store.name;
 
@@ -20,7 +17,7 @@ export default class Store extends Component {
         this.storeApi = new StoreApi();
     }
 
-    async componentDidMount() {
+    async getItems(){
         const fetchedItems = await this.storeApi.getAllItems(this.state.storeId)
         if (fetchedItems && fetchedItems.isSuccess) {
             this.setState({
@@ -28,6 +25,23 @@ export default class Store extends Component {
             })
         }
     }
+    
+    async componentDidMount() {
+        await this.getItems();
+    }
+
+    async componentDidUpdate(prevProps, prevState, undefined) {
+        if (prevProps.storeId !== this.props.storeId) {
+            console.log(`update `);
+            console.log(this.props);
+            console.log(prevProps);
+            await this.setState({
+                storeId: this.props.storeId
+            })
+            await this.getItems();
+        }
+    }
+    
     redirectToHome = (path) => {
         alert(path)
         const { history } = this.props;

@@ -13,7 +13,6 @@ interface PurchaseCartState {
     submitted: boolean
 }
 
-
 interface PurchaseCartProps {
     username: string
 }
