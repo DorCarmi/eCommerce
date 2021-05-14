@@ -110,10 +110,15 @@ namespace eCommerce.Business
         {
             return _systemState.OpenStore(this, store);
         }
-
+        
         public Result<List<string>> GetStoreIds()
         {
             return _systemState.GetStoreIds(this);
+        }
+        
+        public Result<IList<string>> GetManagedStoreIds()
+        {
+            return _systemState.GetManagedStoreIds(this);
         }
 
         /// <TEST>  </TEST>

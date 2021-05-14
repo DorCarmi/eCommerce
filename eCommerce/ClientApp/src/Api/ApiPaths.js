@@ -32,4 +32,5 @@ export const PURCHASE_CART_PATH = CART_PATH + "/PurchaseCart";
 
 export const USER_PATH = API_PATH + '/user';
 export const GET_ALL_OWNED_STORES = USER_PATH + '/getALlStoreIds';
+export const GET_ALL_MANAGED_STORES = USER_PATH + '/aLlManagedStoreIds'
 export const GET_USER_BASIC_INFO_PATH = USER_PATH + '/getUserBasicInfo';

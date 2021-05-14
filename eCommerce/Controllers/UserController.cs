@@ -31,6 +31,13 @@ namespace eCommerce.Controllers
         
         [HttpGet]
         [Route("[action]")]
+        public Result<IList<string>> ALlManagedStoreIds()
+        {
+            return _userService.GetAllManagedStoreIds((string) HttpContext.Items["authToken"]);
+        }
+        
+        [HttpGet]
+        [Route("[action]")]
         public Result<UserBasicInfo> GetUserBasicInfo()
         {
             return _userService.GetUserBasicInfo((string) HttpContext.Items["authToken"]);

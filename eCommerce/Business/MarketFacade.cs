@@ -409,6 +409,18 @@ namespace eCommerce.Business
             return user.GetStoreIds();
         }
 
+        public Result<IList<string>> GetAllManagedStores(string token)
+        {
+            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<IList<string>>(userRes.Error);
+            }
+            IUser user = userRes.Value;
+
+            return user.GetManagedStoreIds();
+        }
+
         #endregion
 
         #region UserBuyingFromStores

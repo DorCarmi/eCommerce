@@ -84,5 +84,13 @@ namespace eCommerce.Service
         /// <param name="token">Authorization token</param>
         /// <returns>All the owned store id</returns>
         public Result<List<string>> GetAllStoreIds(string token);
+
+        /// <summary>
+        /// Get all the managed store id
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <returns>All the managed store id</returns>
+        public Result<IList<string>> GetAllManagedStoreIds(string token);
+
     }
 }

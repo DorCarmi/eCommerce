@@ -86,5 +86,10 @@ namespace eCommerce.Service
         {
             return _marketFacade.GetStoreIds(token);
         }
+        
+        public Result<IList<string>> GetAllManagedStoreIds(string token)
+        {
+            return _marketFacade.GetAllManagedStores(token);
+        }
     }
 }

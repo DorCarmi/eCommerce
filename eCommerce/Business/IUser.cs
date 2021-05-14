@@ -14,6 +14,7 @@ namespace eCommerce.Business
         //Facade
         public Result OpenStore(IStore store);
         public Result<List<string>> GetStoreIds();
+        public Result<IList<string>> GetManagedStoreIds();
         public Result AddItemToCart(ItemInfo item);
         public Result<ICart> GetCartInfo();
         public Result EditCart(ItemInfo info);

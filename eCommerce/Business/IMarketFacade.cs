@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -100,6 +101,8 @@ namespace eCommerce.Business
         /// <returns>Result of the appointment</returns>
         public Result AppointManager(string token, string storeId, string appointedManagerUserId);
         
+        
+        
         // TODO how to define and send the permission
         /// <summary>
         /// Update the manager permission
@@ -132,7 +135,7 @@ namespace eCommerce.Business
         /// <returns>List of all the staff and their permissions</returns>
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(string token,
             string storeId);
-
+        
         /// <summary>
         /// Get the history purchase of a user
         /// </summary>
@@ -221,6 +224,13 @@ namespace eCommerce.Business
         /// <param name="token">The Authorization token</param>
         /// <returns>All the owned store ids</returns>
         public Result<List<string>> GetStoreIds(string token);
+
+        /// <summary>
+        /// Return all stores id that the user manage
+        /// </summary>
+        /// <param name="token">The Authorization token</param>
+        /// <returns>All stores id that the user manage</returns>
+        public Result<IList<string>> GetAllManagedStores(string token);
         
         #endregion
         
@@ -346,7 +356,6 @@ namespace eCommerce.Business
         /// <returns>List of the purchase history in a store</returns>
         public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId);
         
-
         #endregion
     }
 }
