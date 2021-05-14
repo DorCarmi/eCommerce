@@ -41,10 +41,17 @@ export class SideBarMenu extends Component {
     
                 <SidebarContent>
                     <Menu className="menuLayout">
+                        <SubMenu title="Member panel">
                         <MenuItem>
                             <NavLink tag={Link} exact to="/openStore">Create new store</NavLink>
                         </MenuItem>
                         {this.renderStoreListMenu()}
+                        </SubMenu>
+                    </Menu>
+
+                    <Menu className="menuLayout">
+                        <SubMenu title="Admin panel">
+                        </SubMenu>
                     </Menu>
                 </SidebarContent>
         </ProSidebar>)

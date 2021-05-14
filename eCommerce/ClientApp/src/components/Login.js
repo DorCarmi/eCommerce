@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { AuthApi } from "../Api/AuthApi"
 import "./Login.css"
 import {Link,Redirect} from "react-router-dom";
+import {UserRole} from "../Data/UserRole";
 
 export class Login extends Component {
     static displayName = Login.name;
@@ -37,7 +38,7 @@ export class Login extends Component {
             const loginRes = loginRedirectAndRes.data;
 
             if (loginRes && loginRes.isSuccess) {
-                this.props.loginUpdateHandler(username)
+                this.props.loginUpdateHandler(username, this.getUserRole(role))
             } else {
                 this.setState({
                     loginError: loginRes.error
@@ -49,6 +50,12 @@ export class Login extends Component {
             })
         }
     }
+    
+    getUserRole(role){
+        return role === "member" ? UserRole.Member :
+            role === "admin" ? UserRole.Admin : 
+            undefined
+}
     
     componentDidMount() {
         //this.populateWeatherData();

@@ -25,7 +25,8 @@ export default class App extends Component {
       this.state = {
           isLoggedIn: false,
           storeList:[],
-          userName:''
+          userName:'',
+          role: undefined
       }
       this.userApi = new UserApi();
       
@@ -55,10 +56,11 @@ export default class App extends Component {
         });
     }
 
-    async updateLoginHandler(username){
+    async updateLoginHandler(username, role){
       this.setState({
           isLoggedIn: true,
-          userName: username
+          userName: username,
+          role: role
       })
     }
     
