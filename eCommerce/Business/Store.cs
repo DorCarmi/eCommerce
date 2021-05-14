@@ -125,6 +125,36 @@ namespace eCommerce.Business
             return Result.Ok<IList<Tuple<string, IList<StorePermission>>>>(netasCrazyList);
         }
 
+        public Result<IList<StorePermission>> GetPermissions(IUser user)
+        {
+            IList<StorePermission> permissions = null;
+            if (user.Equals(_founder) | _owners.Contains(user))
+            {
+                return Result.Ok<IList<StorePermission>>(Enum.GetValues<StorePermission>());
+            }
+
+            if (!_managers.Contains(user))
+            {
+                return Result.Fail<IList<StorePermission>>("User is not a owner or manager of this store");
+            }
+            
+            foreach (var managerAppointment in _managersAppointments)
+            {
+                if (managerAppointment.User.Equals(user))
+                {
+                    permissions = managerAppointment.GetAllPermissions();
+                }
+            }
+
+            if (permissions == null)
+            {
+                //TODO log it as error
+                return Result.Fail<IList<StorePermission>>("User is not a owner or manager of this store");
+            }
+
+            return Result.Ok(permissions);
+        }
+
         public List<Item> SearchItem(string stringSearch)
         {
             return this._inventory.SearchItem(stringSearch);

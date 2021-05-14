@@ -48,6 +48,11 @@ namespace eCommerce.Service
             return Result.Ok(staffPermissions);
         }
 
+        public Result<IList<StorePermission>> GetStorePermission(string token, string storeId)
+        {
+            return _marketFacade.GetStorePermission(token, storeId);
+        }
+
         public Result<IEnumerable<IItem>> SearchForItem(string token, string query)
         {
             return _marketFacade.SearchForItem(token, query);

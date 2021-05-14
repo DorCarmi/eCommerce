@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using eCommerce.Business;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -15,7 +16,15 @@ namespace eCommerce.Service
         /// <returns>List of all the staff and their permissions</returns>
         public Result<IList<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId);
         
-                /// <summary>
+        /// <summary>
+        /// Get the user permission in the store
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <returns>User permission in the store</returns>
+        public Result<IList<StorePermission>> GetStorePermission(string token, string storeId);
+        
+        /// <summary>
         /// Search for item
         /// </summary>
         /// <param name="query">The item query the search</param>

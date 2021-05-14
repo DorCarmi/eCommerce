@@ -100,9 +100,15 @@ namespace eCommerce.Business
         /// <param name="appointedManagerUserId">The appointment manager</param>
         /// <returns>Result of the appointment</returns>
         public Result AppointManager(string token, string storeId, string appointedManagerUserId);
-        
-        
-        
+
+        /// <summary>
+        /// Return all the store permission that the user have
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The store id</param>
+        /// <returns>All the store permission that the user have</returns>
+        public Result<IList<StorePermission>> GetStorePermission(string token, string storeId);
+
         // TODO how to define and send the permission
         /// <summary>
         /// Update the manager permission

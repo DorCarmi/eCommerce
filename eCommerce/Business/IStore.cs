@@ -26,6 +26,8 @@ namespace eCommerce.Business.Service
         // TODO implement, return list of username and there permissions
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user);
 
+        public Result<IList<StorePermission>> GetPermissions(IUser user);
+
         public List<Item> SearchItem(string stringSearch);
 
         public List<Item> SearchItemWithPriceFilter(string stringSearch, int startPrice, int endPrice);

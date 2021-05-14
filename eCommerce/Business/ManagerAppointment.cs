@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -47,6 +48,11 @@ namespace eCommerce.Business
             }
             this._permissions = newPermissions;
             return Result.Ok();
+        }
+
+        public List<StorePermission> GetAllPermissions()
+        {
+            return _permissions.Keys.ToList();
         }
     }
 }

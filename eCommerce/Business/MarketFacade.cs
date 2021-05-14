@@ -173,7 +173,20 @@ namespace eCommerce.Business
 
             return user.AppointUserToOwner(store, appointedUser);
         }
-        
+
+        public Result<IList<StorePermission>> GetStorePermission(string token, string storeId)
+        {
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return  Result.Fail<IList<StorePermission>>(userAndStoreRes.Error);
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+            return store.GetPermissions(user);
+        }
+
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)
         {
             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);

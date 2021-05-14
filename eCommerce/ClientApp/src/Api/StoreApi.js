@@ -102,5 +102,12 @@ export class StoreApi {
             }).catch(err => undefined)
     }
 
+    getStorePermissionForUser(storeId)
+    {
+        return instance.get(GET_STORE_PERMISSION_FOR_USER_PATH(storeId))
+            .then(res => {
+                return new Result(res.data)
+            }).catch(err => undefined)
+    }
 
 }

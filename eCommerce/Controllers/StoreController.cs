@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using Microsoft.AspNetCore.Http;
@@ -98,6 +100,14 @@ namespace eCommerce.Controllers
         {
             return _storeService.SearchForStore((string) HttpContext.Items["authToken"],
                 query);
+        }
+
+        [HttpGet]
+        [Route("[action]/{storeId}")]
+        public Result<IList<StorePermission>> StorePermissionForUser(string storeId)
+        {
+            return _storeService.GetStorePermission((string) HttpContext.Items["authToken"],
+                storeId);
         }
     }
 }
