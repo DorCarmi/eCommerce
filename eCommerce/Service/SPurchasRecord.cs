@@ -23,7 +23,7 @@ namespace eCommerce.Service
         {
             Username = username;
             StoreId = purchaseRecord.StoreId;
-            Basket = new SBasket(purchaseRecord.BasketInfo);
+            Basket = new SBasket(StoreId, purchaseRecord.BasketInfo);
             PurchaseTime = purchaseRecord.PurchaseTime;
         }
     }

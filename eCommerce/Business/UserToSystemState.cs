@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -9,6 +10,7 @@ namespace eCommerce.Business
         public Result Login(User user,UserToSystemState systemState, MemberData memberData);
         Result Logout(User user,string toGuestName);
         Result OpenStore(User user,IStore store);
+        Result<List<string>> GetStoreIds(User user);
         Result AppointUserToOwner(User user,IStore store, IUser otherUser);
         Result AppointUserToManager(User user,IStore store, IUser otherUser);
         Result<OwnerAppointment> MakeOwner(User user,IStore store);
@@ -22,5 +24,8 @@ namespace eCommerce.Business
         Result HasPermission(User user,IStore store, StorePermission storePermission);
         Result EnterRecordToHistory(User user, PurchaseRecord record);
         Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store);
+        Result RemoveOwnerFromStore(User user, IStore store, IUser otherUser);
+        Result<OwnerAppointment> RemoveOwner(User user, IStore store);
+        Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers);
     }
 }

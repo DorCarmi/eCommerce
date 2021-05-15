@@ -92,7 +92,8 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    var newItem = new Item(itemInfo,_belongsToStore);
+                    var newItem = new Item(itemInfo, _belongsToStore);
+
                     this._itemsInStore.Add(newItem);
                     this._nameToItem.Add(itemInfo.name, newItem);
                     return Result.Ok();

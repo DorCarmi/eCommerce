@@ -27,7 +27,7 @@ namespace eCommerce.Controllers
 
 
 
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AuthController : Controller
     {
         private readonly ILogger<AuthController> _logger;
@@ -57,7 +57,7 @@ namespace eCommerce.Controllers
             Response.Headers.Add("RedirectTo", "/");
             return token;
         }
-
+        
         [HttpPost]
         [Route("[action]")]
         public Result<string> Login([FromBody] LoginInfo loginInfo)
@@ -68,6 +68,15 @@ namespace eCommerce.Controllers
                     loginInfo.Username, loginInfo.Password, serviceRole);
                 if (loginRes.IsSuccess)
                 {
+                    Response.Cookies.Append("_auth", loginRes.Value, new CookieOptions()
+                    {
+                        Path = "/",
+                        Secure = true,
+                        MaxAge = TimeSpan.FromDays(5),
+                        Domain = Request.PathBase.Value,
+                        Expires = DateTimeOffset.Now.AddDays(5),
+                        HttpOnly = true
+                    });
                     Response.Headers.Add("RedirectTo", "/");
                 }
                 
@@ -87,17 +96,6 @@ namespace eCommerce.Controllers
             {
                 Response.Headers.Add("RedirectTo", "/");
             }
-            /* if (Enum.TryParse<ServiceUserRole>(memberInfo.D, true, out var serviceRole))
-             {
-                 Result<string> loginRes = _authService.Login((string) HttpContext.Items["authToken"],
-                     loginInfo.Username, loginInfo.Password, serviceRole);
-                 if (loginRes.IsSuccess)
-                 {
-                     Response.Headers.Add("RedirectTo", "/");
-                 }
-                 
-                 return loginRes;
-             }*/
 
             return registerRes;
         }

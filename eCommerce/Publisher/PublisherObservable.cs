@@ -3,7 +3,7 @@
     public interface PublisherObservable
     {
         public void Register(UserObserver userObserver);
-        public void NotifyAll();
+        public void NotifyAll(string userid);
         
     }
 }

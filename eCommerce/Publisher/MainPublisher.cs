@@ -4,19 +4,47 @@ using System.Collections.Generic;
 
 namespace eCommerce.Publisher
 {
-    public class MainPublisher : PublisherObservable
+    // public class MainPublisher : PublisherObservable
+    // {
+    //     private ConcurrentDictionary<string, ConcurrentQueue<string>> messages;
+    //     private ConcurrentDictionary<string, bool> connected;
+    //     private ConcurrentBag<UserObserver> observers;
+    //     
+    //     
+    //     public MainPublisher()
+    //     {
+    //         observers = new ConcurrentBag<UserObserver>();
+    //         messages = new ConcurrentDictionary<string, ConcurrentQueue<string>>();
+    //         connected = new ConcurrentDictionary<string, bool>();
+    //     }
+    public sealed class MainPublisher : PublisherObservable
     {
+        //Fields:
+        private static readonly MainPublisher instance = new MainPublisher();  
         private ConcurrentDictionary<string, ConcurrentQueue<string>> messages;
         private ConcurrentDictionary<string, bool> connected;
-
         private ConcurrentBag<UserObserver> observers;
+
+        // Explicit static constructor to tell C# compiler not to mark type as beforefieldinit  
+        //Constructor:
+        static MainPublisher(){}
+
+        private MainPublisher()
+        {
+            observers = new ConcurrentBag<UserObserver>();
+            messages = new ConcurrentDictionary<string, ConcurrentQueue<string>>();
+            connected = new ConcurrentDictionary<string, bool>();
+        }  
+        public static MainPublisher Instance => instance;
+
         public void Connect(string userID)
         {
-            this.connected[userID] = true;
-            if (messages.ContainsKey(userID) && messages[userID].Count > 0)
-            {
-                NotifyAll();
-            }
+            // this.connected[userID] = true;
+            connected.TryAdd(userID, true);
+            // if (messages.ContainsKey(userID) && messages[userID].Count > 0)
+            // {
+            NotifyAll(userID);
+            // }
         }
         
         public void Disconnect(string userId)
@@ -24,31 +52,30 @@ namespace eCommerce.Publisher
             connected.TryRemove(userId, out var tstring);
         }
 
-        public void AddMessageToUser(string userid, string message)
+        public void AddMessageToUser(string userID, string message)
         {
-            if (!this.messages.ContainsKey(userid))
+            if (!messages.ContainsKey(userID))
             {
-                this.messages.TryAdd(userid, new ConcurrentQueue<string>());
+                messages.TryAdd(userID, new ConcurrentQueue<string>());
             }
-            this.messages[userid].Enqueue(message);
+            messages[userID].Enqueue(message);
+            NotifyAll(userID);
         }
 
-        public MainPublisher()
-        {
-            observers = new ConcurrentBag<UserObserver>();
-            
-        }
 
         public void Register(UserObserver userObserver)
         {
             observers.Add(userObserver);
         }
 
-        public async void NotifyAll()
+        public async void NotifyAll(string userID)
         {
-            foreach (var observer in this.observers)
+            if (connected.ContainsKey(userID) && messages.ContainsKey(userID) && messages[userID].Count > 0)
             {
-                observer.Notify(null,null);
+                foreach (var observer in this.observers)
+                {
+                    observer.Notify(userID, messages[userID]);
+                }
             }
         }
     }

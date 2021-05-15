@@ -16,3 +16,38 @@ html {
 .box-shadow {
   box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
+
+.containerNavBar {
+  display: grid;
+  grid-auto-flow: column;
+  width: 100%;
+}
+
+.navBarDiv {
+  display: flex;
+}
+
+.navBarSearch {
+  display: flow-root;
+  margin: 0 auto;
+}
+
+.image {
+  width: 25px;
+  height: 25px;
+}
+
+img:hover{
+  opacity: 50%;
+}
+
+.dropdownMenu button {
+  background: white;
+  color: black;
+  border: black;
+}
+
+.labelMargin{
+  text-align: center;
+  margin-top: 10px;
+}

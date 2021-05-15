@@ -16,10 +16,18 @@ namespace eCommerce.Service
         
         internal SCart(IList<IBasket> baskets)
         {
-            IList<SBasket> SBaskets = new List<SBasket>();
+            Baskets = new List<SBasket>();
             foreach (var basket in baskets)
             {
-                SBaskets.Add(new SBasket(basket.GetAllItems().Value as IList<IItem>, basket.GetTotalPrice().Value));
+                var newItems = new List<SItem>();
+                var items = basket.GetAllItems().Value;
+                foreach (var item in items)
+                {
+                    newItems.Add(new SItem(item.ItemName, item.StoreName, item.Amount, 
+                        item.Category, item.KeyWords, item.PricePerUnit));
+                }
+                
+                Baskets.Add(new SBasket(basket.GetStoreName() , newItems, basket.GetTotalPrice().Value));
             }
         }
     }

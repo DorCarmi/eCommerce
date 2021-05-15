@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace eCommerce.Service
 {
@@ -8,7 +9,7 @@ namespace eCommerce.Service
         public string StoreName { get; }
         public int Amount { get; }
         public string Category { get; }
-        public ReadOnlyCollection<string> KeyWords { get; }
+        public List<string> KeyWords { get; }
         public double PricePerUnit { get; }
 
     }

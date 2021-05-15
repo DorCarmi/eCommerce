@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -17,7 +18,7 @@ namespace eCommerce.Business
                 return state;  
             }  
         }
-        
+
         public Result Login(User user,UserToSystemState systemState, MemberData memberData)
         {
             return Result.Fail("Illegal action for member (login).");
@@ -31,6 +32,18 @@ namespace eCommerce.Business
         public Result OpenStore(User user,IStore store)
         {
             return user.OpenStore(this, store);
+        }
+
+        public Result<List<string>> GetStoreIds(User user)
+        {
+            List<string> storeIds = new List<string>();
+            
+            foreach (var store in user.StoresOwned.Keys)
+            {
+                storeIds.Add(store.GetStoreName());
+            }
+
+            return Result.Ok(storeIds);
         }
 
 
@@ -97,6 +110,21 @@ namespace eCommerce.Business
         public Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store)
         {
             return user.GetAllStoreStakeholders(this, store);
+        }
+
+        public Result RemoveOwnerFromStore(User user, IStore store, IUser otherUser)
+        {
+            return user.RemoveOwnerFromStore(this, store,otherUser);
+        }
+
+        public Result<OwnerAppointment> RemoveOwner(User user, IStore store)
+        {
+            return user.RemoveOwner(this, store);
+        }
+
+        public Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
+        {
+            return user.AnnexStakeholders(this, store, owners, managers);
         }
     }
 }
