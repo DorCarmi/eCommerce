@@ -51,8 +51,8 @@ namespace eCommerce.Communication
             }
             //Clients.Client(Context.ConnectionId).SendAsync("ReceiveConnID", Context.ConnectionId);
             
-            // TODO get user and make this section thread safe
-            var userId = "id";
+            var userBasicData = _userService.GetUserBasicInfo(authToken).Value;
+            var userId = userBasicData.Username;
             if (!_userToConnection.TryRemove(userId, out var connectionList))
             {
                 connectionList = new List<string>();
