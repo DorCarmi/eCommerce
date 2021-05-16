@@ -2,7 +2,7 @@
 import {Result} from "../Common";
 import {
     ADD_ITEM_TO_STORE_PATH,
-    EDIT_ITEM_IN_STORE_PATH, GET_ALL_ITEMS_IN_STORE_PATH, GET_ITEM_IN_STORE_PATH,
+    EDIT_ITEM_IN_STORE_PATH, GET_ALL_ITEMS_IN_STORE_PATH, GET_ITEM_IN_STORE_PATH, GET_STORE_PERMISSION_FOR_USER_PATH,
     OPEN_STORE_PATH,
     REMOVE_ITEM_FROM_STORE_PATH, SEARCH_ITEMS_PATH, SEARCH_STORE_PATH
 } from "./ApiPaths";
@@ -10,7 +10,6 @@ import {
 const instance = axios.create(
     {withCredentials : true}
 );
-
 
 
 export class StoreApi {
