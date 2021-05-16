@@ -108,5 +108,4 @@ export class StoreApi {
                 return new Result(res.data)
             }).catch(err => undefined)
     }
-
 }

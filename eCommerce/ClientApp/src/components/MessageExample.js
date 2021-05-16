@@ -1,10 +1,9 @@
 ﻿import React from "react";
-export default ({ userName, message }) => {
+export default ({ message }) => {
     return (
         <>
             <div className="media">
                 <div className="media-body">
-                    <h5 className="mt-0">{userName}</h5>
                     <p>{message}</p>
                 </div>
             </div>

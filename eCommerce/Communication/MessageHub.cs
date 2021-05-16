@@ -13,20 +13,27 @@ namespace eCommerce.Communication
 {
     public class MessageModel
     {
-        public string UserName { get; set; }
         public string Message { get; set; }
-        public string ToUser { get; set; }
+
+        public MessageModel(string message)
+        {
+            Message = message;
+        }
     }
     
     public class MessageHub : Hub, UserObserver
     {
+        
+        private IHubContext<MessageHub> _hubContext = null;
+        
         private MainPublisher _mainPublisher;
         private ConcurrentDictionary<string, IList<string>> _userToConnection;
         private ConcurrentDictionary<string, string> _connectionToUser;
         private IAuthService _authService;
         private IUserService _userService;
-        public MessageHub()
+        public MessageHub(IHubContext<MessageHub> hubContext)
         {
+            _hubContext = hubContext;
             _mainPublisher = MainPublisher.Instance;
             _mainPublisher.Register(this);
             _userToConnection = new ConcurrentDictionary<string, IList<string>>();
@@ -44,7 +51,7 @@ namespace eCommerce.Communication
                 return base.OnDisconnectedAsync(null);
             }
 
-            var authToken = httpContext.Request.Cookies["authToken"];
+            var authToken = httpContext.Request.Cookies["_auth"];
             if (!_authService.IsUserConnected(authToken))
             {
                 return base.OnDisconnectedAsync(null);
@@ -63,7 +70,7 @@ namespace eCommerce.Communication
             _connectionToUser.TryAdd(Context.ConnectionId, userId);
 
             Console.WriteLine("--> Connection Opened: " + Context.ConnectionId);
-            _mainPublisher.Connect(Context.ConnectionId);
+            _mainPublisher.Connect(userId);
             return base.OnConnectedAsync();
         }
         
@@ -84,14 +91,6 @@ namespace eCommerce.Communication
             return base.OnDisconnectedAsync(exception);
         }
 
-        public async Task Message(MessageModel message)
-        {
-            Console.WriteLine($"Get message {message.Message} from {message.UserName} to {message.ToUser}");
-            MainPublisher mainPublisher = MainPublisher.Instance;
-            mainPublisher.Connect(message.UserName);
-            await Clients.Others.SendAsync("message", message);
-        }
-
         public async void Notify(string userId, ConcurrentQueue<string> messages)
         {
             if (!_userToConnection.TryGetValue(userId, out var connectionsIds))
@@ -103,7 +102,17 @@ namespace eCommerce.Communication
             {
                 if (messages.TryDequeue(out var message))
                 {
-                    await Clients.Clients(connectionsIds).SendAsync("message", message);
+                    foreach (var connectionId in connectionsIds)
+                    {
+                        try
+                        {
+                            await _hubContext.Clients.Client(connectionId).SendAsync("message", new MessageModel(message));
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
+                    }
                 }
             }
         }

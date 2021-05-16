@@ -16,6 +16,7 @@ import {UserApi} from "./Api/UserApi";
 import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
 import {SearchComponent} from "./components/SearchComponent";
 import {PurchaseCart} from "./components/Cart/PurchaseCart";
+import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -26,28 +27,15 @@ export default class App extends Component {
           isLoggedIn: false,
           storeList:[],
           userName:'',
-          role: undefined
+          role: undefined,
+          
+          messages: [],
+          webSocketConnection: undefined
       }
       this.userApi = new UserApi();
       
       this.addStoreHandler = this.addStoreHandler.bind(this);
       this.updateLoginHandler = this.updateLoginHandler.bind(this);
-  }
-  
-  async componentDidMount() {
-      const userBasicInfo = await this.userApi.getUserBasicInfo();
-      console.log(userBasicInfo.username);
-      
-      const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
-      if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
-          console.log(userBasicInfo.username);
-
-          this.setState({
-              isLoggedIn: userBasicInfo.isLoggedIn,
-              userName: userBasicInfo.username,
-              storeList: fetchedStoredList.value
-          })
-      }
   }
 
     addStoreHandler(store){
@@ -60,8 +48,40 @@ export default class App extends Component {
       this.setState({
           isLoggedIn: true,
           userName: username,
-          role: role
+          role: role,
       })
+    }
+    
+    async connectToWebSocket(){
+        const socketConnection = new HubConnectionBuilder()
+            .configureLogging(LogLevel.Debug)
+            .withUrl("https://localhost:5001/messageHub", {
+                skipNegotiation: true,
+                transport: HttpTransportType.WebSockets
+            })
+            .build();
+
+        //console.log("socketConnection")
+
+        await socketConnection.start();
+
+        if(socketConnection) {
+            //console.log("socketConnection on")
+
+            socketConnection.on("message", message => {
+                /*console.log("new publisher message:")
+                console.log(message)*/
+                alert(`New message: ${message.message}`)
+                this.setState({
+                    messages: [...this.state.messages, message]
+                });
+            });
+        }
+        
+        this.setState({
+            messages: [],
+            webSocketConnection: socketConnection
+        });
     }
     
     redirectToHome = (path) => {
@@ -73,6 +93,29 @@ export default class App extends Component {
         }
     }
 
+    async componentDidMount() {
+        const userBasicInfo = await this.userApi.getUserBasicInfo();
+        console.log(userBasicInfo.username);
+        
+        const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
+        if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
+            console.log(userBasicInfo.username);
+
+            this.setState({
+                isLoggedIn: userBasicInfo.isLoggedIn,
+                userName: userBasicInfo.username,
+                storeList: fetchedStoredList.value
+            })
+        }
+    }
+
+    async componentDidUpdate(prevProps,prevState) {
+        if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
+            //console.log("componentDidUpdate")
+            await this.connectToWebSocket();
+        }
+    }
+    
     render () {
         return (
         <BrowserRouter>
