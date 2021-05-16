@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using eCommerce.Publisher;
-using eCommerce.SingleR;
+//using eCommerce.SingleR;
 using NUnit.Framework;
 using Tests.Business.Mokups;
 

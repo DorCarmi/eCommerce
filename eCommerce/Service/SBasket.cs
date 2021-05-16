@@ -6,18 +6,28 @@ namespace eCommerce.Service
 {
     public class SBasket
     {
-        public IList<IItem> Items { get; }
+        public string StoreId { get; }
+        public IList<SItem> Items { get; }
         public double TotalPrice { get; }
 
-        public SBasket(IList<IItem> items, double totalPrice)
+        public SBasket(string storeId, IList<SItem> items, double totalPrice)
         {
+            StoreId = storeId;
             Items = items;
             TotalPrice = totalPrice;
         }
 
-        internal SBasket(BasketInfo basketInfo)
+        internal SBasket(string storeId, BasketInfo basketInfo)
         {
-            Items = new List<IItem>(basketInfo.ItemsInBasket);
+            StoreId = storeId;
+            Items = new List<SItem>();
+            var items = basketInfo.ItemsInBasket;
+            foreach (var item in items)
+            {
+                Items.Add(new SItem(item.ItemName, item.StoreName, item.Amount, 
+                    item.Category, item.KeyWords, item.PricePerUnit));
+            }
+            
             TotalPrice = basketInfo.TotalPrice;
         }
     }

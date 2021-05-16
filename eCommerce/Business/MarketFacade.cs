@@ -88,6 +88,11 @@ namespace eCommerce.Business
             return _userManager.IsUserConnected(token);
         }
 
+        public Result<UserBasicInfo> GetUserBasicInfo(string token)
+        {
+            throw new NotImplementedException();
+        }
+
         //<CNAME>PersonalPurchaseHistory</CNAME>
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(string token)
         {
@@ -378,9 +383,12 @@ namespace eCommerce.Business
 
             return Result.Ok<IItem>(itemRes.Value.ShowItem());
         }
-        
-        
-        
+
+        public Result<List<string>> GetStoreIds(string token)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region UserBuyingFromStores

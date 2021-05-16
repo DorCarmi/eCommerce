@@ -22,7 +22,7 @@ namespace eCommerce.Service
             this.CartHolderID = CartHolder;
             foreach (var basket in baskets)
             {
-                Baskets.Add(new SBasket(basket.GetAllItems().Value as IList<IItem>, basket.GetTotalPrice().Value));
+                //Baskets.Add(new SBasket(basket.GetAllItems().Value as IList<IItem>, basket.GetTotalPrice().Value));
             }
         }
     }

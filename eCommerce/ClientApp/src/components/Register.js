@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { authApi } from "../Api/AuthApi"
+import { AuthApi } from "../Api/AuthApi"
 import "./Register.css"
 import {withRouter} from "react-router-dom";
 
@@ -17,6 +17,7 @@ class Register extends Component {
             address: undefined,
             birthday: undefined
         };
+        this.authApi = new AuthApi();
         
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -37,7 +38,7 @@ class Register extends Component {
     async handleSubmit(event){
         event.preventDefault();
         const {username, password, email, name, address, birthday} = this.state;
-        const registerRedirectAndRes = await authApi.Register(username, password, email, name, address, birthday);
+        const registerRedirectAndRes = await this.authApi.Register(username, password, email, name, address, birthday);
         if(registerRedirectAndRes) {
             const registerRes = registerRedirectAndRes.data;
 

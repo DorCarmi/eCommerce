@@ -24,6 +24,10 @@
     margin: 10px;
 }
 
+.RegisterForm h5 {
+    margin: 10px;
+}
+
 .RegisterForm label {
     color: red;
 }

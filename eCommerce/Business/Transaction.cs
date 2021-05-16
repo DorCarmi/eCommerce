@@ -50,7 +50,7 @@ namespace eCommerce.Business
                 return Result.Fail("Problem with calculating prices: can't charge negative price");
             }
 
-            var payTask=this._payment.Charge(totalPriceForAllBaskets, paymentInfo.UserName, paymentInfo.IDNumber,
+            var payTask=this._payment.Charge(totalPriceForAllBaskets, paymentInfo.UserName, paymentInfo.IdNumber,
                 paymentInfo.CreditCardNumber, paymentInfo.CreditCardExpirationDate,
                 paymentInfo.ThreeDigitsOnBackOfCard);
             payTask.Wait();

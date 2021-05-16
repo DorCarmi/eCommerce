@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using System.Net.WebSockets;
 using eCommerce.Communication;
-using eCommerce.SingleR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Connections;
@@ -10,7 +9,6 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.SignalR;
 
 namespace eCommerce
 {
@@ -74,10 +72,8 @@ namespace eCommerce
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}");
-                endpoints.MapHub<MessageHub>("/messageHub", options =>
+                endpoints.MapControllers();
+                    endpoints.MapHub<MessageHub>("/messageHub", options =>
                 {
                     options.Transports = HttpTransportType.WebSockets;
                 });

@@ -64,6 +64,8 @@ namespace eCommerce.Business
                 && user.GetState() == Guest.State)
             {
                 _connectedUsers.TryRemove(token, out user);
+                _logger.Info($"Guest: {user?.Username} disconnected");
+
             }
         }
 
@@ -166,6 +168,7 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Error");
             }
             
+            _logger.Info($"User {user.Username} logged in. Token {loginToken}");
             return Result.Ok(loginToken);
         }
         
@@ -235,6 +238,33 @@ namespace eCommerce.Business
                 return Result.Fail<IUser>("User not connected or logged in");
             }
 
+            return Result.Ok(user);
+        }
+        
+        public Result<IUser> GetUserLoggedIn(string token)
+        {
+            if (!_auth.IsValidToken(token))
+            {
+                _logger.Info($"Invalid use of token {token}");
+                if (token != null)
+                {
+                    _connectedUsers.TryRemove(token, out var tUser);
+                }
+
+                return Result.Fail<IUser>("Invalid token");
+            }
+
+            if (!_connectedUsers.TryGetValue(token, out var user))
+            {
+                _logger.Info($"Usage of old token {token}");
+                return Result.Fail<IUser>("User not logged in");
+            }
+
+            if (user.GetState() == Guest.State)
+            {
+                return Result.Fail<IUser>("This is a guest user");
+            }
+            
             return Result.Ok(user);
         }
         

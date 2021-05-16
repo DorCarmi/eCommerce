@@ -13,8 +13,8 @@ export class RedirectWithData {
     }
 }
 
-export class authApi {
-    static Connect() {
+export class AuthApi {
+    Connect() {
         return instance.get(CONNECT_PATH)
             .then(res => {
                 let data = res.data;
@@ -23,7 +23,7 @@ export class authApi {
             .catch(res => undefined);
     }
     
-    static Login(username, password, role) {
+    Login(username, password, role) {
         return instance.post(LOGIN_PATH,
             {
                 username: username,
@@ -39,7 +39,7 @@ export class authApi {
             .catch(res => undefined);
     }
     
-    static Register(username, password, email, name, address, birthday) {
+    Register(username, password, email, name, address, birthday) {
         return instance.post(REGISTER_PATH,
             {
                 username: username,
