@@ -8,6 +8,7 @@ export class Layout extends Component {
 
   render () {
     let { state } = this.props;
+    console.log(state)
     return (
       <div>
         <NavMenu state={state}/>
@@ -15,7 +16,7 @@ export class Layout extends Component {
             display: 'flex',
             position: 'relative'
         }}>
-            {state.isLoggedIn ? <SideBarMenu storeList={state.storeList}/> : null}
+            {state.isLoggedIn ? <SideBarMenu role={state.role} storeList={state.storeList}/> : null}
             <Container>
               {this.props.children}
             </Container>

@@ -17,6 +17,7 @@ import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
 import {SearchComponent} from "./components/SearchComponent";
 import {PurchaseCart} from "./components/Cart/PurchaseCart";
 import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
+import {UserRole} from "./Data/UserRole";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -95,15 +96,16 @@ export default class App extends Component {
 
     async componentDidMount() {
         const userBasicInfo = await this.userApi.getUserBasicInfo();
-        console.log(userBasicInfo.username);
+        console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
         
         const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
         if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
             console.log(userBasicInfo.username);
-
+            
             this.setState({
                 isLoggedIn: userBasicInfo.isLoggedIn,
                 userName: userBasicInfo.username,
+                role: userBasicInfo.userRole,
                 storeList: fetchedStoredList.value
             })
         }

@@ -98,8 +98,9 @@ namespace eCommerce.Business
             }
             IUser user = userRes.Value;
 
-            UserBasicInfo userBasicInfo = new UserBasicInfo(user.Username, true);
-            if (user.GetState() == Guest.State)
+            UserBasicInfo userBasicInfo = new UserBasicInfo(user.Username, true,
+                UserSystemStateToUserRole(user.GetState()));
+            if (userBasicInfo.UserRole == UserRole.Guest)
             {
                 userBasicInfo.IsLoggedIn = false;
             }
@@ -814,6 +815,22 @@ namespace eCommerce.Business
             }
 
             return Result.Ok(new Tuple<IUser, IStore>(user, store));
+        }
+        
+        private UserRole UserSystemStateToUserRole(UserToSystemState userToSystemState)
+        {
+            if (userToSystemState.Equals(Guest.State))
+            {
+                return UserRole.Guest;
+            } 
+            
+            if (userToSystemState.Equals(Member.State))
+            {
+                return UserRole.Member;
+            }
+            
+            return UserRole.Admin;
+            
         }
     }
 }

@@ -3,6 +3,7 @@ import {Menu, MenuItem, ProSidebar, SidebarContent, SidebarHeader, SubMenu} from
 import "./SideBarMenu.css"
 import {Link} from "react-router-dom";
 import {NavItem, NavLink} from "reactstrap";
+import {UserRole} from "../Data/UserRole";
 
 export class SideBarMenu extends Component {
     static displayName = SideBarMenu.name;
@@ -31,6 +32,8 @@ export class SideBarMenu extends Component {
     }
     
     render() {
+        const { role } = this.props
+        console.log(role)
         return (
             <ProSidebar breakPoint="md" className="sideBarContainer">
                 <SidebarHeader>
@@ -49,10 +52,12 @@ export class SideBarMenu extends Component {
                         </SubMenu>
                     </Menu>
 
-                    <Menu className="menuLayout">
-                        <SubMenu title="Admin panel">
-                        </SubMenu>
-                    </Menu>
+                    {role === UserRole.Admin ?
+                        <Menu className="menuLayout">
+                            <SubMenu title="Admin panel">
+                            </SubMenu>
+                        </Menu> :
+                        null}
                 </SidebarContent>
         </ProSidebar>)
     }

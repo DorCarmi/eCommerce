@@ -55,7 +55,7 @@ export class Login extends Component {
         return role === "member" ? UserRole.Member :
             role === "admin" ? UserRole.Admin : 
             undefined
-}
+    }
     
     componentDidMount() {
         //this.populateWeatherData();
