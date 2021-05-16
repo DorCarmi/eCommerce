@@ -20,6 +20,7 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(4)]
     public class TestSearchForProductsOrStores
     {
         private IAuthService _auth;
@@ -70,6 +71,7 @@ namespace Tests.AcceptanceTests
         
         [TestCase("iPhone")]
         [TestCase("Mermaid")]
+        [Order(1)]
         [Test]
         public void TestNotExistsProduct(string query)
         {
@@ -81,6 +83,8 @@ namespace Tests.AcceptanceTests
         
         [TestCase("iPhone")]
         [TestCase("Mermaid")]
+        //TODO: Check
+        [Order(0)]
         [Test]
         public void TestNotExistsStore(string query)
         {

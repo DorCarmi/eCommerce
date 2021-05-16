@@ -18,6 +18,7 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(1)]
     public class TestAppointManager
     {
         private IAuthService _auth;
@@ -51,6 +52,7 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Yossi's Store", "singerMermaid")]
         [TestCase("Yossi's Store", "Liorwork")]
+        [Order(1)]
         [Test]
         public void TestSuccess(string storeName, string username)
         {

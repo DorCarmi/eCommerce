@@ -109,9 +109,9 @@ namespace Tests.AcceptanceTests
             _auth.Logout(login.Value);
             _auth.Disconnect(token);
         }
-       
-        [TestCase("Yossi11", "qwerty123", "Yossi's Store")]
+        
         [TestCase("singerMermaid", "130452abc", "Prancing dragon")] 
+        [Order(0)]
         [Test]
         public void TestAdminStoreFailureLogin(string admin, string password,string storeId)
         { 

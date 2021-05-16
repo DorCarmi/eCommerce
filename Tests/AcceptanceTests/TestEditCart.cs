@@ -54,7 +54,6 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara milk", "Yossi's store", 9)]
         [TestCase("Tara milk", "Yossi's store", 3)]
         [TestCase("Tara milk", "Yossi's store", 0)]
-        [TestCase("Tara milk", "Yossi's store", -6)]
         [Test]
         public void EditItemAmountOfCart(string itemId, string storeName, int amount)
         {
@@ -65,6 +64,8 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
+        
+        [TestCase("Tara milk", "Yossi's store", -6)]
         [TestCase("Tnuva cream cheese", "Yossi's store", 3)]
         [TestCase("Tara milk", "dancing dragon", 0)]
         [TestCase("Tara milk", "Yossi's store", 15)]

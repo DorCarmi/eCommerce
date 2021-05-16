@@ -8,18 +8,21 @@ namespace eCommerce.Service
     public class SCart
     {
         public IList<SBasket> Baskets { get; }
+        public string CartHolderID { get; }
 
-        public SCart(IList<SBasket> baskets)
+        public SCart(IList<SBasket> baskets, string CartHolder)
         {
             Baskets = baskets;
+            this.CartHolderID = CartHolder;
         }
         
-        internal SCart(IList<IBasket> baskets)
+        internal SCart(IList<IBasket> baskets, string CartHolder)
         {
-            IList<SBasket> SBaskets = new List<SBasket>();
+            this.Baskets = new List<SBasket>();
+            this.CartHolderID = CartHolder;
             foreach (var basket in baskets)
             {
-                SBaskets.Add(new SBasket(basket.GetAllItems().Value as IList<IItem>, basket.GetTotalPrice().Value));
+                Baskets.Add(new SBasket(basket.GetAllItems().Value as IList<IItem>, basket.GetTotalPrice().Value));
             }
         }
     }

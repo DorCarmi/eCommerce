@@ -18,6 +18,7 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(2)]
     public class TestOpenStore
     {
         private IAuthService _auth;
@@ -41,6 +42,7 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Yossi11", "qwerty123","Yossi's store")]
         [TestCase("singerMermaid", "130452abc", "dancing dragon")]
+        [Order(0)]
         [Test]
         public void TestSuccess(string member, string password, string store)
         {
@@ -52,8 +54,9 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Yossi11", "qwerty123","Yossi's store", "singerMermaid", "130452abc", "dancing dragon")]
-        [TestCase("Yossi11", "qwerty123","Yossi's store", "Yossi11", "qwerty123", "dancing dragon")]
+        [TestCase("Yossi11", "qwerty123","Yossi's store", "singerMermaid", "130452abc", "dancing dragon2022")]
+        [TestCase("Yossi11", "qwerty123","Yossi's store", "Yossi11", "qwerty123", "dancing dragon2021")]
+        [Order(1)]
         public void TestMultipleSuccess(string firstMember, string firstPassword, string firstStore, string secondMember, string secondPassword, string secondStore)
         {
             string token = _auth.Connect();
@@ -67,7 +70,7 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Yossi11", "qwerty123","~~~Yossi's store", "~~~Yossi's store")]
+        
         [TestCase("Yossi11", "qwerty123","Yossi's store","Yossi's store")]
         [Test]
         public void TestFailureInput(string member, string password, string storeName, string itemStore)

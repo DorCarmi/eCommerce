@@ -61,6 +61,7 @@ namespace Tests.AcceptanceTests
             new string[]{"milk", "Tara"}, (double)5.4)] //edit keywords
         [TestCase("Tara milk", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)6.2)] // edit price
+        [Order(0)]
         [Test]
         public void TestSuccess(string name, int amount, string category, string[] tags,
             double price)  
@@ -76,8 +77,6 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Tara milk", "Yossi's Store", -23, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (invalid subtract)
-        [TestCase("Tara milk", "Yossi's Store", 10, "~~123~~~Tara",
-            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit invalid category
         [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)-6.2)] // edit invalid price
         [TestCase("Gans 356 air Rubik's cube", "Yossi's Store", 178, "games",

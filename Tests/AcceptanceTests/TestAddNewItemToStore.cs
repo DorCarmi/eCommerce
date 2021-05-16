@@ -19,6 +19,7 @@ namespace Tests.AcceptanceTests
     /// </summary>
     
     [TestFixture]
+    [Order(3)]
     public class TestAddNewItemToStore
     {
         private IAuthService _auth;
@@ -48,11 +49,13 @@ namespace Tests.AcceptanceTests
         [TestCase("Gans 356 air Rubik's cube", 178, "games",
             new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) 114.75)]
         [Test]
+        [Order(2)]
         public void TestSuccess(string name, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Assert.True(yossiLogin.IsSuccess,yossiLogin.Error);
             Result addItemResult = _store.AddNewItemToStore(yossiLogin.Value,
                 new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(addItemResult.IsSuccess, "failed to add item: " + name + "|error: " + addItemResult.Error);
@@ -73,7 +76,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result addItemResult = _store.AddNewItemToStore(yossiLogin.Value,
-                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
+                new SItem(name, store, amount, category, Array.AsReadOnly(tags), price));
             Assert.True(addItemResult.IsFailure, "item addition was suppose to fail for " + name);
             token = _auth.Logout(yossiLogin.Value).Value;
             _auth.Disconnect(token);

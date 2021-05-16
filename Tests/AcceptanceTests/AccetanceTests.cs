@@ -167,8 +167,6 @@ namespace Tests.AcceptanceTests
             new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) -75.9)]
         [TestCase("Cube Alarm", "the dancing pirate", 5986, "electronics",
             new string[] {"alarm", "electronics", "cube","decorations"}, (double) 65.5)]
-        [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (double)5.8)]
         [Test]      //TODO add a test case for a store that exists but not owned by the current user
         public void TestAddNewItemToStoreFailureInput(string name, string storeName, int amount, string category, string[] tags,
             double price)
@@ -200,36 +198,7 @@ namespace Tests.AcceptanceTests
             token = _market.Logout(token).Value;
             _market.Disconnect(token);
         }
-        /*
-         * UC - Update product stock- add items
-         * UC - Update product stock- subtract items
-         * UC - Update existing product's details
-         * Req - 4.1
-         */
-        [TestCase("Tara milk", "Yossi's Store", 15, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (add)
-        [TestCase("Tara milk", "Yossi's Store", 5, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (subtract)
-        [TestCase("Tara milk", "Yossi's Store", 0, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (remove)
-        [TestCase("Tara milk", "Yossi's Store", 10, "Tara",
-            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit category
-        [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
-            new string[]{"milk", "Tara"}, (double)5.4)] //edit keywords
-        [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
-            new string[]{"dairy", "milk", "Tara"}, (double)6.2)] // edit price
-        [Test]
-        public void TestEditItemInStoreSuccess(string name, string storeName, int amount, string category, string[] tags,
-            double price)  
-        {
-            string token = _market.Connect();
-            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
-            Result editItemResult = _market.EditItemInStore(yossiLogin.Value,
-                new SItem(name, storeName, amount, category, Array.AsReadOnly(tags), price));
-            Assert.True(editItemResult.IsSuccess, "failed to edit item: " + editItemResult.Error);
-            token = _market.Logout(yossiLogin.Value).Value;
-            _market.Disconnect(token);
-        }
+       
         /*
          * UC - Update product stock- add items
          * UC - Update product stock- subtract items
@@ -276,20 +245,7 @@ namespace Tests.AcceptanceTests
             Assert.True(editItemResult.IsFailure, "should not succeed since no user is logged in");
             _market.Disconnect(token);
         }
-        /*
-         * UC - Remove product from store
-         * Req - 4.1
-         */
-        [TestCase("Yossi's Store", "Tara milk")]
-        public void TestRemoveProductFromStoreSuccess(string storeName, string productName)
-        {
-            string token = _market.Connect();
-            Result<string> yossiLogin = _market.Login(token, "Yossi11", "qwerty123", Member.State);
-            Result removeItemResult = _market.RemoveItemFromStore(yossiLogin.Value, storeName, productName);
-            Assert.True(removeItemResult.IsSuccess, "failed to remove item " + productName + ": " + removeItemResult.Error);
-            token = _market.Logout(yossiLogin.Value).Value;
-            _market.Disconnect(token); 
-        }
+        
         /*
          * UC - Remove product from store
          * Req - 4.1
@@ -449,22 +405,7 @@ namespace Tests.AcceptanceTests
             token = _market.Logout(login.Value).Value;
             _market.Disconnect(token);  
         }
-        /*
-         * UC - Save items in a shopping cart
-         * Req - 2.7
-         */
-        [TestCase("Tara milk", "Yossi's store", 3)]
-        [TestCase("Tara milk", "Yossi's store", 10)]
-        [Test]
-        public void TestAddItemToCartSuccess(string itemId, string storeName, int amount)
-        { 
-            string token = _market.Connect();
-            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", Member.State);
-            Result result = _market.AddItemToCart(login.Value, itemId, storeName, amount);
-            Assert.True(result.IsSuccess, "failed to add  " + " from " + storeName + " to cart: " + result.Error);
-            token = _market.Logout(login.Value).Value;
-            _market.Disconnect(token);
-        }
+        
         /*
          * UC - Save items in a shopping cart
          * Req - 2.7
@@ -481,25 +422,7 @@ namespace Tests.AcceptanceTests
             token = _market.Logout(login.Value).Value;
             _market.Disconnect(token);
         }
-        /*
-         * UC - Edit shopping cart
-         * Req - 2.8 
-         */
-        [TestCase("Tara milk", "Yossi's store", 9)]
-        [TestCase("Tara milk", "Yossi's store", 3)]
-        [TestCase("Tara milk", "Yossi's store", 0)]
-        [TestCase("Tara milk", "Yossi's store", -6)]
-        [Test]
-        public void EditItemAmountOfCart(string itemId, string storeName, int amount)
-        {
-            string token = _market.Connect();
-            Result<string> login = _market.Login(token, "singerMermaid", "130452abc", Member.State);
-            Result result = _market.AddItemToCart(login.Value, itemId, storeName, 5);
-            result = _market.EditItemAmountOfCart(login.Value, itemId, storeName, amount);
-            Assert.True(result.IsSuccess, "failed to edit item: " + result.Error);
-            token = _market.Logout(login.Value).Value;
-            _market.Disconnect(token);
-        }
+        
         /*
          * UC - Edit shopping cart
          * Req - 2.8 
@@ -591,19 +514,7 @@ namespace Tests.AcceptanceTests
            _market.Logout(login.Value);
            _market.Disconnect(token);
        }
-       /*
-        * UC - Admin requests for user's purchase history 
-        * Req- 6.4
-        */
-       [Test]
-       public void TestAdminGetPurchaseHistorySuccess(string admin, string password,string member)
-       { string token = _market.Connect();
-           Result<string> login = _market.Login(token, admin, password, Admin.State);
-           Result result = _market.AdminGetPurchaseHistoryUser(login.Value,member);
-           Assert.True(result.IsSuccess, result.Error);
-           _market.Logout(login.Value);
-           _market.Disconnect(token);
-       }
+       
        /*
         * UC - Admin requests for user's purchase history 
         * Req- 6.4
@@ -616,31 +527,7 @@ namespace Tests.AcceptanceTests
            _market.Logout(login.Value);
            _market.Disconnect(token);
        }
-       /*
-        * UC - Admin requests for store history  
-        * Req- 6.4
-        */
-       [Test]
-       public void TestAdminGetPurchaseHistoryStoreSuccess(string admin, string password, string storeID)
-       { string token = _market.Connect();
-           Result<string> login = _market.Login(token, admin, password, Admin.State);
-           Result result = _market.AdminGetPurchaseHistoryStore(login.Value,storeID);
-           Assert.True(result.IsSuccess, result.Error);
-           _market.Logout(login.Value);
-           _market.Disconnect(token);
-       }
-       /*
-        * UC - Admin requests for store history  
-        * Req- 6.4
-        */
-       [Test]
-       public void TestAdminGetPurchaseHistoryStoreFailure(string admin, string password,string storeID)
-       { string token = _market.Connect();
-           Result<string> login = _market.Login(token, admin, password, Admin.State);
-           Result result = _market.AdminGetPurchaseHistoryStore(login.Value,storeID);
-           Assert.True(result.IsFailure);
-           _market.Logout(login.Value);
-           _market.Disconnect(token);
-       }
+       
+       
     }
 }
