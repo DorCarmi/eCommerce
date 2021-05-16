@@ -19,6 +19,7 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(0)]
     public class TestChangeManagerPermissions
     {
         private IAuthService _auth;
@@ -51,6 +52,7 @@ namespace Tests.AcceptanceTests
         }
 
         [TestCase("singerMermaid")]
+        [Order(0)]
         [Test]
         public void TestSuccessAdd(string manager)
         {

@@ -9,6 +9,7 @@ using NUnit.Framework;
 namespace Tests.AcceptanceTests
 {
     [TestFixture]
+    [Order(1)]
     public class TestLogin
     {
         /// <summary>

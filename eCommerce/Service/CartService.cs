@@ -48,7 +48,7 @@ namespace eCommerce.Service
             }
             ICart cart = cartRes.Value;
 
-            return Result.Ok(new SCart(cart.GetBaskets()));
+            return Result.Ok(new SCart(cart.GetBaskets(),cart.GetUser().Username));
         }
 
         public Result<double> GetPurchaseCartPrice(string token)

@@ -77,6 +77,11 @@ namespace eCommerce.Business
                 }
             }
 
+            foreach (var basket in _cart.GetBaskets())
+            {
+                basket.AddBasketRecords();
+            }
+
             return Result.Ok();
 
 

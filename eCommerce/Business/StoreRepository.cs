@@ -21,13 +21,13 @@ namespace eCommerce.Business
 
         public bool Add([NotNull] IStore store)
         {
-            return _stores.TryAdd(store.GetStoreName(), store);
+            return _stores.TryAdd(store.GetStoreName().ToUpper(), store);
         }
 
         public IStore GetOrNull([NotNull] string storeName)
         {
             IStore store = null;
-            _stores.TryGetValue(storeName, out store);
+            _stores.TryGetValue(storeName.ToUpper(), out store);
             return store;
         }
 
@@ -82,7 +82,8 @@ namespace eCommerce.Business
         { 
             List<string> storeNames = _stores.Keys.ToList();
             storeNames.Sort(EditDistance);
-            return storeNames;
+            var filtered=storeNames.FindAll(x => x.ToUpper().Contains(query.ToUpper()));
+            return filtered;
         }
         
         

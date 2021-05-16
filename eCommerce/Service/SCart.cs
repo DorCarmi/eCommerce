@@ -8,15 +8,18 @@ namespace eCommerce.Service
     public class SCart
     {
         public IList<SBasket> Baskets { get; }
+        public string CartHolderID { get; }
 
-        public SCart(IList<SBasket> baskets)
+        public SCart(IList<SBasket> baskets, string CartHolder)
         {
             Baskets = baskets;
+            CartHolderID = CartHolder;
         }
         
-        internal SCart(IList<IBasket> baskets)
+        internal SCart(IList<IBasket> baskets, string CartHolder)
         {
             Baskets = new List<SBasket>();
+            CartHolderID = CartHolder;
             foreach (var basket in baskets)
             {
                 var newItems = new List<SItem>();

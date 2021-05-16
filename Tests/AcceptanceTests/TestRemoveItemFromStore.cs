@@ -49,6 +49,7 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Tara milk")]
         [TestCase("iPhone X")]
+        [Order(0)]
         [Test]
         public void TestSuccess(string productName)
         {
@@ -74,17 +75,7 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token); 
         }
 
-        [Test]
-        public void TestRemoveLastProduct()
-        {
-            string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            _store.RemoveItemFromStore(yossiLogin.Value, storeName, "Tara milk");
-            Result removeItemResult = _store.RemoveItemFromStore(yossiLogin.Value, storeName, "iPhone X");
-            Assert.True(removeItemResult.IsFailure, "can't remove all products from a store");
-            token = _auth.Logout(yossiLogin.Value).Value;
-            _auth.Disconnect(token); 
-        }
+       
         
         [TestCase("Tara milk")]
         [TestCase("iPhone X")]
