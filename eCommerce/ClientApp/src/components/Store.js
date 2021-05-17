@@ -2,7 +2,9 @@
 import {Table} from 'react-bootstrap'
 import {StoreApi} from "../Api/StoreApi";
 import {Link} from "react-router-dom";
+import {UserApi} from "../Api/UserApi";
 import {Item} from "../Data/Item";
+import {StorePermission} from '../Data/StorePermission'
 
 export default class Store extends Component {
     static displayName = Store.name;
@@ -12,7 +14,8 @@ export default class Store extends Component {
         const {storeId} = props
         this.state = {
             storeId: storeId,
-            items: []
+            items: [],
+            permissions:[]
         }
         this.storeApi = new StoreApi();
     }
@@ -28,6 +31,13 @@ export default class Store extends Component {
     
     async componentDidMount() {
         await this.getItems();
+        const fetchedPermissions = await this.storeApi.getStorePermissionForUser(this.state.storeId)
+        if(fetchedPermissions.isSuccess){
+            console.log(fetchedPermissions.value)
+            this.setState({
+                permissions:fetchedPermissions.value
+            })
+        }
     }
 
     async componentDidUpdate(prevProps, prevState, undefined) {
@@ -69,11 +79,11 @@ export default class Store extends Component {
     }
     
     render() {
-        const {items,storeId} = this.state
+        const {items,storeId,permissions} = this.state
         if (items.length > 0) {
             return (
                 <div>
-                    <Link to={`${storeId}/addItem`}>Add an Item</Link>
+                    {permissions.includes(StorePermission.AddItemToStore) ? <Link to={`${storeId}/addItem`}>Add an Item</Link> : null} 
                     <Table striped bordered hover>
                     <thead>
                     <tr>
@@ -97,9 +107,9 @@ export default class Store extends Component {
                                     <td>{item.pricePerUnit}</td>
                                     <td>
                                         <div>
-                                        <Link exact to={`${storeId}/editItem/${item.itemName}`}>Edit Item</Link>
+                                            {permissions.includes(StorePermission.EditItemDetails) ? <Link exact to={`${storeId}/editItem/${item.itemName}`}>Edit Item</Link> : null}
                                         </div>
-                                        <button onClick={() => this.removeItem(storeId,item.itemName)}>Remove Item</button>
+                                        {permissions.includes(StorePermission.RemoveStoreStaff) ? <button onClick={() => this.removeItem(storeId,item.itemName)}>Remove Item</button> : null }
                                     </td>
                                 </tr>
                             )
