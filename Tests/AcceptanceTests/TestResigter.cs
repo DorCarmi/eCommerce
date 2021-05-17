@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -25,8 +26,11 @@ namespace Tests.AcceptanceTests
         [SetUp]
         public void SetUp()
         {
-            _auth = new AuthService();
-            Console.WriteLine("setup");
+            StoreRepository SR = new StoreRepository();
+            UserAuth UA = UserAuth.GetInstance();
+            IRepository<IUser> UR = new RegisteredUsersRepository();
+
+            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
         }
         
         
