@@ -7,6 +7,7 @@ using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 namespace Tests.AcceptanceTests
 {
@@ -18,18 +19,20 @@ namespace Tests.AcceptanceTests
     /// 4.1
     /// </Req>
     /// </summary>
-    [TestFixture]
+    //[TestFixture]
+    //[Order(14)]
     public class TestRemoveItemFromStore
     {
         private IAuthService _auth;
         private IStoreService _store;
         private string storeName = "Yossi's Store";
 
-        [SetUp]
+        [SetUpAttribute]
         public void SetUp()
         {
             StoreRepository SR = new StoreRepository();
-            UserAuth UA = UserAuth.GetInstance();
+            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
             IRepository<IUser> UR = new RegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
@@ -50,6 +53,13 @@ namespace Tests.AcceptanceTests
                 new List<string>{"smartphone", "iPhone", "Apple", "Iphone X"}, (double) 5000.99));
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
+        }
+        
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
+            _store = null;
         }
         
         [TestCase("Tara milk")]

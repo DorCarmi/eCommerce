@@ -5,6 +5,7 @@ using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 
 namespace Tests.AcceptanceTests
@@ -17,20 +18,27 @@ namespace Tests.AcceptanceTests
     /// 2.3
     /// </Req>
     /// </summary>
-    [TestFixture]
-    [Order(1)]
+    //[TestFixture]
+    //[Order(15)]
     public class TestRegister
     {
         private IAuthService _auth;
 
-        [SetUp]
+        [SetUpAttribute]
         public void SetUp()
         {
             StoreRepository SR = new StoreRepository();
-            UserAuth UA = UserAuth.GetInstance();
+            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
             IRepository<IUser> UR = new RegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
+        }
+        
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
         }
         
         

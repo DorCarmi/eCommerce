@@ -7,6 +7,7 @@ using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 namespace Tests.AcceptanceTests
 {
@@ -18,8 +19,8 @@ namespace Tests.AcceptanceTests
     /// 4.5
     /// </Req>
     /// </summary>
-    [TestFixture]
-    [Order(1)]
+    //[TestFixture]
+    //[Order(4)]
     public class TestAppointManager
     {
         private IAuthService _auth;
@@ -28,11 +29,12 @@ namespace Tests.AcceptanceTests
         private string store = "Yossi's Store";
         
         
-        [SetUp]
+        [SetUpAttribute]
         public void SetUp()
         {
+            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
             StoreRepository SR = new StoreRepository();
-            UserAuth UA = UserAuth.GetInstance();
             IRepository<IUser> UR = new RegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
@@ -52,6 +54,13 @@ namespace Tests.AcceptanceTests
             _store.OpenStore(yossiLogInResult.Value, store);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
+        }
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
+            _store = null;
+            _user = null;
         }
         
         

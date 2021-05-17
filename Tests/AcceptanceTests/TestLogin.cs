@@ -5,12 +5,13 @@ using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 
 namespace Tests.AcceptanceTests
 {
-    [TestFixture]
-    [Order(1)]
+    //[TestFixture]
+    //[Order(11)]
     public class TestLogin
     {
         /// <summary>
@@ -23,11 +24,12 @@ namespace Tests.AcceptanceTests
         /// </summary>
         private IAuthService _auth;
 
-        [SetUp]
+        [SetUpAttribute]
         public void SetUp()
         {
             StoreRepository SR = new StoreRepository();
-            UserAuth UA = UserAuth.GetInstance();
+            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
             IRepository<IUser> UR = new RegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
@@ -39,6 +41,11 @@ namespace Tests.AcceptanceTests
             _auth.Register(token, shiran, "130452abc");
             _auth.Register(token, lior, "987654321");
             _auth.Disconnect(token);
+        }
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
         }
 
         [TestCase("Yossi11", "qwerty123")]

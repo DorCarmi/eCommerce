@@ -6,7 +6,9 @@ using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
+using NuGet.Frameworks;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 namespace Tests.AcceptanceTests
 {
@@ -18,8 +20,8 @@ namespace Tests.AcceptanceTests
     /// 4.3
     /// </Req>
     /// </summary>
-    [TestFixture]
-    [Order(1)]
+    //[TestFixture]
+    //[Order(3)]
     public class TestAppointCoOwner
     {
         private IAuthService _auth;
@@ -28,11 +30,12 @@ namespace Tests.AcceptanceTests
         private string store = "Yossi's Store";
         
         
-        [SetUp]
+        [SetUpAttribute]
         public void SetUp()
         {
+            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
             StoreRepository SR = new StoreRepository();
-            UserAuth UA = UserAuth.GetInstance();
             IRepository<IUser> UR = new RegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
@@ -53,6 +56,13 @@ namespace Tests.AcceptanceTests
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
+            _store = null;
+            _user = null;
+        }
         
         
         [TestCase("Yossi's Store", "singerMermaid")]
@@ -63,6 +73,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Assert.True(yossiLogin.IsSuccess, yossiLogin.Error);
             Result result = _user.AppointCoOwner(yossiLogin.Value, storeName, username);
             Assert.True(result.IsSuccess, "failed to appoint " + username + ": " + result.Error);
             token = _auth.Logout(yossiLogin.Value).Value;

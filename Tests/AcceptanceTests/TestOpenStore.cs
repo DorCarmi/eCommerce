@@ -7,6 +7,7 @@ using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 namespace Tests.AcceptanceTests
 {
@@ -18,18 +19,19 @@ namespace Tests.AcceptanceTests
     /// 3.2
     /// </Req>
     /// </summary>
-    [TestFixture]
-    [Order(2)]
+    //[TestFixture]
+    //[Order(13)]
     public class TestOpenStore
     {
         private IAuthService _auth;
         private IStoreService _store;
 
-        [SetUp]
+        [SetUpAttribute]
         public void SetUp()
         {
             StoreRepository SR = new StoreRepository();
-            UserAuth UA = UserAuth.GetInstance();
+            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
             IRepository<IUser> UR = new RegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
@@ -42,6 +44,13 @@ namespace Tests.AcceptanceTests
             _auth.Register(token, yossi, "qwerty123");
             _auth.Register(token, shiran, "130452abc");
             _auth.Disconnect(token);
+        }
+        
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
+            _store = null;
         }
         
         
@@ -59,17 +68,18 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Yossi11", "qwerty123","Yossi's store", "singerMermaid", "130452abc", "dancing dragon2022")]
-        [TestCase("Yossi11", "qwerty123","Yossi's store", "Yossi11", "qwerty123", "dancing dragon2021")]
+        [TestCase("Yossi11", "qwerty123","Yossi's store2022", "singerMermaid", "130452abc", "dancing dragon2022")]
+        [TestCase("Yossi11", "qwerty123","Yossi's store2021", "Yossi11", "qwerty123", "dancing dragon2021")]
         [Order(1)]
         public void TestMultipleSuccess(string firstMember, string firstPassword, string firstStore, string secondMember, string secondPassword, string secondStore)
         {
             string token = _auth.Connect();
             Result<string> login = _auth.Login(token, firstMember, firstPassword, ServiceUserRole.Member);
-            _store.OpenStore(login.Value, firstStore);
+            Result result = _store.OpenStore(login.Value, firstStore);
+            Assert.True(result.IsSuccess, result.Error);
             token = _auth.Logout(login.Value).Value;
             login = _auth.Login(token, secondMember, secondPassword, ServiceUserRole.Member);
-            Result result = _store.OpenStore(login.Value, secondStore);
+            result = _store.OpenStore(login.Value, secondStore);
             Assert.True(result.IsSuccess, result.Error);
             token = _auth.Logout(login.Value).Value;
             _auth.Disconnect(token);
@@ -106,7 +116,7 @@ namespace Tests.AcceptanceTests
         [TestCase("prancing dragon")]
         [TestCase("Yossi's store")]
         [Test]
-        public void TestFailureInput(string storeName)
+        public void TestFailureNotLoggedIn(string storeName)
         { 
             string token = _auth.Connect();
             Result result = _store.OpenStore(token, storeName);

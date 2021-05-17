@@ -5,19 +5,30 @@ using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 namespace Tests.AcceptanceTests
 {
-    [TestFixture]
+    /// <summary>
+    /// <UC>
+    /// Logout
+    /// </UC>
+    /// <Req>
+    /// 3.1
+    /// </Req>
+    /// </summary>
+    
+    //[TestFixture]
     public class TestLogout
     {
         private IAuthService _auth;
 
-        [SetUp]
+        [SetUpAttribute]
         public void SetUp()
         {
             StoreRepository SR = new StoreRepository();
-            UserAuth UA = UserAuth.GetInstance();
+            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
             IRepository<IUser> UR = new RegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
@@ -30,17 +41,15 @@ namespace Tests.AcceptanceTests
             _auth.Register(token, lior, "987654321");
             _auth.Disconnect(token);
         }
+
+        [TearDownAttribute]
+        public void teardown()
+        {
+            _auth = null;
+        }
         
-        /// <summary>
-        /// <UC>
-        /// Logout
-        /// </UC>
-        /// <Req>
-        /// 3.1
-        /// </Req>
-        /// </summary>
         [Test]
-        [Order(0)]
+        [Order(12)]
         public void TestSuccess()
         {
             string token = _auth.Connect();
@@ -52,6 +61,12 @@ namespace Tests.AcceptanceTests
             result = _auth.Logout(result.Value);
             Assert.True(result.IsSuccess, result.Error);
             _auth.Disconnect(result.Value);
+        }
+        
+        [TearDown]
+        public void Teardown()
+        {
+            _auth = null;
         }
         
         [Test]

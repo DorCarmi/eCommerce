@@ -8,6 +8,7 @@ using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 namespace Tests.AcceptanceTests
 {
@@ -20,19 +21,20 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     
-    [TestFixture]
-    [Order(3)]
+    //[TestFixture]
+    //[Order(3)]
     public class TestAddNewItemToStore
     {
         private IAuthService _auth;
         private IStoreService _store;
         private string storeName = "Yossi's Store";
 
-        [SetUp]
+        [SetUpAttribute]
         public void SetUp()
         {
+            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
             StoreRepository SR = new StoreRepository();
-            UserAuth UA = UserAuth.GetInstance();
             IRepository<IUser> UR = new RegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
@@ -49,16 +51,23 @@ namespace Tests.AcceptanceTests
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
-        
+
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
+            _store = null;
+        }
+
         [TestCase("iPhone X", 35, "smartphones",
-            new string[] {"smartphone", "iPhone", "Apple", "Iphone X"}, (double) 5000.99)]
+            new string[] {"smartphone", "iPhone", "Apple", "Iphone X"}, 5000.99)]
         [TestCase("Gans 356 air Rubik's cube", 178, "games",
-            new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) 114.75)]
+            new string[] {"games", "Rubik's cube", "Gans","356 air"}, 114.75)]
         [Test]
         [Order(2)]
         public void TestSuccess(string name, int amount, string category, string[] tags,
             double price)
-        {
+        { 
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Assert.True(yossiLogin.IsSuccess,yossiLogin.Error);
