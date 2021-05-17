@@ -115,6 +115,11 @@ namespace eCommerce.Business
         {
             return Result.Fail<OwnerAppointment>("Guest can not be an owner of a store.");
         }
+        
+        public Result<ManagerAppointment> RemoveManager(User user, IStore store)
+        {
+            return Result.Fail<ManagerAppointment>("Guest can not be a manager of a store.");
+        }
 
         public Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {

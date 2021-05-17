@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -18,6 +19,7 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(2)]
     public class TestOpenStore
     {
         private IAuthService _auth;
@@ -26,8 +28,12 @@ namespace Tests.AcceptanceTests
         [SetUp]
         public void SetUp()
         {
-            _auth = new AuthService();
-            _store = new StoreService();
+            StoreRepository SR = new StoreRepository();
+            UserAuth UA = UserAuth.GetInstance();
+            IRepository<IUser> UR = new RegisteredUsersRepository();
+
+            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
+            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             MemberInfo shiran = new MemberInfo("singerMermaid", "shiran@gmail.com", "Shiran Moris",
@@ -41,6 +47,7 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Yossi11", "qwerty123","Yossi's store")]
         [TestCase("singerMermaid", "130452abc", "dancing dragon")]
+        [Order(0)]
         [Test]
         public void TestSuccess(string member, string password, string store)
         {
@@ -52,8 +59,9 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Yossi11", "qwerty123","Yossi's store", "singerMermaid", "130452abc", "dancing dragon")]
-        [TestCase("Yossi11", "qwerty123","Yossi's store", "Yossi11", "qwerty123", "dancing dragon")]
+        [TestCase("Yossi11", "qwerty123","Yossi's store", "singerMermaid", "130452abc", "dancing dragon2022")]
+        [TestCase("Yossi11", "qwerty123","Yossi's store", "Yossi11", "qwerty123", "dancing dragon2021")]
+        [Order(1)]
         public void TestMultipleSuccess(string firstMember, string firstPassword, string firstStore, string secondMember, string secondPassword, string secondStore)
         {
             string token = _auth.Connect();
@@ -67,7 +75,7 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Yossi11", "qwerty123","~~~Yossi's store", "~~~Yossi's store")]
+        
         [TestCase("Yossi11", "qwerty123","Yossi's store","Yossi's store")]
         [Test]
         public void TestFailureInput(string member, string password, string storeName, string itemStore)

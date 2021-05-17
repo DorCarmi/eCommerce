@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -29,9 +30,13 @@ namespace Tests.AcceptanceTests
         [SetUp]
         public void SetUp()
         {
-            _auth = new AuthService();
-            _store = new StoreService();
-            _cart = new CartService();
+            StoreRepository SR = new StoreRepository();
+            UserAuth UA = UserAuth.GetInstance();
+            IRepository<IUser> UR = new RegisteredUsersRepository();
+
+            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
+            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();

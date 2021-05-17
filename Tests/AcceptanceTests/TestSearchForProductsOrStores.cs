@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -20,20 +21,23 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(4)]
     public class TestSearchForProductsOrStores
     {
         private IAuthService _auth;
         private IStoreService _store;
-        private IUserService _user;
         private string store = "Yossi's Store";
         
         
         [SetUp]
         public void SetUp()
         {
-            _auth = new AuthService();
-            _store = new StoreService();
-            _user = new UserService();
+            StoreRepository SR = new StoreRepository();
+            UserAuth UA = UserAuth.GetInstance();
+            IRepository<IUser> UR = new RegisteredUsersRepository();
+
+            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
+            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();
@@ -70,6 +74,7 @@ namespace Tests.AcceptanceTests
         
         [TestCase("iPhone")]
         [TestCase("Mermaid")]
+        [Order(1)]
         [Test]
         public void TestNotExistsProduct(string query)
         {
@@ -81,6 +86,8 @@ namespace Tests.AcceptanceTests
         
         [TestCase("iPhone")]
         [TestCase("Mermaid")]
+        //TODO: Check
+        [Order(0)]
         [Test]
         public void TestNotExistsStore(string query)
         {

@@ -60,6 +60,9 @@ namespace eCommerce.Business.Service
 
         public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment);
 
+        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired,
+            ManagerAppointment managerAppointment);
+
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user);
         public Result EnterBasketToHistory(IBasket basket);
 
@@ -76,5 +79,6 @@ namespace eCommerce.Business.Service
         Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
         Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
         Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
+        Result<PurchaseRecord> AddBasketRecordToStore(Basket basket);
     }
 }

@@ -94,7 +94,7 @@ namespace eCommerce.Business
 
         public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(User user, IStore store)
         {
-            return user.GetStorePurchaseHistory(store);
+            return store.GetPurchaseHistory(user);
         }
 
         public virtual Result HasPermission(User user, IStore store, StorePermission storePermission)
@@ -120,6 +120,11 @@ namespace eCommerce.Business
         public Result<OwnerAppointment> RemoveOwner(User user, IStore store)
         {
             return user.RemoveOwner(this, store);
+        }
+        
+        public Result<ManagerAppointment> RemoveManager(User user, IStore store)
+        {
+            return user.RemoveManager(this, store);
         }
 
         public Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)

@@ -171,7 +171,7 @@ namespace eCommerce.Business
             }
             IUser appointedUser = appointedUserRes.Value;
 
-            return user.AppointUserToOwner(store, appointedUser);
+            return user.AppointUserToManager(store, appointedUser);
         }
         
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)
@@ -449,15 +449,15 @@ namespace eCommerce.Business
             IStore store = userAndStoreRes.Value.Item2;
             
             _logger.Info($"EditItemAmountOfCart({user.Username}, {itemId}, {storeId}, {amount})");
-
             Result<Item> itemRes = store.GetItem(itemId);
             if (itemRes.IsFailure)
             {
                 return itemRes;
             }
-            var itemInfo = itemRes.Value.ShowItem();
-            itemInfo.amount = amount;
-            return user.EditCart(itemInfo);
+            var editedItemInfo = itemRes.Value.ShowItem();
+            editedItemInfo.amount = amount;
+            //newItemInfo.AssignStoreToItem(store);
+            return user.EditCart(editedItemInfo);
         }
         //<CNAME>GetCart</CNAME>
         public Result<ICart> GetCart(string token)

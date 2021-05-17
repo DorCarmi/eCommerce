@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -29,8 +30,12 @@ namespace Tests.AcceptanceTests
         [SetUp]
         public void SetUp()
         {
-            _auth = new AuthService();
-            _store = new StoreService();
+            StoreRepository SR = new StoreRepository();
+            UserAuth UA = UserAuth.GetInstance();
+            IRepository<IUser> UR = new RegisteredUsersRepository();
+
+            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
+            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             MemberInfo shiran = new MemberInfo("singerMermaid", "shiran@gmail.com", "Shiran Moris",
@@ -61,6 +66,7 @@ namespace Tests.AcceptanceTests
             new string[]{"milk", "Tara"}, (double)5.4)] //edit keywords
         [TestCase("Tara milk", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)6.2)] // edit price
+        [Order(0)]
         [Test]
         public void TestSuccess(string name, int amount, string category, string[] tags,
             double price)  
@@ -76,8 +82,6 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Tara milk", "Yossi's Store", -23, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (invalid subtract)
-        [TestCase("Tara milk", "Yossi's Store", 10, "~~123~~~Tara",
-            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit invalid category
         [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)-6.2)] // edit invalid price
         [TestCase("Gans 356 air Rubik's cube", "Yossi's Store", 178, "games",
