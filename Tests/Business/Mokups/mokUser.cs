@@ -97,7 +97,7 @@ namespace Tests.Business.Mokups
 
         public Result EnterRecordToHistory(PurchaseRecord record)
         {
-            throw new System.NotImplementedException();
+            return Result.Ok();
         }
 
         public Result<OwnerAppointment> MakeOwner(IStore store)
@@ -111,6 +111,11 @@ namespace Tests.Business.Mokups
         }
 
         public Result<OwnerAppointment> RemoveOwner(IStore store)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<ManagerAppointment> RemoveManager(IStore store)
         {
             throw new NotImplementedException();
         }

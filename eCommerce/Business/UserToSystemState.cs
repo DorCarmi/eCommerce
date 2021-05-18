@@ -27,6 +27,7 @@ namespace eCommerce.Business
         Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store);
         Result RemoveOwnerFromStore(User user, IStore store, IUser otherUser);
         Result<OwnerAppointment> RemoveOwner(User user, IStore store);
+        Result<ManagerAppointment> RemoveManager(User user, IStore store);
         Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers);
     }
 }

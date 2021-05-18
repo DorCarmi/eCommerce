@@ -18,6 +18,7 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(4)]
     public class TestSaveItemToCart
     {
         private IAuthService _auth;
@@ -47,19 +48,22 @@ namespace Tests.AcceptanceTests
             Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", store, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
+            
             _store.OpenStore(yossiLogInResult.Value, store);
             _store.AddNewItemToStore(yossiLogInResult.Value, product);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
         
+        //TODO:Check
         [TestCase("Tara milk", "Yossi's store", 3)]
-        [TestCase("Tara milk", "Yossi's store", 10)]
+        [TestCase("Tara milk", "Yossi's store", 5)]
         [Test]
         public void TestAddItemToCartSuccess(string itemId, string storeName, int amount)
         { 
             string token = _auth.Connect();
             Result<string> login = _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Assert.True(login.IsSuccess, login.Error);
             Result result = _cart.AddItemToCart(login.Value, itemId, storeName, amount);
             Assert.True(result.IsSuccess, "failed to add  " + " from " + storeName + " to cart: " + result.Error);
             token = _auth.Logout(login.Value).Value;

@@ -18,7 +18,7 @@ export function GET_ALL_ITEMS_IN_STORE_PATH(storeId){ return STORE_PATH + '/getA
 export function GET_STORE_PERMISSION_FOR_USER_PATH(storeId) { return STORE_PATH + '/storePermissionForUser/' + storeId }
 export const SEARCH_ITEMS_PATH = STORE_PATH + '/search';
 export const SEARCH_STORE_PATH = STORE_PATH + '/searchStore';
-
+export function STAFF_OF_STORE_PATH(storeId){ return STORE_PATH + `/${storeId}/staff` }
 
 // ========= Cart ========== //
 

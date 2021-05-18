@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { Home } from './components/Home';
-import { Login } from "./components/Login";
+import Login from "./components/Login";
 import Store from './components/Store'
-import {OpenStore} from "./components/OpenStore";
+import OpenStore from "./components/OpenStore";
 import { Cart } from "./components/Cart"
 import Register from "./components/Register";
 import './custom.css'
@@ -119,7 +119,7 @@ export default class App extends Component {
     }
     
     render () {
-        return (
+    return (
         <BrowserRouter>
           <Layout state={this.state}>
             <Route exact path='/' component={Home} />

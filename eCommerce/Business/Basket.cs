@@ -94,7 +94,7 @@ namespace eCommerce.Business
             }
             if (this._nameToItem.ContainsKey(item.name))
             {
-                if (item.amount == -1)
+                if (item.amount == -1 || item.amount == 0)
                 {
                     this._nameToItem.Remove(item.name);
                     this.currentPrice = this.getRegularTotalPrice();
@@ -103,6 +103,10 @@ namespace eCommerce.Business
                 else if (item.amount <= 0)
                 {
                     return Result.Fail("Bad amount for item info");
+                }
+                else if(this._store.TryGetItems(item).IsFailure)
+                {
+                    return Result.Fail("Problem getting items from store");
                 }
                 else
                 {
@@ -184,5 +188,20 @@ namespace eCommerce.Business
             BasketInfo basketInfo = new BasketInfo(this);
             return basketInfo;
         }
+
+
+        public Result AddBasketRecords()
+        {
+            var resStore=this._store.AddBasketRecordToStore(this);
+            if (resStore.IsFailure)
+            {
+                return Result.Fail(resStore.Error);
+            }
+
+            var userRes=this.GetCart().GetUser().EnterRecordToHistory(resStore.Value);
+            return userRes;
+        }
     }
+    
+    
 }

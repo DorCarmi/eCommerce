@@ -205,7 +205,9 @@ namespace eCommerce.Business
         {
             return _systemState.RemoveOwnerFromStore(this, store, user);
         }
-
+        
+        
+        
         /// <TEST> UserTest.TestUpdatePermissionsToManager </TEST>
         /// <UC> 'Change management permission for sub-manger' </UC>
         /// <REQ> 4.6 </REQ>
@@ -275,6 +277,11 @@ namespace eCommerce.Business
         {
             return _systemState.RemoveOwner(this, store);
         }
+        
+        public Result<ManagerAppointment> RemoveManager(IStore store)
+        {
+            return _systemState.RemoveManager(this, store);
+        }
 
         public Result AnnexStakeholders(IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
@@ -293,7 +300,7 @@ namespace eCommerce.Business
             if (publisher == null)
                 return Result.Fail("user can not access publisher");
             //@TODO_sharon:: find out whether 'userID' or 'Username' sould be passed
-            publisher.AddMessageToUser(Username, message);
+            publisher.AddMessageToUser(MemberInfo.Id, message);
             return Result.Ok();
         }
 
@@ -479,6 +486,30 @@ namespace eCommerce.Business
     
             return Result.Ok();
         }
+        
+        
+        public Result RemoveManagerFromStore(Member member, IStore store,IUser otherUser)
+        {
+            if (!_storesManaged.ContainsKey(store)){
+                return Result.Fail("user \'"+Username+"\' is not a manager of the given store.");
+            }
+            if ((!_appointedManagers.ContainsKey(store)) || FindCoManager(store,otherUser).IsFailure){
+                return Result.Fail("user \'"+Username+"\' did not appoint the manager of the given store \'"+otherUser.Username+"\'.");
+            }
+            var res = otherUser.RemoveManager(store);
+            if (res.IsFailure)
+            {
+                return res;
+            }
+
+            if (_appointedManagers.ContainsKey(store))
+            {
+                _appointedManagers[store].Remove(res.Value);
+            }
+            
+    
+            return Result.Ok();
+        }
 
         public Result AnnexStakeholders(Member member,IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
@@ -572,10 +603,10 @@ namespace eCommerce.Business
                 var firedList = new List<ManagerAppointment>(_appointedManagers[store]);
                 foreach (var manager in firedList)
                 {
-                    //@TODO_sharon:: remove co-managers from store too!
-                    // var res = RemoveManagerFromStore(member, store, manager.User);
-                    // if(res.IsFailure)
-                    //     failMessage= failMessage+";\n"+res.Error;
+                    
+                     var res = RemoveManagerFromStore(member, store, manager.User);
+                     if(res.IsFailure)
+                         failMessage= failMessage+";\n"+res.Error;
                 }
             }
             
@@ -585,6 +616,41 @@ namespace eCommerce.Business
             if(failMessage != "")
                 return Result.Fail<OwnerAppointment>(failMessage);
             return Result.Ok(own);
+        }
+        
+        
+        public Result<ManagerAppointment> RemoveManager(Member member, IStore store)
+        {
+            if (!_storesManaged.ContainsKey(store))
+            {
+                return Result.Fail<ManagerAppointment>("user ["+Username+"] is not a manager of the store ["+store.GetStoreName()+"]");
+            }
+            ManagerAppointment mng;
+            IList<ManagerAppointment> comanagers;
+            
+            
+            
+            string failMessage = "";
+            
+            
+            if (_appointedManagers.ContainsKey(store) && _appointedManagers[store]!=null)
+            {
+                var firedList = new List<ManagerAppointment>(_appointedManagers[store]);
+                foreach (var mngr in firedList)
+                {
+                    var res = RemoveManagerFromStore(member, store, mngr.User);
+                    if(res.IsFailure)
+                        failMessage= failMessage+";\n"+res.Error;
+                }
+            }
+            
+            
+            _storesManaged.TryRemove(store, out mng);
+            
+            _appointedManagers.TryRemove(store, out comanagers);
+            if(failMessage != "")
+                return Result.Fail<ManagerAppointment>(failMessage);
+            return Result.Ok(mng);
         }
 
 

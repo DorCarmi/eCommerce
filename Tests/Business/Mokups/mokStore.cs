@@ -29,7 +29,7 @@ namespace Tests.Business.Mokups
 
         public Result TryGetItems(ItemInfo item)
         {
-            throw new NotImplementedException();
+            return Result.Ok();
         }
 
         public Result<Item> GetItem(string itemId)
@@ -140,6 +140,11 @@ namespace Tests.Business.Mokups
             return Result.Ok();
         }
 
+        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired, ManagerAppointment managerAppointment)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
         {
             Console.WriteLine("MokStore: Getting Purchase History (its empty..)");
@@ -210,6 +215,11 @@ namespace Tests.Business.Mokups
         }
 
         public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
         {
             throw new NotImplementedException();
         }

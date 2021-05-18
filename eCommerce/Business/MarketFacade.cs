@@ -5,7 +5,6 @@ using System.Linq;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
-using eCommerce.Publisher;
 using eCommerce.Service;
 using NLog;
 
@@ -173,7 +172,7 @@ namespace eCommerce.Business
             }
             IUser appointedUser = appointedUserRes.Value;
 
-            return user.AppointUserToOwner(store, appointedUser);
+            return user.AppointUserToManager(store, appointedUser);
         }
 
         public Result<IList<StorePermission>> GetStorePermission(string token, string storeId)
@@ -476,15 +475,15 @@ namespace eCommerce.Business
             IStore store = userAndStoreRes.Value.Item2;
             
             _logger.Info($"EditItemAmountOfCart({user.Username}, {itemId}, {storeId}, {amount})");
-
+            
             Result<Item> itemRes = store.GetItem(itemId);
             if (itemRes.IsFailure)
             {
                 return itemRes;
             }
-            var itemInfo = itemRes.Value.ShowItem();
-            itemInfo.amount = amount;
-            return user.EditCart(itemInfo);
+            var editedItemInfo = itemRes.Value.ShowItem();
+            editedItemInfo.amount = amount;
+            return user.EditCart(editedItemInfo);
         }
         //<CNAME>GetCart</CNAME>
         public Result<ICart> GetCart(string token)

@@ -19,6 +19,7 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(0)]
     public class TestViewPurchaseHistory
     {
         private IAuthService _auth;

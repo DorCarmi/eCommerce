@@ -418,6 +418,27 @@ namespace eCommerce.Business
             }
         }
         
+        
+        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired, ManagerAppointment managerAppointment)
+        {
+            if (theOneWhoFires.HasPermission(this, StorePermission.RemoveStoreStaff).IsSuccess)
+            {
+                if (this._managersAppointments.Contains(managerAppointment))
+                {
+                    this._managersAppointments.Remove(managerAppointment);
+                    return Result.Ok();
+                }
+                else
+                {
+                    return Result.Fail("Manager appointed not record in store");
+                }
+            }
+            else
+            {
+                return Result.Fail("User doesn't have permissions to remove staff");
+            }
+        }
+        
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
         {
             return this._transactionHistory.GetHistory(user);
@@ -558,6 +579,11 @@ namespace eCommerce.Business
         public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
         {
             throw new NotImplementedException();
+        }
+
+        public Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
+        {
+            return this._transactionHistory.AddRecordToHistory(basket);
         }
 
 
