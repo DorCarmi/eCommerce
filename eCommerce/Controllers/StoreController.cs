@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -104,7 +105,15 @@ namespace eCommerce.Controllers
         // ========== Store staff ========== //
 
         [HttpGet]
-        [Route("{storeId}/staff")]
+        [Route("[action]/{storeId}")]
+        public Result<IList<StorePermission>> StorePermissionForUser(string storeId)
+        {
+            return _storeService.GetStorePermission((string) HttpContext.Items["authToken"],
+                storeId);
+        }
+        
+        [HttpGet]
+        [Route("{storeId}/staffPermission")]
         public Result<IList<StaffPermission>> GetStoreStaffPermissions(string storeId)
         {
             return _storeService.GetStoreStaffAndTheirPermissions((string) HttpContext.Items["authToken"],

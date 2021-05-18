@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { Home } from './components/Home';
-import Login from "./components/Login";
+import { Login } from "./components/Login";
 import Store from './components/Store'
-import OpenStore from "./components/OpenStore";
+import { OpenStore } from "./components/OpenStore";
 import { Cart } from "./components/Cart"
 import Register from "./components/Register";
 import './custom.css'
@@ -17,7 +17,6 @@ import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
 import {SearchComponent} from "./components/SearchComponent";
 import {PurchaseCart} from "./components/Cart/PurchaseCart";
 import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
-import {UserRole} from "./Data/UserRole";
 
 export default class App extends Component {
   static displayName = App.name;

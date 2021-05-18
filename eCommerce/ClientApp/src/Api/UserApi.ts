@@ -14,9 +14,9 @@ const instance = axios.create(
 export class UserApi {
     
     getAllOwnedStoreIds() {
-        return instance.get(GET_ALL_OWNED_STORES)
+        return instance.get<Result<string[]>>(GET_ALL_OWNED_STORES)
             .then(res => {
-                return new Result<string[]>(res.data)
+                return res.data
             })
             .catch(err => {
                 return undefined
@@ -24,9 +24,9 @@ export class UserApi {
     }
 
     getAllManagedStoreIds() {
-        return instance.get(GET_ALL_MANAGED_STORES)
+        return instance.get<Result<string[]>>(GET_ALL_MANAGED_STORES)
             .then(res => {
-                return new Result<string[]>(res.data)
+                return res.data
             })
             .catch(err => {
                 return undefined
