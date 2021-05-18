@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -25,11 +26,13 @@ namespace eCommerce.Controllers
     {
         private readonly ILogger<StoreController> _logger;
         private readonly IStoreService _storeService;
+        private readonly IUserService _userService;
 
         public StoreController(ILogger<StoreController> logger)
         {
             _logger = logger;
             _storeService = new StoreService();
+            _userService = new UserService();
         }
 
 
@@ -98,6 +101,39 @@ namespace eCommerce.Controllers
         {
             return _storeService.SearchForStore((string) HttpContext.Items["authToken"],
                 query);
+        }
+        
+        // ========== Store staff ========== //
+
+        [HttpGet]
+        [Route("{storeId}/staff")]
+        public Result<IList<StaffPermission>> GetStoreStaffPermissions(string storeId)
+        {
+            return _storeService.GetStoreStaffAndTheirPermissions((string) HttpContext.Items["authToken"],
+                storeId);
+        }
+        
+        [HttpPost]
+        [Route("{storeId}/staff")]
+        public Result AppointStaff(string storeId, string role, string userId)
+        {
+            string token = (string) HttpContext.Items["authToken"];
+            Result appointRes;
+
+            switch (role)
+            {
+                case "owner":
+                    appointRes = _userService.AppointCoOwner(token, storeId, userId); 
+                    break;
+                case "manager":
+                    appointRes = _userService.AppointManager(token, storeId, userId);
+                    break;
+                default:
+                    appointRes = Result.Fail("Invalid staff role");
+                    break;
+            }
+
+            return appointRes;
         }
     }
 }

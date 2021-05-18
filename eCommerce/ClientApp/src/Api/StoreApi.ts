@@ -4,7 +4,7 @@ import {
     ADD_ITEM_TO_STORE_PATH,
     EDIT_ITEM_IN_STORE_PATH, GET_ALL_ITEMS_IN_STORE_PATH, GET_ITEM_IN_STORE_PATH,
     OPEN_STORE_PATH,
-    REMOVE_ITEM_FROM_STORE_PATH, SEARCH_ITEMS_PATH, SEARCH_STORE_PATH
+    REMOVE_ITEM_FROM_STORE_PATH, SEARCH_ITEMS_PATH, SEARCH_STORE_PATH, STAFF_OF_STORE_PATH
 } from "./ApiPaths";
 import {Item} from "../Data/Item";
 
@@ -94,6 +94,36 @@ export class StoreApi {
             {
                 params: {
                     query: query
+                }
+            })
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+
+    // ========== Store staff ========== //
+    
+    appointOwner(storeId: string, appointedUserId: string){
+        return instance.post<Result<any>>(STAFF_OF_STORE_PATH(storeId),
+            {},
+            {
+                params: {
+                    role: "owner",
+                    userId: appointedUserId
+                }
+            })
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+
+    appointManager(storeId: string, appointedUserId: string){
+        return instance.post<Result<any>>(STAFF_OF_STORE_PATH(storeId),
+            {},
+            {
+                params: {
+                    role: "manager",
+                    userId: appointedUserId
                 }
             })
             .then(res => {

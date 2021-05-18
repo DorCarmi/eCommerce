@@ -15,6 +15,7 @@ import {BrowserRouter,useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
 import {SearchComponent} from "./components/SearchComponent";
+import {StoreApi} from "./Api/StoreApi";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -27,7 +28,7 @@ export default class App extends Component {
           userName:''
       }
       this.userApi = new UserApi();
-      
+      this.storeApi = new StoreApi();
       this.addStoreHandler = this.addStoreHandler.bind(this);
   }
   
