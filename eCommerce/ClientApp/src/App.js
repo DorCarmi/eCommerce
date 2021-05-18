@@ -3,7 +3,6 @@ import { Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { Home } from './components/Home';
 import { Login } from "./components/Login";
-import { Logout } from "./components/Logout";
 
 import Store from './components/Store'
 import { OpenStore } from "./components/OpenStore";
@@ -60,9 +59,12 @@ export default class App extends Component {
     }
 
     async updateLogoutHandler(){
+        const userBasicInfo = await this.userApi.getUserBasicInfo();
         this.setState({
-            isLoggedIn: false,
-            userName: '',
+            isLoggedIn: userBasicInfo.isLoggedIn,
+            userName: userBasicInfo.username,
+            role: userBasicInfo.userRole,
+            storeList: []
         })
     }
     
@@ -108,12 +110,8 @@ export default class App extends Component {
     }
 
     async componentDidMount() {
-        alert('app rendered')
         const userBasicInfo = await this.userApi.getUserBasicInfo();
         console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
-        
-        const storePermission = await this.storeApi.getStoreStaffPermissions("a");
-        console.log(storePermission);
         
         const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
         if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
@@ -127,22 +125,32 @@ export default class App extends Component {
         }
     }
 
-    // async componentDidUpdate(prevProps,prevState) {
-    //     if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
-    //         //console.log("componentDidUpdate")
-    //         await this.connectToWebSocket();
-    //     }
-    // }
+     async componentDidUpdate(prevProps,prevState) {
+         /*if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
+             //console.log("componentDidUpdate")
+             await this.connectToWebSocket();
+         }*/
+         
+         if(prevState.userName !== this.state.userName){
+             if(this.state.isLoggedIn){
+                 const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
+                 if (fetchedStoredList && fetchedStoredList.isSuccess) {
+                     this.setState({
+                         storeList: fetchedStoredList.value
+                     })
+                 }
+             }
+         }
+     }
     
     render () {
     return (
         <BrowserRouter>
-          <Layout state={this.state}>
+          <Layout logoutHandler={this.updateLogoutHandler} state={this.state}>
             <Route exact path='/' component={Home} />
             <Route exact path='/login' component={() => <Login isLoggedIn={this.state.isLoggedIn} loginUpdateHandler={this.updateLoginHandler}/>} />
-              <Route exact path='/logout' component={() => <Logout logoutUpdateHandler={this.updateLogoutHandler}/> }/>
 
-              <Route exact path='/register' component={Register}/>
+            <Route exact path='/register' component={Register}/>
             
             <Route exact path='/cart' component={Cart} />
             <Route exact path='/purchaseCart' component={() => <PurchaseCart username={this.state.userName}/>} />

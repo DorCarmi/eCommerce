@@ -36,7 +36,6 @@ namespace eCommerce.Communication
                 if (controller != null)
                 {
                     Console.WriteLine(controller);
-                    _controllersNames.Add(controller, true);
                 }
             }
         }

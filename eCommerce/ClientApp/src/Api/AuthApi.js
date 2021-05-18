@@ -22,15 +22,6 @@ export class AuthApi {
             })
             .catch(res => undefined);
     }
-
-    Logout() {
-        return instance.get(LOGOUT_PATH)
-            .then(res => {
-                console.log(res)
-                return res.data
-            })
-            .catch(res => undefined);
-    }
     
     Login(username, password, role) {
         return instance.post(LOGIN_PATH,
@@ -44,6 +35,15 @@ export class AuthApi {
                     new Result(res.data),
                     res.headers['redirectto']
                 );
+            })
+            .catch(res => undefined);
+    }
+
+    Logout() {
+        return instance.get(LOGOUT_PATH)
+            .then(res => {
+                console.log(res)
+                return new Result(res.data)
             })
             .catch(res => undefined);
     }

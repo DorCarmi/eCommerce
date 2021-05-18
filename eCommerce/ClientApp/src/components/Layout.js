@@ -7,11 +7,11 @@ export class Layout extends Component {
   static displayName = Layout.name;
 
   render () {
-    let { state } = this.props;
+    let { state, logoutHandler } = this.props;
     console.log(state)
     return (
       <div>
-        <NavMenu state={state}/>
+        <NavMenu logoutHandler={logoutHandler} state={state}/>
         <div style={{
             display: 'flex',
             position: 'relative'

@@ -54,7 +54,6 @@ export default class Store extends Component {
     }
     
     redirectToHome = (path) => {
-        alert(path)
         const { history } = this.props;
         if(history) {
             alert('succed')

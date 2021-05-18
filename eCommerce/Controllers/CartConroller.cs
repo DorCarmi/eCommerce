@@ -16,8 +16,9 @@ namespace eCommerce.Controllers
         public int Amount { get; set; }
     }
 
+    [ApiController]
     [Route("api/[controller]")]
-    public class CartController : Controller
+    public class CartController : ControllerBase
     {
         private readonly ILogger<CartController> _logger;
         private readonly ICartService _cartService;
@@ -32,38 +33,33 @@ namespace eCommerce.Controllers
         // the route is /Store/OpenStore  
         //removes "Controller" from the class name and add the name of the function as an endpoint 
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public Result AddItem([FromBody] AddOrEditItemData addItemData)
         {
             return _cartService.AddItemToCart((string) HttpContext.Items["authToken"],
                 addItemData.ItemId, addItemData.StoreId, addItemData.Amount);
         }
         
-        [HttpPut]
-        [Route("[action]")]
+        [HttpPut("[action]")]
         public Result EditItemAmount([FromBody] AddOrEditItemData editItemData)
         {
             return _cartService.EditItemAmountOfCart((string) HttpContext.Items["authToken"],
                 editItemData.ItemId, editItemData.StoreId, editItemData.Amount);
         }
         
-        [HttpGet]
-        [Route("[action]")]
+        [HttpGet("[action]")]
         public Result<SCart> GetCart()
         {
             return _cartService.GetCart((string) HttpContext.Items["authToken"]);
         }
         
-        [HttpGet]
-        [Route("[action]")]
+        [HttpGet("[action]")]
         public Result<double> GetPurchasePrice()
         {
             return _cartService.GetPurchaseCartPrice((string) HttpContext.Items["authToken"]);
         }
         
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public Result PurchaseCart([FromBody] PaymentInfo paymentInfo)
         {
             return _cartService.PurchaseCart((string) HttpContext.Items["authToken"],

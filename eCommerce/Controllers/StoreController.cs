@@ -20,8 +20,9 @@ namespace eCommerce.Controllers
         public string ItemId { get; set; }
     }
     
+    [ApiController]
     [Route("api/[controller]")]
-    public class StoreController : Controller
+    public class StoreController : ControllerBase
     {
         private readonly ILogger<StoreController> _logger;
         private readonly IStoreService _storeService;
@@ -38,64 +39,56 @@ namespace eCommerce.Controllers
         // the route is /Store/OpenStore  
         //removes "Controller" from the class name and add the name of the function as an endpoint 
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public Result OpenStore([FromBody] StoreName storeName)
         {
             return _storeService.OpenStore((string) HttpContext.Items["authToken"],
                 storeName.StoreId);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public Result AddItem([FromBody] SItem item)
         {
             return _storeService.AddNewItemToStore((string) HttpContext.Items["authToken"],
                 item);
         }
         
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public Result RemoveItem([FromBody] StoreAndItemId data)
         {
             return _storeService.RemoveItemFromStore((string) HttpContext.Items["authToken"],
                 data.StoreId, data.ItemId);
         }
 
-        [HttpPost]
-        [Route("[action]")]
+        [HttpPost("[action]")]
         public Result EditItem([FromBody] SItem item)
         {
             return _storeService.EditItemInStore((string) HttpContext.Items["authToken"],
                 item);
         }
         
-        [HttpGet]
-        [Route("{storeId}/{itemId}")]
+        [HttpGet("{storeId}/{itemId}")]
         public Result<IItem> GetItem(string storeId, string itemId)
         {
             return _storeService.GetItem((string) HttpContext.Items["authToken"],
                 storeId, itemId);
         }
         
-        [HttpGet]
-        [Route("[action]/{storeId}")]
+        [HttpGet("[action]/{storeId}")]
         public Result<IEnumerable<IItem>> GetAllItems(string storeId)
         {
             return _storeService.GetAllStoreItems((string) HttpContext.Items["authToken"],
                     storeId);
         }
         
-        [HttpGet]
-        [Route("[action]")]
+        [HttpGet("[action]")]
         public Result<IEnumerable<IItem>> Search(string query)
         {
             return _storeService.SearchForItem((string) HttpContext.Items["authToken"],
                 query);
         }
         
-        [HttpGet]
-        [Route("[action]")]
+        [HttpGet("[action]")]
         public Result<IEnumerable<string>> SearchStore(string query)
         {
             return _storeService.SearchForStore((string) HttpContext.Items["authToken"],
@@ -104,24 +97,21 @@ namespace eCommerce.Controllers
         
         // ========== Store staff ========== //
 
-        [HttpGet]
-        [Route("[action]/{storeId}")]
+        [HttpGet("[action]/{storeId}")]
         public Result<IList<StorePermission>> StorePermissionForUser(string storeId)
         {
             return _storeService.GetStorePermission((string) HttpContext.Items["authToken"],
                 storeId);
         }
         
-        [HttpGet]
-        [Route("{storeId}/staffPermission")]
+        [HttpGet("{storeId}/staffPermission")]
         public Result<IList<StaffPermission>> GetStoreStaffPermissions(string storeId)
         {
             return _storeService.GetStoreStaffAndTheirPermissions((string) HttpContext.Items["authToken"],
                 storeId);
         }
         
-        [HttpPost]
-        [Route("{storeId}/staff")]
+        [HttpPost("{storeId}/staff")]
         public Result AppointStaff(string storeId, string role, string userId)
         {
             string token = (string) HttpContext.Items["authToken"];

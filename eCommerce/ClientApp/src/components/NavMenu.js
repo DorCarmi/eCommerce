@@ -37,14 +37,11 @@ export class NavMenu extends Component {
       collapsed: !this.state.collapsed
     });
   }
-
-
   
   async handleLogout(event){
     const logoutStatus = await this.authApi.Logout()
     if(logoutStatus.isSuccess){
-      return <Redirect exact to="/"/>
-
+      await this.props.logoutHandler()
     }
     
   }
@@ -90,7 +87,8 @@ export class NavMenu extends Component {
                     <ul className="navbar-nav flex-grow">
                       {isLoggedIn ?
                           <NavItem>
-                            <NavLink tag={Link} className="text-dark" exact to="/logout">Logout</NavLink>
+                            <NavLink tag={Link} className="text-dark" onClick={this.handleLogout}
+                                      exact to="/">Logout</NavLink>
                           </NavItem>
                           :
                           <NavItem>
