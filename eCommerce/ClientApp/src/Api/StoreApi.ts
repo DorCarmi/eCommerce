@@ -6,6 +6,7 @@ import {
     OPEN_STORE_PATH,
     REMOVE_ITEM_FROM_STORE_PATH, SEARCH_ITEMS_PATH, SEARCH_STORE_PATH
 } from "./ApiPaths";
+import {Item} from "../Data/Item";
 
 const instance = axios.create(
     {withCredentials : true}
@@ -15,71 +16,69 @@ const instance = axios.create(
 
 export class StoreApi {
     
-    openStore(storeId) {
-        return instance.post(OPEN_STORE_PATH, 
+    openStore(storeId: string) {
+        return instance.post<Result<any>>(OPEN_STORE_PATH, 
             {
                 storeId: storeId
             })
             .then(res => {
-                return new Result(res.data)
-
+                return res.data
             })
             .catch(res => undefined)
         }
         
-   static async addItem(item)
+   static async addItem(item: Item)
     {
-        alert(item)
-        return instance.post(ADD_ITEM_TO_STORE_PATH, item)
+        return instance.post<Result<any>>(ADD_ITEM_TO_STORE_PATH, item)
             .then(res => {
-                return new Result(res.data)
+                return res.data
             })
             .catch(res => undefined)
     }
 
-    removeItem(storeId, itemId)
+    removeItem(storeId: string, itemId: string)
     {
-        return instance.post(REMOVE_ITEM_FROM_STORE_PATH, 
+        return instance.post<Result<any>>(REMOVE_ITEM_FROM_STORE_PATH, 
             {
                 storeId: storeId,
                 itemId: itemId
             })
             .then(res => {
-                return new Result(res.data)
+                return res.data
             })
             .catch(res => undefined)
     }
 
-    editItem(item)
+    editItem(item: Item)
     {
-        return instance.post(EDIT_ITEM_IN_STORE_PATH, item)
+        return instance.post<Result<any>>(EDIT_ITEM_IN_STORE_PATH, item)
             .then(res => {
-                return new Result(res.data)
+                return res.data
             })
             .catch(res => undefined)
     }
     
     // ========== Store query ========== //
 
-    getItem(storeId, itemId)
+    getItem(storeId: string, itemId: string)
     {
-        return instance.get(GET_ITEM_IN_STORE_PATH)
+        return instance.get<Result<Item>>(GET_ITEM_IN_STORE_PATH)
             .then(res => {
-                return new Result(res.data)
+                return res.data
             })
             .catch(res => undefined)
     }
 
-    getAllItems(storeId)
+    getAllItems(storeId: string)
     {
-        return instance.get(GET_ALL_ITEMS_IN_STORE_PATH(storeId))
+        return instance.get<Result<Item[]>>(GET_ALL_ITEMS_IN_STORE_PATH(storeId))
             .then(res => {
                 return new Result(res.data)
             }).catch(err => undefined)
     }
     
-    searchItems(query){
-        return instance.get(SEARCH_ITEMS_PATH,
+    searchItems(query: string){
+        return instance.get<Result<Item[]>>(SEARCH_ITEMS_PATH,
             {
                 params: {
                     query: query
@@ -90,17 +89,15 @@ export class StoreApi {
             }).catch(err => undefined)
     }
 
-    searchStore(query){
-        return instance.get(SEARCH_STORE_PATH,
+    searchStore(query: string){
+        return instance.get<Result<string[]>>(SEARCH_STORE_PATH,
             {
                 params: {
                     query: query
                 }
             })
             .then(res => {
-                return new Result(res.data)
+                return res.data
             }).catch(err => undefined)
     }
-
-
 }
