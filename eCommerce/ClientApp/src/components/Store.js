@@ -125,7 +125,8 @@ export default class Store extends Component {
         } else {
             return <div>
                 <div>
-                 <Link to={`${storeId}/addItem`}>Add an Item</Link>   
+                    {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link to={`${storeId}/appointManager`}>Appoint Manager</Link></div> : null}
+                    <Link to={`${storeId}/addItem`}>Add an Item</Link>   
                 </div>
                 Empty Store
             </div>
