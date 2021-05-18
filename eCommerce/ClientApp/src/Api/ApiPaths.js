@@ -4,6 +4,8 @@ const API_PATH = "api"
 export const AUTH_PATH = API_PATH + '/auth';
 export const CONNECT_PATH = AUTH_PATH + '/connect';
 export const LOGIN_PATH = AUTH_PATH + '/login';
+export const LOGOUT_PATH = AUTH_PATH + '/logout';
+
 export const REGISTER_PATH = AUTH_PATH + '/register';
 
 // ========= Store ========== //

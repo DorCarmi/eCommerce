@@ -1,5 +1,5 @@
 ﻿import axios from "axios";
-import {CONNECT_PATH, LOGIN_PATH, REGISTER_PATH} from "./ApiPaths";
+import {CONNECT_PATH, LOGIN_PATH, REGISTER_PATH,LOGOUT_PATH} from "./ApiPaths";
 import {Result} from "../Common";
 
 const instance = axios.create(
@@ -19,6 +19,15 @@ export class AuthApi {
             .then(res => {
                 let data = res.data;
                 return new RedirectWithData(data, res.headers['redirectto'])
+            })
+            .catch(res => undefined);
+    }
+
+    Logout() {
+        return instance.get(LOGOUT_PATH)
+            .then(res => {
+                console.log(res)
+                return res.data
             })
             .catch(res => undefined);
     }

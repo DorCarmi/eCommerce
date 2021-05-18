@@ -32,6 +32,7 @@ export default class Store extends Component {
     async componentDidMount() {
         await this.getItems();
         const fetchedPermissions = await this.storeApi.getStorePermissionForUser(this.state.storeId)
+        console.log(fetchedPermissions)
         if(fetchedPermissions.isSuccess){
             console.log(fetchedPermissions.value)
             this.setState({
@@ -83,6 +84,8 @@ export default class Store extends Component {
         if (items.length > 0) {
             return (
                 <div>
+                    {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link to={`${storeId}/appointManager`}>Appoint Manager</Link></div> : null}
+
                     {permissions.includes(StorePermission.AddItemToStore) ? <Link to={`${storeId}/addItem`}>Add an Item</Link> : null} 
                     <Table striped bordered hover>
                     <thead>

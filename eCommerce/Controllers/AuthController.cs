@@ -24,6 +24,7 @@ namespace eCommerce.Controllers
             this.Password = password;
         }
     }
+    
 
 
 
@@ -40,6 +41,14 @@ namespace eCommerce.Controllers
         }
 
 
+        
+        [HttpGet]
+        [Route("[action]")]
+        public Result<string> Logout()
+        {
+            return _authService.Logout((string) HttpContext.Items["authToken"]);
+        }
+        
         [HttpGet]
         [Route("[action]")]
         public string Connect()

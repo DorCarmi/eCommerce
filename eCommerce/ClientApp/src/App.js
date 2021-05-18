@@ -3,6 +3,8 @@ import { Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { Home } from './components/Home';
 import { Login } from "./components/Login";
+import { Logout } from "./components/Logout";
+
 import Store from './components/Store'
 import { OpenStore } from "./components/OpenStore";
 import { Cart } from "./components/Cart"
@@ -18,6 +20,7 @@ import {SearchComponent} from "./components/SearchComponent";
 import {PurchaseCart} from "./components/Cart/PurchaseCart";
 import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
 import {StoreApi} from "./Api/StoreApi";
+import {AppointManager} from "./components/AppointManager";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -38,6 +41,8 @@ export default class App extends Component {
       
       this.addStoreHandler = this.addStoreHandler.bind(this);
       this.updateLoginHandler = this.updateLoginHandler.bind(this);
+      this.updateLogoutHandler = this.updateLogoutHandler.bind(this);
+
   }
 
     addStoreHandler(store){
@@ -52,6 +57,13 @@ export default class App extends Component {
           userName: username,
           role: role,
       })
+    }
+
+    async updateLogoutHandler(){
+        this.setState({
+            isLoggedIn: false,
+            userName: '',
+        })
     }
     
     async connectToWebSocket(){
@@ -96,6 +108,7 @@ export default class App extends Component {
     }
 
     async componentDidMount() {
+        alert('app rendered')
         const userBasicInfo = await this.userApi.getUserBasicInfo();
         console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
         
@@ -105,7 +118,6 @@ export default class App extends Component {
         const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
         if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
             console.log(userBasicInfo.username);
-            
             this.setState({
                 isLoggedIn: userBasicInfo.isLoggedIn,
                 userName: userBasicInfo.username,
@@ -115,12 +127,12 @@ export default class App extends Component {
         }
     }
 
-    async componentDidUpdate(prevProps,prevState) {
-        if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
-            //console.log("componentDidUpdate")
-            await this.connectToWebSocket();
-        }
-    }
+    // async componentDidUpdate(prevProps,prevState) {
+    //     if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
+    //         //console.log("componentDidUpdate")
+    //         await this.connectToWebSocket();
+    //     }
+    // }
     
     render () {
     return (
@@ -128,7 +140,9 @@ export default class App extends Component {
           <Layout state={this.state}>
             <Route exact path='/' component={Home} />
             <Route exact path='/login' component={() => <Login isLoggedIn={this.state.isLoggedIn} loginUpdateHandler={this.updateLoginHandler}/>} />
-            <Route exact path='/register' component={Register}/>
+              <Route exact path='/logout' component={() => <Logout logoutUpdateHandler={this.updateLogoutHandler}/> }/>
+
+              <Route exact path='/register' component={Register}/>
             
             <Route exact path='/cart' component={Cart} />
             <Route exact path='/purchaseCart' component={() => <PurchaseCart username={this.state.userName}/>} />
@@ -140,8 +154,8 @@ export default class App extends Component {
             <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
             <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
             <Route exact path="/searchItems/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query} />} />
-    
-            <Route exact path="/searchItems1" render={() => <SearchComponent />} />
+            <Route exact path="/store/:id/appointManager" render={({match}) => <AppointManager storeId ={match.params.id}/>} />
+
           </Layout>
         </BrowserRouter>
     );
