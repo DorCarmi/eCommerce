@@ -2,12 +2,20 @@
 import {Result} from "../Common";
 import {
     ADD_ITEM_TO_STORE_PATH,
-    EDIT_ITEM_IN_STORE_PATH, GET_ALL_ITEMS_IN_STORE_PATH, GET_ITEM_IN_STORE_PATH, GET_STORE_PERMISSION_FOR_USER_PATH,
+    EDIT_ITEM_IN_STORE_PATH,
+    GET_ALL_ITEMS_IN_STORE_PATH,
+    GET_ITEM_IN_STORE_PATH,
+    GET_STORE_PERMISSION_FOR_USER_PATH,
     OPEN_STORE_PATH,
-    REMOVE_ITEM_FROM_STORE_PATH, SEARCH_ITEMS_PATH, SEARCH_STORE_PATH, STAFF_OF_STORE_PATH
+    REMOVE_ITEM_FROM_STORE_PATH,
+    SEARCH_ITEMS_PATH,
+    SEARCH_STORE_PATH,
+    STAFF_OF_STORE_PATH,
+    STAFF_PERMISSIONS_OF_STORE_PATH
 } from "./ApiPaths";
 import {Item} from "../Data/Item";
 import {StorePermission} from "../Data/StorePermission";
+import {StaffPermission} from "../Data/StaffPermission";
 
 const instance = axios.create(
     {withCredentials : true}
@@ -133,6 +141,13 @@ export class StoreApi {
                     userId: appointedUserId
                 }
             })
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+    
+    getStoreStaffPermissions(storeId: string){
+        return instance.get<Result<StaffPermission[]>>(STAFF_PERMISSIONS_OF_STORE_PATH(storeId))
             .then(res => {
                 return res.data
             }).catch(err => undefined)

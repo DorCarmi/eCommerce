@@ -17,6 +17,7 @@ import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
 import {SearchComponent} from "./components/SearchComponent";
 import {PurchaseCart} from "./components/Cart/PurchaseCart";
 import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
+import {StoreApi} from "./Api/StoreApi";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -33,6 +34,7 @@ export default class App extends Component {
           webSocketConnection: undefined
       }
       this.userApi = new UserApi();
+      this.storeApi = new StoreApi();
       
       this.addStoreHandler = this.addStoreHandler.bind(this);
       this.updateLoginHandler = this.updateLoginHandler.bind(this);
@@ -96,6 +98,9 @@ export default class App extends Component {
     async componentDidMount() {
         const userBasicInfo = await this.userApi.getUserBasicInfo();
         console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
+        
+        const storePermission = await this.storeApi.getStoreStaffPermissions("a");
+        console.log(storePermission);
         
         const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
         if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
