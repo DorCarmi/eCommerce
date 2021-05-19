@@ -1,11 +1,11 @@
 ﻿import axios from "axios";
 import {Result} from "../Common";
 import {
-    ADD_ITEM_TO_STORE_PATH,
+    ADD_ITEM_TO_STORE_PATH, ADMIN_GET_STORE_PURCHASE_HISTORY, ADMIN_GET_USER_PURCHASE_HISTORY,
     EDIT_ITEM_IN_STORE_PATH,
-    GET_ALL_ITEMS_IN_STORE_PATH,
+    GET_ALL_ITEMS_IN_STORE_PATH, GET_HISTORY_OF_STORE_PATH,
     GET_ITEM_IN_STORE_PATH,
-    GET_STORE_PERMISSION_FOR_USER_PATH,
+    GET_STORE_PERMISSION_FOR_USER_PATH, GET_USER_PURCHASE_HISTORY_PATH,
     OPEN_STORE_PATH,
     REMOVE_ITEM_FROM_STORE_PATH,
     SEARCH_ITEMS_PATH,
@@ -16,6 +16,7 @@ import {
 import {Item} from "../Data/Item";
 import {StorePermission} from "../Data/StorePermission";
 import {StaffPermission} from "../Data/StaffPermission";
+import {PurchaseHistory} from "../Data/Purchase";
 
 const instance = axios.create(
     {withCredentials : true}
@@ -66,6 +67,31 @@ export class StoreApi {
                 return res.data
             })
             .catch(res => undefined)
+    }
+
+    getPurchaseHistory(storeId: string){
+        return instance.get<Result<PurchaseHistory>>(GET_HISTORY_OF_STORE_PATH(storeId))
+            .then(res => {
+                return res.data;
+            })
+            .catch(err => {
+                return undefined
+            })
+    }
+
+    adminGetStorePurchaseHistory(storeId: string){
+        return instance.get<Result<PurchaseHistory>>(ADMIN_GET_STORE_PURCHASE_HISTORY,
+            {
+                params: {
+                    storeId: storeId
+                }
+            })
+            .then(res => {
+                return res.data;
+            })
+            .catch(err => {
+                return undefined
+            })
     }
     
     // ========== Store query ========== //

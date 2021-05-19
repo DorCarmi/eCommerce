@@ -46,5 +46,12 @@ namespace eCommerce.Controllers
         {
             return _userService.GetPurchaseHistory((string) HttpContext.Items["authToken"]);
         }
+        
+        [HttpGet("admin/userHistory")]
+        public Result<SPurchaseHistory> GePurchaseHistory(string? userId)
+        {
+            return _userService.AdminGetPurchaseHistoryUser((string) HttpContext.Items["authToken"],
+                userId);
+        }
     }
 }

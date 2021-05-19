@@ -4,7 +4,7 @@ import {
     GET_ALL_MANAGED_STORES,
     GET_ALL_OWNED_STORES,
     GET_USER_BASIC_INFO_PATH,
-    GET_STORE_PERMISSION_FOR_USER_PATH, GET_USER_PURCHASE_HISTORY_PATH
+    GET_STORE_PERMISSION_FOR_USER_PATH, GET_USER_PURCHASE_HISTORY_PATH, ADMIN_GET_USER_PURCHASE_HISTORY
 } from "./ApiPaths";
 import {BasicUserInfo} from "../Data/BasicUserInfo";
 import {StorePermission} from "../Data/StorePermission";
@@ -49,6 +49,21 @@ export class UserApi {
 
     getPurchaseHistory(){
         return instance.get<Result<PurchaseHistory>>(GET_USER_PURCHASE_HISTORY_PATH)
+            .then(res => {
+                return res.data;
+            })
+            .catch(err => {
+                return undefined
+            })
+    }
+
+    adminGetPurchaseHistory(userId: string){
+        return instance.get<Result<PurchaseHistory>>(ADMIN_GET_USER_PURCHASE_HISTORY,
+            {
+                params: {
+                    userId: userId
+                }
+            })
             .then(res => {
                 return res.data;
             })

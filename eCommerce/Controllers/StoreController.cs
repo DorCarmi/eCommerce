@@ -95,6 +95,20 @@ namespace eCommerce.Controllers
                 query);
         }
         
+        [HttpGet("{storeId}/history")]
+        public Result<SPurchaseHistory> GetStoreHistory(string storeId)
+        {
+            return _storeService.GetPurchaseHistoryOfStore((string) HttpContext.Items["authToken"],
+                storeId);
+        }
+        
+        [HttpGet("admin/storeHistory")]
+        public Result<SPurchaseHistory> AdminGetStoreHistory(string storeId)
+        {
+            return _userService.AdminGetPurchaseHistoryStore((string) HttpContext.Items["authToken"],
+                storeId);
+        }
+        
         // ========== Store staff ========== //
 
         [HttpGet("[action]/{storeId}")]
