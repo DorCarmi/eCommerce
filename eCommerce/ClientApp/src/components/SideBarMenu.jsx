@@ -12,15 +12,36 @@ export class SideBarMenu extends Component {
         super(props);
     }
     
-    renderStoreListMenu() {
-        const { storeList } = this.props;
-        if(storeList.length === 0) {
+    renderOwnedStoreListMenu() {
+        const { ownedStoreList } = this.props;
+        if(!ownedStoreList || ownedStoreList.length === 0) {
             return null;
         }
         
         return (
-            <SubMenu title="My stores">
-                {storeList.map ((store) =>
+            <SubMenu title="Owned Stores">
+                {ownedStoreList.map ((store) =>
+                    (
+                        <MenuItem>
+                            <NavLink tag={Link} exact to={`/store/${store}`}>{store}</NavLink>
+                        </MenuItem>
+                        
+                    )
+                )}
+            </SubMenu>
+        )
+    }
+
+
+    renderManagedStoreListMenu() {
+        const { managedStoreList } = this.props;
+        if(!managedStoreList ||managedStoreList.length === 0) {
+            return null;
+        }
+
+        return (
+            <SubMenu title="Managed Stores">
+                {managedStoreList.map ((store) =>
                     (
                         <MenuItem>
                             <NavLink tag={Link} exact to={`/store/${store}`}>{store}</NavLink>
@@ -48,7 +69,8 @@ export class SideBarMenu extends Component {
                         <MenuItem>
                             <NavLink tag={Link} exact to="/openStore">Create new store</NavLink>
                         </MenuItem>
-                        {this.renderStoreListMenu()}
+                            {this.renderOwnedStoreListMenu()}
+                            {this.renderManagedStoreListMenu()}
                         </SubMenu>
                     </Menu>
 

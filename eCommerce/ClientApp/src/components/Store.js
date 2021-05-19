@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import {UserApi} from "../Api/UserApi";
 import {Item} from "../Data/Item";
 import {StorePermission} from '../Data/StorePermission'
+import {NavLink} from "reactstrap";
 
 export default class Store extends Component {
     static displayName = Store.name;
@@ -31,6 +32,7 @@ export default class Store extends Component {
     
     async componentDidMount() {
         await this.getItems();
+        console.log(this.state.storeId)
         const fetchedPermissions = await this.storeApi.getStorePermissionForUser(this.state.storeId)
         console.log(fetchedPermissions)
         if(fetchedPermissions.isSuccess){
@@ -83,7 +85,7 @@ export default class Store extends Component {
         if (items.length > 0) {
             return (
                 <div>
-                    {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link to={`${storeId}/appointManager`}>Appoint Manager</Link></div> : null}
+                    {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link tag={Link} exact to={`/managePermissions/${storeId}`}>Manage Permissions</Link></div> : null}
 
                     {permissions.includes(StorePermission.AddItemToStore) ? <Link to={`${storeId}/addItem`}>Add an Item</Link> : null} 
                     <Table striped bordered hover>
@@ -124,7 +126,7 @@ export default class Store extends Component {
         } else {
             return <div>
                 <div>
-                    {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link to={`${storeId}/appointManager`}>Appoint Manager</Link></div> : null}
+                    {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link tag={Link} exact to={`/managePermissions/${storeId}`}>Manage Permissions</Link></div> : null}
                     <Link to={`${storeId}/addItem`}>Add an Item</Link>   
                 </div>
                 Empty Store

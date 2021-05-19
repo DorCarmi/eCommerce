@@ -11,8 +11,9 @@ import Register from "./components/Register";
 import './custom.css'
 import AddItem from './components/AddItem'
 import EditItem from './components/EditItem'
+import ManagePermissions from './components/ManagePermissions'
 
-import {BrowserRouter,useHistory} from "react-router-dom";
+import {BrowserRouter, Link, useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
 import {SearchComponent} from "./components/SearchComponent";
@@ -21,6 +22,7 @@ import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/sign
 import {StoreApi} from "./Api/StoreApi";
 import {AppointManager} from "./components/AppointManager";
 import {StorePermission} from "./Data/StorePermission";
+import {NavLink} from "reactstrap";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -29,7 +31,7 @@ export default class App extends Component {
       super(props)
       this.state = {
           isLoggedIn: false,
-          storeList:[],
+          ownedStoreList:[],
           userName:'',
           role: undefined,
           
@@ -39,15 +41,15 @@ export default class App extends Component {
       this.userApi = new UserApi();
       this.storeApi = new StoreApi();
       
-      this.addStoreHandler = this.addStoreHandler.bind(this);
+      this.addOwnedStoreHandler = this.addOwnedStoreHandler.bind(this);
       this.updateLoginHandler = this.updateLoginHandler.bind(this);
       this.updateLogoutHandler = this.updateLogoutHandler.bind(this);
 
   }
 
-    addStoreHandler(store){
+    addOwnedStoreHandler(store){
         this.setState({
-            storeList:[...this.state.storeList, store]
+            ownedStoreList:[...this.state.ownedStoreList, store]
         });
     }
 
@@ -65,7 +67,8 @@ export default class App extends Component {
             isLoggedIn: userBasicInfo.isLoggedIn,
             userName: userBasicInfo.username,
             role: userBasicInfo.userRole,
-            storeList: []
+            ownedStoreList: [],
+            managedStoreList:[]
         })
     }
     
@@ -113,17 +116,44 @@ export default class App extends Component {
     async componentDidMount() {
         const userBasicInfo = await this.userApi.getUserBasicInfo();
         console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
+        await this.connectToWebSocket()
         
-        const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
-        if (userBasicInfo && fetchedStoredList && fetchedStoredList.isSuccess) {
-            console.log(userBasicInfo.username);
-            this.setState({
-                isLoggedIn: userBasicInfo.isLoggedIn,
-                userName: userBasicInfo.username,
-                role: userBasicInfo.userRole,
-                storeList: fetchedStoredList.value
-            })
+        const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()
+        const fetchedManagedStoredList = await this.userApi.getAllManagedStoreIds()
+
+        if(userBasicInfo) {
+
+            if (fetchedOwnedStoredList && fetchedOwnedStoredList.isSuccess) {
+                if (fetchedManagedStoredList && fetchedManagedStoredList.isSuccess) {
+                    console.log(fetchedManagedStoredList);
+                    this.setState({
+                        isLoggedIn: userBasicInfo.isLoggedIn,
+                        userName: userBasicInfo.username,
+                        role: userBasicInfo.userRole,
+                        ownedStoreList: fetchedOwnedStoredList.value,
+                        managedStoreList: fetchedManagedStoredList.value
+
+                    })}
+                    else{
+                        this.setState({
+                            isLoggedIn: userBasicInfo.isLoggedIn,
+                            userName: userBasicInfo.username,
+                            role: userBasicInfo.userRole,
+                            ownedStoreList: fetchedOwnedStoredList.value,
+                        })
+                    }
+                }
+            else{
+                this.setState({
+                    isLoggedIn: userBasicInfo.isLoggedIn,
+                    userName: userBasicInfo.username,
+                    role: userBasicInfo.userRole
+                })
+            }
+
+            
         }
+        
     }
 
      async componentDidUpdate(prevProps,prevState) {
@@ -134,12 +164,27 @@ export default class App extends Component {
          
          if(prevState.userName !== this.state.userName){
              if(this.state.isLoggedIn){
-                 const fetchedStoredList = await this.userApi.getAllOwnedStoreIds()
-                 if (fetchedStoredList && fetchedStoredList.isSuccess) {
+                 const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()
+                 const fetchedManagedStoredList = await this.userApi.getAllManagedStoreIds()
+                 if (fetchedOwnedStoredList && fetchedOwnedStoredList.isSuccess) {
+                     if (fetchedManagedStoredList && fetchedManagedStoredList.isSuccess) {
+                         this.setState({
+                             managedStoreList: fetchedManagedStoredList.value,
+                             ownedStoreList: fetchedOwnedStoredList.value
+                         })
+                     }
+                     else {
+                         this.setState({
+                             ownedStoreList: fetchedOwnedStoredList.value
+                         })
+                     }
+                 }
+             else if (fetchedOwnedStoredList && fetchedOwnedStoredList.isSuccess) {
                      this.setState({
-                         storeList: fetchedStoredList.value
+                         managedStoreList: fetchedManagedStoredList.value
                      })
                  }
+
              }
          }
      }
@@ -157,13 +202,14 @@ export default class App extends Component {
             <Route exact path='/purchaseCart' component={() => <PurchaseCart username={this.state.userName}/>} />
             
             <Route exact path="/store/:id" render={({match}) => (<Store  storeId={match.params.id} 
-                                                                        storeList={this.state.storeList} redirect={this.redirectToHome}/>
+                                                                        ownedStoreList={this.state.ownedStoreList} redirect={this.redirectToHome}/>
             )} />            
-            <Route exact path='/openStore' component={() => <OpenStore addStoreToState={this.addStoreHandler}/>} />
+            <Route exact path='/openStore' component={() => <OpenStore addStoreToState={this.addOwnedStoreHandler}/>} />
             <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
             <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
             <Route exact path="/searchItems/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query} />} />
-            <Route exact path="/store/:id/appointManager" render={({match}) => <AppointManager storeId ={match.params.id}/>} />
+            <Route exact path="/managePermissions/:id/appointManager" render={({match}) => <AppointManager storeId ={match.params.id}/>} />
+            <Route exact path="/managePermissions/:storeId/" render={({match}) => <ManagePermissions storeId ={match.params.storeId}/>}/>
 
           </Layout>
         </BrowserRouter>
