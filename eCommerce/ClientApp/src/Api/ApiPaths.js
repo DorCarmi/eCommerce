@@ -20,8 +20,10 @@ export function GET_ALL_ITEMS_IN_STORE_PATH(storeId){ return STORE_PATH + '/getA
 export function GET_STORE_PERMISSION_FOR_USER_PATH(storeId) { return STORE_PATH + '/storePermissionForUser/' + storeId }
 export const SEARCH_ITEMS_PATH = STORE_PATH + '/search';
 export const SEARCH_STORE_PATH = STORE_PATH + '/searchStore';
+
 export function STAFF_OF_STORE_PATH(storeId){ return STORE_PATH + `/${storeId}/staff` }
-export function STAFF_PERMISSIONS_OF_STORE_PATH(storeId){ return STORE_PATH + `/${storeId}/staffPermission` }
+export function STAFF_PERMISSIONS_OF_STORE_PATH(storeId){ return STORE_PATH + `/${storeId}/staff` }
+export function UPDATE_MANAGER_PERMISSIONS_IN_STORE_PATH(storeId){ return STORE_PATH + `/${storeId}/staff` }
 
 
 // ========= Cart ========== //
@@ -39,3 +41,4 @@ export const USER_PATH = API_PATH + '/user';
 export const GET_ALL_OWNED_STORES = USER_PATH + '/getALlStoreIds';
 export const GET_ALL_MANAGED_STORES = USER_PATH + '/aLlManagedStoreIds'
 export const GET_USER_BASIC_INFO_PATH = USER_PATH + '/getUserBasicInfo';
+export const GET_USER_PURCHASE_HISTORY_PATH = USER_PATH + '/purchaseHistory'

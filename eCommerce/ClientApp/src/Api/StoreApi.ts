@@ -11,7 +11,7 @@ import {
     SEARCH_ITEMS_PATH,
     SEARCH_STORE_PATH,
     STAFF_OF_STORE_PATH,
-    STAFF_PERMISSIONS_OF_STORE_PATH
+    STAFF_PERMISSIONS_OF_STORE_PATH, UPDATE_MANAGER_PERMISSIONS_IN_STORE_PATH
 } from "./ApiPaths";
 import {Item} from "../Data/Item";
 import {StorePermission} from "../Data/StorePermission";
@@ -25,8 +25,11 @@ export class StoreApi {
     
     openStore(storeId: string) {
         return instance.post<Result<any>>(OPEN_STORE_PATH, 
+            {},
             {
-                storeId: storeId
+                params: {
+                    storeId: storeId
+                }
             })
             .then(res => {
                 return res.data
@@ -139,6 +142,23 @@ export class StoreApi {
                 params: {
                     role: "manager",
                     userId: appointedUserId
+                }
+            })
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+    
+    updateManagerPermissions(storeId: string, managerUserId: string,
+                             permissions: StorePermission[]){
+        return instance.put<Result<any>>(UPDATE_MANAGER_PERMISSIONS_IN_STORE_PATH(storeId),
+            {
+                storePermissions: permissions
+            },
+            {
+                params: {
+                    role: "manager",
+                    userId: managerUserId
                 }
             })
             .then(res => {

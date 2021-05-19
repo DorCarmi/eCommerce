@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 namespace eCommerce.Controllers
 {
 
-    public class StoreName
+    public class JSONStorePermissions
     {
-        public string StoreId { get; set; }
+        public List<StorePermission> StorePermissions { get; set; }
     }
     
     public class StoreAndItemId
@@ -40,10 +40,10 @@ namespace eCommerce.Controllers
         //removes "Controller" from the class name and add the name of the function as an endpoint 
 
         [HttpPost("[action]")]
-        public Result OpenStore([FromBody] StoreName storeName)
+        public Result OpenStore(string storeId)
         {
             return _storeService.OpenStore((string) HttpContext.Items["authToken"],
-                storeName.StoreId);
+                storeId);
         }
 
         [HttpPost("[action]")]
@@ -104,7 +104,7 @@ namespace eCommerce.Controllers
                 storeId);
         }
         
-        [HttpGet("{storeId}/staffPermission")]
+        [HttpGet("{storeId}/staff")]
         public Result<IList<StaffPermission>> GetStoreStaffPermissions(string storeId)
         {
             return _storeService.GetStoreStaffAndTheirPermissions((string) HttpContext.Items["authToken"],
@@ -131,6 +131,26 @@ namespace eCommerce.Controllers
             }
 
             return appointRes;
+        }
+        
+        [HttpPut("{storeId}/staff")]
+        public Result UpdateManagerPermissions(string storeId, string role, 
+            string userId, [FromBody] JSONStorePermissions storePermissions)
+        {
+            string token = (string) HttpContext.Items["authToken"];
+            Result updateRes;
+
+            switch (role)
+            {
+                case "manager":
+                    updateRes = _userService.UpdateManagerPermission(token, storeId, userId, storePermissions.StorePermissions);
+                    break;
+                default:
+                    updateRes = Result.Fail("Invalid staff role");
+                    break;
+            }
+
+            return updateRes;
         }
     }
 }

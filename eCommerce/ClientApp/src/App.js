@@ -20,6 +20,7 @@ import {PurchaseCart} from "./components/Cart/PurchaseCart";
 import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
 import {StoreApi} from "./Api/StoreApi";
 import {AppointManager} from "./components/AppointManager";
+import {StorePermission} from "./Data/StorePermission";
 
 export default class App extends Component {
   static displayName = App.name;
