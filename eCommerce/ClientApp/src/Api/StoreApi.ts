@@ -68,7 +68,8 @@ export class StoreApi {
             })
             .catch(res => undefined)
     }
-
+    
+    //in Store component
     getPurchaseHistory(storeId: string){
         return instance.get<Result<PurchaseHistory>>(GET_HISTORY_OF_STORE_PATH(storeId))
             .then(res => {
@@ -78,7 +79,8 @@ export class StoreApi {
                 return undefined
             })
     }
-
+    
+    //history for specific store - admin panel
     adminGetStorePurchaseHistory(storeId: string){
         return instance.get<Result<PurchaseHistory>>(ADMIN_GET_STORE_PURCHASE_HISTORY,
             {

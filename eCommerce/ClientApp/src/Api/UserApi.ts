@@ -46,7 +46,7 @@ export class UserApi {
                 return undefined
             })
     }
-
+    //current user history- member panel
     getPurchaseHistory(){
         return instance.get<Result<PurchaseHistory>>(GET_USER_PURCHASE_HISTORY_PATH)
             .then(res => {
@@ -57,6 +57,7 @@ export class UserApi {
             })
     }
 
+    //history of specific user - admin panel
     adminGetPurchaseHistory(userId: string){
         return instance.get<Result<PurchaseHistory>>(ADMIN_GET_USER_PURCHASE_HISTORY,
             {

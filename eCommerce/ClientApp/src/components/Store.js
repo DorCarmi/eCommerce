@@ -78,6 +78,18 @@ export default class Store extends Component {
             }
         }
 
+    }   
+    
+    storeManagment(){
+        const {items,storeId,permissions} = this.state
+        return (
+            <div>
+                {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link tag={Link} exact to={`/managePermissions/${storeId}`}>Manage Permissions</Link></div> : null}
+                {permissions.includes(StorePermission.AddItemToStore) ? <div><Link to={`${storeId}/addItem`}>Add an Item</Link></div> : null}
+                {permissions.includes(StorePermission.GetStoreHistory) ? <Link to={`/purchaseHistory/${storeId}`}>Show Store's Purchase History</Link> : null}
+            </div>
+
+        )
     }
     
     render() {
@@ -85,9 +97,7 @@ export default class Store extends Component {
         if (items.length > 0) {
             return (
                 <div>
-                    {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link tag={Link} exact to={`/managePermissions/${storeId}`}>Manage Permissions</Link></div> : null}
-
-                    {permissions.includes(StorePermission.AddItemToStore) ? <Link to={`${storeId}/addItem`}>Add an Item</Link> : null} 
+                    {this.storeManagment()}
                     <Table striped bordered hover>
                     <thead>
                     <tr>
@@ -125,10 +135,7 @@ export default class Store extends Component {
             );
         } else {
             return <div>
-                <div>
-                    {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link tag={Link} exact to={`/managePermissions/${storeId}`}>Manage Permissions</Link></div> : null}
-                    <Link to={`${storeId}/addItem`}>Add an Item</Link>   
-                </div>
+                {this.storeManagment()}
                 Empty Store
             </div>
         }

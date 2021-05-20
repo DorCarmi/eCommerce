@@ -225,7 +225,7 @@ export default class ManagePermissions extends Component {
                         }
                         </tbody>
                     </Table>
-                    <Button color="primary" onClick={this.handleSubmit}>Submit</Button>
+                    <button className="action" onClick={this.handleSubmit}>Submit</button>
                 </div>
             );
 

@@ -11,6 +11,7 @@ import Register from "./components/Register";
 import './custom.css'
 import AddItem from './components/AddItem'
 import EditItem from './components/EditItem'
+import StoreHistory from './components/StoreHistory'
 import ManagePermissions from './components/ManagePermissions'
 
 import {BrowserRouter, Link, useHistory} from "react-router-dom";
@@ -21,6 +22,7 @@ import {PurchaseCart} from "./components/Cart/PurchaseCart";
 import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
 import {StoreApi} from "./Api/StoreApi";
 import {AppointManager} from "./components/AppointManager";
+
 import {StorePermission} from "./Data/StorePermission";
 import {NavLink} from "reactstrap";
 
@@ -207,6 +209,8 @@ export default class App extends Component {
             <Route exact path='/openStore' component={() => <OpenStore addStoreToState={this.addOwnedStoreHandler}/>} />
             <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
             <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
+            <Route exact path="/purchaseHistory/:storeId" render={({match}) => <StoreHistory storeId ={match.params.storeId}/>} />
+
             <Route exact path="/searchItems/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query} />} />
             <Route exact path="/managePermissions/:id/appointManager" render={({match}) => <AppointManager storeId ={match.params.id}/>} />
             <Route exact path="/managePermissions/:storeId/" render={({match}) => <ManagePermissions storeId ={match.params.storeId}/>}/>
