@@ -69,6 +69,9 @@ export class SideBarMenu extends Component {
                         <MenuItem>
                             <NavLink tag={Link} exact to="/openStore">Create new store</NavLink>
                         </MenuItem>
+                        <MenuItem>
+                            <NavLink tag={Link} exact to="/purchaseHistory">My Purchase History</NavLink>
+                        </MenuItem>
                             {this.renderOwnedStoreListMenu()}
                             {this.renderManagedStoreListMenu()}
                         </SubMenu>
@@ -77,6 +80,12 @@ export class SideBarMenu extends Component {
                     {role === UserRole.Admin ?
                         <Menu className="menuLayout">
                             <SubMenu title="Admin panel">
+                                <MenuItem>
+                                    <NavLink tag={Link} exact to={`/AdminPurchaseHistory/Store`}>Store Purchase History</NavLink>
+                                </MenuItem>
+                                <MenuItem>
+                                    <NavLink tag={Link} exact to={`/AdminPurchaseHistory/User`}>User Purchase History</NavLink>
+                                </MenuItem>
                             </SubMenu>
                         </Menu> :
                         null}

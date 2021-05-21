@@ -1,43 +1,56 @@
 ﻿import React, {Component} from "react";
 import {Table} from 'react-bootstrap'
 import {StoreApi} from "../Api/StoreApi";
-import {Link} from "react-router-dom";
 import {UserApi} from "../Api/UserApi";
+import {Link} from "react-router-dom";
 import {Item} from "../Data/Item";
 import {StorePermission} from '../Data/StorePermission'
 import {NavLink} from "reactstrap";
 
-export default class StoreHistory extends Component {
-    static displayName = StoreHistory.name;
+export default class PurchaseHistory extends Component {
+    static displayName = PurchaseHistory.name;
 
     constructor(props) {
         super(props)
-        const {storeId} = props
+        const {storeId,userId,isAdmin} = props
         this.state = {
             storeId: storeId,
+            userId:userId,
+            isAdmin:isAdmin,
             historyDetails: [],
         }
         this.storeApi = new StoreApi();
+        this.userApi = new UserApi();
     }
 
     async getHistory(){
-        const fetchedHistory = await this.storeApi.getPurchaseHistory(this.state.storeId)
-        if (fetchedHistory && fetchedHistory.isSuccess) {
-            console.log(fetchedHistory.value)
+        const {storeId,userId,isAdmin} = this.state
+        console.log('storeId ' + this.state.storeId)
+        console.log('userId ' + this.state.userId)
+        console.log('isAdmin ' + this.state.isAdmin)
+        let res = undefined
+        if(isAdmin && storeId && userId === ' '){
+            res = await this.storeApi.adminGetStorePurchaseHistory(storeId)
+        }
+        else if(storeId && !userId && !isAdmin) {
+            res = await this.storeApi.getPurchaseHistory(this.state.storeId)
+        }
+        else if (storeId === ' ' && userId !== ' ' && isAdmin){
+            res = await this.userApi.adminGetPurchaseHistory(this.state.userId)
+        }
+        else{
+            res = await this.userApi.getPurchaseHistory()
+        }
+        if (res && res.isSuccess) {
+            console.log(res.value)
             this.setState({
-                historyDetails: fetchedHistory.value.records
+                historyDetails: res.value.records
             })
         }
     }
 
     async componentDidMount() {
         await this.getHistory();
-        const fetchedPermissions = await this.storeApi.getPurchaseHistory(this.state.storeId)
-        if(fetchedPermissions.isSuccess){
-            this.setState({
-                permissions:fetchedPermissions.value
-            })
-        }
     }
 
     async componentDidUpdate(prevProps, prevState, undefined) {
