@@ -102,7 +102,7 @@ namespace eCommerce.Controllers
                 storeId);
         }
         
-        [HttpGet("admin/storeHistory")]
+        [HttpGet("{storeId}/storeHistory")]
         public Result<SPurchaseHistory> AdminGetStoreHistory(string storeId)
         {
             return _userService.AdminGetPurchaseHistoryStore((string) HttpContext.Items["authToken"],

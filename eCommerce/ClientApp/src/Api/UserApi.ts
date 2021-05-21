@@ -59,12 +59,7 @@ export class UserApi {
 
     //history of specific user - admin panel
     adminGetPurchaseHistory(userId: string){
-        return instance.get<Result<PurchaseHistory>>(ADMIN_GET_USER_PURCHASE_HISTORY,
-            {
-                params: {
-                    userId: userId
-                }
-            })
+        return instance.get<Result<PurchaseHistory>>(ADMIN_GET_USER_PURCHASE_HISTORY (userId))
             .then(res => {
                 return res.data;
             })

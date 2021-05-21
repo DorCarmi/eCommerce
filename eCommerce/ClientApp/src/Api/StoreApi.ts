@@ -82,12 +82,7 @@ export class StoreApi {
     
     //history for specific store - admin panel
     adminGetStorePurchaseHistory(storeId: string){
-        return instance.get<Result<PurchaseHistory>>(ADMIN_GET_STORE_PURCHASE_HISTORY,
-            {
-                params: {
-                    storeId: storeId
-                }
-            })
+        return instance.get<Result<PurchaseHistory>>(ADMIN_GET_STORE_PURCHASE_HISTORY(storeId))
             .then(res => {
                 return res.data;
             })

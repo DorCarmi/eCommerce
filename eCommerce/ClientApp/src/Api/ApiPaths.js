@@ -46,6 +46,7 @@ export const GET_USER_PURCHASE_HISTORY_PATH = USER_PATH + '/purchaseHistory'
 
 // ========= Admin ========== //
 
-export const ADMIN_PATH = API_PATH + '/admin';
-export const ADMIN_GET_USER_PURCHASE_HISTORY = ADMIN_PATH + '/userHistory'
-export const ADMIN_GET_STORE_PURCHASE_HISTORY = ADMIN_PATH + '/storeHistory'
+
+
+export function ADMIN_GET_USER_PURCHASE_HISTORY(userId) {return USER_PATH + `/${userId}/userHistory`}
+export function ADMIN_GET_STORE_PURCHASE_HISTORY(storeId) {return STORE_PATH + `/${storeId}/storeHistory`}
