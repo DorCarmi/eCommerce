@@ -1,7 +1,7 @@
 ﻿import React, {Component} from "react";
 import {Table} from 'react-bootstrap'
 import {StoreApi} from "../Api/StoreApi";
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 import {UserApi} from "../Api/UserApi";
 import {Item} from "../Data/Item";
 import {StorePermission} from '../Data/StorePermission'
@@ -16,7 +16,8 @@ export default class Store extends Component {
         this.state = {
             storeId: storeId,
             items: [],
-            permissions:[]
+            permissions:[],
+            selectedItem:''
         }
         this.storeApi = new StoreApi();
     }
@@ -91,9 +92,18 @@ export default class Store extends Component {
 
         )
     }
+
+    addToCart(itemName){
+        this.setState({
+            selectedItem:itemName
+        })
+    }
     
     render() {
-        const {items,storeId,permissions} = this.state
+        const {items,storeId,permissions,selectedItem} = this.state
+        if(selectedItem.length > 0){
+            return <Redirect exact to={`/searchItems/Item/${selectedItem}`}/>
+        }
         if (items.length > 0) {
             return (
                 <div>
@@ -123,7 +133,10 @@ export default class Store extends Component {
                                         <div>
                                             {permissions.includes(StorePermission.EditItemDetails) ? <Link exact to={`${storeId}/editItem/${item.itemName}`}>Edit Item</Link> : null}
                                         </div>
+                                        <div>
                                         {permissions.includes(StorePermission.RemoveStoreStaff) ? <button onClick={() => this.removeItem(storeId,item.itemName)}>Remove Item</button> : null }
+                                        </div>
+                                        <button onClick={(e) => this.addToCart(item.itemName) }>Add To Cart</button>
                                     </td>
                                 </tr>
                             )
