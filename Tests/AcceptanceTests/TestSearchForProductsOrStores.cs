@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -29,7 +30,7 @@ namespace Tests.AcceptanceTests
         
         
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _auth = new AuthService();
             _store = new StoreService();
@@ -38,7 +39,7 @@ namespace Tests.AcceptanceTests
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();
             _auth.Register(token, yossi, "qwerty123");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", store, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             _store.OpenStore(yossiLogInResult.Value, store);

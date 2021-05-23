@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -69,7 +70,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result Register(string token, MemberInfo memberInfo, string password)
+        public async Task<Result> Register(string token, MemberInfo memberInfo, string password)
         {
             if (!_auth.IsValidToken(token))
             {
@@ -93,7 +94,7 @@ namespace eCommerce.Business
                 return validMemberInfoRes;
             }
 
-            Result authRegistrationRes = RegisterAtAuthorization(memberInfo.Username, password);
+            Result authRegistrationRes = await RegisterAtAuthorization(memberInfo.Username, password);
             if (authRegistrationRes.IsFailure)
             {
                 return authRegistrationRes;
@@ -115,18 +116,18 @@ namespace eCommerce.Business
         public void AddAdmin(MemberInfo adminInfo, string password)
         {
             IUser user = new User(Admin.State, adminInfo);
-            RegisterAtAuthorization(adminInfo.Username, password);
+            RegisterAtAuthorization(adminInfo.Username, password).Wait();
             _registeredUsersRepo.Add(user);
             _admins.TryAdd(adminInfo.Username, user);
         }
         
-        private Result RegisterAtAuthorization(string username, string password)
+        private Task<Result> RegisterAtAuthorization(string username, string password)
         {
             return _auth.Register(username, password);
         }
         
         // TODO: use the role here, how user that is admin can log in as member
-        public Result<string> Login(string guestToken, string username, string password, UserToSystemState role)
+        public async Task<Result<string>> Login(string guestToken, string username, string password, UserToSystemState role)
         {
             if (!_auth.IsValidToken(guestToken))
             {
@@ -144,7 +145,7 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Not connected or not guest");
             }
             
-            Result authLoginRes = _auth.Authenticate(username, password);
+            Result authLoginRes = await _auth.Authenticate(username, password);
             if (authLoginRes.IsFailure)
             {
                 return Result.Fail<string>(authLoginRes.Error);

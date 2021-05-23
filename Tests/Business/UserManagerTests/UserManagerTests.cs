@@ -76,7 +76,7 @@ namespace Tests.Business.UserManagerTests
                 () =>
                 {
                     string token = _userManager.Connect();
-                    return _userManager.Register(token, memberInfo, "password1");
+                    return _userManager.Register(token, memberInfo, "password1").Result;
                 },
                 numberOfTasks);
 
@@ -101,14 +101,14 @@ namespace Tests.Business.UserManagerTests
             string password = "passwrod1"; 
             string token = _userManager.Connect();
             MemberInfo memberInfo = new MemberInfo("user1", "email@email.com", "user", DateTime.Now, "Sea street 1");
-            Result registerRes = _userManager.Register(token, memberInfo, password);
+            Result registerRes = await _userManager.Register(token, memberInfo, password);
             if (registerRes.IsFailure)
             {
                 Assert.Fail("The registration of the user didnt work");
             }
 
             Result[] loginRes = await TaskTestUtils.CreateAndRunTasks(
-                () =>  _userManager.Login(token, memberInfo.Username, password, Member.State),
+                () =>  _userManager.Login(token, memberInfo.Username, password, Member.State).Result,
                 numberOfTasks);
 
             int registeredSuccessfully = 0;
@@ -132,7 +132,7 @@ namespace Tests.Business.UserManagerTests
             string password = "passwrod1"; 
             string token = _userManager.Connect();
             MemberInfo memberInfo = new MemberInfo("user1", "email@email.com", "user", DateTime.Now, "Sea street 1");
-            Result registerRes = _userManager.Register(token, memberInfo, password);
+            Result registerRes = await _userManager.Register(token, memberInfo, password);
             if (registerRes.IsFailure)
             {
                 Assert.Fail("The registration of the user didnt work");
@@ -143,7 +143,7 @@ namespace Tests.Business.UserManagerTests
                 () =>
                 {
                     string token = _userManager.Connect();
-                    return _userManager.Login(token, memberInfo.Username, password, Member.State);
+                    return _userManager.Login(token, memberInfo.Username, password, Member.State).Result;
                 },
                 numberOfTasks);
 
@@ -173,7 +173,7 @@ namespace Tests.Business.UserManagerTests
             {
                 guestTokens[i] = _userManager.Connect();
                 MemberInfo memberInfo = new MemberInfo($"{username}{i}", "email@email.com", "user", DateTime.Now, "Sea street 1");
-                Result registerRes = _userManager.Register(guestTokens[i], memberInfo, $"{password}{i}");
+                Result registerRes = await _userManager.Register(guestTokens[i], memberInfo, $"{password}{i}");
                 if (registerRes.IsFailure)
                 {
                     Assert.Fail($"The registration of the user didnt work\nError:{registerRes.Error}");
@@ -187,7 +187,7 @@ namespace Tests.Business.UserManagerTests
                 string upassword = $"{password}{i}";
                 string token = guestTokens[i];
                 loginTasks[i] = new Task<Result<string>>(
-                    () => _userManager.Login(token, uname, upassword, Member.State));
+                    () => _userManager.Login(token, uname, upassword, Member.State).Result);
             }
 
             TaskTestUtils.RunTasks(loginTasks);
@@ -212,7 +212,7 @@ namespace Tests.Business.UserManagerTests
         }
 
         [Test]
-        public void LoginLogoutInARow()
+        public async Task LoginLogoutInARow()
         {
             string username = "user";
             string password = "password";
@@ -220,12 +220,12 @@ namespace Tests.Business.UserManagerTests
 
             
             string token = _userManager.Connect();
-            Result registrationRes = _userManager.Register(token, memberInfo, password);
+            Result registrationRes = await _userManager.Register(token, memberInfo, password);
             Assert.True(registrationRes.IsSuccess, registrationRes.Error);
             
             for (int i = 0; i < 3; i++)
             {
-                Result<string> loginTokenRes = _userManager.Login(token, username, password, Member.State);
+                Result<string> loginTokenRes = await _userManager.Login(token, username, password, Member.State);
                 Assert.True(loginTokenRes.IsSuccess, loginTokenRes.Error);
                 Result<string> logoutTokenRes = _userManager.Logout(loginTokenRes.Value);
                 Assert.True(logoutTokenRes.IsSuccess, logoutTokenRes.Error);

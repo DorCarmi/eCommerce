@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -27,7 +28,7 @@ namespace Tests.AcceptanceTests
         
         
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _auth = new AuthService();
             _store = new StoreService();
@@ -42,7 +43,7 @@ namespace Tests.AcceptanceTests
             _auth.Register(token, yossi, "qwerty123");
             _auth.Register(token, shiran, "130452abc");
             _auth.Register(token, lior, "987654321");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             _store.OpenStore(yossiLogInResult.Value, store);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
@@ -52,10 +53,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi's Store", "singerMermaid")]
         [TestCase("Yossi's Store", "Liorwork")]
         [Test]
-        public void TestSuccess(string storeName, string username)
+        public async Task TestSuccess(string storeName, string username)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result result = _user.AppointCoOwner(yossiLogin.Value, storeName, username);
             Assert.True(result.IsSuccess, "failed to appoint " + username + ": " + result.Error);
             token = _auth.Logout(yossiLogin.Value).Value;
@@ -65,10 +66,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi's Store", "singerMermaid")]
         [TestCase("Yossi's Store", "Liorwork")]
         [Test]
-        public void TestFailureDouble(string storeName, string username)
+        public async Task TestFailureDouble(string storeName, string username)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             _user.AppointCoOwner(yossiLogin.Value, storeName, username);
             Result result = _user.AppointCoOwner(yossiLogin.Value, storeName, username);
             Assert.True(result.IsFailure, "Appointing Co-Owner was suppose to fail, co-owner already appointed");
@@ -82,10 +83,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11",   "qwerty123", "Yossi's Store", "Tamir123")]
         [TestCase("singerMermaid", "130452abc", "Yossi's Store", "Liorwork")]
         [Test]
-        public void TestFailureInvalid(string appointer, string appointerPassword,  string storeName, string username)
+        public async Task TestFailureInvalid(string appointer, string appointerPassword,  string storeName, string username)
         {
             string token = _auth.Connect();
-            Result<string>login = _auth.Login(token, appointer, appointerPassword, ServiceUserRole.Member);
+            Result<string>login = await _auth.Login(token, appointer, appointerPassword, ServiceUserRole.Member);
             Result result = _user.AppointCoOwner(login.Value, storeName, username);
             Assert.True(result.IsFailure, "Appointing " + username + " was expected to fail!");
             token = _auth.Logout(login.Value).Value;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -27,7 +28,7 @@ namespace Tests.AcceptanceTests
         private string storeName = "Yossi's Store";
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _auth = new AuthService();
             _store = new StoreService();
@@ -39,7 +40,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             _auth.Register(token, yossi, "qwerty123");
             _auth.Register(token, shiran, "130452abc");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             _store.OpenStore(yossiLogInResult.Value, storeName);
@@ -49,10 +50,10 @@ namespace Tests.AcceptanceTests
         }
 
         [Test] 
-        public void TestSuccessEmpty()
+        public async Task TestSuccessEmpty()
         {
             string token = _auth.Connect();
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result<SPurchaseHistory> result = _store.GetPurchaseHistoryOfStore(yossiLogInResult.Value, storeName);
             Assert.True(result.IsSuccess && result.Value.Records.Count == 0);
             token = _auth.Logout(yossiLogInResult.Value).Value;
@@ -60,14 +61,14 @@ namespace Tests.AcceptanceTests
         }
         
         [Test] 
-        public void TestSuccessNonEmpty()
+        public async Task TestSuccessNonEmpty()
         {
             string token = _auth.Connect();
             _cart.AddItemToCart(token, "Tara milk", storeName, 5);
             _cart.PurchaseCart(token, new PaymentInfo("Yossi11","123456789","1234567890123456","12/34","123","address"));
             _auth.Disconnect(token);
             token = _auth.Connect();
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result<SPurchaseHistory> result = _store.GetPurchaseHistoryOfStore(yossiLogInResult.Value, storeName);
             Assert.True(result.IsSuccess && result.Value.Records.Count != 0);
             token = _auth.Logout(yossiLogInResult.Value).Value;
@@ -77,10 +78,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11", "qwerty123","dancing dragon")]
         [TestCase("singerMermaid", "130452abc", "Yossi's Store")]
         [Test] 
-        public void TestFailureLogic(string member, string password, string store)
+        public async Task TestFailureLogic(string member, string password, string store)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogInResult = _auth.Login(token, member, password, ServiceUserRole.Member);
+            Result<string> yossiLogInResult = await _auth.Login(token, member, password, ServiceUserRole.Member);
             Result<SPurchaseHistory> result = _store.GetPurchaseHistoryOfStore(yossiLogInResult.Value, store);
             Assert.True(result.IsFailure);
             token = _auth.Logout(yossiLogInResult.Value).Value;

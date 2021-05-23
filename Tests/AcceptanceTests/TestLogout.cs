@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -35,24 +36,24 @@ namespace Tests.AcceptanceTests
         /// </Req>
         /// </summary>
         [Test]
-        public void TestSuccess()
+        public async Task TestSuccess()
         {
             string token = _auth.Connect();
-            Result<string> result = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> result = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             result = _auth.Logout(result.Value);
             Assert.True(result.IsSuccess, result.Error);
             token = result.Value;
-            result = _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            result = await _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
             result = _auth.Logout(result.Value);
             Assert.True(result.IsSuccess, result.Error);
             _auth.Disconnect(result.Value);
         }
         
         [Test]
-        public void TestFailure()
+        public async Task TestFailure()
         {
             string token = _auth.Connect();
-            Result<string> result = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> result = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result<string> falseResult = _auth.Logout(token);
             Assert.True(falseResult.IsFailure, "Logout was suppose to fail");
             _auth.Disconnect(result.Value);

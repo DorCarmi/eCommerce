@@ -1,4 +1,5 @@
-﻿using eCommerce.Common;
+﻿using System.Threading.Tasks;
+using eCommerce.Common;
 
 namespace eCommerce.Auth
 {
@@ -10,7 +11,7 @@ namespace eCommerce.Auth
         /// <param name="username">The user name</param>
         /// <param name="password">The user password</param>
         /// <returns>Successful Result if the user has been successfully registered</returns>
-        public Result Register(string username, string password);
+        public Task<Result> Register(string username, string password);
         
         /// <summary>
         /// Authenticate the username password.
@@ -19,7 +20,7 @@ namespace eCommerce.Auth
         /// <param name="username">The user name</param>
         /// <param name="password">The user password</param>
         /// <returns>The result of the authentication</returns>
-        public Result Authenticate(string username, string password);
+        public Task<Result> Authenticate(string username, string password);
 
         /// <summary>
         /// Generate an access token for the user

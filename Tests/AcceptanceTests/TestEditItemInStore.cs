@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -27,7 +28,7 @@ namespace Tests.AcceptanceTests
         private string storeName = "Yossi's Store";
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _auth = new AuthService();
             _store = new StoreService();
@@ -38,7 +39,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             _auth.Register(token, yossi, "qwerty123");
             _auth.Register(token, shiran, "130452abc");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             _store.OpenStore(yossiLogInResult.Value, storeName);
@@ -62,11 +63,11 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara milk", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)6.2)] // edit price
         [Test]
-        public void TestSuccess(string name, int amount, string category, string[] tags,
+        public async Task TestSuccess(string name, int amount, string category, string[] tags,
             double price)  
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result editItemResult = _store.EditItemInStore(yossiLogin.Value,
                 new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsSuccess, "failed to edit item: " + editItemResult.Error);
@@ -85,11 +86,11 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara milk", "prancing dragon", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit fail, can't change the store (store doesn't exist)
         [Test] 
-        public void TestFailureInvalid(string name, string store, int amount, string category, string[] tags,
+        public async Task TestFailureInvalid(string name, string store, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result editItemResult = _store.EditItemInStore(yossiLogin.Value,
                 new SItem(name, store, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item");
@@ -100,11 +101,11 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara milk", 15, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)]
         [Test] 
-        public void TestFailureNotOwner(string name, int amount, string category, string[] tags,
+        public async Task TestFailureNotOwner(string name, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result<string> login = await _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
             Result editItemResult = _store.EditItemInStore(login.Value,
                 new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item, user doesn't own the store");

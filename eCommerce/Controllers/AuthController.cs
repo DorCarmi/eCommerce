@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using eCommerce.Common;
 using eCommerce.Service;
 using Microsoft.AspNetCore.Http;
@@ -60,11 +61,11 @@ namespace eCommerce.Controllers
         
         [HttpPost]
         [Route("[action]")]
-        public Result<string> Login([FromBody] LoginInfo loginInfo)
+        public async Task<Result<string>> Login([FromBody] LoginInfo loginInfo)
         {
             if (Enum.TryParse<ServiceUserRole>(loginInfo.Role, true, out var serviceRole))
             {
-                Result<string> loginRes = _authService.Login((string) HttpContext.Items["authToken"],
+                Result<string> loginRes = await _authService.Login((string) HttpContext.Items["authToken"],
                     loginInfo.Username, loginInfo.Password, serviceRole);
                 if (loginRes.IsSuccess)
                 {
@@ -88,9 +89,9 @@ namespace eCommerce.Controllers
         
         [HttpPost]
         [Route("[action]")]
-        public Result Register([FromBody] MemberInfo memberInfo)
+        public async Task<Result> Register([FromBody] MemberInfo memberInfo)
         {
-            Result registerRes = _authService.Register((string) HttpContext.Items["authToken"],
+            Result registerRes = await _authService.Register((string) HttpContext.Items["authToken"],
                 memberInfo, memberInfo.Password);
             if (registerRes.IsSuccess)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -34,7 +35,7 @@ namespace eCommerce.Business
         /// <param name="memberInfoDto">The user information</param>
         /// <param name="password">The user password</param>
         /// <returns>Successful Result if the user has been successfully registered</returns>
-        public Result Register(string token, MemberInfo memberInfo, string password);
+        public Task<Result> Register(string token, MemberInfo memberInfo, string password);
         
         /// <summary>
         /// Log in to the system
@@ -48,7 +49,7 @@ namespace eCommerce.Business
         /// <param name="password">The user password</param>
         /// <param name="role">The user role</param>
         /// <returns>Authorization token</returns>
-        public Result<string> Login(string guestToken ,string username, string password, UserToSystemState role);
+        public Task<Result<string>> Login(string guestToken ,string username, string password, UserToSystemState role);
         
         /// <summary>
         /// Logout a user form the system.

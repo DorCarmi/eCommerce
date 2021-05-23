@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Common;
 
@@ -32,7 +33,7 @@ namespace Tests.Business.UserManagerTests
             _idGenerator = new ConcurrentIdGenerator(0);
         }
 
-        public Result Register(string username, string password)
+        public async Task<Result> Register(string username, string password)
         {
             if (!_registeredUsers.TryAdd(username, new AuthData(username)))
             {
@@ -43,7 +44,7 @@ namespace Tests.Business.UserManagerTests
             return Result.Ok();
         }
 
-        public Result Authenticate(string username, string password)
+        public async Task<Result> Authenticate(string username, string password)
         {
             if (!(_registeredUsers.ContainsKey(username) && _passwords.TryGetValue(username, out var userPassword)))
             {

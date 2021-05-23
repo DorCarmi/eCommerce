@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -66,13 +67,13 @@ namespace eCommerce.Business
         }
 
         // <CNAME>Register</CNAME>
-        public Result Register(string token, MemberInfo memberInfo, string password)
+        public Task<Result> Register(string token, MemberInfo memberInfo, string password)
         {
             return _userManager.Register(token, memberInfo, password);
         }
 
         // <CNAME>Login</CNAME>
-        public Result<string> Login(string guestToken, string username, string password, UserToSystemState role)
+        public Task<Result<string>> Login(string guestToken, string username, string password, UserToSystemState role)
         {
             return _userManager.Login(guestToken, username, password, role);
         }

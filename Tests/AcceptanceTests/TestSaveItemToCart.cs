@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -28,7 +29,7 @@ namespace Tests.AcceptanceTests
         
         
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _auth = new AuthService();
             _store = new StoreService();
@@ -44,7 +45,7 @@ namespace Tests.AcceptanceTests
             _auth.Register(token, yossi, "qwerty123");
             _auth.Register(token, shiran, "130452abc");
             _auth.Register(token, lior, "987654321");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", store, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             _store.OpenStore(yossiLogInResult.Value, store);
@@ -56,10 +57,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara milk", "Yossi's store", 3)]
         [TestCase("Tara milk", "Yossi's store", 10)]
         [Test]
-        public void TestAddItemToCartSuccess(string itemId, string storeName, int amount)
+        public async Task TestAddItemToCartSuccess(string itemId, string storeName, int amount)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result<string> login = await _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
             Result result = _cart.AddItemToCart(login.Value, itemId, storeName, amount);
             Assert.True(result.IsSuccess, "failed to add  " + " from " + storeName + " to cart: " + result.Error);
             token = _auth.Logout(login.Value).Value;
@@ -70,10 +71,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara milk", "Yossi's store", -3)]
         [TestCase("Tara milk", "Yossi's store", 12)]
         [Test] 
-        public void TestAddItemToCartFailure(string itemId, string storeName, int amount)
+        public async Task TestAddItemToCartFailure(string itemId, string storeName, int amount)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result<string> login = await _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
             Result result = _cart.AddItemToCart(login.Value, itemId, storeName, amount);
             Assert.True(result.IsFailure, "action was suppose to fail!");
             token = _auth.Logout(login.Value).Value;

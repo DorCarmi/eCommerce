@@ -1,4 +1,5 @@
-﻿using eCommerce.Business;
+﻿using System.Threading.Tasks;
+using eCommerce.Business;
 using eCommerce.Common;
 
 namespace eCommerce.Service
@@ -27,7 +28,7 @@ namespace eCommerce.Service
         /// <param name="memberInfo">The user information</param>
         /// <param name="password">The user password</param>
         /// <returns>Successful Result if the user has been successfully registered</returns>
-        public Result Register(string token, MemberInfo memberInfo, string password);
+        public Task<Result> Register(string token, MemberInfo memberInfo, string password);
         
         /// <summary>
         /// Log in to the system
@@ -41,7 +42,7 @@ namespace eCommerce.Service
         /// <param name="password">The user password</param>
         /// <param name="role">The user role</param>
         /// <returns>Authorization token</returns>
-        public Result<string> Login(string guestToken ,string username, string password, ServiceUserRole role);
+        public Task<Result<string>> Login(string guestToken ,string username, string password, ServiceUserRole role);
         
         /// <summary>
         /// Logout a user form the system.

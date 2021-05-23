@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Service;
@@ -44,12 +45,12 @@ namespace eCommerce.Service
         }
 
         //TODO: maybe user dto for MemberInfo
-        public Result Register(string token, MemberInfo memberInfo, string password)
+        public Task<Result> Register(string token, MemberInfo memberInfo, string password)
         {
             return _marketFacade.Register(token, memberInfo, password);
         }
 
-        public Result<string> Login(string guestToken, string username, string password, ServiceUserRole role)
+        public Task<Result<string>> Login(string guestToken, string username, string password, ServiceUserRole role)
         {
             return _marketFacade.Login(guestToken, username, password,
                 DtoUtils.ServiceUserRoleToSystemState(role));

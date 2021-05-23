@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -25,7 +26,7 @@ namespace Tests.AcceptanceTests
         private string storeName = "Yossi's Store";
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _auth = new AuthService();
             _store = new StoreService();
@@ -36,7 +37,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             _auth.Register(token, yossi, "qwerty123");
             _auth.Register(token, shiran, "130452abc");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             _store.OpenStore(yossiLogInResult.Value, storeName);
@@ -50,10 +51,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara milk")]
         [TestCase("iPhone X")]
         [Test]
-        public void TestSuccess(string productName)
+        public async Task TestSuccess(string productName)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Result removeItemResult = _store.RemoveItemFromStore(yossiLogin.Value, storeName, productName);
             Assert.True(removeItemResult.IsSuccess, "failed to remove item " + productName + ": " + removeItemResult.Error);
             token = _auth.Logout(yossiLogin.Value).Value;
@@ -64,10 +65,10 @@ namespace Tests.AcceptanceTests
         [TestCase("dancing doors", "Tara milk", "Yossi11", "qwerty123")] // non existing store
         [TestCase("Yossi's Store", "Gans 356 air", "singerMermaid", "130452abc")]
         [Test]      
-        public void TestFailureInvalid(string store, string productName, string member, string password)
+        public async Task TestFailureInvalid(string store, string productName, string member, string password)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, member, password, ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, member, password, ServiceUserRole.Member);
             Result removeItemResult = _store.RemoveItemFromStore(yossiLogin.Value, store, productName);
             Assert.True(removeItemResult.IsFailure);
             token = _auth.Logout(yossiLogin.Value).Value;
@@ -75,10 +76,10 @@ namespace Tests.AcceptanceTests
         }
 
         [Test]
-        public void TestRemoveLastProduct()
+        public async Task TestRemoveLastProduct()
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             _store.RemoveItemFromStore(yossiLogin.Value, storeName, "Tara milk");
             Result removeItemResult = _store.RemoveItemFromStore(yossiLogin.Value, storeName, "iPhone X");
             Assert.True(removeItemResult.IsFailure, "can't remove all products from a store");

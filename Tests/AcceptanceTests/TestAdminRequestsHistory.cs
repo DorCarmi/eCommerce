@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -26,7 +27,7 @@ namespace Tests.AcceptanceTests
         private IStoreService _store;
         
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
             _auth = new AuthService();
             _user = new UserService();
@@ -38,7 +39,7 @@ namespace Tests.AcceptanceTests
             _auth.Register(token, yossi, "qwerty123");
             _auth.Register(token, shiran, "130452abc");
             _auth.Register(token, lior, "987654321");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             string storeName = "Yossi's Store";
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
@@ -51,10 +52,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11")]
         [TestCase("singerMermaid")] 
         [Test]
-        public void TestAdminUserSuccess(string member)
+        public async Task TestAdminUserSuccess(string member)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
+            Result<string> login = await _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
             Result result = _user.AdminGetPurchaseHistoryUser(login.Value,member);
             Assert.True(result.IsSuccess, result.Error);
             _auth.Logout(login.Value);
@@ -64,10 +65,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Tamir")]
         [TestCase("++uhs++")] 
         [Test]
-        public void TestAdminUserFailure(string member)
+        public async Task TestAdminUserFailure(string member)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
+            Result<string> login = await _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
             Result result = _user.AdminGetPurchaseHistoryUser(login.Value,member);
             Assert.True(result.IsFailure);
             _auth.Logout(login.Value);
@@ -77,10 +78,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11", "qwerty123", "singerMermaid")]
         [TestCase("singerMermaid", "130452abc", "Yossi11")] 
         [Test]
-        public void TestAdminUserFailureLogin(string admin, string password,string member)
+        public async Task TestAdminUserFailureLogin(string admin, string password,string member)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, admin, password, ServiceUserRole.Admin);
+            Result<string> login = await _auth.Login(token, admin, password, ServiceUserRole.Admin);
             Result result = _user.AdminGetPurchaseHistoryUser(login.Value,member);
             Assert.True(result.IsFailure);
             _auth.Logout(login.Value);
@@ -89,10 +90,10 @@ namespace Tests.AcceptanceTests
        
         [TestCase("Yossi's Store")] 
         [Test]
-        public void TestAdminStoreSuccess(string storeID)
+        public async Task TestAdminStoreSuccess(string storeID)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
+            Result<string> login = await _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
             Result result = _user.AdminGetPurchaseHistoryStore(login.Value,storeID);
             Assert.True(result.IsSuccess, result.Error);
             _auth.Logout(login.Value);
@@ -100,10 +101,10 @@ namespace Tests.AcceptanceTests
         }
         [TestCase("dancing dragon")]       
         [Test]
-        public void TestAdminStoreFailure(string storeID)
+        public async Task TestAdminStoreFailure(string storeID)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
+            Result<string> login = await _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
             Result result = _user.AdminGetPurchaseHistoryStore(login.Value,storeID);
             Assert.True(result.IsFailure);
             _auth.Logout(login.Value);
@@ -113,10 +114,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11", "qwerty123", "Yossi's Store")]
         [TestCase("singerMermaid", "130452abc", "Prancing dragon")] 
         [Test]
-        public void TestAdminStoreFailureLogin(string admin, string password,string storeId)
+        public async Task TestAdminStoreFailureLogin(string admin, string password,string storeId)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, admin, password, ServiceUserRole.Admin);
+            Result<string> login = await _auth.Login(token, admin, password, ServiceUserRole.Admin);
             Result result = _user.AdminGetPurchaseHistoryStore(login.Value,storeId);
             Assert.True(result.IsFailure);
             _auth.Logout(login.Value);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -42,10 +43,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11", "qwerty123","Yossi's store")]
         [TestCase("singerMermaid", "130452abc", "dancing dragon")]
         [Test]
-        public void TestSuccess(string member, string password, string store)
+        public async Task TestSuccess(string member, string password, string store)
         {
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, member, password, ServiceUserRole.Member);
+            Result<string> login = await _auth.Login(token, member, password, ServiceUserRole.Member);
             Result result = _store.OpenStore(login.Value, store);
             Assert.True(result.IsSuccess, result.Error);
             _auth.Logout(login.Value);
@@ -54,13 +55,13 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Yossi11", "qwerty123","Yossi's store", "singerMermaid", "130452abc", "dancing dragon")]
         [TestCase("Yossi11", "qwerty123","Yossi's store", "Yossi11", "qwerty123", "dancing dragon")]
-        public void TestMultipleSuccess(string firstMember, string firstPassword, string firstStore, string secondMember, string secondPassword, string secondStore)
+        public async Task TestMultipleSuccess(string firstMember, string firstPassword, string firstStore, string secondMember, string secondPassword, string secondStore)
         {
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, firstMember, firstPassword, ServiceUserRole.Member);
+            Result<string> login = await _auth.Login(token, firstMember, firstPassword, ServiceUserRole.Member);
             _store.OpenStore(login.Value, firstStore);
             token = _auth.Logout(login.Value).Value;
-            login = _auth.Login(token, secondMember, secondPassword, ServiceUserRole.Member);
+            login = await _auth.Login(token, secondMember, secondPassword, ServiceUserRole.Member);
             Result result = _store.OpenStore(login.Value, secondStore);
             Assert.True(result.IsSuccess, result.Error);
             token = _auth.Logout(login.Value).Value;
@@ -70,10 +71,10 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11", "qwerty123","~~~Yossi's store", "~~~Yossi's store")]
         [TestCase("Yossi11", "qwerty123","Yossi's store","Yossi's store")]
         [Test]
-        public void TestFailureInput(string member, string password, string storeName, string itemStore)
+        public async Task TestFailureInput(string member, string password, string storeName, string itemStore)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, member, password, ServiceUserRole.Member);
+            Result<string> login = await _auth.Login(token, member, password, ServiceUserRole.Member);
             Result result = _store.OpenStore(login.Value, storeName);
             Assert.True(result.IsFailure, "store opening was suppose to fail");
             _auth.Logout(login.Value);
@@ -82,13 +83,13 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Yossi11", "qwerty123","Yossi's store", "singerMermaid", "130452abc")]
         [TestCase("Yossi11", "qwerty123","Yossi's store", "Yossi11", "qwerty123")]
-        public void TestFailureAlreadyExists(string firstMember, string firstPassword, string store, string secondMember, string secondPassword)
+        public async Task TestFailureAlreadyExists(string firstMember, string firstPassword, string store, string secondMember, string secondPassword)
         {
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, firstMember, firstPassword, ServiceUserRole.Member);
+            Result<string> login = await _auth.Login(token, firstMember, firstPassword, ServiceUserRole.Member);
             _store.OpenStore(login.Value, store);
             token = _auth.Logout(login.Value).Value;
-            login = _auth.Login(token, secondMember, secondPassword, ServiceUserRole.Member);
+            login = await _auth.Login(token, secondMember, secondPassword, ServiceUserRole.Member);
             Result result = _store.OpenStore(login.Value, store);
             Assert.True(result.IsFailure, "store name already used. expected fail");
             token = _auth.Logout(login.Value).Value;
