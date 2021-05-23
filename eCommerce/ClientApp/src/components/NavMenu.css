@@ -23,6 +23,14 @@ html {
   width: 100%;
 }
 
+.nb-member {
+  background: #d1e6f7;
+}
+
+.nb-admin {
+  background: #00b8e9;
+}
+
 .navBarDiv {
   display: flex;
 }

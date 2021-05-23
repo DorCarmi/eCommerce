@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {StoreApi} from "../Api/StoreApi";
 import {SearchComponent} from "./SearchComponent";
 import {AuthApi} from "../Api/AuthApi";
+import {UserRole} from "../Data/UserRole";
 
 
 export class NavMenu extends Component {
@@ -65,10 +66,14 @@ export class NavMenu extends Component {
   }
 
   render () {
-    const {isLoggedIn, storeList} = this.props.state
+    const {isLoggedIn, storeList, role} = this.props.state
+    const navColor = 
+        role === UserRole.Member ? "nb-member" :
+            "nb-admin";
       return (
           <header>
-            <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow" expand="md"
+            <Navbar className={["navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow"].concat(navColor)} 
+                    expand="md"
                     light>
               <div className="containerNavBar">
                 <div className="navBarDiv">
@@ -97,7 +102,7 @@ export class NavMenu extends Component {
                     </ul>
                   </Collapse>
                   <NavLink tag={Link} className="text-dark" exact to="/Cart">
-                    <img src="/Images/cart.png" alt="Cart" class="image"/>
+                    <img src="/Images/cart1.png" alt="Cart" class="image"/>
                   </NavLink>
                 </div>
               </div>

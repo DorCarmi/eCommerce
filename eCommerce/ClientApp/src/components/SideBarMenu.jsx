@@ -65,7 +65,8 @@ export class SideBarMenu extends Component {
     
                 <SidebarContent>
                     <Menu className="menuLayout">
-                        <SubMenu title="Member panel">
+                        <SubMenu title="Member panel"
+                            icon={<img class="imgSideBar" src="Images/member.png" alt={null}/>}>
                         <MenuItem>
                             <NavLink tag={Link} exact to="/openStore">Create new store</NavLink>
                         </MenuItem>
@@ -79,7 +80,8 @@ export class SideBarMenu extends Component {
 
                     {role === UserRole.Admin ?
                         <Menu className="menuLayout">
-                            <SubMenu title="Admin panel">
+                            <SubMenu title="Admin panel"
+                                     icon={<img class="imgSideBar" src="Images/admin.png" alt={null}/>}>
                                 <MenuItem>
                                     <NavLink tag={Link} exact to={`/AdminPurchaseHistory/Store`}>Store Purchase History</NavLink>
                                 </MenuItem>
