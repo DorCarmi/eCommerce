@@ -10,6 +10,10 @@ export class SideBarMenu extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            memberIconJsx: undefined,
+            adminIconJsx: undefined
+        }
     }
     
     renderOwnedStoreListMenu() {
@@ -30,6 +34,13 @@ export class SideBarMenu extends Component {
                 )}
             </SubMenu>
         )
+    }
+    
+    componentDidMount() {
+        this.setState({
+            memberIconJsx: <img className="imgSideBar" src="Images/member.png" alt={null}/>,
+            adminIconJsx: <img className="imgSideBar" src="Images/admin.png" alt={null}/>
+        })
     }
 
 
@@ -54,6 +65,7 @@ export class SideBarMenu extends Component {
     
     render() {
         const { role } = this.props
+        const { memberIconJsx, adminIconJsx } = this.state;
         console.log(role)
         return (
             <ProSidebar breakPoint="md" className="sideBarContainer">
@@ -66,7 +78,8 @@ export class SideBarMenu extends Component {
                 <SidebarContent>
                     <Menu className="menuLayout">
                         <SubMenu title="Member panel"
-                            icon={<img class="imgSideBar" src="Images/member.png" alt={null}/>}>
+                                 // <img class="imgSideBar" src="Images/member.png" alt={null}/>
+                            icon={memberIconJsx}>
                         <MenuItem>
                             <NavLink tag={Link} exact to="/openStore">Create new store</NavLink>
                         </MenuItem>
@@ -81,7 +94,8 @@ export class SideBarMenu extends Component {
                     {role === UserRole.Admin ?
                         <Menu className="menuLayout">
                             <SubMenu title="Admin panel"
-                                     icon={<img class="imgSideBar" src="Images/admin.png" alt={null}/>}>
+                                 //<img className="imgSideBar" src="Images/admin.png" alt={null}/>
+                                     icon={adminIconJsx}>
                                 <MenuItem>
                                     <NavLink tag={Link} exact to={`/AdminPurchaseHistory/Store`}>Store Purchase History</NavLink>
                                 </MenuItem>

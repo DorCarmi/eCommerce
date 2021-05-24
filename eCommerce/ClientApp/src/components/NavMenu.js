@@ -69,10 +69,11 @@ export class NavMenu extends Component {
     const {isLoggedIn, storeList, role} = this.props.state
     const navColor = 
         role === UserRole.Member ? "nb-member" :
-            "nb-admin";
+        role === UserRole.Admin ? "nb-admin" :
+            "ng-white"
       return (
           <header>
-            <Navbar className={["navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow"].concat(navColor)} 
+            <Navbar className={["navbar-expand-sm navbar-toggleable-sm box-shadow"].concat(navColor)} 
                     expand="md"
                     light>
               <div className="containerNavBar">
