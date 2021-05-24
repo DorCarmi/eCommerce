@@ -31,6 +31,10 @@ html {
   background: #00b8e9;
 }
 
+.nb-white {
+  background: white;
+}
+
 .navBarDiv {
   display: flex;
 }
