@@ -9,7 +9,7 @@
         GetStoreHistory,
         EditStorePolicy,
         ControlStaffPermission,
-        RemoveStoreStaff,
-        AdminGetHistory
+        ViewStaffPermission,
+        RemoveStoreStaff
     }
 }
