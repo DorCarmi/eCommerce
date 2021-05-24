@@ -20,5 +20,6 @@ namespace eCommerce.Business
         public BasketInfo GetBasketInfo();
 
         public Result AddBasketRecords();
+        public double GetRegularTotalPrice();
     }
 }

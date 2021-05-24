@@ -18,11 +18,19 @@ namespace eCommerce.Service
         
         internal SCart(IList<IBasket> baskets, string CartHolder)
         {
-            this.Baskets = new List<SBasket>();
-            this.CartHolderID = CartHolder;
+            Baskets = new List<SBasket>();
+            CartHolderID = CartHolder;
             foreach (var basket in baskets)
             {
-                //Baskets.Add(new SBasket(basket.GetAllItems().Value as IList<IItem>, basket.GetTotalPrice().Value));
+                var newItems = new List<SItem>();
+                var items = basket.GetAllItems().Value;
+                foreach (var item in items)
+                {
+                    newItems.Add(new SItem(item.ItemName, item.StoreName, item.Amount, 
+                        item.Category, item.KeyWords, item.PricePerUnit));
+                }
+                
+                Baskets.Add(new SBasket(basket.GetStoreName() , newItems, basket.GetTotalPrice().Value));
             }
         }
     }

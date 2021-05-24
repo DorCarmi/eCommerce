@@ -101,6 +101,7 @@ namespace eCommerce.Business
 
         public Result<double> CalculatePricesForCart()
         {
+            this._totalPrice = 0;
             foreach (var storeBasket in _baskets)
             {
                 var currAns = storeBasket.Key.CalculateBasketPrices(storeBasket.Value);

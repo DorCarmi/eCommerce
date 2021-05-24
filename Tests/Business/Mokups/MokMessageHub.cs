@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using eCommerce.Publisher;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Tests.Business.Mokups
 {

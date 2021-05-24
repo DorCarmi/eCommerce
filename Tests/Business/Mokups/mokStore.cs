@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using eCommerce.Business;
+using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -210,6 +211,11 @@ namespace Tests.Business.Mokups
         }
 
         public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result AddDiscountToStore(DiscountInfoNode infoNode)
         {
             throw new NotImplementedException();
         }

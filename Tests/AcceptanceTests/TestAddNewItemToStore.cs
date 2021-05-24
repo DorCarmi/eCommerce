@@ -58,7 +58,7 @@ namespace Tests.AcceptanceTests
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             Assert.True(yossiLogin.IsSuccess,yossiLogin.Error);
             Result addItemResult = _store.AddNewItemToStore(yossiLogin.Value,
-                new SItem(name, storeName, amount, category,  tags.ToList(), price));
+                new SItem(name, storeName, amount, category, tags.ToList(), price));
             Assert.True(addItemResult.IsSuccess, "failed to add item: " + name + "|error: " + addItemResult.Error);
             token = _auth.Logout(yossiLogin.Value).Value;
             _auth.Disconnect(token);
