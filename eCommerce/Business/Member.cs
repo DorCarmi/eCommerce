@@ -99,7 +99,7 @@ namespace eCommerce.Business
 
         public virtual Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, IUser otherUser)
         {
-            return Result.Fail<IList<PurchaseRecord>>("Illegal action for member (Get-Other-User-History)");
+            return Result.Fail<IList<PurchaseRecord>>("Illegal action for member (GetDiscount-Other-User-History)");
         }
 
         public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(User user, IStore store)

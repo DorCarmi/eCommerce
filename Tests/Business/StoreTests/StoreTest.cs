@@ -29,8 +29,8 @@ namespace Tests.Business.StoreTests
             Alice = new mokUser("Alice");
             Bob = new mokUser("Bob");
             this.MyStore = new Store("Alenby", Alice);
-            SupplyProxy.AssignSupplyService(new mokSupplyService());
-            PaymentProxy.AssignPaymentService(new mokPaymentService());
+            SupplyProxy.AssignSupplyService(new mokSupplyService(true,true));
+            PaymentProxy.AssignPaymentService(new mokPaymentService(true,true,true));
             
         }
         

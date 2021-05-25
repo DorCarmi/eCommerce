@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -141,7 +142,7 @@ namespace eCommerce.Business
         /// <returns>List of all the staff and their permissions</returns>
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(string token,
             string storeId);
-        
+
         /// <summary>
         /// Get the history purchase of a user
         /// </summary>
@@ -362,6 +363,46 @@ namespace eCommerce.Business
         /// <returns>List of the purchase history in a store</returns>
         public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId);
         
+        
+        /// <summary>
+        /// Adding a rule to the store to modify what can or cannot happen.
+        /// The rule can be simple or a combination of number of rules combined with logical combination functions (and,or..)
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <param name="ruleInfoNode">The rule: Leaf (simple) or Composite (Combined)</param>
+        public Result AddRuleToStorePolicy(string token, string storeId, RuleInfoNode ruleInfoNode);
+        
+        
+        /// <summary>
+        /// Adding a discount to the store
+        /// The discount can be simple or a combination of number of discounts combined with logical or math combination functions (and,or, max,min..)
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <param name="discountInfoNode">The discount: Leaf (simple) or Composite (Combined)</param>
+        public Result AddDiscountToStore(string token, string storeId, DiscountInfoNode discountInfoNode);
+        
+        
+        /// <summary>
+        /// Returns all the rules in store's policy
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <returns>List of the all rules in store</returns>
+        public Result<IList<RuleInfoNode>> GetStorePolicyRules(string token, string storeId);
+        
+        /// <summary>
+        /// Return all the discounts in store
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <returns>List of all discounts in store</returns>
+        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId);
+        
+        
+        
+
         #endregion
     }
 }

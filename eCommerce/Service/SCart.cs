@@ -13,7 +13,7 @@ namespace eCommerce.Service
         public SCart(IList<SBasket> baskets, string CartHolder)
         {
             Baskets = baskets;
-            CartHolderID = CartHolder;
+            this.CartHolderID = CartHolder;
         }
         
         internal SCart(IList<IBasket> baskets, string CartHolder)

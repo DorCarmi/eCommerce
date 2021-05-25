@@ -496,6 +496,8 @@ namespace eCommerce.Business
             if ((!_appointedManagers.ContainsKey(store)) || FindCoManager(store,otherUser).IsFailure){
                 return Result.Fail("user \'"+Username+"\' did not appoint the manager of the given store \'"+otherUser.Username+"\'.");
             }
+            
+            //TODO: Check with sharon-> why not exist RemoveManager method
             var res = otherUser.RemoveManager(store);
             if (res.IsFailure)
             {
@@ -504,6 +506,7 @@ namespace eCommerce.Business
 
             if (_appointedManagers.ContainsKey(store))
             {
+                
                 _appointedManagers[store].Remove(res.Value);
             }
             

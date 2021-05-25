@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Auth;
+using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -475,7 +476,7 @@ namespace eCommerce.Business
             IStore store = userAndStoreRes.Value.Item2;
             
             _logger.Info($"EditItemAmountOfCart({user.Username}, {itemId}, {storeId}, {amount})");
-            
+
             Result<Item> itemRes = store.GetItem(itemId);
             if (itemRes.IsFailure)
             {
@@ -485,6 +486,7 @@ namespace eCommerce.Business
             editedItemInfo.amount = amount;
             return user.EditCart(editedItemInfo);
         }
+        
         //<CNAME>GetCart</CNAME>
         public Result<ICart> GetCart(string token)
         {
@@ -574,13 +576,12 @@ namespace eCommerce.Business
                 return Result.Fail("Store name taken");
             }
 
-            Result res = user.OpenStore(newStore);
-            if (res.IsFailure)
+            if (user.OpenStore(newStore).IsFailure)
             {
-                _storeRepository.Remove(newStore.GetStoreName());
+                return Result.Fail("Error opening store");
             }
 
-            return res;
+            return Result.Ok();
         }
         
         //<CNAME>ItemsToStore</CNAME>
@@ -660,117 +661,6 @@ namespace eCommerce.Business
 
             return store.UpdateStock_SubtractItems(DtoUtils.ItemDtoToProductInfo(item), user);
         }
-
-        public Result AddBuyingStrategyToStorePolicy(string token, string storeId,  PurchaseStrategyName purchaseStrategy)
-        {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
-
-            return store.AddPurchaseStrategyToStore(user, purchaseStrategy);
-        }
-        
-        public Result<IList<PurchaseStrategyName>> GetStorePolicyPurchaseStrategies(string token, string storeId,  PurchaseStrategyName purchaseStrategy)
-        {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return Result.Fail<IList<PurchaseStrategyName>>(userAndStoreRes.Error);
-            }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
-
-            return store.GetStorePurchaseStrategy(user);
-        }
-        
-        public Result UpdateStorePurchaseStrategies(string token, string storeId,  PurchaseStrategyName purchaseStrategy)
-        {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
-
-            return store.UpdatePurchaseStrategies(user, purchaseStrategy);
-        }
-
-        public Result AddPurchaseStrategyToStoreItem(string token, string storeID, string itemID,
-            PurchaseStrategyName strategyName)
-        {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeID);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
-
-            return store.AddPurchaseStrategyToStoreItem(user, storeID,itemID,strategyName);
-        }
-        
-        public Result RemovePurchaseStrategyToStoreItem(string token, string storeID, string itemID,
-            PurchaseStrategyName strategyName)
-        {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeID);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
-
-            return store.RemovePurchaseStrategyToStoreItem(user, storeID,itemID,strategyName);
-        }
-        
-        public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(string token, string storeID, string itemID,
-            PurchaseStrategyName strategyName)
-        {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeID);
-            if (userAndStoreRes.IsFailure)
-            {
-                return Result.Fail<IList<PurchaseStrategyName>>(userAndStoreRes.Error);
-            }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
-
-            return store.GetPurchaseStrategyToStoreItem(user, storeID,itemID,strategyName);
-        }
-
-        public Result AddDiscountToProduct()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result RemoveDiscountsFromProduct()
-        {
-            throw new NotImplementedException();
-        }
-        
-        public Result GetProductDiscounts()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result AddAllowedDiscountsToStore()
-        {
-            throw new NotImplementedException();
-        }
-        
-        public Result UpdateAllowedDiscountsToStore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result GetPolicy()
-        {
-            throw new NotImplementedException();
-        }
         
         //<CNAME>GetStoreHistory</CNAME>
         public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId)
@@ -793,6 +683,27 @@ namespace eCommerce.Business
 
             return Result.Ok<IList<PurchaseRecord>>((IList<PurchaseRecord>) purchaseHistoryRes.Value);
         }
+
+        public Result AddRuleToStorePolicy(string token, string storeId, RuleInfoNode ruleInfoNode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result AddDiscountToStore(string token, string storeId, DiscountInfoNode discountInfoNode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<RuleInfoNode>> GetStorePolicyRules(string token, string storeId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         private Result<Tuple<IUser, IStore>> GetUserAndStore(string token, string storeId)

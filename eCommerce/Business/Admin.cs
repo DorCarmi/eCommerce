@@ -7,8 +7,9 @@ namespace eCommerce.Business
     public class Admin : Member
     {
         private static readonly Admin state = new Admin();
-
-        private static readonly IList<StorePermission> Permissions = new List<StorePermission>(new []{StorePermission.AdminGetHistory});
+        
+        //TODO: Check with sharon about change, was AdminGetHistory
+        private static readonly IList<StorePermission> Permissions = new List<StorePermission>(new []{StorePermission.GetStoreHistory});
         
         
         // Explicit static constructor to tell C# compiler not to mark type as beforefieldinit  
