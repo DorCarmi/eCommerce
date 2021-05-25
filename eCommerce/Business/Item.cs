@@ -301,6 +301,16 @@ namespace eCommerce.Business
             {
                 return Result.Fail("Item info is not about the same store");
             }
+
+            if (newItem.amount < 0)
+            {
+                return Result.Fail("Item in store can't be negative");
+            }
+
+            if (newItem.pricePerUnit <= 0)
+            {
+                return Result.Fail("Item price can't be lower or equal to zero");
+            }
             this._amount=newItem.amount;
             this._category = new Category(newItem.category);
             CopyKeyWords(newItem.keyWords);

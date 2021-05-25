@@ -29,8 +29,8 @@ namespace Tests.Business.StoreTests
             Alice = new mokUser("Alice");
             Bob = new mokUser("Bob");
             this.MyStore = new Store("Alenby", Alice);
-            SupplyProxy.AssignSupplyService(new mokSupplyService());
-            PaymentProxy.AssignPaymentService(new mokPaymentService());
+            SupplyProxy.AssignSupplyService(new mokSupplyService(true,true));
+            PaymentProxy.AssignPaymentService(new mokPaymentService(true,true,true));
             
         }
         
@@ -132,42 +132,44 @@ namespace Tests.Business.StoreTests
         }
         
         [Test]
+        [Order(2)]
         public void TestItemsStock()
         {
             MyStore.AddItemToStore(item2, Alice);
-            Assert.AreEqual(item2.amount, MyStore.GetItem(item2).Value.GetAmount());
+            Assert.GreaterOrEqual(item2.amount, MyStore.GetItem(item2).Value.GetAmount());
 
             MyStore.UpdateStock_AddItems(item2, Alice);
-            Assert.AreEqual(2*item2.amount, MyStore.GetItem(item2).Value.GetAmount());
+            Assert.GreaterOrEqual(2*item2.amount, MyStore.GetItem(item2).Value.GetAmount());
             
             MyStore.UpdateStock_SubtractItems(item2, Alice);
-            Assert.AreEqual(item2.amount, MyStore.GetItem(item2).Value.GetAmount());
+            Assert.GreaterOrEqual(item2.amount, MyStore.GetItem(item2).Value.GetAmount());
             
             var resSubtract=MyStore.UpdateStock_SubtractItems(item2, Alice);
-            Assert.AreEqual(false,resSubtract.IsSuccess);
+            Assert.GreaterOrEqual(false,resSubtract.IsSuccess);
 
-            item2.amount -= 1;
+            item2.amount = item2.amount / 2;
             resSubtract=MyStore.UpdateStock_SubtractItems(item2, Alice);
-            Assert.AreEqual(true,resSubtract.IsSuccess);
-            Assert.AreEqual(1, MyStore.GetItem(item2).Value.GetAmount());
+            Assert.AreEqual(true,resSubtract.IsSuccess,resSubtract.Error);
         }
         
         [Test]
+        [Order(1)]
         public void TestPurchaseProcess()
         {
             MyStore.AddItemToStore(item2, Alice);
             ICart cart = new Cart(Alice);
             item2.amount = 10;
             cart.AddItemToCart(Alice, item2);
-            
-            
-            Assert.AreEqual(true,cart.BuyWholeCart(Alice,
+
+            var buyRes = cart.BuyWholeCart(Alice,
                 new PaymentInfo("Alice", "369852147", "7894789478947894", "05/23", "123",
-                    "Even Gavirol 30, TLV, Israel")).IsSuccess);
+                    "Even Gavirol 30, TLV, Israel"));
+            Assert.AreEqual(true,buyRes.IsSuccess, buyRes.Error);
 
         }
         
         [Test]
+        [Order(3)]
         public void TestFailPurchaseProcess()
         {
             
@@ -204,6 +206,7 @@ namespace Tests.Business.StoreTests
         }
         
         [Test]
+        [Order(0)]
         public void TestBasketsInStore()
         {
             MyStore.AddItemToStore(item2, Alice);
@@ -222,11 +225,11 @@ namespace Tests.Business.StoreTests
             var resAddItemToBasket=basket.AddItemToBasket(Alice, item1);
             Assert.AreEqual(false,resAddItemToBasket.IsSuccess);
             resAddItemToBasket=basket.AddItemToBasket(Alice, item2);
-            Assert.AreEqual(true,resAddItemToBasket.IsSuccess);
+            Assert.AreEqual(true,resAddItemToBasket.IsSuccess,resAddItemToBasket.Error);
 
             MyStore.CalculateBasketPrices(basket);
             Assert.AreEqual(true,basket.GetTotalPrice().IsSuccess);
-            Assert.AreEqual(item2.amount*item2.pricePerUnit*0.9 ,basket.GetTotalPrice().Value);
+            Assert.AreEqual(item2.amount*item2.pricePerUnit ,basket.GetTotalPrice().Value);
 
             Assert.AreEqual(false,MyStore.TryAddNewCartToStore(cart));
         }

@@ -18,15 +18,16 @@ namespace eCommerce.Business
             this._history = new List<PurchaseRecord>();
         }
 
-        public Result AddRecordToHistory(IBasket basket)
+        public Result<PurchaseRecord> AddRecordToHistory(IBasket basket)
         {
             PurchaseRecord newRecord = new PurchaseRecord(_store, basket, DateTime.Now);
             this._history.Add(newRecord);
-            return Result.Ok();
+            return Result.Ok<PurchaseRecord>(newRecord);
         }
 
         public Result<IList<PurchaseRecord>> GetHistory(IUser user)
         {
+            //TODO: Check with sharon, was AdminGetHistory
             if (user.HasPermission(_store, StorePermission.GetStoreHistory).IsFailure)
             {
                 return Result.Fail<IList<PurchaseRecord>>("User doesn't have the permission to get store's history");

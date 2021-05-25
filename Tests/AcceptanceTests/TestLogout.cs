@@ -35,6 +35,7 @@ namespace Tests.AcceptanceTests
         /// </Req>
         /// </summary>
         [Test]
+        [Order(0)]
         public void TestSuccess()
         {
             string token = _auth.Connect();

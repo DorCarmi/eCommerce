@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using eCommerce.Business.Discounts;
 using eCommerce.Common;
 
 namespace eCommerce.Business.Service
@@ -60,6 +61,9 @@ namespace eCommerce.Business.Service
 
         public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment);
 
+        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired,
+            ManagerAppointment managerAppointment);
+
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user);
         public Result EnterBasketToHistory(IBasket basket);
 
@@ -69,6 +73,11 @@ namespace eCommerce.Business.Service
         bool TryAddNewCartToStore(ICart cart);
         Result ConnectNewBasketToStore(IBasket newBasket);
         bool CheckConnectionToCart(ICart cart);
+        
+        Result<PurchaseRecord> AddBasketRecordToStore(Basket basket);
+        
+        
+        
         Result<double> CheckDiscount(Basket basket);
         Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy);
         Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(IUser user);
@@ -76,5 +85,8 @@ namespace eCommerce.Business.Service
         Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
         Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
         Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
+
+
+        Result AddDiscountToStore(DiscountInfoNode infoNode);
     }
 }

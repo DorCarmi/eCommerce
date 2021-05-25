@@ -26,7 +26,7 @@ namespace eCommerce.Service
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount);
 
         /// <summary>
-        /// Get the cart of the user
+        /// GetDiscount the cart of the user
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The user cart</returns>

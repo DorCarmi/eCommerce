@@ -10,7 +10,7 @@
         public bool Add(User user);
 
         /// <summary>
-        /// Get the user
+        /// GetDiscount the user
         /// </summary>
         /// <param name="username">The user name</param>
         /// <returns>Return a User of exists</returns>

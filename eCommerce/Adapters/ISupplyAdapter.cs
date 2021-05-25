@@ -6,6 +6,7 @@ namespace eCommerce.Adapters
     {
 
         public Task<bool> SupplyProducts(string storeName, string[] itemsNames, string userAddress);
+        public Task<bool> CheckSupplyInfo(string storeName, string[] itemsNames, string userAddress);
 
     }
 }

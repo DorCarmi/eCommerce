@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Business.CombineRules;
+using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using Microsoft.Extensions.Logging;
@@ -19,9 +20,8 @@ namespace eCommerce.Business
 
         //Store's issues
         //Discounts and purchases
-        private List<DiscountComposite> _myDiscountStrategies;
+        private List<Composite> _myDiscountStrategies;
         private List<PurchaseStrategy> _myPurchaseStrategies;
-        private DiscountPolicy _myDiscountPolicy;
         private PurchasePolicy _myPurchasePolicy;
         
         //History and inventory
@@ -41,14 +41,13 @@ namespace eCommerce.Business
         {
             this._storeName = name;
 
-            this._myDiscountStrategies = new List<DiscountComposite>();
-            this._myDiscountStrategies.Add(new DefaultDiscount());
+            this._myDiscountStrategies = new List<Composite>();
+            //this._myDiscountStrategies.Add(new DefaultDiscount());
             this._myPurchaseStrategies = new List<PurchaseStrategy>();
             this._myPurchaseStrategies.Add(new DefaultPurchaseStrategy(this));
 
             _myPurchasePolicy = new PurchasePolicy(this);
-            _myDiscountPolicy = new DiscountPolicy(this);
-            
+
             _transactionHistory = new StoreTransactionHistory(this);
 
             _inventory = new ItemsInventory(this);
@@ -388,6 +387,27 @@ namespace eCommerce.Business
             }
         }
         
+        
+        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired, ManagerAppointment managerAppointment)
+        {
+            if (theOneWhoFires.HasPermission(this, StorePermission.RemoveStoreStaff).IsSuccess)
+            {
+                if (this._managersAppointments.Contains(managerAppointment))
+                {
+                    this._managersAppointments.Remove(managerAppointment);
+                    return Result.Ok();
+                }
+                else
+                {
+                    return Result.Fail("Manager appointed not record in store");
+                }
+            }
+            else
+            {
+                return Result.Fail("User doesn't have permissions to remove staff");
+            }
+        }
+        
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
         {
             return this._transactionHistory.GetHistory(user);
@@ -460,23 +480,33 @@ namespace eCommerce.Business
         public Result<double> CheckDiscount(Basket basket)
         {
             //No double discounts
+            
             double minValue = basket.GetTotalPrice().Value;
-            foreach (var strategy in this._myDiscountStrategies)
+            foreach (var discount in this._myDiscountStrategies)
             {
-                var price = strategy.Get(basket,basket.GetCart().GetUser());
-                if (price.IsFailure)
+                Dictionary<string, ItemInfo> itemsInDiscount = new Dictionary<string, ItemInfo>();
+                var checkIfDiscount = discount.CheckIfDiscount();
+                if (checkIfDiscount)
                 {
-                    return price;
-                }
-                else
-                {
-                    if (price.GetValue() < minValue)
+                    var checkDiscount = discount.Check(basket, basket.GetCart().GetUser());
+                    if (checkDiscount.Count>0)
                     {
-                        minValue = price.GetValue();
+                        
+                        var price = discount.Get(basket, basket.GetCart().GetUser());
+                        if (price.IsFailure)
+                        {
+                            return price;
+                        }
+                        else
+                        {
+                            if (price.GetValue() < minValue)
+                            {
+                                minValue = price.GetValue();
+                            }
+                        }
                     }
                 }
             }
-
             return Result.Ok(minValue);
         }
 
@@ -530,6 +560,31 @@ namespace eCommerce.Business
             throw new NotImplementedException();
         }
 
+        public Result AddDiscountToStore(DiscountInfoNode infoNode)
+        {
+            var discountRes = DiscountHandler.HandleDiscount(infoNode);
+            if (discountRes.IsFailure)
+            {
+                return discountRes;
+            }
+            this._myDiscountStrategies.Add(discountRes.Value);
+            return Result.Ok();
+        }
+
+        public Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
+        {
+            var purchaseRecord=this._transactionHistory.AddRecordToHistory(basket);
+            foreach (var owner in _owners)
+            {
+                foreach (var item in purchaseRecord.Value.BasketInfo._itemsInBasket)
+                {
+                    owner.PublishMessage(String.Format("User: {0} , bought {1} items of {2} at {3}",
+                        purchaseRecord.Value.Username, item.name, item.name, purchaseRecord.Value.GetDate()));
+                }
+            }
+            return purchaseRecord;
+
+        }
 
         public Result<IUser> GetFounder()
         {

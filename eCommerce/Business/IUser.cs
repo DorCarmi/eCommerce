@@ -41,6 +41,7 @@ namespace eCommerce.Business
         public Result PublishMessage(string message);
        
         public UserToSystemState GetState();
+        Result<ManagerAppointment> RemoveManager(IStore store);
     }
 
     
