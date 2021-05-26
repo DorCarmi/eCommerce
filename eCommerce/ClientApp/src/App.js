@@ -23,10 +23,11 @@ import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/sign
 import {StoreApi} from "./Api/StoreApi";
 import {AppointManager} from "./components/AppointManager";
 
-import {StorePermission} from "./Data/StorePermission";
-import {NavLink} from "reactstrap";
 import {AdminPurchaseHistory} from "./components/AdminPurchaseHistory";
 import {UserRole} from "./Data/UserRole";
+import {makeRuleInfo, makeRuleNodeComposite, makeRuleNodeLeaf, RuleType} from "./Data/StorePolicies/RuleInfo";
+import {Comperators} from "./Data/StorePolicies/Comperators";
+import {Combinations} from "./Data/StorePolicies/Combinations";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -117,11 +118,25 @@ export default class App extends Component {
         }
     }
 
+    async policyExample(){
+        const ruleInfo1 = makeRuleInfo(RuleType.Amount, "10", "3", Comperators.EQUALS);
+        const ruleInfo2 = makeRuleInfo(RuleType.Category, "watermelon", "1", Comperators.BIGGER);
+        
+        const ruleNodeLeaf1 = makeRuleNodeLeaf(ruleInfo1);
+        const ruleNodeLeaf2 = makeRuleNodeLeaf(ruleInfo2);
+        console.log(await this.storeApi.addRuleToStorePolicy("a", ruleNodeLeaf1));
+
+        const ruleNodeComposite = makeRuleNodeComposite(ruleNodeLeaf1, ruleNodeLeaf2, Combinations.XOR);
+        console.log(await this.storeApi.addRuleToStorePolicy("a", ruleNodeComposite));
+    }
+    
     async componentDidMount() {
         const userBasicInfo = await this.userApi.getUserBasicInfo();
         console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
         if(userBasicInfo.userRole !== UserRole.Guest){
             await this.connectToWebSocket();
+            
+            await this.policyExample();
         }
         
         const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()

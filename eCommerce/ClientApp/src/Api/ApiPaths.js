@@ -27,6 +27,8 @@ export function UPDATE_MANAGER_PERMISSIONS_IN_STORE_PATH(storeId){ return STORE_
 
 export function GET_HISTORY_OF_STORE_PATH(storeId){ return STORE_PATH + `/${storeId}/history` }
 
+export function ADD_POLICY_TO_STORE_PATH(storeId) { return STORE_PATH + `/${storeId}/policy`}
+
 // ========= Cart ========== //
 
 export const CART_PATH = API_PATH + '/cart';

@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using eCommerce.Auth;
 using eCommerce.Business;
+using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using eCommerce.Service.StorePolicies;
 
 namespace eCommerce.Service
 {
@@ -142,6 +144,12 @@ namespace eCommerce.Service
             }
 
             return Result.Ok(new SPurchaseHistory(purchaseRecordRes.Value));
+        }
+
+        public Result AddRuleToStorePolicy(string token, string storeId, SRuleNode sRuleNode)
+        {
+            RuleInfoNode ruleInfoNode = sRuleNode.ParseToRuleInfoNude();
+            return _marketFacade.AddRuleToStorePolicy(token, storeId, ruleInfoNode);
         }
     }
 }

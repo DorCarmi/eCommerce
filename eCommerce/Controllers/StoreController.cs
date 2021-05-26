@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
+using eCommerce.Service.StorePolicies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -165,6 +166,15 @@ namespace eCommerce.Controllers
             }
 
             return updateRes;
+        }
+        
+        // ========== Store policy ========== //
+
+        [HttpPost("{storeId}/policy")]
+        public Result AddPolicy(string storeId, [FromBody] SRuleNode ruleNode)
+        {
+            return _storeService.AddRuleToStorePolicy((string) HttpContext.Items["authToken"],
+                storeId, ruleNode);
         }
     }
 }

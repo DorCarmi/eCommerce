@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using eCommerce.Business;
-using eCommerce.Business.Service;
 using eCommerce.Common;
+using eCommerce.Service.StorePolicies;
 
 namespace eCommerce.Service
 {
@@ -144,5 +144,17 @@ namespace eCommerce.Service
         /// <param name="storeId">The storeId</param>
         /// <returns>List of the purchase history in a store</returns>
         public Result<SPurchaseHistory> GetPurchaseHistoryOfStore(string token, string storeId);
+        
+        // ========== Store policies ========== //
+
+        /// <summary>
+        /// Adding a rule to the store to modify what can or cannot happen.
+        /// The rule can be simple or a combination of number of rules combined with logical combination functions (and,or..)
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <param name="sRuleNode">The rule: Leaf (simple) or Composite (Combined)</param>
+        public Result AddRuleToStorePolicy(string token, string storeId, SRuleNode sRuleNode);
+
     }
 }

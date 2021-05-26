@@ -16,17 +16,17 @@ export interface RuleInfo {
     ruleType: RuleType,
     whatIsTheRuleFor: string,
     kind: string | null
-    itemsId: string,
+    itemId: string,
     comperator: Comperators
 }
 
 export function makeRuleInfo(ruleType: RuleType, whatIsTheRuleFor: string,
-                             itemsId: string, comperator: Comperators): RuleInfo{
+                             itemId: string, comperator: Comperators): RuleInfo{
     return {
         ruleType: ruleType,
         whatIsTheRuleFor: whatIsTheRuleFor,
         kind: null,
-        itemsId: itemsId,
+        itemId: itemId,
         comperator: comperator
     }
 }

@@ -1,7 +1,7 @@
 ﻿import axios from "axios";
 import {Result} from "../Common";
 import {
-    ADD_ITEM_TO_STORE_PATH, ADMIN_GET_STORE_PURCHASE_HISTORY, ADMIN_GET_USER_PURCHASE_HISTORY,
+    ADD_ITEM_TO_STORE_PATH, ADD_POLICY_TO_STORE_PATH, ADMIN_GET_STORE_PURCHASE_HISTORY, ADMIN_GET_USER_PURCHASE_HISTORY,
     EDIT_ITEM_IN_STORE_PATH,
     GET_ALL_ITEMS_IN_STORE_PATH, GET_HISTORY_OF_STORE_PATH,
     GET_ITEM_IN_STORE_PATH,
@@ -17,6 +17,7 @@ import {Item} from "../Data/Item";
 import {StorePermission} from "../Data/StorePermission";
 import {StaffPermission} from "../Data/StaffPermission";
 import {PurchaseHistory} from "../Data/Purchase";
+import {RuleNode} from "../Data/StorePolicies/RuleInfo";
 
 const instance = axios.create(
     {withCredentials : true}
@@ -191,6 +192,15 @@ export class StoreApi {
     
     getStoreStaffPermissions(storeId: string){
         return instance.get<Result<StaffPermission[]>>(STAFF_PERMISSIONS_OF_STORE_PATH(storeId))
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+
+    // ========== Store policy ========== //
+    
+    addRuleToStorePolicy(storeId: string, ruleNode: RuleNode){
+        return instance.post<Result<any>>(ADD_POLICY_TO_STORE_PATH(storeId), ruleNode)
             .then(res => {
                 return res.data
             }).catch(err => undefined)
