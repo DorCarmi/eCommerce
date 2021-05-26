@@ -523,9 +523,6 @@ namespace eCommerce.Business
             return cart.CalculatePricesForCart();
         }
 
-        
-
-
         //<CNAME>BuyWholeCart</CNAME>
         public Result PurchaseCart(string token, PaymentInfo paymentInfo)
         {
@@ -536,7 +533,7 @@ namespace eCommerce.Business
             }
             IUser user = userRes.Value;
 
-            _logger.Info($"GetPurchaseCartPrice({user.Username} {paymentInfo})");
+            _logger.Info($"PurchaseCart({user.Username} {paymentInfo})");
             
             Result<ICart> cartRes = user.GetCartInfo();
             if (cartRes.IsFailure)

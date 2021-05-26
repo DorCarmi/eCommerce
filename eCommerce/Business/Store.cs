@@ -55,6 +55,7 @@ namespace eCommerce.Business
             this._founder = founder;
 
             _owners = new List<IUser>();
+            _owners.Add(founder);
             _ownersAppointments = new List<OwnerAppointment>();
             _managers = new List<IUser>();
             _managersAppointments = new List<ManagerAppointment>();

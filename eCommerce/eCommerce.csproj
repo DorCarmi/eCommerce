@@ -19,6 +19,7 @@
       <Folder Include="Adapters" />
       <Folder Include="Business\DiscountsAndPurchases" />
       <Folder Include="ClientApp\public\Images" />
+      <Folder Include="ClientApp\src\Data\StorePolicies" />
     </ItemGroup>
 
     <ItemGroup>

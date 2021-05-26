@@ -400,9 +400,6 @@ namespace eCommerce.Business
         /// <returns>List of all discounts in store</returns>
         public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId);
         
-        
-        
-
         #endregion
     }
 }

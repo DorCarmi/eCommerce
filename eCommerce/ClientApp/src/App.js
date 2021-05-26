@@ -26,6 +26,7 @@ import {AppointManager} from "./components/AppointManager";
 import {StorePermission} from "./Data/StorePermission";
 import {NavLink} from "reactstrap";
 import {AdminPurchaseHistory} from "./components/AdminPurchaseHistory";
+import {UserRole} from "./Data/UserRole";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -119,7 +120,9 @@ export default class App extends Component {
     async componentDidMount() {
         const userBasicInfo = await this.userApi.getUserBasicInfo();
         console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
-        await this.connectToWebSocket()
+        if(userBasicInfo.userRole !== UserRole.Guest){
+            await this.connectToWebSocket();
+        }
         
         const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()
         const fetchedManagedStoredList = await this.userApi.getAllManagedStoreIds()
@@ -160,10 +163,10 @@ export default class App extends Component {
     }
 
      async componentDidUpdate(prevProps,prevState) {
-         /*if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
+         if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
              //console.log("componentDidUpdate")
              await this.connectToWebSocket();
-         }*/
+         }
          
          if(prevState.userName !== this.state.userName){
              if(this.state.isLoggedIn){

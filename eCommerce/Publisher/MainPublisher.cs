@@ -40,6 +40,7 @@ namespace eCommerce.Publisher
         public void Connect(string userID)
         {
             // this.connected[userID] = true;
+            Console.WriteLine($"Connect: {userID}");
             connected.TryAdd(userID, true);
             // if (messages.ContainsKey(userID) && messages[userID].Count > 0)
             // {
@@ -54,6 +55,7 @@ namespace eCommerce.Publisher
 
         public void AddMessageToUser(string userID, string message)
         {
+            Console.WriteLine($"Add message: {userID}");
             if (!messages.ContainsKey(userID))
             {
                 messages.TryAdd(userID, new ConcurrentQueue<string>());

@@ -27,6 +27,5 @@ namespace eCommerce.Business.Discounts
             WhatKind = whatKind;
             WhichItems = whichItems;
         }
-        
     }
 }
