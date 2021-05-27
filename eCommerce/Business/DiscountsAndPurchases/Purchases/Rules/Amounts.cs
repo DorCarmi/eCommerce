@@ -11,11 +11,11 @@ namespace eCommerce.Business
 {
     public class Amounts: CompositeRule
     {
-        private ItemInfo _item;
+        private string _item;
         private int _amount;
         private Compare _compare;
         
-        public Amounts(ItemInfo item,int amount,Compare compare)
+        public Amounts(string item, int amount,Compare compare)
         {
             _item = item;
             _amount = amount;
@@ -28,8 +28,7 @@ namespace eCommerce.Business
             Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
             foreach (var item in basket.GetAllItems().Value)
             {
-                if (item.name.Equals(_item.name) &&
-                    item.storeName.Equals(_item.storeName)
+                if (item.name.Equals(_item) 
                     && _compare.GetResult(_amount,item.amount)>0)
                     {
                         if (!itemsList.ContainsKey(item.name))
@@ -50,8 +49,7 @@ namespace eCommerce.Business
 
         public override bool CheckOneItem(ItemInfo item, IUser checkItem2)
         {
-            if (item.name.Equals(_item.name) &&
-                item.storeName.Equals(_item.storeName)
+            if (item.name.Equals(_item)
                 && _compare.GetResult(_amount,item.amount)>0)
             {
                 return true;

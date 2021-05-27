@@ -53,7 +53,7 @@ namespace Tests.Business.StoreTests
                 RuleType.Amount,
                 "10",
                 "Amount",
-                item1
+                item1.ItemName
             );
             RuleInfoNodeLeaf ruleInfoNodeLeaf = new RuleInfoNodeLeaf(rule);
             DiscountInfoLeaf discountInfoLeaf = new DiscountInfoLeaf(theDiscount,ruleInfoNodeLeaf);
@@ -77,14 +77,14 @@ namespace Tests.Business.StoreTests
                 RuleType.Amount,
                 "10",
                 "Amount",
-                item1
+                item1.ItemName
             );
             
             RuleInfo rule2 = new RuleInfo(
                 RuleType.Category,
                 "Tech",
                 "Category",
-                item1
+                item1.ItemName
             );
 
             RuleInfoNodeLeaf ruleInfoNodeLeaf1 = new RuleInfoNodeLeaf(rule1);
@@ -112,14 +112,14 @@ namespace Tests.Business.StoreTests
                 RuleType.Amount,
                 "10",
                 "Amount",
-                item1
+                item1.ItemName
             );
             
             RuleInfo rule2 = new RuleInfo(
                 RuleType.Category,
                 "Tech",
                 "Category",
-                item1
+                item1.ItemName
             );
 
             RuleInfoNodeLeaf ruleInfoNodeLeaf1 = new RuleInfoNodeLeaf(rule1);
@@ -151,14 +151,14 @@ namespace Tests.Business.StoreTests
                 RuleType.Amount,
                 "10",
                 "Amount",
-                item1
+                item1.ItemName
             );
             
             RuleInfo rule2 = new RuleInfo(
                 RuleType.Category,
                 "Tech",
                 "Category",
-                item1
+                item1.ItemName
             );
 
             RuleInfoNodeLeaf ruleInfoNodeLeaf1 = new RuleInfoNodeLeaf(rule1);

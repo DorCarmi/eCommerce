@@ -113,7 +113,7 @@ namespace eCommerce.Business.Purchases
                     }
                     break;
                 case RuleType.IsItem:
-                    IsItem isItem = new IsItem(therule.WhichItems.name);
+                    IsItem isItem = new IsItem(therule.WhichItems);
                     retComp = isItem;
                     break;
                 case RuleType.Age:
