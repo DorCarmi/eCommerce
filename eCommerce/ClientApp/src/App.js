@@ -28,6 +28,7 @@ import {UserRole} from "./Data/UserRole";
 import {makeRuleInfo, makeRuleNodeComposite, makeRuleNodeLeaf, RuleType} from "./Data/StorePolicies/RuleInfo";
 import {Comperators} from "./Data/StorePolicies/Comperators";
 import {Combinations} from "./Data/StorePolicies/Combinations";
+import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "./Data/StorePolicies/DiscountInfoTree";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -119,6 +120,7 @@ export default class App extends Component {
     }
 
     async policyExample(){
+        console.log("Policy example: ==========")
         const ruleInfo1 = makeRuleInfo(RuleType.Amount, "10", "3", Comperators.EQUALS);
         const ruleInfo2 = makeRuleInfo(RuleType.Category, "watermelon", "1", Comperators.BIGGER);
         
@@ -128,6 +130,13 @@ export default class App extends Component {
 
         const ruleNodeComposite = makeRuleNodeComposite(ruleNodeLeaf1, ruleNodeLeaf2, Combinations.XOR);
         console.log(await this.storeApi.addRuleToStorePolicy("a", ruleNodeComposite));
+        
+        const discountNodeLeaf = makeDiscountNodeLeaf(ruleNodeComposite, 10);
+        console.log(await this.storeApi.addDiscountToStore("a", discountNodeLeaf));
+
+        const discountCompositeNode = makeDiscountCompositeNode(discountNodeLeaf, discountNodeLeaf, Combinations.XOR);
+        console.log(await this.storeApi.addDiscountToStore("a", discountCompositeNode));
+        console.log("==========");
     }
     
     async componentDidMount() {

@@ -1,6 +1,7 @@
 ﻿import axios from "axios";
 import {Result} from "../Common";
 import {
+    ADD_DISCOUNT_TO_STORE_PATH,
     ADD_ITEM_TO_STORE_PATH, ADD_POLICY_TO_STORE_PATH, ADMIN_GET_STORE_PURCHASE_HISTORY, ADMIN_GET_USER_PURCHASE_HISTORY,
     EDIT_ITEM_IN_STORE_PATH,
     GET_ALL_ITEMS_IN_STORE_PATH, GET_HISTORY_OF_STORE_PATH,
@@ -18,6 +19,7 @@ import {StorePermission} from "../Data/StorePermission";
 import {StaffPermission} from "../Data/StaffPermission";
 import {PurchaseHistory} from "../Data/Purchase";
 import {RuleNode} from "../Data/StorePolicies/RuleInfo";
+import {DiscountNode} from "../Data/StorePolicies/DiscountInfoTree";
 
 const instance = axios.create(
     {withCredentials : true}
@@ -201,6 +203,13 @@ export class StoreApi {
     
     addRuleToStorePolicy(storeId: string, ruleNode: RuleNode){
         return instance.post<Result<any>>(ADD_POLICY_TO_STORE_PATH(storeId), ruleNode)
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+
+    addDiscountToStore(storeId: string, discountNode: DiscountNode){
+        return instance.post<Result<any>>(ADD_DISCOUNT_TO_STORE_PATH(storeId), discountNode)
             .then(res => {
                 return res.data
             }).catch(err => undefined)

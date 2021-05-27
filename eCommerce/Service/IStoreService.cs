@@ -156,5 +156,14 @@ namespace eCommerce.Service
         /// <param name="sRuleNode">The rule: Leaf (simple) or Composite (Combined)</param>
         public Result AddRuleToStorePolicy(string token, string storeId, SRuleNode sRuleNode);
 
+        /// <summary>
+        /// Adding a discount to the store
+        /// The discount can be simple or a combination of number of discounts combined with logical or math combination functions (and,or, max,min..)
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <param name="discountNode">The discount: Leaf (simple) or Composite (Combined)</param>
+        public Result AddDiscountToStore(string token, string storeId, SDiscountNode discountNode);
+        
     }
 }

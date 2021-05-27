@@ -28,7 +28,7 @@ namespace eCommerce.Service.StorePolicies
                         RuleInfo.RuleType,
                         RuleInfo.WhatIsTheRuleFor,
                         RuleInfo.Kind,
-                        null, //TODO get the itemInfo
+                        RuleInfo.ItemId,
                         RuleInfo.Comperator
                     ));
                 }

@@ -151,5 +151,11 @@ namespace eCommerce.Service
             RuleInfoNode ruleInfoNode = sRuleNode.ParseToRuleInfoNude();
             return _marketFacade.AddRuleToStorePolicy(token, storeId, ruleInfoNode);
         }
+
+        public Result AddDiscountToStore(string token, string storeId, SDiscountNode discountNode)
+        {
+            DiscountInfoNode discountInfoNode = discountNode.ParseToDiscountInfoNode();
+            return _marketFacade.AddDiscountToStore(token, storeId, discountInfoNode);
+        }
     }
 }

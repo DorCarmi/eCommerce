@@ -28,6 +28,8 @@ export function UPDATE_MANAGER_PERMISSIONS_IN_STORE_PATH(storeId){ return STORE_
 export function GET_HISTORY_OF_STORE_PATH(storeId){ return STORE_PATH + `/${storeId}/history` }
 
 export function ADD_POLICY_TO_STORE_PATH(storeId) { return STORE_PATH + `/${storeId}/policy`}
+export function ADD_DISCOUNT_TO_STORE_PATH(storeId) { return STORE_PATH + `/${storeId}/discount`}
+
 
 // ========= Cart ========== //
 

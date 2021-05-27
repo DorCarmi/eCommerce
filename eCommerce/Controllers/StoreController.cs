@@ -176,5 +176,12 @@ namespace eCommerce.Controllers
             return _storeService.AddRuleToStorePolicy((string) HttpContext.Items["authToken"],
                 storeId, ruleNode);
         }
+        
+        [HttpPost("{storeId}/discount")]
+        public Result AddDiscount(string storeId, [FromBody] SDiscountNode discountNode)
+        {
+            return _storeService.AddDiscountToStore((string) HttpContext.Items["authToken"],
+                storeId, discountNode);
+        }
     }
 }
