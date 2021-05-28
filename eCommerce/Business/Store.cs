@@ -56,6 +56,7 @@ namespace eCommerce.Business
 
             _owners = new List<IUser>();
             _ownersAppointments = new List<OwnerAppointment>();
+            
             _managers = new List<IUser>();
             _managersAppointments = new List<ManagerAppointment>();
             
