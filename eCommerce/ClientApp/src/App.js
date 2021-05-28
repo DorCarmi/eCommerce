@@ -69,12 +69,14 @@ export default class App extends Component {
 
     async updateLogoutHandler(){
         const userBasicInfo = await this.userApi.getUserBasicInfo();
+        await this.state.webSocketConnection.stop();
         this.setState({
             isLoggedIn: userBasicInfo.isLoggedIn,
             userName: userBasicInfo.username,
             role: userBasicInfo.userRole,
             ownedStoreList: [],
-            managedStoreList:[]
+            managedStoreList:[],
+            webSocketConnection: undefined
         })
     }
     
@@ -90,7 +92,6 @@ export default class App extends Component {
         //console.log("socketConnection")
 
         await socketConnection.start();
-
         if(socketConnection) {
             //console.log("socketConnection on")
 

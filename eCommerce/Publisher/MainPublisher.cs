@@ -37,7 +37,7 @@ namespace eCommerce.Publisher
         }  
         public static MainPublisher Instance => instance;
 
-        public void Connect(string userID)
+        public async void Connect(string userID)
         {
             // this.connected[userID] = true;
             Console.WriteLine($"Connect: {userID}");
@@ -69,8 +69,8 @@ namespace eCommerce.Publisher
         {
             observers.Add(userObserver);
         }
-
-        public async void NotifyAll(string userID)
+        
+        public void NotifyAll(string userID)
         {
             if (connected.ContainsKey(userID) && messages.ContainsKey(userID) && messages[userID].Count > 0)
             {
