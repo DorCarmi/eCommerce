@@ -19,8 +19,8 @@ namespace Tests.AcceptanceTests
     /// 2.9
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(6)]
+    [TestFixture]
+    [Order(6)]
     public class TestCartPrice
     {
         private IAuthService _auth;
@@ -62,7 +62,7 @@ namespace Tests.AcceptanceTests
         }
 
         [Test]
-        public void TestEmpty()
+        public void TestCartPriceEmpty()
         {
             string token = _auth.Connect();
             Result<double> result = _cart.GetPurchaseCartPrice(token);
@@ -71,7 +71,7 @@ namespace Tests.AcceptanceTests
         }
         
         [Test]
-        public void TestNonEmpty()
+        public void TestCartPriceNonEmpty()
         {
             string token = _auth.Connect();
             _cart.AddItemToCart(token, "Tara milk", store, 3);

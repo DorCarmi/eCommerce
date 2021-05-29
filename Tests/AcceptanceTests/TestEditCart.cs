@@ -19,8 +19,8 @@ namespace Tests.AcceptanceTests
     /// 2.8
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(8)]
+    [TestFixture]
+    [Order(8)]
     public class TestEditCart
     {
         private IAuthService _auth;
@@ -71,7 +71,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara cheese", "Yossi's Store8", 3)]
         [TestCase("Tara cheese", "Yossi's Store8", 0)]
         [Test]
-        public void EditItemAmountOfCart(string itemId, string storeName, int amount)
+        public void TestEditItemAmountOfCart(string itemId, string storeName, int amount)
         {
             string token = _auth.Connect();
             Result result = _cart.AddItemToCart(token, itemId, storeName, 5);
@@ -87,7 +87,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara cheese", "dancing dragon", 0)]
         [TestCase("Tara cheese", "Yossi's Store8", 15)]
         [Test]
-        public void EditItemAmountOfCartFailure(string itemId, string storeName, int amount)
+        public void TestEditItemAmountOfCartFailure(string itemId, string storeName, int amount)
         {
             string token = _auth.Connect();
             _cart.AddItemToCart(token, itemId, storeName, 5);

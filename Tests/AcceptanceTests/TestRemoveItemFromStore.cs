@@ -19,13 +19,13 @@ namespace Tests.AcceptanceTests
     /// 4.1
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(14)]
+    [TestFixture]
+    [Order(14)]
     public class TestRemoveItemFromStore
     {
         private IAuthService _auth;
         private IStoreService _store;
-        private string storeName = "Yossi's Store";
+        private string storeName = "Target";
 
         [SetUpAttribute]
         public void SetUp()
@@ -37,14 +37,14 @@ namespace Tests.AcceptanceTests
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
             _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
-            MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
+            MemberInfo yossi = new MemberInfo("Mechanism1000", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
-            MemberInfo shiran = new MemberInfo("singerMermaid", "shiran@gmail.com", "Shiran Moris",
+            MemberInfo shiran = new MemberInfo("PhrogLiv", "shiran@gmail.com", "Shiran Moris",
                 DateTime.ParseExact("25/06/2008", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Rabin 14");
             string token = _auth.Connect();
             _auth.Register(token, yossi, "qwerty123");
             _auth.Register(token, shiran, "130452abc");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = _auth.Login(token, "Mechanism1000", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             _store.OpenStore(yossiLogInResult.Value, storeName);
@@ -66,21 +66,21 @@ namespace Tests.AcceptanceTests
         [TestCase("iPhone X")]
         [Order(0)]
         [Test]
-        public void TestSuccess(string productName)
+        public void TestRemoveItemFromStoreSuccess(string productName)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = _auth.Login(token, "Mechanism1000", "qwerty123", ServiceUserRole.Member);
             Result removeItemResult = _store.RemoveItemFromStore(yossiLogin.Value, storeName, productName);
             Assert.True(removeItemResult.IsSuccess, "failed to remove item " + productName + ": " + removeItemResult.Error);
             token = _auth.Logout(yossiLogin.Value).Value;
             _auth.Disconnect(token); 
         }
         
-        [TestCase("Yossi's Store", "Gans 356 air", "Yossi11", "qwerty123")]
-        [TestCase("dancing doors", "Tara milk", "Yossi11", "qwerty123")] // non existing store
-        [TestCase("Yossi's Store", "Gans 356 air", "singerMermaid", "130452abc")]
+        [TestCase("Target", "Gans 356 air", "Mechanism1000", "qwerty123")]
+        [TestCase("dancing doors", "Tara milk", "Mechanism1000", "qwerty123")] // non existing store
+        [TestCase("Target", "Gans 356 air", "PhrogLiv", "130452abc")]
         [Test]      
-        public void TestFailureInvalid(string store, string productName, string member, string password)
+        public void TestRemoveItemFromStoreFailureInvalid(string store, string productName, string member, string password)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, member, password, ServiceUserRole.Member);
@@ -95,7 +95,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara milk")]
         [TestCase("iPhone X")]
         [Test]
-        public void TestFailureLogic(string productName)
+        public void TestRemoveItemFromStoreFailureLogic(string productName)
         {
             string token = _auth.Connect();
             Result removeItemResult = _store.RemoveItemFromStore(token, storeName, productName);

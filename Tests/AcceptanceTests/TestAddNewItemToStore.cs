@@ -21,8 +21,8 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     
-    //[TestFixture]
-    //[Order(3)]
+    [TestFixture]
+    [Order(1)]
     public class TestAddNewItemToStore
     {
         private IAuthService _auth;
@@ -65,7 +65,7 @@ namespace Tests.AcceptanceTests
             new string[] {"games", "Rubik's cube", "Gans","356 air"}, 114.75)]
         [Test]
         [Order(2)]
-        public void TestSuccess(string name, int amount, string category, string[] tags,
+        public void TestAddNewItemToStoreSuccess(string name, int amount, string category, string[] tags,
             double price)
         { 
             string token = _auth.Connect();
@@ -85,7 +85,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Cube Alarm", "the dancing pirate", 5986, "electronics",
             new string[] {"alarm", "electronics", "cube","decorations"}, (double) 65.5)]
         [Test]      
-        public void TestFailureInput(string name, string store, int amount, string category, string[] tags,
+        public void TestAddNewItemToStoreFailureInput(string name, string store, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();
@@ -102,7 +102,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Gans 356 air Rubik's cube", 178, "games",
             new string[] {"games", "Rubik's cube", "Gans","356 air"}, 114.75, "Yossi's store")]
         [Test]      
-        public void TestFailureLogic(string name, int amount, string category, string[] tags,
+        public void TestAddNewItemToStoreFailureLogic(string name, int amount, string category, string[] tags,
             double price, string store)
         {
             string token = _auth.Connect();
@@ -117,7 +117,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.8)]
         [Test]      
-        public void TestFailureInputDoubleAddition(string name, string store, int amount, string category, string[] tags,
+        public void TestAddNewItemToStoreFailureInputDoubleAddition(string name, string store, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();
@@ -135,7 +135,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Gans 356 air Rubik's cube", 178, "games",
             new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) 114.75)]
         [Test]      
-        public void TestFailureLogicNoLogin(string name, int amount, string category, string[] tags,
+        public void TestAddNewItemToStoreFailureLogicNoLogin(string name, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();

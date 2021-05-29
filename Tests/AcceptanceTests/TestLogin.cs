@@ -10,18 +10,19 @@ using Tests.AuthTests;
 
 namespace Tests.AcceptanceTests
 {
-    //[TestFixture]
-    //[Order(11)]
+    /// <summary>
+    /// <UC>
+    /// Login
+    /// </UC>
+    /// <Req>
+    /// 2.4
+    /// </Req>
+    /// </summary>
+    
+    [TestFixture]
+    [Order(11)]
     public class TestLogin
     {
-        /// <summary>
-        /// <UC>
-        /// Login
-        /// </UC>
-        /// <Req>
-        /// 2.4
-        /// </Req>
-        /// </summary>
         private IAuthService _auth;
 
         [SetUpAttribute]
@@ -51,7 +52,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11", "qwerty123")]
         [TestCase("singerMermaid", "130452abc")]
         [Test]
-        public void TestSuccess(string username, string password)
+        public void TestLoginSuccess(string username, string password)
         {
             string token = _auth.Connect();
             Result<string> result = _auth.Login(token, username, password, ServiceUserRole.Member);
@@ -63,7 +64,7 @@ namespace Tests.AcceptanceTests
         [TestCase("_singerMermaid", "130452abc")]
         [TestCase("Tamir123", "130452abc")]
         [Test]
-        public void TestFailure(string username, string password)
+        public void TestLoginFailure(string username, string password)
         {
             string token = _auth.Connect();
             Result<string> result = _auth.Login(token, username, password, ServiceUserRole.Member);

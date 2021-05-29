@@ -19,14 +19,14 @@ namespace Tests.AcceptanceTests
     /// 2.7
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(16)]
+    [TestFixture]
+    [Order(16)]
     public class TestSaveItemToCart
     {
         private IAuthService _auth;
         private IStoreService _store;
         private ICartService _cart;
-        private string store = "Yossi's Store";
+        private string store = "halfords";
         
         
         [SetUpAttribute]
@@ -40,17 +40,17 @@ namespace Tests.AcceptanceTests
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
             _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
             _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
-            MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
+            MemberInfo yossi = new MemberInfo("Yossi1192", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
-            MemberInfo shiran = new MemberInfo("singerMermaid", "shiran@gmail.com", "Shiran Moris",
+            MemberInfo shiran = new MemberInfo("singerFrog", "shiran@gmail.com", "Shiran Moris",
                 DateTime.ParseExact("25/06/2008", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Rabin 14");
-            MemberInfo lior = new MemberInfo("Liorwork","lior@gmail.com", "Lior Lee", 
+            MemberInfo lior = new MemberInfo("Barov","lior@gmail.com", "Lior Lee", 
                 DateTime.ParseExact("05/07/1996", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Carl Neter 14");
             string token = _auth.Connect();
             _auth.Register(token, yossi, "qwerty123");
             _auth.Register(token, shiran, "130452abc");
             _auth.Register(token, lior, "987654321");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = _auth.Login(token, "Yossi1192", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", store, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             
@@ -69,13 +69,13 @@ namespace Tests.AcceptanceTests
         }
         
         //TODO:Check
-        [TestCase("Tara milk", "Yossi's store", 3)]
-        [TestCase("Tara milk", "Yossi's store", 5)]
+        [TestCase("Tara milk", "halfords", 3)]
+        [TestCase("Tara milk", "halfords", 5)]
         [Test]
         public void TestAddItemToCartSuccess(string itemId, string storeName, int amount)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result<string> login = _auth.Login(token, "singerFrog", "130452abc", ServiceUserRole.Member);
             Assert.True(login.IsSuccess, login.Error);
             Result result = _cart.AddItemToCart(login.Value, itemId, storeName, amount);
             Assert.True(result.IsSuccess, "failed to add  " + " from " + storeName + " to cart: " + result.Error);
@@ -83,14 +83,14 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Tnuva cream cheese", "Yossi's store", 3)]
-        [TestCase("Tara milk", "Yossi's store", -3)]
-        [TestCase("Tara milk", "Yossi's store", 12)]
+        [TestCase("Tnuva cream cheese", "halfords", 3)]
+        [TestCase("Tara milk", "halfords", -3)]
+        [TestCase("Tara milk", "halfords", 12)]
         [Test] 
         public void TestAddItemToCartFailure(string itemId, string storeName, int amount)
         { 
             string token = _auth.Connect();
-            Result<string> login = _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result<string> login = _auth.Login(token, "singerFrog", "130452abc", ServiceUserRole.Member);
             Result result = _cart.AddItemToCart(login.Value, itemId, storeName, amount);
             Assert.True(result.IsFailure, "action was suppose to fail!");
             token = _auth.Logout(login.Value).Value;

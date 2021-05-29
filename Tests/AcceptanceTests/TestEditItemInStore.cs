@@ -21,8 +21,8 @@ namespace Tests.AcceptanceTests
     /// 4.1
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(9)]
+    [TestFixture]
+    [Order(9)]
     public class TestEditItemInStore
     {
         private IAuthService _auth;
@@ -78,7 +78,7 @@ namespace Tests.AcceptanceTests
             new string[]{"dairy", "milk", "Tara"}, (double)6.2)] // edit price
         [Order(0)]
         [Test]
-        public void TestSuccess(string name, int amount, string category, string[] tags,
+        public void TestEditItemInStoreSuccess(string name, int amount, string category, string[] tags,
             double price)  
         {
             string token = _auth.Connect();
@@ -99,7 +99,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara choclate milk", "prancing dragon", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit fail, can't change the store (store doesn't exist)
         [Test] 
-        public void TestFailureInvalid(string name, string store, int amount, string category, string[] tags,
+        public void TestEditItemInStoreFailureInvalid(string name, string store, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();
@@ -114,7 +114,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara choclate milk", 15, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)]
         [Test] 
-        public void TestFailureNotOwner(string name, int amount, string category, string[] tags,
+        public void TestEditItemInStoreFailureNotOwner(string name, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();
@@ -129,7 +129,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Tara choclate milk", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)6.2)]
         [Test]
-        public void TestFailureNotLoggedIn(string name, int amount, string category, string[] tags,
+        public void TestEditItemInStoreFailureNotLoggedIn(string name, int amount, string category, string[] tags,
             double price)  
         {
             string token = _auth.Connect();

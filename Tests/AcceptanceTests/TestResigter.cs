@@ -18,8 +18,8 @@ namespace Tests.AcceptanceTests
     /// 2.3
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(15)]
+    [TestFixture]
+    [Order(15)]
     public class TestRegister
     {
         private IAuthService _auth;
@@ -42,12 +42,11 @@ namespace Tests.AcceptanceTests
         }
         
         
-        [TestCase("Yossi11","yossi@gmail.com", "Yossi Park", "19/04/2005", "hazait 14", "tdddev123")]
         [TestCase("Tamir123","tamir@gmail.com", "Tamir", "23/03/1961", "gold st. 14", "tdddev123")]
         [TestCase("Nathan43","nat4343@gmail.com", "Nathan dor", "17/07/1997", "main st. 57", "NathanFTW765")]
         [Order(0)]
         [Test]
-        public void TestSuccess(string username, string email, string name, string birthday, string address, string password)
+        public void TestRegisterSuccess(string username, string email, string name, string birthday, string address, string password)
         {
             MemberInfo info = new MemberInfo(username, email, name, DateTime.ParseExact(birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture), address);
             string token = _auth.Connect();
@@ -61,7 +60,7 @@ namespace Tests.AcceptanceTests
         //[TestCase("Nathan43","nat4343@gmail.com", "Nathan dor", "17/07/1997", "main st. 57", "Nath")]
         //[TestCase("Nathan43","nat4343@gmail.com", "Nathan dor", "17/07/1997", "main st. 57", "NathanFTW12345678")]
         [Test]
-        public void TestFailureInput(string username, string email, string name, string birthday, string address, string password)
+        public void TestRegisterFailureInput(string username, string email, string name, string birthday, string address, string password)
         {
             MemberInfo info = new MemberInfo(username, email, name, DateTime.ParseExact(birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture), address);
             string token = _auth.Connect();
@@ -72,7 +71,7 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Yossi11","yossi@gmail.com", "Yossi Park", "19/04/2005", "hazait 14", "tdddev123")]
         [Test]
-        public void TestFailureLogic(string username, string email, string name, string birthday, string address, string password)
+        public void TestRegisterFailureLogic(string username, string email, string name, string birthday, string address, string password)
         {
             MemberInfo info = new MemberInfo(username, email, name, DateTime.ParseExact(birthday, "dd/MM/yyyy", CultureInfo.InvariantCulture), address);
             string token = _auth.Connect();

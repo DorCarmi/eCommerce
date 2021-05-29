@@ -20,8 +20,8 @@ namespace Tests.AcceptanceTests
     /// 6.4
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(2)]
+    [TestFixture]
+    [Order(2)]
     public class TestAdminRequestsHistory
     {
         private IAuthService _auth;

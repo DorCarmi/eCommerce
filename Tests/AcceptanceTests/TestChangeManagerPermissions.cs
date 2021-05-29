@@ -20,8 +20,8 @@ namespace Tests.AcceptanceTests
     /// 4.6
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(7)]
+    [TestFixture]
+    [Order(7)]
     public class TestChangeManagerPermissions
     {
         private IAuthService _auth;
@@ -69,7 +69,7 @@ namespace Tests.AcceptanceTests
         [TestCase("singerMermaid7")]
         [Order(0)]
         [Test]
-        public void TestSuccessAdd(string manager)
+        public void TestChangeManagerPermissionsSuccessAdd(string manager)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
@@ -84,7 +84,7 @@ namespace Tests.AcceptanceTests
         
         [TestCase("singerMermaid7")]
         [Test]
-        public void TestSuccessRemove(string manager)
+        public void TestChangeManagerPermissionsSuccessRemove(string manager)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
@@ -102,7 +102,7 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Liorwork347")]
         [Test]
-        public void TestFailureInvalid(string manager)
+        public void TestChangeManagerPermissionsFailureInvalid(string manager)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
@@ -118,7 +118,7 @@ namespace Tests.AcceptanceTests
         [TestCase("singerMermaid7", "prancing dragon")]
         [TestCase("Tamir123", "prancing dragon")]
         [Test]
-        public void TestFailurelogic(string manager, string storeName)
+        public void TestChangeManagerPermissionsFailureLogic(string manager, string storeName)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);

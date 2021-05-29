@@ -20,8 +20,8 @@ namespace Tests.AcceptanceTests
     /// 4.11
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(10)]
+    [TestFixture]
+    [Order(10)]
     public class TestGetPurchaseHistoryOfStore
     {
         private IAuthService _auth;
@@ -65,7 +65,7 @@ namespace Tests.AcceptanceTests
         }
 
         [Test] 
-        public void TestSuccessEmpty()
+        public void TestGetPurchaseHistoryOfStoreSuccessEmpty()
         {
             string token = _auth.Connect();
             Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -76,7 +76,7 @@ namespace Tests.AcceptanceTests
         }
         
         [Test] 
-        public void TestSuccessNonEmpty()
+        public void TestGetPurchaseHistoryOfStoreSuccessNonEmpty()
         {
             string token = _auth.Connect();
             _cart.AddItemToCart(token, "Tara milk", storeName, 5);
@@ -93,7 +93,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11", "qwerty123","dancing dragon")]
         [TestCase("singerMermaid", "130452abc", "Yossi's Store")]
         [Test] 
-        public void TestFailureLogic(string member, string password, string store)
+        public void TestGetPurchaseHistoryOfStoreFailureLogic(string member, string password, string store)
         {
             string token = _auth.Connect();
             Result<string> yossiLogInResult = _auth.Login(token, member, password, ServiceUserRole.Member);

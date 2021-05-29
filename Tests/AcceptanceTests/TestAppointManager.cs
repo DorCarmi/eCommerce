@@ -19,8 +19,8 @@ namespace Tests.AcceptanceTests
     /// 4.5
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(4)]
+    [TestFixture]
+    [Order(4)]
     public class TestAppointManager
     {
         private IAuthService _auth;
@@ -68,7 +68,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi's Store", "Liorwork")]
         [Order(1)]
         [Test]
-        public void TestSuccess(string storeName, string username)
+        public void TestAppointManagerSuccess(string storeName, string username)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -81,7 +81,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi's Store", "singerMermaid")]
         [TestCase("Yossi's Store", "Liorwork")]
         [Test]
-        public void TestFailureDouble(string storeName, string username)
+        public void TestAppointManagerFailureDouble(string storeName, string username)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -97,7 +97,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11",   "qwerty123", "Yossi's Store", "Tamir123")]
         [TestCase("singerMermaid", "130452abc", "Yossi's Store", "Liorwork")]
         [Test]
-        public void TestFailureInvalid(string appointer, string appointerPassword,  string storeName, string username)
+        public void TestAppointManagerFailureInvalid(string appointer, string appointerPassword,  string storeName, string username)
         {
             string token = _auth.Connect();
             Result<string>login = _auth.Login(token, appointer, appointerPassword, ServiceUserRole.Member);
@@ -108,15 +108,15 @@ namespace Tests.AcceptanceTests
         }
         
         
-        [TestCase("Yossi's Store", "singerMermaid")]
-        [TestCase("Yossi's Store", "Liorwork")]
-        [Test]
-        public void TestFailureLogic(string storeName, string username)
-        {
-            string token = _auth.Connect();
-            Result result = _user.AppointManager(token, storeName, username);
-            Assert.True(result.IsFailure, "Appointing " + username + " was expected to fail since the user wasn't logged in!");
-            _auth.Disconnect(token);
-        }
+         [TestCase("Yossi's Store", "singerMermaid")]
+         [TestCase("Yossi's Store", "Liorwork")]
+         [Test]
+         public void TestAppointManagerFailureLogic(string storeName, string username)
+         {
+             string token = _auth.Connect();
+             Result result = _user.AppointManager(token, storeName, username);
+             Assert.True(result.IsFailure, "Appointing " + username + " was expected to fail since the user wasn't logged in!");
+             _auth.Disconnect(token);
+         }
     }
 }

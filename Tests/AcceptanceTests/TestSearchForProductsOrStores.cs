@@ -21,13 +21,13 @@ namespace Tests.AcceptanceTests
     /// 2.6
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(17)]
+    [TestFixture]
+    [Order(17)]
     public class TestSearchForProductsOrStores
     {
         private IAuthService _auth;
         private IStoreService _store;
-        private string store = "Yossi's Store";
+        private string store = "Barovia";
         
         
         [SetUpAttribute]
@@ -40,11 +40,11 @@ namespace Tests.AcceptanceTests
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
             _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
-            MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
+            MemberInfo yossi = new MemberInfo("Strahd", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();
             _auth.Register(token, yossi, "qwerty123");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogInResult = _auth.Login(token, "Strahd", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", store, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             _store.OpenStore(yossiLogInResult.Value, store);
@@ -72,7 +72,7 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Yossi's Store")]
+        [TestCase("Barovia")]
         public void TestExistsStore(string query)
         {
             string token = _auth.Connect();
@@ -81,7 +81,7 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("iPhone")]
+        [TestCase("Red dragon Crush")]
         [TestCase("Mermaid")]
         [Order(1)]
         [Test]
@@ -93,7 +93,7 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("iPhone")]
+        [TestCase("Red dragon Crush")]
         [TestCase("Mermaid")]
         //TODO: Check
         [Order(0)]

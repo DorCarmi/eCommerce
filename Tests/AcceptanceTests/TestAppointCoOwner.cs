@@ -20,8 +20,9 @@ namespace Tests.AcceptanceTests
     /// 4.3
     /// </Req>
     /// </summary>
-    //[TestFixture]
-    //[Order(3)]
+    
+    [TestFixture]
+    [Order(3)]
     public class TestAppointCoOwner
     {
         private IAuthService _auth;
@@ -43,9 +44,9 @@ namespace Tests.AcceptanceTests
             _user = UserService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
-            MemberInfo shiran = new MemberInfo("singerMermaid", "shiran@gmail.com", "Shiran Moris",
+            MemberInfo shiran = new MemberInfo("singerMerm", "shiran@gmail.com", "Shiran Moris",
                 DateTime.ParseExact("25/06/2008", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Rabin 14");
-            MemberInfo lior = new MemberInfo("Liorwork","lior@gmail.com", "Lior Lee", 
+            MemberInfo lior = new MemberInfo("Lior","lior@gmail.com", "Lior Lee", 
                 DateTime.ParseExact("05/07/1996", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Carl Neter 14");
             string token = _auth.Connect();
             _auth.Register(token, yossi, "qwerty123");
@@ -65,11 +66,11 @@ namespace Tests.AcceptanceTests
         }
         
         
-        [TestCase("Yossi's Store", "singerMermaid")]
-        [TestCase("Yossi's Store", "Liorwork")]
+        [TestCase("Yossi's Store", "singerMerm")]
+        [TestCase("Yossi's Store", "Lior")]
         [Order(0)]
         [Test]
-        public void TestSuccess(string storeName, string username)
+        public void TestAppointCoOwnerSuccess(string storeName, string username)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -80,10 +81,10 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Yossi's Store", "singerMermaid")]
-        [TestCase("Yossi's Store", "Liorwork")]
+        [TestCase("Yossi's Store", "singerMerm")]
+        [TestCase("Yossi's Store", "Lior")]
         [Test]
-        public void TestFailureDouble(string storeName, string username)
+        public void TestAppointCoOwnerFailureDouble(string storeName, string username)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -95,12 +96,12 @@ namespace Tests.AcceptanceTests
         }
         
         
-        [TestCase("Yossi11", "qwerty123", "The Polite Frog", "singerMermaid")]
+        [TestCase("Yossi11", "qwerty123", "The Polite Frog", "singerMerm")]
         [TestCase("Yossi11",  "qwerty123", "Yossi's Store", "Yossi11")] 
         [TestCase("Yossi11",   "qwerty123", "Yossi's Store", "Tamir123")]
-        [TestCase("singerMermaid", "130452abc", "Yossi's Store", "Liorwork")]
+        [TestCase("singerMerm", "130452abc", "Yossi's Store", "Lior")]
         [Test]
-        public void TestFailureInvalid(string appointer, string appointerPassword,  string storeName, string username)
+        public void TestAppointCoOwnerFailureInvalid(string appointer, string appointerPassword,  string storeName, string username)
         {
             string token = _auth.Connect();
             Result<string>login = _auth.Login(token, appointer, appointerPassword, ServiceUserRole.Member);
@@ -111,10 +112,10 @@ namespace Tests.AcceptanceTests
         }
         
         
-        [TestCase("Yossi's Store", "singerMermaid")]
-        [TestCase("Yossi's Store", "Liorwork")]
+        [TestCase("Yossi's Store", "singerMerm")]
+        [TestCase("Yossi's Store", "Lior")]
         [Test]
-        public void TestFailureLogic(string storeName, string username)
+        public void TestAppointCoOwnerFailureLogic(string storeName, string username)
         {
             string token = _auth.Connect();
             Result result = _user.AppointCoOwner(token, storeName, username);
