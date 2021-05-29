@@ -86,7 +86,7 @@ namespace eCommerce.Communication
 
         public async Task Message(MessageModel message)
         {
-            Console.WriteLine($"Get message {message.Message} from {message.UserName} to {message.ToUser}");
+            Console.WriteLine($"GetDiscount message {message.Message} from {message.UserName} to {message.ToUser}");
             MainPublisher mainPublisher = MainPublisher.Instance;
             mainPublisher.Connect(message.UserName);
             await Clients.Others.SendAsync("message", message);

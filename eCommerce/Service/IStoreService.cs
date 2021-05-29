@@ -8,7 +8,7 @@ namespace eCommerce.Service
     public interface IStoreService
     {
         /// <summary>
-        /// Get all the staff of the store and their permissions
+        /// GetDiscount all the staff of the store and their permissions
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
@@ -51,7 +51,7 @@ namespace eCommerce.Service
         public Result<IEnumerable<string>> SearchForStore(string token, string query);
         
         /// <summary>
-        /// Get all the store information
+        /// GetDiscount all the store information
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -59,7 +59,7 @@ namespace eCommerce.Service
         public Result<ServiceStore> GetStore(string token, string storeId);
         
         /// <summary>
-        /// Get all the store items
+        /// GetDiscount all the store items
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -67,7 +67,7 @@ namespace eCommerce.Service
         public Result<IEnumerable<IItem>> GetAllStoreItems(string token, string storeId);
         
         /// <summary>
-        /// Get the info of an item
+        /// GetDiscount the info of an item
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>

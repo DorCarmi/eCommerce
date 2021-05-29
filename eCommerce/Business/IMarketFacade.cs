@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -66,7 +67,7 @@ namespace eCommerce.Business
         Result<UserBasicInfo> GetUserBasicInfo(string token);
 
         /// <summary>
-        /// Get the purchase history of the user 
+        /// GetDiscount the purchase history of the user 
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The purchase history</returns>
@@ -125,7 +126,7 @@ namespace eCommerce.Business
 
 
         /// <summary>
-        /// Get all the staff of the store and their permissions
+        /// GetDiscount all the staff of the store and their permissions
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
@@ -134,7 +135,7 @@ namespace eCommerce.Business
             string storeId);
 
         /// <summary>
-        /// Get the history purchase of a user
+        /// GetDiscount the history purchase of a user
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -143,7 +144,7 @@ namespace eCommerce.Business
         public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryUser(string token, string ofUserId);
         
         /// <summary>
-        /// Get the history purchase of a store
+        /// GetDiscount the history purchase of a store
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -191,7 +192,7 @@ namespace eCommerce.Business
         public Result<IEnumerable<string>> SearchForStore(string token, string query);
         
         /// <summary>
-        /// Get all the store information
+        /// GetDiscount all the store information
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -199,7 +200,7 @@ namespace eCommerce.Business
         public Result<IStore> GetStore(string token, string storeId);
         
         /// <summary>
-        /// Get all the store items
+        /// GetDiscount all the store items
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -207,7 +208,7 @@ namespace eCommerce.Business
         public Result<IEnumerable<IItem>> GetAllStoreItems(string token, string storeId);
         
         /// <summary>
-        /// Get the info of an item
+        /// GetDiscount the info of an item
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -216,7 +217,7 @@ namespace eCommerce.Business
         public Result<IItem> GetItem(string token, string storeId, string itemId);
         
         /// <summary>
-        /// Get all the store ids of the user owns
+        /// GetDiscount all the store ids of the user owns
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <returns>All the owned store ids</returns>
@@ -248,7 +249,7 @@ namespace eCommerce.Business
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount);
 
         /// <summary>
-        /// Get the cart of the user
+        /// GetDiscount the cart of the user
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The user cart</returns>
@@ -345,6 +346,45 @@ namespace eCommerce.Business
         /// <param name="storeId">The storeId</param>
         /// <returns>List of the purchase history in a store</returns>
         public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId);
+        
+        
+        /// <summary>
+        /// Adding a rule to the store to modify what can or cannot happen.
+        /// The rule can be simple or a combination of number of rules combined with logical combination functions (and,or..)
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <param name="ruleInfoNode">The rule: Leaf (simple) or Composite (Combined)</param>
+        public Result AddRuleToStorePolicy(string token, string storeId, RuleInfoNode ruleInfoNode);
+        
+        
+        /// <summary>
+        /// Adding a discount to the store
+        /// The discount can be simple or a combination of number of discounts combined with logical or math combination functions (and,or, max,min..)
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <param name="discountInfoNode">The discount: Leaf (simple) or Composite (Combined)</param>
+        public Result AddDiscountToStore(string token, string storeId, DiscountInfoNode discountInfoNode);
+        
+        
+        /// <summary>
+        /// Returns all the rules in store's policy
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <returns>List of the all rules in store</returns>
+        public Result<IList<RuleInfoNode>> GetStorePolicyRules(string token, string storeId);
+        
+        /// <summary>
+        /// Return all the discounts in store
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <returns>List of all discounts in store</returns>
+        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId);
+        
+        
         
 
         #endregion

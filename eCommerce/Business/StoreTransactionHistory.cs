@@ -27,7 +27,8 @@ namespace eCommerce.Business
 
         public Result<IList<PurchaseRecord>> GetHistory(IUser user)
         {
-            if (user.HasPermission(_store, StorePermission.AdminGetHistory).IsFailure)
+            //TODO: Check with sharon, was AdminGetHistory
+            if (user.HasPermission(_store, StorePermission.GetStoreHistory).IsFailure)
             {
                 return Result.Fail<IList<PurchaseRecord>>("User doesn't have the permission to get store's history");
                 

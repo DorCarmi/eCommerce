@@ -17,6 +17,8 @@ export function GET_ITEM_IN_STORE_PATH(storeId, itemId) { return  STORE_PATH + `
 export function GET_ALL_ITEMS_IN_STORE_PATH(storeId){ return STORE_PATH + '/getAllItems/' + storeId }
 export const SEARCH_ITEMS_PATH = STORE_PATH + '/search';
 export const SEARCH_STORE_PATH = STORE_PATH + '/searchStore';
+export function STAFF_OF_STORE_PATH(storeId){ return STORE_PATH + `/${storeId}/staff` }
+
 
 
 // ========= Cart ========== //
