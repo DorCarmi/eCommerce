@@ -12,6 +12,8 @@ export enum RuleType {
     Age
 }
 
+export var RuleTypesOptions =["Amount","Total_Amount","Category","Date","Default","IsItem","Age"]
+
 export interface RuleInfo {
     ruleType: RuleType,
     whatIsTheRuleFor: string,

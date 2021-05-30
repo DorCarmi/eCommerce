@@ -88,7 +88,8 @@ export default class Store extends Component {
                 {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link tag={Link} exact to={`/managePermissions/${storeId}`}>Manage Permissions</Link></div> : null}
                 {permissions.includes(StorePermission.AddItemToStore) ? <div><Link to={`${storeId}/addItem`}>Add an Item</Link></div> : null}
                 {permissions.includes(StorePermission.GetStoreHistory) ? <Link to={`/purchaseHistory/${storeId}`}>Show Store's Purchase History</Link> : null}
-            </div>
+
+                    </div>
 
         )
     }
@@ -135,6 +136,9 @@ export default class Store extends Component {
                                         </div>
                                         <div>
                                         {permissions.includes(StorePermission.RemoveStoreStaff) ? <button onClick={() => this.removeItem(storeId,item.itemName)}>Remove Item</button> : null }
+                                        </div>
+                                        <div>
+                                            {permissions.includes(StorePermission.EditStorePolicy) ? <Link to={`/store/${storeId}/addRule/${item.itemName}`}>Add Rule</Link> : null}
                                         </div>
                                         <button onClick={(e) => this.addToCart(item.itemName) }>Add To Cart</button>
                                     </td>

@@ -13,7 +13,7 @@ import AddItem from './components/AddItem'
 import EditItem from './components/EditItem'
 import PurchaseHistory from './components/PurchaseHistory'
 import ManagePermissions from './components/ManagePermissions'
-
+import AddRule from './components/AddRule'
 import {BrowserRouter, Link, useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
@@ -23,12 +23,9 @@ import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/sign
 import {StoreApi} from "./Api/StoreApi";
 import {AppointManager} from "./components/AppointManager";
 
+import {StorePermission} from "./Data/StorePermission";
+import {NavLink} from "reactstrap";
 import {AdminPurchaseHistory} from "./components/AdminPurchaseHistory";
-import {UserRole} from "./Data/UserRole";
-import {makeRuleInfo, makeRuleNodeComposite, makeRuleNodeLeaf, RuleType} from "./Data/StorePolicies/RuleInfo";
-import {Comperators} from "./Data/StorePolicies/Comperators";
-import {Combinations} from "./Data/StorePolicies/Combinations";
-import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "./Data/StorePolicies/DiscountInfoTree";
 
 export default class App extends Component {
   static displayName = App.name;
@@ -69,14 +66,12 @@ export default class App extends Component {
 
     async updateLogoutHandler(){
         const userBasicInfo = await this.userApi.getUserBasicInfo();
-        await this.state.webSocketConnection.stop();
         this.setState({
             isLoggedIn: userBasicInfo.isLoggedIn,
             userName: userBasicInfo.username,
             role: userBasicInfo.userRole,
             ownedStoreList: [],
-            managedStoreList:[],
-            webSocketConnection: undefined
+            managedStoreList:[]
         })
     }
     
@@ -92,6 +87,7 @@ export default class App extends Component {
         //console.log("socketConnection")
 
         await socketConnection.start();
+
         if(socketConnection) {
             //console.log("socketConnection on")
 
@@ -120,34 +116,10 @@ export default class App extends Component {
         }
     }
 
-    async policyExample(){
-        console.log("Policy example: ==========")
-        const ruleInfo1 = makeRuleInfo(RuleType.Amount, "10", "3", Comperators.EQUALS);
-        const ruleInfo2 = makeRuleInfo(RuleType.Category, "watermelon", "1", Comperators.BIGGER);
-        
-        const ruleNodeLeaf1 = makeRuleNodeLeaf(ruleInfo1);
-        const ruleNodeLeaf2 = makeRuleNodeLeaf(ruleInfo2);
-        console.log(await this.storeApi.addRuleToStorePolicy("a", ruleNodeLeaf1));
-
-        const ruleNodeComposite = makeRuleNodeComposite(ruleNodeLeaf1, ruleNodeLeaf2, Combinations.XOR);
-        console.log(await this.storeApi.addRuleToStorePolicy("a", ruleNodeComposite));
-        
-        const discountNodeLeaf = makeDiscountNodeLeaf(ruleNodeComposite, 10);
-        console.log(await this.storeApi.addDiscountToStore("a", discountNodeLeaf));
-
-        const discountCompositeNode = makeDiscountCompositeNode(discountNodeLeaf, discountNodeLeaf, Combinations.XOR);
-        console.log(await this.storeApi.addDiscountToStore("a", discountCompositeNode));
-        console.log("==========");
-    }
-    
     async componentDidMount() {
         const userBasicInfo = await this.userApi.getUserBasicInfo();
         console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
-        if(userBasicInfo.userRole !== UserRole.Guest){
-            await this.connectToWebSocket();
-            
-            await this.policyExample();
-        }
+        await this.connectToWebSocket()
         
         const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()
         const fetchedManagedStoredList = await this.userApi.getAllManagedStoreIds()
@@ -188,10 +160,10 @@ export default class App extends Component {
     }
 
      async componentDidUpdate(prevProps,prevState) {
-         if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
+         /*if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
              //console.log("componentDidUpdate")
              await this.connectToWebSocket();
-         }
+         }*/
          
          if(prevState.userName !== this.state.userName){
              if(this.state.isLoggedIn){
@@ -248,7 +220,8 @@ export default class App extends Component {
               <Route exact path="/searchItems/Store/:query" render={({match}) => <Store  storeId={match.params.query}/>} />
 
               <Route exact path="/managePermissions/:id/appointManager" render={({match}) => <AppointManager storeId ={match.params.id}/>} />
-            <Route exact path="/managePermissions/:storeId/" render={({match}) => <ManagePermissions storeId ={match.params.storeId}/>}/>
+                <Route exact path="/managePermissions/:storeId/" render={({match}) => <ManagePermissions storeId ={match.params.storeId}/>}/>
+              <Route exact path="/store/:id/addRule/:itemId" render={({match}) => <AddRule storeId ={match.params.id} itemId ={match.params.itemId}/>} />
 
           </Layout>
         </BrowserRouter>

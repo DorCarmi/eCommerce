@@ -72,6 +72,7 @@ namespace eCommerce.Publisher
         
         public void NotifyAll(string userID)
         {
+            Console.WriteLine(userID);
             if (connected.ContainsKey(userID) && messages.ContainsKey(userID) && messages[userID].Count > 0)
             {
                 foreach (var observer in this.observers)
