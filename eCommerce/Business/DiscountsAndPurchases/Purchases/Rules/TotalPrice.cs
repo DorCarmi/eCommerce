@@ -1,28 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using eCommerce.Business.CombineRules;
+﻿using System.Collections.Generic;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.Purchases;
-using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Business
 {
-    public class Dates : CompositeRule
+    public class TotalPrice : CompositeRule
     {
-        private DateTime _date;
+        private int _totalPrice;
         private Compare _compare;
-        public Dates(DateTime date, Compare compare)
+
+        public TotalPrice(int totalPrice,Compare compare)
         {
-            _date = date;
+            _totalPrice = totalPrice;
             _compare = compare;
         }
         
+
         public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
         {
             Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
-            var compareAns = _compare.GetResult(_date, DateTime.Now);
+            int totalPrice = 0;
+            foreach (var item in checkItem1.GetAllItems().Value)
+            {
+                totalPrice += item.amount * item.pricePerUnit;
+            }
+            var compareAns = _compare.GetResult(_totalPrice, totalPrice);
             if (compareAns > 0)
             {
                 foreach (var item in checkItem1.GetAllItems().Value)
@@ -33,23 +36,19 @@ namespace eCommerce.Business
                     }
                 }
             }
+
             return itemsList;
         }
 
         public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
         {
-            var compareAns = _compare.GetResult(_date, DateTime.Now);
-            if (compareAns > 0)
-            {
-                return true;
-            }
-
-            return false;
+            var compareAns = _compare.GetResult(_totalPrice, itemInfo.amount*itemInfo.pricePerUnit);
+            return compareAns > 0;
         }
 
         public override Result<RuleInfoNode> GetRuleInfo()
         {
-            return Result.Ok<RuleInfoNode>(new RuleInfoNodeLeaf(new RuleInfo(RuleType.Date, this._date.ToString(), "", "",
+            return Result.Ok<RuleInfoNode>(new RuleInfoNodeLeaf(new RuleInfo(RuleType.Total_Price, this._totalPrice.ToString(), "", "",
                 this._compare.GetComperatorInfo())));
         }
     }

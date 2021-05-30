@@ -4,6 +4,7 @@
     {
         Amount,
         Total_Amount,
+        Total_Price,
         Category,
         Date,
         Default,

@@ -51,5 +51,10 @@ namespace Tests.Business.Mokups
         {
             throw new System.NotImplementedException();
         }
+
+        public IList<ItemInfo> GetAllItems()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using eCommerce.Business.CombineRules;
+using eCommerce.Business.Discounts;
+using eCommerce.Business.Purchases;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -6,36 +10,20 @@ namespace eCommerce.Business
 {
     public class PurchasePolicy
     {
-        private List<PurchaseStrategyName> _allowedStrategies;
+        private List<Composite> _storeRules;
         private IStore _store;
 
         public PurchasePolicy(IStore store)
         {
             this._store = store;
-            this._allowedStrategies = new List<PurchaseStrategyName>();
-            this._allowedStrategies.Add(PurchaseStrategyName.Regular);
-        }
-        public bool checkStrategy(PurchaseStrategyName strategyName)
-        {
-            return _allowedStrategies.Contains(strategyName);
+            this._storeRules = new List<Composite>();
         }
 
-        public bool checkAmountAndPrice(int pricePerUnit, int amount)
-        {
-            //TODO: change to something meaningful
-            return true;
-        }
-
-        public bool CheckBasket(Basket basket)
-        {
-            //TODO: change to something meaningful
-            return true;
-        }
-
-        public Result AddAllowedPurchaseStrategy(User user)
+        public Result AddRuleToStorePolicy(IUser user, Composite rule)
         {
             if (user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {
+                this._storeRules.Add(rule);
                 return Result.Ok();
             }
             else
@@ -44,28 +32,52 @@ namespace eCommerce.Business
             }
         }
 
-        public Result AddTimesToStore(User user)
+        public Result CheckWithStorePolicy(IBasket basket, IUser user)
         {
-            if (user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
+            foreach (var storeRule in _storeRules)
             {
-                return Result.Ok();
+                var dict = storeRule.Check(basket, user);
+                foreach (var itemInfo in basket.GetAllItems().Value)
+                {
+                    if (dict.ContainsKey(itemInfo.name))
+                    {
+                        return Result.Fail($"Item {itemInfo} in basket has problem with store policy- check user information and item information with store policy");
+                    }
+                }
             }
-            else
-            {
-                return Result.Fail("User doesn't have permission to edit store's policy");
-            }
+
+            return Result.Ok();
         }
 
-        public Result AddPriceRule(User user)
+        public Result<IList<RuleInfoNode>> GetPolicy(IUser user)
         {
-            if (user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
+            if (!user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {
-                return Result.Ok();
+                return Result.Fail<IList<RuleInfoNode>>("User doesn't have permission to edit/view store's policy");
             }
-            else
+            
+            IList<RuleInfoNode> ruleInfoNodes = new List<RuleInfoNode>();
+            foreach (var rule in _storeRules)
             {
-                return Result.Fail("User doesn't have permission to edit store's policy");
+                var res = rule.GetRuleInfo();
+                if (res.IsFailure)
+                {
+                    return Result.Fail<IList<RuleInfoNode>>(res.Error);
+                }
+                ruleInfoNodes.Add(res.Value);
             }
+            return Result.Ok(ruleInfoNodes);
+        }
+
+        public Result Reset(IUser user)
+        {
+            if (!user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
+            {
+                return Result.Fail<IList<DiscountInfoNode>>("User doesn't have the permission to handle store discounts and policies");
+            }
+
+            this._storeRules = new List<Composite>();
+            return Result.Ok();
         }
     }
 }

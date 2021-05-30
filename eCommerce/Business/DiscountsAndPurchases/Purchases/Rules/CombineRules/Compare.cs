@@ -12,6 +12,8 @@ namespace eCommerce.Business
         /// <param name="b"></param>
         /// <returns>return 1 if a is ? from b, 0 if equals and -1 if a is not ? from b</returns>
         public abstract int GetResult(IComparable a, IComparable b);
+
+        public abstract Comperators GetComperatorInfo();
     }
     
     

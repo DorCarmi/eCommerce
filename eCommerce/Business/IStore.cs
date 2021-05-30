@@ -69,7 +69,7 @@ namespace eCommerce.Business.Service
 
 
         public String GetStoreName();
-        bool CheckWithPolicy(PurchaseStrategyName purchaseStrategy);
+
         bool TryAddNewCartToStore(ICart cart);
         Result ConnectNewBasketToStore(IBasket newBasket);
         bool CheckConnectionToCart(ICart cart);
@@ -79,14 +79,15 @@ namespace eCommerce.Business.Service
         
         
         Result<double> CheckDiscount(Basket basket);
-        Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy);
-        Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(IUser user);
-        Result UpdatePurchaseStrategies(IUser user, PurchaseStrategyName purchaseStrategy);
-        Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
-        Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
-        Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
+        Result CheckWithStorePolicy(IBasket basket, IUser user);
 
 
-        Result AddDiscountToStore(DiscountInfoNode infoNode);
+        Result AddDiscountToStore(IUser user,DiscountInfoNode infoNode);
+        Result AddRuleToStorePolicy(IUser user,RuleInfoNode ruleInfoNode);
+        Result<IList<RuleInfoNode>> GetStorePolicy(IUser user);
+        Result<IList<DiscountInfoNode>> GetStoreDiscounts(IUser user);
+
+        Result ResetStorePolicy(IUser user);
+        Result ResetStoreDiscount(IUser user);
     }
 }

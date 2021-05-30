@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using eCommerce.Business.Discounts;
+using eCommerce.Business.Purchases;
+using eCommerce.Common;
 
 namespace eCommerce.Business
 {
@@ -39,7 +42,14 @@ namespace eCommerce.Business
 
         public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
         {
-            return itemInfo.amount == _totalAmount;
+            var compareAns = _compare.GetResult(_totalAmount, itemInfo.amount);
+            return compareAns > 0;
+        }
+
+        public override Result<RuleInfoNode> GetRuleInfo()
+        {
+            return Result.Ok<RuleInfoNode>(new RuleInfoNodeLeaf(new RuleInfo(RuleType.Amount, this._totalAmount.ToString(), "", "",
+            this._compare.GetComperatorInfo())));
         }
     }
 }

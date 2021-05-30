@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
+using eCommerce.Business.Purchases;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -45,5 +46,12 @@ namespace eCommerce.Business
 
             return false;
         }
+
+        public override Result<RuleInfoNode> GetRuleInfo()
+        {
+            return Result.Ok<RuleInfoNode>(new RuleInfoNodeLeaf(new RuleInfo(RuleType.Category, this._category, "", "",
+                Comperators.EQUALS)));
+        }
+        
     }
 }

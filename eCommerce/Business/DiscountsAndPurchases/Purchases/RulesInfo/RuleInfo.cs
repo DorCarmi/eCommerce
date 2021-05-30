@@ -8,11 +8,11 @@ namespace eCommerce.Business.Discounts
         public RuleType RuleType;
         public string WhatIsTheRuleFor;
         public string WhatKind;
-        public ItemInfo WhichItems;
+        public string WhichItems;
         public Comperators Comperators;
         
 
-        public RuleInfo(RuleType ruleType, string whatIsTheRuleFor, string whatKind, ItemInfo whichItems, Comperators comperators)
+        public RuleInfo(RuleType ruleType, string whatIsTheRuleFor, string whatKind, string whichItems, Comperators comperators)
         {
             RuleType = ruleType;
             WhatIsTheRuleFor = whatIsTheRuleFor;
@@ -20,7 +20,7 @@ namespace eCommerce.Business.Discounts
             WhichItems = whichItems;
             Comperators = comperators;
         }
-        public RuleInfo(RuleType ruleType, string whatIsTheRuleFor, string whatKind, ItemInfo whichItems)
+        public RuleInfo(RuleType ruleType, string whatIsTheRuleFor, string whatKind, string whichItems)
         {
             RuleType = ruleType;
             WhatIsTheRuleFor = whatIsTheRuleFor;

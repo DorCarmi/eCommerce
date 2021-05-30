@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using eCommerce.Business.CombineRules;
+using eCommerce.Business.Discounts;
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -20,6 +21,10 @@ namespace eCommerce.Business
         public override Result<double> GetOneItem(ItemInfo itemInfo, IUser user)
         {
             return Result.Fail<double>("Not a discount");
+        }
+        public override Result<DiscountInfoNode> GetDisocuntInfo()
+        {
+            return Result.Fail<DiscountInfoNode>("Not a discount");
         }
     }
 }

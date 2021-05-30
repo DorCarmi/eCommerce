@@ -8,5 +8,10 @@ namespace eCommerce.Business.CombineRules
         {
             return b.CompareTo(a) >= 0 ? 1 : -1;
         }
+
+        public override Comperators GetComperatorInfo()
+        {
+            return Comperators.BIGGER_EQUALS;
+        }
     }
 }

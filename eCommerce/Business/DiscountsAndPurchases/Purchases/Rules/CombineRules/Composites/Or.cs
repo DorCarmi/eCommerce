@@ -6,13 +6,14 @@ using System.IO;
 using System.Linq;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
+using eCommerce.Business.DiscountsAndPurchases.Purchases.Rules.CombineRules;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using Rule = System.Data.Rule;
 
 namespace eCommerce.Business.DiscountPoliciesCombination
 {
-    public class Or : Composite
+    public class Or : CombinatedComposite
     {
         private Composite _A;
         private Composite _B;
@@ -98,26 +99,29 @@ namespace eCommerce.Business.DiscountPoliciesCombination
 
         }
 
-        public Result<DiscountInfoNode> GetDiscountInfo()
+        public override Result<RuleInfoNode> GetRuleInfo_A()
         {
-            if (CheckIfDiscount())
-            {
-                
-            }
-            else
-            {
-                
-            }
-            return null;
+            return _A.GetRuleInfo();
         }
 
-        public Result<RuleInfoNode> GetRuleInfo()
+        public override Result<RuleInfoNode> GetRuleInfo_B()
         {
-            if (CheckIfDiscount())
-            {
-                
-            }
-            return null;
+            return _B.GetRuleInfo();
+        }
+
+        public override Result<DiscountInfoNode> GetDiscountInfo_A()
+        {
+            return _A.GetDisocuntInfo();
+        }
+
+        public override Result<DiscountInfoNode> GetDiscountInfo_B()
+        {
+            return _B.GetDisocuntInfo();
+        }
+
+        public override Combinations GetCombination()
+        {
+            return Combinations.OR;
         }
     }
 }
