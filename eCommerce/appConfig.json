@@ -1,0 +1,10 @@
+﻿{
+  "DBConnectionString": "a",
+  "AdminCreationInfo" : {
+    "Username": "_Admin",
+    "Email": "Admin@eCommerce.com",
+    "Password": "_Admin"
+  },
+
+  "AuthDBConnectionString": "AuthDB"
+}

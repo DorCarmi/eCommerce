@@ -342,13 +342,15 @@ namespace eCommerce.Business
 
         public void CreateMainAdmin()
         {
+            AppConfig config = AppConfig.GetInstance();
+            
             MemberInfo adminInfo = new MemberInfo(
-                "_Admin",
-                "Admin@eCommerce.com",
+                config.GetData("AdminCreationInfo:Username"),
+                config.GetData("AdminCreationInfo:Email"),
                 "TheAdmin",
                 DateTime.Now, 
                 null);
-            AddAdmin(adminInfo, "_Admin");
+            AddAdmin(adminInfo, config.GetData("AdminCreationInfo:Password"));
         }
     }
 }
