@@ -38,16 +38,16 @@ class AddRule extends Component {
         console.log(comperatorIdx)
         console.log(Comperators.NOT_EQUALS)
         event.preventDefault();
-        const res = await this.storeApi.addRuleToStorePolicy(storeId,makeRuleNodeLeaf(makeRuleInfo(ruleType,whatIsTheRuleOf,
-                                                                                        itemId,selectedComperator)))
+        const res = await this.storeApi.addRuleToStorePolicy(storeId,makeRuleNodeLeaf(makeRuleInfo(parseInt(ruleType),whatIsTheRuleOf,
+                                                                                        itemId,parseInt(selectedComperator))))
 
         if(res && res.isSuccess) {
-            alert('edit item succeed')
+            alert('add rule succeed')
             this.redirectToHome(`/store/${storeId}`)
         }
         else{
             if(res) {
-                alert(`edit item failed because- ${res.error}`)
+                alert(`add rule failed because- ${res.error}`)
             }
         }
         this.handleSubmit = this.handleSubmit.bind(this);
