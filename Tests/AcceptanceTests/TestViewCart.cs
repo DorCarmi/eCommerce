@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 namespace Tests.AcceptanceTests
 {
@@ -18,6 +20,7 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(18)]
     public class TestViewCart
     {
         private IAuthService _auth;
@@ -26,12 +29,17 @@ namespace Tests.AcceptanceTests
         private string store = "Yossi's Store";
 
 
-        [SetUp]
+        [SetUpAttribute]
         public void SetUp()
         {
-            _auth = new AuthService();
-            _store = new StoreService();
-            _cart = new CartService();
+            StoreRepository SR = new StoreRepository();
+            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
+            IRepository<IUser> UR = new RegisteredUsersRepository();
+
+            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
+            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             MemberInfo shiran = new MemberInfo("singerMermaid", "shiran@gmail.com", "Shiran Moris",
@@ -50,9 +58,17 @@ namespace Tests.AcceptanceTests
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
+        
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
+            _store = null;
+            _cart = null;
+        }
 
         [Test]
-        public void TestEmpty()
+        public void TestViewCartEmpty()
         {
             string token = _auth.Connect();
             Result<SCart> result = _cart.GetCart(token);
@@ -60,7 +76,7 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         [Test]
-        public void TestNonEmpty()
+        public void TestViewCartNonEmpty()
         {
             string token = _auth.Connect();
             _cart.AddItemToCart(token, "Tara milk", store, 3);

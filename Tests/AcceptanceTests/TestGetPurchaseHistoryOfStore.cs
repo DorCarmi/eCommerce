@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
+using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 namespace Tests.AcceptanceTests
 {
@@ -19,6 +21,7 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(10)]
     public class TestGetPurchaseHistoryOfStore
     {
         private IAuthService _auth;
@@ -26,12 +29,17 @@ namespace Tests.AcceptanceTests
         private ICartService _cart;
         private string storeName = "Yossi's Store";
 
-        [SetUp]
+        [SetUpAttribute]
         public void SetUp()
         {
-            _auth = new AuthService();
-            _store = new StoreService();
-            _cart = new CartService();
+            StoreRepository SR = new StoreRepository();
+            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
+            IRepository<IUser> UR = new RegisteredUsersRepository();
+
+            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
+            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             MemberInfo shiran = new MemberInfo("singerMermaid", "shiran@gmail.com", "Shiran Moris",
@@ -47,9 +55,17 @@ namespace Tests.AcceptanceTests
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
+        
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
+            _store = null;
+            _cart = null;
+        }
 
         [Test] 
-        public void TestSuccessEmpty()
+        public void TestGetPurchaseHistoryOfStoreSuccessEmpty()
         {
             string token = _auth.Connect();
             Result<string> yossiLogInResult = _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -60,7 +76,7 @@ namespace Tests.AcceptanceTests
         }
         
         [Test] 
-        public void TestSuccessNonEmpty()
+        public void TestGetPurchaseHistoryOfStoreSuccessNonEmpty()
         {
             string token = _auth.Connect();
             _cart.AddItemToCart(token, "Tara milk", storeName, 5);
@@ -77,7 +93,7 @@ namespace Tests.AcceptanceTests
         [TestCase("Yossi11", "qwerty123","dancing dragon")]
         [TestCase("singerMermaid", "130452abc", "Yossi's Store")]
         [Test] 
-        public void TestFailureLogic(string member, string password, string store)
+        public void TestGetPurchaseHistoryOfStoreFailureLogic(string member, string password, string store)
         {
             string token = _auth.Connect();
             Result<string> yossiLogInResult = _auth.Login(token, member, password, ServiceUserRole.Member);

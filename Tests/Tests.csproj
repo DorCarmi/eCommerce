@@ -17,4 +17,16 @@
       <ProjectReference Include="..\eCommerce\eCommerce.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="AcceptanceTests\AcceptanceTests2\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="AcceptanceTests\AcceptanceTests2\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="AcceptanceTests\AcceptanceTests2\**" />
+    </ItemGroup>
+
 </Project>
