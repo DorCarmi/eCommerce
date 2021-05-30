@@ -21,6 +21,16 @@ namespace eCommerce.Business
 
         public Result BuyWholeCart(PaymentInfo paymentInfo)
         {
+            //Check with store policy
+            foreach (var basket in this._cart.GetBaskets())
+            {
+                var res = basket.CheckWithStorePolicy();
+                if (res.IsFailure)
+                {
+                    return res;
+                }
+            }
+            
             //Calculate prices for each basket
             foreach (var basket in this._cart.GetBaskets())
             {

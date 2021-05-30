@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
+using eCommerce.Business.DiscountsAndPurchases.Purchases.Rules.CombineRules;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Business.DiscountPoliciesCombination
 {
-    public class Plus : Composite
+    public class Plus : CombinatedComposite
     {
         private Composite _A;
         private Composite _B;
@@ -57,7 +58,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
 
                 var theDiscoutA = discountA.Value / price;
                 var theDiscoutB = discountB.Value / price;
-                var plusDiscount = theDiscoutA + theDiscoutB;
+                var plusDiscount = (1-theDiscoutA) + (1-theDiscoutB);
                 return Result.Ok(price * (1 - plusDiscount));
             }
             else
@@ -93,6 +94,31 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             {
                 return aGet;
             }
+        }
+
+        public override Result<RuleInfoNode> GetRuleInfo_A()
+        {
+            return _A.GetRuleInfo();
+        }
+
+        public override Result<RuleInfoNode> GetRuleInfo_B()
+        {
+            return _B.GetRuleInfo();
+        }
+
+        public override Result<DiscountInfoNode> GetDiscountInfo_A()
+        {
+            return _A.GetDisocuntInfo();
+        }
+
+        public override Result<DiscountInfoNode> GetDiscountInfo_B()
+        {
+            return _B.GetDisocuntInfo();
+        }
+
+        public override Combinations GetCombination()
+        {
+            return Combinations.OR;
         }
     }
 }

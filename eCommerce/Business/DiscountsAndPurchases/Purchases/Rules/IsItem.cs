@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using eCommerce.Business.CombineRules;
+using eCommerce.Business.Discounts;
+using eCommerce.Business.Purchases;
+using eCommerce.Common;
 
 namespace eCommerce.Business.PurchaseRules
 {
@@ -33,6 +37,12 @@ namespace eCommerce.Business.PurchaseRules
         public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
         {
             return this._itemName.Equals(itemInfo.name);
+        }
+
+        public override Result<RuleInfoNode> GetRuleInfo()
+        {
+            return Result.Ok<RuleInfoNode>(new RuleInfoNodeLeaf(new RuleInfo(RuleType.IsItem, "", "", this._itemName,
+                Comperators.EQUALS)));
         }
     }
 }

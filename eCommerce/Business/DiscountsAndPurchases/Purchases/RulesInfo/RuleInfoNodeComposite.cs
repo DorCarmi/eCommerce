@@ -35,6 +35,16 @@ namespace eCommerce.Business.Purchases
             this.ItemInfoToCompare = itemInfoToCompare;
         }
         
+        public RuleInfoNodeComposite(RuleInfoNode ruleA, RuleInfoNode ruleB,
+            Comperators Comperator,FieldToCompare FieldToCompare)
+        {
+            this.ruleA = ruleA;
+            this.ruleB = ruleB;
+            this.combination = Combinations.XOR;
+            this.Comperator = Comperator;
+            this.FieldToCompare = FieldToCompare;
+            this.ItemInfoToCompare = null;
+        }
         public override bool hasKids()
         {
             return true;

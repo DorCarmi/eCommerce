@@ -6,13 +6,14 @@ using System.IO;
 using System.Linq;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
+using eCommerce.Business.DiscountsAndPurchases.Purchases.Rules.CombineRules;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using Rule = System.Data.Rule;
 
 namespace eCommerce.Business.DiscountPoliciesCombination
 {
-    public class Not : Composite
+    public class Not : CombinatedComposite
     {
         private Composite _A;
 
@@ -86,26 +87,31 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             }
         }
 
-        public Result<DiscountInfoNode> GetDiscountInfo()
+
+        public override Result<RuleInfoNode> GetRuleInfo_A()
         {
-            if (CheckIfDiscount())
-            {
-                
-            }
-            else
-            {
-                
-            }
-            return null;
+            return _A.GetRuleInfo();
         }
 
-        public Result<RuleInfoNode> GetRuleInfo()
+        public override Result<RuleInfoNode> GetRuleInfo_B()
         {
-            if (CheckIfDiscount())
-            {
-                
-            }
-            return null;
+            return Result.Fail<RuleInfoNode>("No B value in not");
+        }
+
+        public override Result<DiscountInfoNode> GetDiscountInfo_A()
+        {
+            return _A.GetDisocuntInfo();
+        }
+
+        public override Result<DiscountInfoNode> GetDiscountInfo_B()
+        {
+            return Result.Fail<DiscountInfoNode>("No B value in not");
+        }
+
+
+        public override Combinations GetCombination()
+        {
+            return Combinations.NOT;
         }
     }
 }

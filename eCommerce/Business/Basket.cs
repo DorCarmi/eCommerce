@@ -27,6 +27,11 @@ namespace eCommerce.Business
             return totalPrice;
         }
 
+        public Result CheckWithStorePolicy()
+        {
+            return _store.CheckWithStorePolicy(this, _cart.GetUser());
+        }
+
         public Basket(ICart cart, IStore store)
         {
             if (!store.CheckConnectionToCart(cart))
@@ -79,7 +84,7 @@ namespace eCommerce.Business
             }
             else
             {
-                this._nameToItem.Add(item.name,item);
+                this._nameToItem.Add(item.name,new ItemInfo(item));
                 this._itemsInBasket.Add(item);
                 this.currentPrice = this.GetRegularTotalPrice();
                 return Result.Ok();

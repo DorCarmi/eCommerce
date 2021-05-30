@@ -34,6 +34,16 @@ namespace eCommerce.Business.Discounts
             this.FieldToCompare = FieldToCompare;
             this.ItemInfoToCompare = itemInfoToCompare;
         }
+        
+        public DiscountInfoCompositeNode(DiscountInfoNode nodeA,DiscountInfoNode nodeB,
+            Comperators Comperator,FieldToCompare FieldToCompare)
+        {
+            this.combinationDiscountInfoNodeA = nodeA;
+            this.combinationDiscountInfoNodeB = nodeB;
+            this._combination = Combinations.XOR;
+            this.Comperator = Comperator;
+            this.FieldToCompare = FieldToCompare;
+        }
 
 
         public override bool hasKids()

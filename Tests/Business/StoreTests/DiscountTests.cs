@@ -46,6 +46,7 @@ namespace Tests.Business.StoreTests
         }
 
         [Test]
+        [Order(0)]
         public void SuccessTestDiscountLeaf()
         {
             double theDiscount = 0.5;
@@ -53,11 +54,11 @@ namespace Tests.Business.StoreTests
                 RuleType.Amount,
                 "10",
                 "Amount",
-                item1
+                item1.name
             );
             RuleInfoNodeLeaf ruleInfoNodeLeaf = new RuleInfoNodeLeaf(rule);
             DiscountInfoLeaf discountInfoLeaf = new DiscountInfoLeaf(theDiscount,ruleInfoNodeLeaf);
-            var addDiscountToStore = MyStore.AddDiscountToStore(discountInfoLeaf);
+            var addDiscountToStore = MyStore.AddDiscountToStore(Alice,discountInfoLeaf);
             Assert.True(addDiscountToStore.IsSuccess,addDiscountToStore.Error);
             Cart cart = new Cart(Alice);
             item1.amount = 15;
@@ -70,6 +71,7 @@ namespace Tests.Business.StoreTests
         }
 
         [Test]
+        [Order(0)]
         public void TestSuccessDiscountRulesComposite()
         {
             double theDiscount = 0.5;
@@ -77,14 +79,14 @@ namespace Tests.Business.StoreTests
                 RuleType.Amount,
                 "10",
                 "Amount",
-                item1
+                item1.name
             );
             
             RuleInfo rule2 = new RuleInfo(
                 RuleType.Category,
                 "Tech",
                 "Category",
-                item1
+                item1.name
             );
 
             RuleInfoNodeLeaf ruleInfoNodeLeaf1 = new RuleInfoNodeLeaf(rule1);
@@ -92,7 +94,7 @@ namespace Tests.Business.StoreTests
 
             RuleInfoNodeComposite composite = new RuleInfoNodeComposite(ruleInfoNodeLeaf1, ruleInfoNodeLeaf2, Combinations.AND);
             DiscountInfoLeaf discountInfoComp = new DiscountInfoLeaf(theDiscount,composite);
-            var addDiscountToStore = MyStore.AddDiscountToStore(discountInfoComp);
+            var addDiscountToStore = MyStore.AddDiscountToStore(Alice,discountInfoComp);
             Assert.True(addDiscountToStore.IsSuccess,addDiscountToStore.Error);
             Cart cart = new Cart(Alice);
             item1.amount = 15;
@@ -105,6 +107,7 @@ namespace Tests.Business.StoreTests
         }
         
         [Test]
+        [Order(0)]
         public void TestSuccessDiscountComposite()
         {
             double theDiscount = 0.5;
@@ -112,14 +115,14 @@ namespace Tests.Business.StoreTests
                 RuleType.Amount,
                 "10",
                 "Amount",
-                item1
+                item1.name
             );
             
             RuleInfo rule2 = new RuleInfo(
                 RuleType.Category,
                 "Tech",
                 "Category",
-                item1
+                item1.name
             );
 
             RuleInfoNodeLeaf ruleInfoNodeLeaf1 = new RuleInfoNodeLeaf(rule1);
@@ -131,7 +134,7 @@ namespace Tests.Business.StoreTests
             //RuleInfoNodeComposite composite = new RuleInfoNodeComposite(ruleInfoNodeLeaf1, ruleInfoNodeLeaf2, Combinations.AND);
             DiscountInfoCompositeNode discountInfoComp =
                 new DiscountInfoCompositeNode(discountInfoLeaf1, discountInfoLeaf2, Combinations.AND);
-            var addDiscountToStore = MyStore.AddDiscountToStore(discountInfoComp);
+            var addDiscountToStore = MyStore.AddDiscountToStore(Alice,discountInfoComp);
             Assert.True(addDiscountToStore.IsSuccess,addDiscountToStore.Error);
             Cart cart = new Cart(Alice);
             item1.amount = 15;
@@ -144,6 +147,7 @@ namespace Tests.Business.StoreTests
         }
 
         [Test]
+        [Order(0)]
         public void TestOrBothForDiscountAndRules()
         {
             double theDiscount = 0.5;
@@ -151,14 +155,14 @@ namespace Tests.Business.StoreTests
                 RuleType.Amount,
                 "10",
                 "Amount",
-                item1
+                item1.name
             );
             
             RuleInfo rule2 = new RuleInfo(
                 RuleType.Category,
                 "Tech",
                 "Category",
-                item1
+                item1.name
             );
 
             RuleInfoNodeLeaf ruleInfoNodeLeaf1 = new RuleInfoNodeLeaf(rule1);
@@ -170,7 +174,7 @@ namespace Tests.Business.StoreTests
             //RuleInfoNodeComposite composite = new RuleInfoNodeComposite(ruleInfoNodeLeaf1, ruleInfoNodeLeaf2, Combinations.AND);
             DiscountInfoCompositeNode discountInfoComp =
                 new DiscountInfoCompositeNode(discountInfoLeaf1, discountInfoLeaf2, Combinations.AND);
-            var addDiscountToStore = MyStore.AddDiscountToStore(discountInfoComp);
+            var addDiscountToStore = MyStore.AddDiscountToStore(Alice,discountInfoComp);
             Assert.True(addDiscountToStore.IsSuccess,addDiscountToStore.Error);
             Cart cart = new Cart(Alice);
             item1.amount = 15;
