@@ -1,3 +1,5 @@
+using System;
+using eCommerce.Adapters;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
