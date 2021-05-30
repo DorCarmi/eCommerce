@@ -9,6 +9,7 @@ namespace Tests.Business.Mokups
     public class mokUser : IUser
     {
         private bool isLoggedIn = false;
+        
         private string userName;
 
         public mokUser(string username)
@@ -48,7 +49,7 @@ namespace Tests.Business.Mokups
         }
 
 
-        public MemberInfo MemberInfo { get; }
+        public MemberInfo MemberInfo { get; set; }
 
         public Result OpenStore(IStore store)
         {

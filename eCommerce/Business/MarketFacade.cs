@@ -683,22 +683,86 @@ namespace eCommerce.Business
 
         public Result AddRuleToStorePolicy(string token, string storeId, RuleInfoNode ruleInfoNode)
         {
-            throw new NotImplementedException();
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+            _logger.Info($"AddRuleToStorePolicy({user.Username} , {storeId})");
+
+            var res=store.AddRuleToStorePolicy(user,ruleInfoNode);
+            if (res.IsFailure)
+            {
+                return Result.Fail<IList<PurchaseRecord>>(res.Error);
+            }
+
+            return Result.Ok();
         }
 
         public Result AddDiscountToStore(string token, string storeId, DiscountInfoNode discountInfoNode)
         {
-            throw new NotImplementedException();
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+            _logger.Info($"AddDiscountToStore({user.Username} , {storeId})");
+
+            var res=store.AddDiscountToStore(user,discountInfoNode);
+            if (res.IsFailure)
+            {
+                return Result.Fail(res.Error);
+            }
+
+            return Result.Ok();
         }
 
         public Result<IList<RuleInfoNode>> GetStorePolicyRules(string token, string storeId)
         {
-            throw new NotImplementedException();
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<IList<RuleInfoNode>>(userAndStoreRes.Error);
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+            _logger.Info($"GetStorePolicyRules({user.Username} , {storeId})");
+
+            var res=store.GetStorePolicy(user);
+            if (res.IsFailure)
+            {
+                return Result.Fail<IList<RuleInfoNode>>(res.Error);
+            }
+
+            return res;
         }
 
         public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId)
         {
-            throw new NotImplementedException();
+            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<IList<DiscountInfoNode>>(userAndStoreRes.Error);
+            }
+            IUser user = userAndStoreRes.Value.Item1;
+            IStore store = userAndStoreRes.Value.Item2;
+
+            _logger.Info($"GetStorePolicyRules({user.Username} , {storeId})");
+
+            var res=store.GetStoreDiscounts(user);
+            if (res.IsFailure)
+            {
+                return Result.Fail<IList<DiscountInfoNode>>(res.Error);
+            }
+
+            return res;
         }
 
         #endregion

@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
+using eCommerce.Business.DiscountsAndPurchases.Purchases.Rules.CombineRules;
 using eCommerce.Business.DiscountsAndPurchases.Purchases.RulesInfo;
+using eCommerce.Business.Purchases;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Business.DiscountPoliciesCombination
 {
-    public class Xor : Composite
+    public class Xor : CombinatedComposite
     {
         private Composite _A;
         private Composite _B;
@@ -25,22 +27,47 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             _fieldToCompare = fieldToCompare;
             _itemToCompare = itemToCompare;
         }
+        public Xor(Composite a, Composite b, Compare comperator, FieldToCompare fieldToCompare)
+        {
+            _A = a;
+            _B = b;
+            _comperator = comperator;
+            _fieldToCompare = fieldToCompare;
+            _itemToCompare = null;
+        }
 
         public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
         {
-            Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
-            var aLst = _A.Check(checkItem1, checkItem2);
-            if (aLst.Count > 0)
+            var checkA = _A.Check(checkItem1, checkItem2);
+            var checkB = _B.Check(checkItem1, checkItem2);
+            Composite theChosenOne;
+            if (checkA.Count > 0 && checkB.Count > 0)
             {
-                itemsList=CombineDictionaries(itemsList, aLst);
+                var theChosenOneRes = HandleFieldToCompare(checkItem1, checkItem2);
+                if (theChosenOneRes.IsSuccess)
+                {
+                    theChosenOne = theChosenOneRes.Value;
+                }
+                else
+                {
+                    return new Dictionary<string, ItemInfo>();
+                }
+                    
             }
-            var bLst = _B.Check(checkItem1, checkItem2);
-            if (bLst.Count > 0)
+            else if(checkA.Count>0)
             {
-                itemsList=CombineDictionaries(itemsList, bLst);
+                theChosenOne = _A;
+            }
+            else if(checkB.Count>0)
+            {
+                theChosenOne = _B;
+            }
+            else
+            {
+                return new Dictionary<string, ItemInfo>();
             }
 
-            return itemsList;
+            return theChosenOne.Check(checkItem1,checkItem2);
         }
 
         public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
@@ -149,6 +176,10 @@ namespace eCommerce.Business.DiscountPoliciesCombination
                     }
                 break;
                 case FieldToCompare.SpecificItem:
+                    if (_itemToCompare == null)
+                    {
+                        return Result.Fail<Composite>("No item to compare");
+                    }
                     var lstA = _A.Check(basket, user);
                     var lstB = _B.Check(basket, user);
                     if (lstA.Where(x=>x.Value.name.Equals(_itemToCompare.name)).ToList().Count>0)
@@ -161,6 +192,10 @@ namespace eCommerce.Business.DiscountPoliciesCombination
                     }
                 break;
                 case FieldToCompare.SpecificItemPrice:
+                    if (_itemToCompare == null)
+                    {
+                        return Result.Fail<Composite>("No item to compare");
+                    }
                     var priceItemA = _A.GetOneItem(this._itemToCompare, user);
                     var priceItemB = _B.GetOneItem(this._itemToCompare, user);
                     var comparedPrice = _comperator.GetResult(priceItemA.Value, priceItemB.Value);
@@ -186,6 +221,64 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             }
         }
 
-        
+
+        public override Result<RuleInfoNode> GetRuleInfo_A()
+        {
+            return _A.GetRuleInfo();
+        }
+
+        public override Result<RuleInfoNode> GetRuleInfo_B()
+        {
+            return _B.GetRuleInfo();
+        }
+
+        public override Result<DiscountInfoNode> GetDiscountInfo_A()
+        {
+            return _A.GetDisocuntInfo();
+        }
+
+        public override Result<DiscountInfoNode> GetDiscountInfo_B()
+        {
+            return _B.GetDisocuntInfo();
+        }
+
+        public override Combinations GetCombination()
+        {
+            return Combinations.XOR;
+        }
+
+        public override Result<DiscountInfoNode> GetDisocuntInfo()
+        {
+            var resA = _A.GetDisocuntInfo();
+            var resB = _B.GetDisocuntInfo();
+            if (resA.IsFailure)
+            {
+                return Result.Fail<DiscountInfoNode>(resA.Error);
+            }
+            if (resB.IsFailure)
+            {
+                return Result.Fail<DiscountInfoNode>(resB.Error);
+            }
+            return Result.Ok<DiscountInfoNode>(new DiscountInfoCompositeNode(_A.GetDisocuntInfo().Value, _B.GetDisocuntInfo().Value,
+                this._comperator.GetComperatorInfo(), _fieldToCompare, _itemToCompare));
+        }
+
+        public override Result<RuleInfoNode> GetRuleInfo()
+        {
+            var resA = _A.GetRuleInfo();
+            var resB = _B.GetRuleInfo();
+            if (resA.IsFailure)
+            {
+                return Result.Fail<RuleInfoNode>(resA.Error);
+            }
+            if (resB.IsFailure)
+            {
+                return Result.Fail<RuleInfoNode>(resB.Error);
+            }
+
+            return Result.Ok<RuleInfoNode>(new RuleInfoNodeComposite(_A.GetRuleInfo().Value, _B.GetRuleInfo().Value,
+                _comperator.GetComperatorInfo(),
+                _fieldToCompare, _itemToCompare));
+        }
     }
 }

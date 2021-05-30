@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using eCommerce.Common;
@@ -23,5 +24,6 @@ namespace eCommerce.Business
         public CartInfo GetCartInfo();
 
         public IUser GetUser();
+        IList<ItemInfo> GetAllItems();
     }
 }

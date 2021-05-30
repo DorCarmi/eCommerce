@@ -190,6 +190,41 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
+        public Result CheckWithStorePolicy(IBasket basket, IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result AddDiscountToStore(IUser user, DiscountInfoNode infoNode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result AddRuleToStorePolicy(IUser user, RuleInfoNode ruleInfoNode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<RuleInfoNode>> GetStorePolicy(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result ResetStorePolicy(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result ResetStoreDiscount(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy)
         {
             throw new NotImplementedException();

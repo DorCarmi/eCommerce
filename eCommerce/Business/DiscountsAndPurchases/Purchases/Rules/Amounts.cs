@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
+using eCommerce.Business.Purchases;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -15,7 +17,7 @@ namespace eCommerce.Business
         private int _amount;
         private Compare _compare;
         
-        public Amounts(string item, int amount,Compare compare)
+        public Amounts(string item,int amount,Compare compare)
         {
             _item = item;
             _amount = amount;
@@ -49,7 +51,7 @@ namespace eCommerce.Business
 
         public override bool CheckOneItem(ItemInfo item, IUser checkItem2)
         {
-            if (item.name.Equals(_item)
+            if (item.name.Equals(_item) 
                 && _compare.GetResult(_amount,item.amount)>0)
             {
                 return true;
@@ -57,5 +59,12 @@ namespace eCommerce.Business
 
             return false;
         }
+
+        public override Result<RuleInfoNode> GetRuleInfo()
+        {
+            return Result.Ok<RuleInfoNode>(new RuleInfoNodeLeaf(new RuleInfo(RuleType.Amount, this._amount.ToString(), "", this._item,
+                this._compare.GetComperatorInfo())));
+        }
+        
     }
 }

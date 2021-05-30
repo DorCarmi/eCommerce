@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection.Metadata;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.DiscountPoliciesCombination;
 using eCommerce.Business.Discounts;
+using eCommerce.Business.DiscountsAndPurchases.Purchases.Rules.CombineRules;
 using eCommerce.Business.PurchaseRules;
 using eCommerce.Common;
 
@@ -55,7 +57,7 @@ namespace eCommerce.Business.Purchases
                     retComp = new Plus(resA.Value, resB.Value);
                     break;
                 default:
-                    retComp = new DefaultDiscount();
+                    retComp = new DefaultRule();
                     break;
             }
 
@@ -112,6 +114,20 @@ namespace eCommerce.Business.Purchases
                         return Result.Fail<Composite>("Bad item amount input to discount");
                     }
                     break;
+                case RuleType.Total_Price:
+                    
+                    int totalPriceVal;
+                    parseAns = int.TryParse(therule.WhatIsTheRuleFor, out totalPriceVal);
+                    if (parseAns)
+                    {
+                        TotalPrice totalPrice = new TotalPrice(totalPriceVal, HandleComperator(therule.Comperators));
+                        retComp = totalPrice;
+                    }
+                    else
+                    {
+                        return Result.Fail<Composite>("Bad item price input to discount");
+                    }
+                    break;
                 case RuleType.IsItem:
                     IsItem isItem = new IsItem(therule.WhichItems);
                     retComp = isItem;
@@ -145,13 +161,13 @@ namespace eCommerce.Business.Purchases
                     break;
 
                 default:
-                    retComp = new DefaultDiscount(); 
+                    retComp = new DefaultRule(); 
                     break;
             }
             return Result.Ok(retComp);
         }
 
-        private static Compare HandleComperator(Comperators theruleComperators)
+        public static Compare HandleComperator(Comperators theruleComperators)
         {
             Compare retCompare;
             switch (theruleComperators)
@@ -179,5 +195,46 @@ namespace eCommerce.Business.Purchases
             return retCompare;
         }
     }
-    
+
+    public class DefaultRule : CompositeRule
+    {
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        {
+            Dictionary<string, ItemInfo> items = new Dictionary<string, ItemInfo>();
+            foreach (var item in checkItem1.GetAllItems().Value)
+            {
+                items.Add(item.name,item);
+            }
+
+            return items;
+        }
+
+        public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
+        {
+            return true;
+        }
+        
+        public override Result<double> Get(IBasket basket, IUser user)
+        {
+            double price = 0;
+            
+            foreach (var item in basket.GetAllItems().Value)
+            {
+                price += item.amount * item.pricePerUnit;
+            }
+
+            return Result.Ok(price);
+        }
+
+        public override Result<double> GetOneItem(ItemInfo itemInfo, IUser user)
+        {
+            return Result.Ok<double>(itemInfo.amount * itemInfo.pricePerUnit);
+        }
+
+        public override Result<RuleInfoNode> GetRuleInfo()
+        {
+            return Result.Ok<RuleInfoNode>(new RuleInfoNodeLeaf(new RuleInfo(RuleType.Default, "", "", "")));
+        }
+        
+    }
 }

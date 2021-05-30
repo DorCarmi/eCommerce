@@ -259,36 +259,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result AssignPurchaseStrategy(User user,PurchaseStrategyName purchaseStrategy)
-        {
-            if (user.HasPermission(_belongsToStore, StorePermission.ChangeItemStrategy).IsSuccess)
-            {
-                if (_belongsToStore.CheckWithPolicy(purchaseStrategy))
-                {
-                    var resStrategy=DefaultPurchaseStrategy.GetPurchaseStrategyByName(purchaseStrategy,_belongsToStore);
-                    if (resStrategy.IsFailure)
-                    {
-                        return Result.Fail(resStrategy.GetErrorReason());
-                    }
-                    else
-                    {
-                        
-                        this._purchaseStrategy = resStrategy.GetValue();
-                        return Result.Ok();
-                    }
-                    
-                }
-                else
-                {
-                    return Result.Fail("Strategy not permitted by store's policy");
-                }
-            }
-            else
-            {
-                return Result.Fail(
-                    "User doesn't have the permission to change the strategy for this item in this store");
-            }
-        }
+        
 
         public Result EditItem(ItemInfo newItem)
         {

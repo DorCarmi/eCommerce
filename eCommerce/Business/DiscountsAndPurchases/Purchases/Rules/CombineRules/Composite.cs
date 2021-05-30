@@ -43,5 +43,10 @@ namespace eCommerce.Business.CombineRules
 
             return combinedDictionary;
         }
+
+
+        public abstract Result<RuleInfoNode> GetRuleInfo();
+
+        public abstract Result<DiscountInfoNode> GetDisocuntInfo();
     }
 }

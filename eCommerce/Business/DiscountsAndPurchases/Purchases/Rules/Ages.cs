@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using eCommerce.Business.Discounts;
+using eCommerce.Business.Purchases;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -20,7 +21,8 @@ namespace eCommerce.Business.PurchaseRules
         public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
         {
             Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
-            var compareAns = compare.GetResult(age, (checkItem2.MemberInfo.Birthday.Date - DateTime.Now.Date).Days);
+            int currAge = (DateTime.Now.Date-checkItem2.MemberInfo.Birthday.Date).Days/ 365;
+            var compareAns = compare.GetResult(age, currAge);
             if (compareAns > 0)
             {
                 foreach (var item in checkItem1.GetAllItems().Value)
@@ -39,6 +41,12 @@ namespace eCommerce.Business.PurchaseRules
         {
             var compareAns = compare.GetResult(age, (checkItem2.MemberInfo.Birthday.Date - DateTime.Now.Date).Days);
             return compareAns > 0;
+        }
+
+        public override Result<RuleInfoNode> GetRuleInfo()
+        {
+            return Result.Ok<RuleInfoNode>(new RuleInfoNodeLeaf(new RuleInfo(RuleType.Age, this.age.ToString(), "", "",
+                compare.GetComperatorInfo())));
         }
 
         
