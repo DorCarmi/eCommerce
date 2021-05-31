@@ -18,25 +18,33 @@ namespace eCommerce.Adapters
         public WSEPSupplyAdapter()
         {
             _httpClient = new HttpClient();
-            _url = "https://cs-bgu-wsep.herokuapap.com/";
+            _url = "https://cs-bgu-wsep.herokuapp.com/";
             LogManager.GetCurrentClassLogger();
         }
         
         public async Task<bool> VerifyConnection()
         {
+            HttpResponseMessage responseMessage;
             Dictionary<string, string> dictionary = new Dictionary<string, string>()
             {
                 {"action_type", "handshake"},
             };
 
             HttpContent content = new FormUrlEncodedContent(dictionary);
-            HttpResponseMessage responseMessage = await _httpClient.PostAsync(_url, content);
+            try
+            {
+                responseMessage = await _httpClient.PostAsync(_url, content);
+            } catch (Exception e)
+            {
+                return false;
+            }
 
             return responseMessage.IsSuccessStatusCode;
         }
         public async Task<Result<int>> SupplyProducts(string storeName, string[] itemsNames, string userAddress)
         {
             int transactionId = -1;
+            HttpResponseMessage responseMessage;
             Dictionary<string, string> dictionary = new Dictionary<string, string>()
             {
                 {"action_type", "supply"},
@@ -45,7 +53,14 @@ namespace eCommerce.Adapters
             };
 
             HttpContent content = new FormUrlEncodedContent(dictionary);
-            HttpResponseMessage responseMessage = await _httpClient.PostAsync(_url, content);
+            try
+            {
+                responseMessage = await _httpClient.PostAsync(_url, content);
+            }
+            catch (Exception e)
+            {
+                return Result.Fail<int>("Payment system connection error");
+            }
 
             if (!responseMessage.IsSuccessStatusCode)
             {
@@ -66,6 +81,7 @@ namespace eCommerce.Adapters
 
         public async Task<Result> CheckSupplyInfo(int transactionId)
         {
+            HttpResponseMessage responseMessage;
             Dictionary<string, string> dictionary = new Dictionary<string, string>()
             {
                 {"action_type", "cancel_supply"},
@@ -73,8 +89,15 @@ namespace eCommerce.Adapters
             };
 
             HttpContent content = new FormUrlEncodedContent(dictionary);
-            HttpResponseMessage responseMessage = await _httpClient.PostAsync(_url, content);
-            
+            try
+            {
+                responseMessage = await _httpClient.PostAsync(_url, content);
+            }
+            catch (Exception e)
+            {
+                return Result.Fail("Payment system connection error");
+            }
+
             if (!responseMessage.IsSuccessStatusCode)
             {
                 string message = $"Connection error with the supply system {responseMessage.StatusCode}";

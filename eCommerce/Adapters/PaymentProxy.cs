@@ -16,6 +16,7 @@ namespace eCommerce.Adapters
         public PaymentProxy()
         {
             _transactionId = 10000;
+            _adapter = new WSEPPaymentAdapter();
         }
 
         public static void AssignPaymentService(IPaymentAdapter paymentAdapter)
