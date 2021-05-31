@@ -66,6 +66,7 @@ export default class App extends Component {
 
     async updateLogoutHandler(){
         const userBasicInfo = await this.userApi.getUserBasicInfo();
+        await this.state.webSocketConnection.stop();
         this.setState({
             isLoggedIn: userBasicInfo.isLoggedIn,
             userName: userBasicInfo.username,

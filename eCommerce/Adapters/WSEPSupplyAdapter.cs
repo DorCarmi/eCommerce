@@ -19,6 +19,7 @@ namespace eCommerce.Adapters
         {
             _httpClient = new HttpClient();
             _url = "https://cs-bgu-wsep.herokuapp.com/";
+            _logger = LogManager.GetCurrentClassLogger();
             LogManager.GetCurrentClassLogger();
         }
         
