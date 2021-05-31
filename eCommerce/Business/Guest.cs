@@ -38,7 +38,12 @@ namespace eCommerce.Business
         {
             return Result.Fail<List<string>>("Illegal action for guest (GetDiscount-Store-Ids).");
         }
-        
+
+        public Result<IList<string>> GetManagedStoreIds(User user)
+        {
+            return Result.Fail<IList<string>>("Illegal action for guest (Get-Managed-Stores-Ids).");
+        }
+
         public Result AppointUserToOwner(User user, IStore store, IUser otherUser)
         {
             return Result.Fail("Illegal action for guest (Appoint-User).");

@@ -9,6 +9,7 @@ export class Home extends Component {
     return (
       <div>
         <h1>Welcome to the greadt ecommerce store</h1>
+        {/*<WebSocketExample/>*/}
       </div>
     );
   }

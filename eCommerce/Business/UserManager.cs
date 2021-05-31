@@ -19,6 +19,7 @@ namespace eCommerce.Business
         
         // token to user
         private ConcurrentDictionary<string, IUser> _connectedUsers;
+        private ConcurrentDictionary<string, bool> _connectedUsersName;
         private IRepository<IUser> _registeredUsersRepo;
         private ConcurrentDictionary<string, IUser> _admins;
 
@@ -29,6 +30,7 @@ namespace eCommerce.Business
         {
             _auth = auth;
             _connectedUsers = new ConcurrentDictionary<string, IUser>();
+            _connectedUsersName = new ConcurrentDictionary<string, bool>();
             // TODO get the initialze id value from DB
             _concurrentIdGenerator = new ConcurrentIdGenerator(0);
             _registeredUsersRepo = registeredUsersRepo;
@@ -149,11 +151,18 @@ namespace eCommerce.Business
             {
                 return Result.Fail<string>(authLoginRes.Error);
             }
+
+            if (_connectedUsersName.ContainsKey(username))
+            {
+                return Result.Fail<string>("User is already logged in");
+            }
+            
             string loginToken = _auth.GenerateToken(username);
             
             IUser user = _registeredUsersRepo.GetOrNull(username);
             if (user == null)
             {
+                _logger.Error($"User {username} is registered in auth, but not in usermanger");
                 return Result.Fail<string>("Invalid username or password");
             }
 
@@ -162,7 +171,7 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Guest not connected");
             }
             
-            if (!_connectedUsers.TryAdd(loginToken, user))
+            if (!_connectedUsers.TryAdd(loginToken, user) || !_connectedUsersName.TryAdd(username, true))
             {
                 _logger.Error($"UserAuth created duplicate toekn(already in connected userses dictionry)");
                 return Result.Fail<string>("Error");
@@ -191,7 +200,8 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Guest cant logout");
             }
 
-            if (!_connectedUsers.TryRemove(token, out var tUser1))
+            if (!_connectedUsers.TryRemove(token, out var tUser1) || 
+                !_connectedUsersName.TryRemove(user.Username, out var tbool))
             {
                 _logger.Error($"User logout error");
             }
@@ -332,13 +342,15 @@ namespace eCommerce.Business
 
         public void CreateMainAdmin()
         {
+            AppConfig config = AppConfig.GetInstance();
+            
             MemberInfo adminInfo = new MemberInfo(
-                "_Admin",
-                "Admin@eCommerce.com",
+                config.GetData("AdminCreationInfo:Username"),
+                config.GetData("AdminCreationInfo:Email"),
                 "TheAdmin",
                 DateTime.Now, 
                 null);
-            AddAdmin(adminInfo, "_Admin");
+            AddAdmin(adminInfo, config.GetData("AdminCreationInfo:Password"));
         }
     }
 }

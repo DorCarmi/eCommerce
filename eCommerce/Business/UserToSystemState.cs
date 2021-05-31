@@ -11,6 +11,7 @@ namespace eCommerce.Business
         Result Logout(User user,string toGuestName);
         Result OpenStore(User user,IStore store);
         Result<List<string>> GetStoreIds(User user);
+        Result<IList<string>> GetManagedStoreIds(User user);
         Result AppointUserToOwner(User user,IStore store, IUser otherUser);
         Result AppointUserToManager(User user,IStore store, IUser otherUser);
         Result<OwnerAppointment> MakeOwner(User user,IStore store);

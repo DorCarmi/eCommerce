@@ -5,7 +5,7 @@ import {ItemDisplay} from "./ItemDisplay";
 import {StoreApi} from "../Api/StoreApi";
 
 interface ItemsSearchDisplayProps {
-    itemQuery: string
+    itemQuery: string,
 }
 
 interface ItemsSearchDisplayState {
@@ -19,19 +19,21 @@ export class ItemSearchDisplay extends Component<ItemsSearchDisplayProps, ItemsS
     constructor(props: ItemsSearchDisplayProps) {
         super(props);
         this.state = {
-            items: undefined
+            items: undefined,
+            
         }
         this.storeApi = new StoreApi();
     }
 
     async componentDidMount() {
-        const searchForItems = await this.storeApi.searchItems(this.props.itemQuery);
-
-        if (searchForItems && searchForItems.isSuccess) {
-            this.setState({
-                items: searchForItems.value
-            })
-        }
+        let res=undefined
+            res = await this.storeApi.searchItems(this.props.itemQuery);
+        
+            if (res && res.isSuccess) {
+                this.setState({
+                    items: res.value
+                })
+            }
     }
 
     render() {
