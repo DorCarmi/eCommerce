@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
@@ -67,7 +68,7 @@ namespace eCommerce.Business
         Result<UserBasicInfo> GetUserBasicInfo(string token);
 
         /// <summary>
-        /// GetDiscount the purchase history of the user 
+        /// Get the purchase history of the user 
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The purchase history</returns>
@@ -100,7 +101,15 @@ namespace eCommerce.Business
         /// <param name="appointedManagerUserId">The appointment manager</param>
         /// <returns>Result of the appointment</returns>
         public Result AppointManager(string token, string storeId, string appointedManagerUserId);
-        
+
+        /// <summary>
+        /// Return all the store permission that the user have
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The store id</param>
+        /// <returns>All the store permission that the user have</returns>
+        public Result<IList<StorePermission>> GetStorePermission(string token, string storeId);
+
         // TODO how to define and send the permission
         /// <summary>
         /// Update the manager permission
@@ -126,7 +135,7 @@ namespace eCommerce.Business
 
 
         /// <summary>
-        /// GetDiscount all the staff of the store and their permissions
+        /// Get all the staff of the store and their permissions
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The storeId</param>
@@ -135,7 +144,7 @@ namespace eCommerce.Business
             string storeId);
 
         /// <summary>
-        /// GetDiscount the history purchase of a user
+        /// Get the history purchase of a user
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -144,7 +153,7 @@ namespace eCommerce.Business
         public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryUser(string token, string ofUserId);
         
         /// <summary>
-        /// GetDiscount the history purchase of a store
+        /// Get the history purchase of a store
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -192,7 +201,7 @@ namespace eCommerce.Business
         public Result<IEnumerable<string>> SearchForStore(string token, string query);
         
         /// <summary>
-        /// GetDiscount all the store information
+        /// Get all the store information
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -200,7 +209,7 @@ namespace eCommerce.Business
         public Result<IStore> GetStore(string token, string storeId);
         
         /// <summary>
-        /// GetDiscount all the store items
+        /// Get all the store items
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -208,7 +217,7 @@ namespace eCommerce.Business
         public Result<IEnumerable<IItem>> GetAllStoreItems(string token, string storeId);
         
         /// <summary>
-        /// GetDiscount the info of an item
+        /// Get the info of an item
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -217,11 +226,18 @@ namespace eCommerce.Business
         public Result<IItem> GetItem(string token, string storeId, string itemId);
         
         /// <summary>
-        /// GetDiscount all the store ids of the user owns
+        /// Get all the store ids of the user owns
         /// </summary>
         /// <param name="token">The Authorization token</param>
         /// <returns>All the owned store ids</returns>
         public Result<List<string>> GetStoreIds(string token);
+
+        /// <summary>
+        /// Return all stores id that the user manage
+        /// </summary>
+        /// <param name="token">The Authorization token</param>
+        /// <returns>All stores id that the user manage</returns>
+        public Result<IList<string>> GetAllManagedStores(string token);
         
         #endregion
         
@@ -249,7 +265,7 @@ namespace eCommerce.Business
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount);
 
         /// <summary>
-        /// GetDiscount the cart of the user
+        /// Get the cart of the user
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The user cart</returns>
@@ -384,9 +400,6 @@ namespace eCommerce.Business
         /// <returns>List of all discounts in store</returns>
         public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId);
         
-        
-        
-
         #endregion
     }
 }

@@ -14,7 +14,6 @@ namespace eCommerce.Communication
         private const string AUTH_COOKIE = "_auth";
         
         private readonly RequestDelegate _next;
-        private readonly IDictionary<string, bool> _controllersNames;
         private readonly IAuthService _authService;
         
         
@@ -22,7 +21,6 @@ namespace eCommerce.Communication
             IActionDescriptorCollectionProvider provider)
         {
             _next = next;
-            _controllersNames = new Dictionary<string, bool>();
             _authService = new AuthService();
             
              var controllers = provider.ActionDescriptors.Items.Where(
@@ -36,7 +34,6 @@ namespace eCommerce.Communication
                 if (controller != null)
                 {
                     Console.WriteLine(controller);
-                    _controllersNames.Add(controller, true);
                 }
             }
         }

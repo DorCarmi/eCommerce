@@ -43,6 +43,11 @@ namespace Tests.Business.Mokups
             throw new NotImplementedException();
         }
 
+        public Result<IList<StorePermission>> GetPermissions(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<Item> SearchItem(string stringSearch)
         {
             throw new System.NotImplementedException();

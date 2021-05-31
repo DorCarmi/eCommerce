@@ -1,11 +1,11 @@
 ﻿import React, {Component} from "react";
 import {Table} from 'react-bootstrap'
 import {StoreApi} from "../Api/StoreApi";
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
+import {UserApi} from "../Api/UserApi";
 import {Item} from "../Data/Item";
-
-
-
+import {StorePermission} from '../Data/StorePermission'
+import {NavLink} from "reactstrap";
 
 export default class Store extends Component {
     static displayName = Store.name;
@@ -15,12 +15,14 @@ export default class Store extends Component {
         const {storeId} = props
         this.state = {
             storeId: storeId,
-            items: []
+            items: [],
+            permissions:[],
+            selectedItem:''
         }
         this.storeApi = new StoreApi();
     }
 
-    async componentDidMount() {
+    async getItems(){
         const fetchedItems = await this.storeApi.getAllItems(this.state.storeId)
         if (fetchedItems && fetchedItems.isSuccess) {
             this.setState({
@@ -28,8 +30,33 @@ export default class Store extends Component {
             })
         }
     }
+    
+    async componentDidMount() {
+        await this.getItems();
+        console.log(this.state.storeId)
+        const fetchedPermissions = await this.storeApi.getStorePermissionForUser(this.state.storeId)
+        console.log(fetchedPermissions)
+        if(fetchedPermissions.isSuccess){
+            console.log(fetchedPermissions.value)
+            this.setState({
+                permissions:fetchedPermissions.value
+            })
+        }
+    }
+
+    async componentDidUpdate(prevProps, prevState, undefined) {
+        if (prevProps.storeId !== this.props.storeId) {
+            console.log(`update `);
+            console.log(this.props);
+            console.log(prevProps);
+            await this.setState({
+                storeId: this.props.storeId
+            })
+            await this.getItems();
+        }
+    }
+    
     redirectToHome = (path) => {
-        alert(path)
         const { history } = this.props;
         if(history) {
             alert('succed')
@@ -52,14 +79,36 @@ export default class Store extends Component {
             }
         }
 
+    }   
+    
+    storeManagment(){
+        const {items,storeId,permissions} = this.state
+        return (
+            <div>
+                {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link tag={Link} exact to={`/managePermissions/${storeId}`}>Manage Permissions</Link></div> : null}
+                {permissions.includes(StorePermission.AddItemToStore) ? <div><Link to={`${storeId}/addItem`}>Add an Item</Link></div> : null}
+                {permissions.includes(StorePermission.GetStoreHistory) ? <Link to={`/purchaseHistory/${storeId}`}>Show Store's Purchase History</Link> : null}
+
+                    </div>
+
+        )
+    }
+
+    addToCart(itemName){
+        this.setState({
+            selectedItem:itemName
+        })
     }
     
     render() {
-        const {items,storeId} = this.state
+        const {items,storeId,permissions,selectedItem} = this.state
+        if(selectedItem.length > 0){
+            return <Redirect exact to={`/searchItems/Item/${selectedItem}`}/>
+        }
         if (items.length > 0) {
             return (
                 <div>
-                    <Link to={`${storeId}/addItem`}>Add an Item</Link>
+                    {this.storeManagment()}
                     <Table striped bordered hover>
                     <thead>
                     <tr>
@@ -83,9 +132,15 @@ export default class Store extends Component {
                                     <td>{item.pricePerUnit}</td>
                                     <td>
                                         <div>
-                                        <Link exact to={`${storeId}/editItem/${item.itemName}`}>Edit Item</Link>
+                                            {permissions.includes(StorePermission.EditItemDetails) ? <Link exact to={`${storeId}/editItem/${item.itemName}`}>Edit Item</Link> : null}
                                         </div>
-                                        <button onClick={() => this.removeItem(storeId,item.itemName)}>Remove Item</button>
+                                        <div>
+                                        {permissions.includes(StorePermission.RemoveStoreStaff) ? <button onClick={() => this.removeItem(storeId,item.itemName)}>Remove Item</button> : null }
+                                        </div>
+                                        <div>
+                                            {permissions.includes(StorePermission.EditStorePolicy) ? <Link to={`/store/${storeId}/addRule/${item.itemName}`}>Add Rule</Link> : null}
+                                        </div>
+                                        <button onClick={(e) => this.addToCart(item.itemName) }>Add To Cart</button>
                                     </td>
                                 </tr>
                             )
@@ -97,9 +152,7 @@ export default class Store extends Component {
             );
         } else {
             return <div>
-                <div>
-                 <Link to={`${storeId}/addItem`}>Add an Item</Link>   
-                </div>
+                {this.storeManagment()}
                 Empty Store
             </div>
         }
