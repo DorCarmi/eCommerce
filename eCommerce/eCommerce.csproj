@@ -24,6 +24,7 @@
       <Folder Include="Adapters" />
       <Folder Include="Business\DiscountsAndPurchases" />
       <Folder Include="ClientApp\public\Images" />
+      <Folder Include="Migrations" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -10,40 +12,62 @@ namespace eCommerce.Business
 {
     public class User : IUser
     {
-        
+        [NotMapped]
         private bool _isRegistered;
+        [NotMapped]
         private UserToSystemState _systemState;
-        private readonly MemberInfo  _memberInfo;
-        public string Username {get => _memberInfo.Username;}
+        [NotMapped]
+        private MemberInfo _memberInfo { get; set; }
+
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string Username { get; set; }
+        
         public MemberInfo MemberInfo
         {
-            get => _memberInfo;
+            get
+            {
+                return _memberInfo;
+            }
+            set
+            {
+                _memberInfo = value;
+            }
         }
+        [NotMapped]
         private ICart _myCart;
-
+        [NotMapped]
         private Object dataLock;
         //MemberData:
+        [NotMapped]
         private ConcurrentDictionary<IStore, bool> _storesFounded;
+        [NotMapped]
         private ConcurrentDictionary<IStore, OwnerAppointment> _storesOwned;
+        [NotMapped]
         private ConcurrentDictionary<IStore, ManagerAppointment> _storesManaged;
+        [NotMapped]
         private ConcurrentDictionary<IStore, IList<OwnerAppointment>> _appointedOwners;
+        [NotMapped]
         private ConcurrentDictionary<IStore, IList<ManagerAppointment>> _appointedManagers;
+        [NotMapped]
         private UserTransactionHistory _transHistory ;
         
 
         //constructors
-        public User(string userName)
+        public User(string Username)
         {
-            _memberInfo = new MemberInfo(userName, null,null,DateTime.Now, null);
+            this.Username = Username;
+            _memberInfo = new MemberInfo(Username, null,null,DateTime.Now, null);
             _systemState = Guest.State;
             _myCart = new Cart(this);
             _isRegistered = false;
             dataLock = new Object();
         }
-        public User(MemberInfo info)
+        public User(MemberInfo MemberInfo)
         {
             _isRegistered = true;
-            _memberInfo = info;
+            Username = MemberInfo.Username;
+            _memberInfo = MemberInfo;
             dataLock = new Object();
             _systemState = Member.State;
             _myCart = new Cart(this);
@@ -55,10 +79,11 @@ namespace eCommerce.Business
             _appointedManagers = new ConcurrentDictionary<IStore, IList<ManagerAppointment>>();
             _transHistory = new UserTransactionHistory();
         } 
-        public User(UserToSystemState state, MemberInfo info)
+        public User(UserToSystemState state, MemberInfo MemberInfo)
         {
             _isRegistered = true;
-            _memberInfo = info;
+            Username = MemberInfo.Username;
+            _memberInfo = MemberInfo;
             dataLock = new Object();
             _systemState = state;
             _myCart = new Cart(this);
