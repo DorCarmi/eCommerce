@@ -12,9 +12,11 @@ namespace eCommerce.DataLayer
         public DbSet<MyPair<Classroom,Course>> Pairs { get; set; }
 
         
-       // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //    =>optionsBuilder.EnableSensitiveDataLogging().UseSqlite(@"Data Source=.\Persistence\testSchool.db");
-
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            // optionsBuilder.UseSqlServer("server=(localdb)\\MSSQLLocalDB;database=testDb;trusted_connection=true;");
+            optionsBuilder.EnableSensitiveDataLogging().UseSqlServer("Server=localhost;Database=master;Trusted_Connection=True;");
+        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<MyPair<Classroom,Course>>()
