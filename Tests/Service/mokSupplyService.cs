@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using eCommerce.Adapters;
+using eCommerce.Common;
 
 namespace Tests.Service
 {
@@ -12,16 +14,18 @@ namespace Tests.Service
             this.checkAns = checkAns;
             this.chargeAns = chargeAns;
         }
-        public async Task<bool> SupplyProducts(string storeName, string[] itemsNames, string userAddress)
+
+        public async Task<Result<int>> SupplyProducts(string storeName, string[] itemsNames, string userAddress)
         {
-            await Task.Delay(5000);
-            return chargeAns;
+            await Task.Delay(2000);
+            //TODO may generate id
+            return Result.Ok(100000);
         }
 
-        public async Task<bool> CheckSupplyInfo(string storeName, string[] itemsNames, string userAddress)
+        public async Task<Result> CheckSupplyInfo(int transactionId)
         {
-            await Task.Delay(5000);
-            return checkAns;
+            await Task.Delay(2000);
+            return Result.Ok();
         }
     }
 }
