@@ -16,7 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Adapters" />
       <Folder Include="Business\DiscountsAndPurchases" />
       <Folder Include="ClientApp\public\Images" />
     </ItemGroup>

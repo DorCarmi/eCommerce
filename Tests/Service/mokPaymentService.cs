@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using eCommerce.Adapters;
+using eCommerce.Common;
 
 namespace Tests.Service
 {
@@ -14,26 +15,24 @@ namespace Tests.Service
             this.checkAns = checkAnswer;
             this.refundAns = refundAns;
         }
-        public async Task<bool> Charge(double price, string paymentInfoUserName, string paymentInfoIdNumber, string paymentInfoCreditCardNumber,
+
+        public async Task<Result<int>> Charge(double price, string paymentInfoUserName, string paymentInfoIdNumber, string paymentInfoCreditCardNumber,
             string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)
         {
-                await Task.Delay(5000);
-                return chargeAns;
-            
+            await Task.Delay(2000);
+            //TODO may generate id
+            return Result.Ok(100000);        }
+
+        public Task<bool> CheckPaymentInfo(string paymentInfoUserName, string paymentInfoIdNumber, string paymentInfoCreditCardNumber,
+            string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)
+        {
+            throw new System.NotImplementedException();
         }
 
-        public async Task<bool> CheckPaymentInfo(string paymentInfoUserName, string paymentInfoIdNumber, string paymentInfoCreditCardNumber,
-            string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)
+        public async Task<Result> Refund(int transactionId)
         {
-            await Task.Delay(5000);
-            return checkAns;
-        }
-
-        public async Task<bool> Refund(double price, string paymentInfoUserName, string paymentInfoIdNumber, string paymentInfoCreditCardNumber,
-            string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)
-        {
-            await Task.Delay(5000);
-            return refundAns;
+            await Task.Delay(2000);
+            return Result.Ok();
         }
     }
 }
