@@ -1,0 +1,29 @@
+﻿[
+  {
+    "Type": "CreateUser",
+    "Data": {
+      "MemberInfo": {
+        "Username": "User1",
+        "Email": "User1@ecommerce.com",
+        "Name": "User1",
+        "Birthday": "01/01/1990",
+        "Address": "Hollywood Street 1"
+      },
+      "Password": "User1"
+    }
+  },
+
+  {
+    "Type": "AddStore",
+    "Data": {
+      "var": "1"
+    }
+  },
+
+  {
+    "Type": "AddItemToStore",
+    "Data": {
+      "var": "1"
+    }
+  }
+]
