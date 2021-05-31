@@ -9,11 +9,9 @@ namespace eCommerce
     {
         public static void Main(string[] args)
         {
+            InitSystem initSystem = new InitSystem();
+            initSystem.Init("Init.json");
            CreateHostBuilder(args).Build().Run();
-           /*var payment = new WSEPPaymentAdapter();
-           var res = payment.Charge(10, "a", "a", "123",
-               DateTime.Now.AddDays(1).ToLongDateString(), "123").Result;
-           Console.WriteLine(res.Value);*/
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

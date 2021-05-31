@@ -1,5 +1,5 @@
 ﻿{
-  "DBConnectionString": "a",
+  "DBConnectionString": "server=localhost",
   "AdminCreationInfo" : {
     "Username": "_Admin",
     "Email": "Admin@eCommerce.com",
