@@ -1,6 +1,6 @@
 ﻿[
   {
-    "Type": "CreateUser",
+    "Action": "CreateUser",
     "Data": {
       "MemberInfo": {
         "Username": "User1",
@@ -14,16 +14,30 @@
   },
 
   {
-    "Type": "AddStore",
-    "Data": {
-      "var": "1"
-    }
-  },
+    "Action": "MemberAction",
+    "Data" : {
+      "Username": "User1",
+      "Password": "User1",
+      "Actions": [
+        {
+          "Action": "OpenStore",
+          "Data": {
+            "StoreName": "Store1(User1)"
+          }
+        },
 
-  {
-    "Type": "AddItemToStore",
-    "Data": {
-      "var": "1"
+        {
+          "Action": "AddItem",
+          "Data": {
+            "ItemName": "Watermelon",
+            "StoreName": "Store1(User1)",
+            "Amount": 20,
+            "Category": "Sweat",
+            "KeyWords": ["Summer"],
+            "PricePerUnit": 22
+          }
+        }
+      ]
     }
   }
 ]
