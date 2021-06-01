@@ -3,14 +3,16 @@ using System.IO;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.SignalR.Protocol;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
 
 namespace eCommerce
 {
-    public class InitDataJsonFormat {
-        public string Type { get; set; }
+    public class BasicActionJsonFormat {
+        public string Action { get; set; }
         public JObject Data { get; set; }
     }
     
@@ -19,6 +21,12 @@ namespace eCommerce
         public string Password { get;  set; }
     }
     
+    public class MemberAction {
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public BasicActionJsonFormat[] Actions { get; set; }
+    }
+
     public class InitSystem
     {
         private IAuthService _authService;
@@ -26,6 +34,7 @@ namespace eCommerce
         private IStoreService _storeService;
 
         private string _guestToken;
+        private string _workingToken;
         public InitSystem()
         {
             _authService = new AuthService();
@@ -43,6 +52,7 @@ namespace eCommerce
         private void CleanUp()
         { 
             _authService.Disconnect(_guestToken);
+            _authService.Disconnect(_authService.Logout(_workingToken).Value);
         }
 
         public void Init(string initFile)
@@ -50,11 +60,11 @@ namespace eCommerce
             Setup();
             
             int at = 0;
-            InitDataJsonFormat[] initDataJsons = JsonConvert.DeserializeObject<InitDataJsonFormat[]>(File.ReadAllText(initFile));
+            BasicActionJsonFormat[] initDataJsons = JsonConvert.DeserializeObject<BasicActionJsonFormat[]>(File.ReadAllText(initFile));
 
             foreach (var initData in initDataJsons)
             {
-                switch (initData.Type)
+                switch (initData.Action)
                 {
                     case "CreateUser":
                     {
@@ -62,23 +72,19 @@ namespace eCommerce
                         Result registerRes = _authService.Register(_guestToken, userData.MemberInfo, userData.Password);
                         if (registerRes.IsFailure)
                         {
-                            throw new InvalidDataException(
-                                $"\nSystem Init:\nError when register user {userData.MemberInfo.Username}\n" +
-                                $"Error message: {registerRes.Error}\n" +
-                                $"In index {at}, file {initFile}");
+                            ThrowInvalidException($"Error when register user {userData.MemberInfo.Username}",
+                                registerRes.Error, at, initFile);
                         }
                         break;
                     }
-                    case "AddStore":
+                    case "MemberAction":
                     {
-                        Console.WriteLine($"AddStore {initData.Data}");
+                        MemberAction memberAction = initData.Data.ToObject<MemberAction>();
+                        HandleMemberActions(memberAction, at, initFile);
                         break;
                     }
-                    case "AddItemToStore":
-                    {
-                        Console.WriteLine($"AddItemToStore {initData.Data}");
-                        break;
-                    }
+                    default:
+                        throw new InvalidDataException($"Invalid init action {initData.Action}");
                         
                 }
 
@@ -86,6 +92,62 @@ namespace eCommerce
             }
 
             CleanUp();
+        }
+
+        private void HandleMemberActions(MemberAction memberAction, int at, string initFile)
+        {
+            _workingToken = _authService.Connect();
+            Result<string> loginRes = _authService.Login(_workingToken, memberAction.Username,
+                memberAction.Password, ServiceUserRole.Member);
+            if (loginRes.IsFailure)
+            {
+                ThrowInvalidException($"User {memberAction.Username} wasn't able to login",
+                    loginRes.Error, at, initFile);
+            }
+
+            _workingToken = loginRes.Value;
+            
+            foreach (var basicAction in memberAction.Actions)
+            {
+                switch (basicAction.Action)
+                {
+                    case "OpenStore":
+                    {
+                        string storeName = basicAction.Data["StoreName"].ToString();
+                        Result openStoreRes = _storeService.OpenStore(_workingToken, storeName);
+                        if (openStoreRes.IsFailure)
+                        {
+                            ThrowInvalidException($"Error when opening store {storeName} for {memberAction.Username}",
+                                openStoreRes.Error, at, initFile);
+                        }
+                        break;
+                    }
+                    case "AddItem":
+                    {
+                        SItem item = basicAction.Data.ToObject<SItem>();
+                        Result addItemRes = _storeService.AddNewItemToStore(_workingToken, item);
+                        if (addItemRes.IsFailure)
+                        {
+                            ThrowInvalidException($"Error when adding item {item.ItemName} to store {item.StoreName}",
+                                addItemRes.Error, at, initFile);
+                        }
+                        break;
+                    }
+                    default:
+                        throw new InvalidDataException($"Invalid init action at index {at} of MemberAction");
+                }
+            }
+            
+            _authService.Disconnect(_authService.Logout(_workingToken).Value);
+        }
+
+        private void ThrowInvalidException(string errorMessage, string resMessage, int at, string initFile)
+        {
+            CleanUp();
+            throw new InvalidDataException(
+                $"\nSystem Init:\n{errorMessage}\n" +
+                $"Error message: {resMessage}\n" +
+                $"In index {at}, file {initFile}");
         }
     }
 }
