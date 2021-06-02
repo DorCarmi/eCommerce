@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+
 using NUnit.Framework;
 using Tests.Business.Mokups;
 
@@ -27,7 +27,7 @@ namespace Tests.Business.StoreTests
         private int itemPrice2 = 3000;
         private Category itemCategory2 = new Category("AppleProducts");
         
-        private IStore alenbyStore;
+        private Store alenbyStore;
         
         [SetUp]
         public void Setup()

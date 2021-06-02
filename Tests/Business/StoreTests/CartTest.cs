@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+
 using NUnit.Framework;
 using Tests.Business.Mokups;
 
@@ -12,7 +12,7 @@ namespace Tests.Business.StoreTests
     public class CartTest
     {
         private ICart MyCart;
-        private IStore MyStore;
+        private Store MyStore;
         private User Alice;
         private ItemInfo item1;
         private ItemInfo item2;

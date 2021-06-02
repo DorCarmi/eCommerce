@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using eCommerce.Publisher;
 
@@ -34,11 +34,11 @@ namespace eCommerce.Business
         private ICart _myCart;
         private Object dataLock;
         //MemberData:
-        private ConcurrentDictionary<IStore, bool> _storesFounded;
-        private ConcurrentDictionary<IStore, OwnerAppointment> _storesOwned;
-        private ConcurrentDictionary<IStore, ManagerAppointment> _storesManaged;
-        private ConcurrentDictionary<IStore, IList<OwnerAppointment>> _appointedOwners;
-        private ConcurrentDictionary<IStore, IList<ManagerAppointment>> _appointedManagers;
+        private ConcurrentDictionary<Store, bool> _storesFounded;
+        private ConcurrentDictionary<Store, OwnerAppointment> _storesOwned;
+        private ConcurrentDictionary<Store, ManagerAppointment> _storesManaged;
+        private ConcurrentDictionary<Store, IList<OwnerAppointment>> _appointedOwners;
+        private ConcurrentDictionary<Store, IList<ManagerAppointment>> _appointedManagers;
         private UserTransactionHistory _transHistory ;
         
 
@@ -61,11 +61,11 @@ namespace eCommerce.Business
             _systemState = Member.State;
             _myCart = new Cart(this);
             // _userName = memberData.Username;
-            _storesFounded = new ConcurrentDictionary<IStore, bool>();
-            _storesOwned = new ConcurrentDictionary<IStore, OwnerAppointment>();
-            _storesManaged = new ConcurrentDictionary<IStore, ManagerAppointment>();
-            _appointedOwners = new ConcurrentDictionary<IStore, IList<OwnerAppointment>>();
-            _appointedManagers = new ConcurrentDictionary<IStore, IList<ManagerAppointment>>();
+            _storesFounded = new ConcurrentDictionary<Store, bool>();
+            _storesOwned = new ConcurrentDictionary<Store, OwnerAppointment>();
+            _storesManaged = new ConcurrentDictionary<Store, ManagerAppointment>();
+            _appointedOwners = new ConcurrentDictionary<Store, IList<OwnerAppointment>>();
+            _appointedManagers = new ConcurrentDictionary<Store, IList<ManagerAppointment>>();
             _transHistory = new UserTransactionHistory();
         } 
         public User(UserToSystemState state, MemberInfo MemberInfo)
@@ -76,11 +76,11 @@ namespace eCommerce.Business
             dataLock = new Object();
             _systemState = state;
             _myCart = new Cart(this);
-            _storesFounded = new ConcurrentDictionary<IStore, bool>();
-            _storesOwned = new ConcurrentDictionary<IStore, OwnerAppointment>();
-            _storesManaged = new ConcurrentDictionary<IStore, ManagerAppointment>();
-            _appointedOwners = new ConcurrentDictionary<IStore, IList<OwnerAppointment>>();
-            _appointedManagers = new ConcurrentDictionary<IStore, IList<ManagerAppointment>>();
+            _storesFounded = new ConcurrentDictionary<Store, bool>();
+            _storesOwned = new ConcurrentDictionary<Store, OwnerAppointment>();
+            _storesManaged = new ConcurrentDictionary<Store, ManagerAppointment>();
+            _appointedOwners = new ConcurrentDictionary<Store, IList<OwnerAppointment>>();
+            _appointedManagers = new ConcurrentDictionary<Store, IList<ManagerAppointment>>();
             _transHistory = new UserTransactionHistory();
         }
 
@@ -116,11 +116,11 @@ namespace eCommerce.Business
         /// <UC> 'Open a Store' </UC>
         /// <REQ> 3.2 </REQ>
         /// <summary>
-        ///  receives an IStore to open. makes this User a founder and an owner. 
+        ///  receives an Store to open. makes this User a founder and an owner. 
         /// </summary>
         /// <param name="store"></param>
         /// <returns>Result, OK/Fail. </returns>
-        public virtual Result OpenStore(IStore store)
+        public virtual Result OpenStore(Store store)
         {
             return _systemState.OpenStore(this, store);
         }
@@ -187,7 +187,7 @@ namespace eCommerce.Business
         /// <param name="user"></param>
         /// <param name="store"></param>
         /// <returns>Result, OK/Fail. </returns>
-        public virtual Result AppointUserToOwner(IStore store, User user)
+        public virtual Result AppointUserToOwner(Store store, User user)
         {
             return _systemState.AppointUserToOwner(this, store, user);
         }
@@ -201,7 +201,7 @@ namespace eCommerce.Business
         /// <param name="user"></param>
         /// <param name="store"></param>
         /// <returns>Result, OK/Fail. </returns>
-        public virtual Result AppointUserToManager(IStore store, User user)
+        public virtual Result AppointUserToManager(Store store, User user)
         {
             return _systemState.AppointUserToManager(this, store, user);
         }
@@ -215,7 +215,7 @@ namespace eCommerce.Business
         /// <param name="user"></param>
         /// <param name="store"></param>
         /// <returns>Result, OK/Fail. </returns>
-        public virtual Result RemoveOwnerFromStore(IStore store, User user)
+        public virtual Result RemoveOwnerFromStore(Store store, User user)
         {
             return _systemState.RemoveOwnerFromStore(this, store, user);
         }
@@ -232,12 +232,12 @@ namespace eCommerce.Business
         /// <param name="store"></param>
         /// <param name="permissions"></param>
         /// <returns>Result, OK/Fail. </returns>
-        public virtual Result UpdatePermissionsToManager(IStore store, User user, IList<StorePermission> permissions)
+        public virtual Result UpdatePermissionsToManager(Store store, User user, IList<StorePermission> permissions)
         {
             return _systemState.UpdatePermissionsToManager(this, store, user, permissions);
         }
 
-        public virtual Result RemovePermissionsToManager(IStore store, User user, StorePermission permission)
+        public virtual Result RemovePermissionsToManager(Store store, User user, StorePermission permission)
         {
             return _systemState.RemovePermissionsToManager(this, store, user, permission);
         }
@@ -270,34 +270,34 @@ namespace eCommerce.Business
         /// <summary>
         ///  returns all purchase-records of the requested store. 
         /// </summary>
-        public virtual Result<IList<PurchaseRecord>> GetStorePurchaseHistory(IStore store)
+        public virtual Result<IList<PurchaseRecord>> GetStorePurchaseHistory(Store store)
         {
             return _systemState.GetStorePurchaseHistory(this, store);
         }
 
 
         //User to User
-        public virtual Result<OwnerAppointment> MakeOwner(IStore store)
+        public virtual Result<OwnerAppointment> MakeOwner(Store store)
         {
             return _systemState.MakeOwner(this, store);
         }
 
-        public virtual Result<ManagerAppointment> MakeManager(IStore store)
+        public virtual Result<ManagerAppointment> MakeManager(Store store)
         {
             return _systemState.MakeManager(this, store);
         }
 
-        public virtual Result<OwnerAppointment> RemoveOwner(IStore store)
+        public virtual Result<OwnerAppointment> RemoveOwner(Store store)
         {
             return _systemState.RemoveOwner(this, store);
         }
         
-        public virtual Result<ManagerAppointment> RemoveManager(IStore store)
+        public virtual Result<ManagerAppointment> RemoveManager(Store store)
         {
             return _systemState.RemoveManager(this, store);
         }
 
-        public virtual Result AnnexStakeholders(IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
+        public virtual Result AnnexStakeholders(Store store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
             return _systemState.AnnexStakeholders(this,store,owners,managers);
         }
@@ -326,7 +326,7 @@ namespace eCommerce.Business
         /// <summary>
         ///  checks if user has the required permission. 
         /// </summary>
-        public virtual Result HasPermission(IStore store, StorePermission storePermission)
+        public virtual Result HasPermission(Store store, StorePermission storePermission)
         {
             return _systemState.HasPermission(this, store, storePermission);
         }
@@ -384,7 +384,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
-        public virtual Result OpenStore(Member member, IStore store)
+        public virtual Result OpenStore(Member member, Store store)
         {
             // adds store to both Owned-By and Founded-By
             OwnerAppointment owner = new OwnerAppointment(this);
@@ -397,7 +397,7 @@ namespace eCommerce.Business
             return Result.Fail("Unable to open store");
         }
 
-        public virtual Result AppointUserToOwner(Member member, IStore store, User otherUser)
+        public virtual Result AppointUserToOwner(Member member, Store store, User otherUser)
         {
             if (!_storesOwned.ContainsKey(store))
             {
@@ -429,7 +429,7 @@ namespace eCommerce.Business
             return store.AppointNewOwner(this,newOwner);
         }
 
-        public virtual Result AppointUserToManager(Member member, IStore store, User otherUser)
+        public virtual Result AppointUserToManager(Member member, Store store, User otherUser)
         {
             if (!_storesOwned.ContainsKey(store)){
                 return Result.Fail("user \'"+Username+"\' is not an owner of the given store.");
@@ -458,7 +458,7 @@ namespace eCommerce.Business
             return store.AppointNewManager(this,newManager);
         }
 
-        public virtual Result<OwnerAppointment> MakeOwner(Member member, IStore store)
+        public virtual Result<OwnerAppointment> MakeOwner(Member member, Store store)
         {
             OwnerAppointment newOwner = new OwnerAppointment(this);
             if (_storesOwned.TryAdd(store, newOwner))
@@ -468,7 +468,7 @@ namespace eCommerce.Business
             return Result.Fail<OwnerAppointment>("unable to add user \'"+Username+"\' as store owner");
         }
 
-        public virtual Result<ManagerAppointment> MakeManager(Member member, IStore store)
+        public virtual Result<ManagerAppointment> MakeManager(Member member, Store store)
         {
             ManagerAppointment newManager = new ManagerAppointment(this);
             if (!_storesOwned.ContainsKey(store) && _storesManaged.TryAdd(store, newManager))
@@ -478,7 +478,7 @@ namespace eCommerce.Business
             return Result.Fail<ManagerAppointment>("unable to add user \'"+Username+"\' as store Manager");
         }
         
-        public virtual Result RemoveOwnerFromStore(Member member, IStore store,User otherUser)
+        public virtual Result RemoveOwnerFromStore(Member member, Store store,User otherUser)
         {
             if (!_storesOwned.ContainsKey(store)){
                 return Result.Fail("user \'"+Username+"\' is not an owner of the given store.");
@@ -502,7 +502,7 @@ namespace eCommerce.Business
         }
         
         
-        public virtual Result RemoveManagerFromStore(Member member, IStore store,User otherUser)
+        public virtual Result RemoveManagerFromStore(Member member, Store store,User otherUser)
         {
             if (!_storesManaged.ContainsKey(store)){
                 return Result.Fail("user \'"+Username+"\' is not a manager of the given store.");
@@ -528,7 +528,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
-        public virtual Result AnnexStakeholders(Member member,IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
+        public virtual Result AnnexStakeholders(Member member,Store store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
             if (!_storesFounded.ContainsKey(store))
             {
@@ -557,7 +557,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
-        private Result<ManagerAppointment> FindCoManager(IStore store, User otherUser)
+        private Result<ManagerAppointment> FindCoManager(Store store, User otherUser)
         {
             ManagerAppointment manager = null;
             if (_appointedManagers.ContainsKey(store))
@@ -573,7 +573,7 @@ namespace eCommerce.Business
             return Result.Ok<ManagerAppointment>(manager);
         }
 
-        private Result<OwnerAppointment> FindCoOwner(IStore store, User otherUser)
+        private Result<OwnerAppointment> FindCoOwner(Store store, User otherUser)
         {
             OwnerAppointment owner = null;
             if (_appointedOwners.ContainsKey(store))
@@ -589,7 +589,7 @@ namespace eCommerce.Business
             return Result.Ok<OwnerAppointment>(owner);
         }
 
-        public virtual Result<OwnerAppointment> RemoveOwner(Member member, IStore store)
+        public virtual Result<OwnerAppointment> RemoveOwner(Member member, Store store)
         {
             if (!_storesOwned.ContainsKey(store))
             {
@@ -636,7 +636,7 @@ namespace eCommerce.Business
         }
         
         
-        public virtual Result<ManagerAppointment> RemoveManager(Member member, IStore store)
+        public virtual Result<ManagerAppointment> RemoveManager(Member member, Store store)
         {
             if (!_storesManaged.ContainsKey(store))
             {
@@ -671,7 +671,7 @@ namespace eCommerce.Business
         }
 
 
-        public virtual Result AddPermissionsToManager(Member member, IStore store, User otherUser, StorePermission permission)
+        public virtual Result AddPermissionsToManager(Member member, Store store, User otherUser, StorePermission permission)
         {
             ManagerAppointment manager = null;
             var res = FindCoManager(store, otherUser);
@@ -683,7 +683,7 @@ namespace eCommerce.Business
             return Result.Fail("user\'"+Username+"\' can not grant permissions to given manager");
         }
 
-        public virtual Result RemovePermissionsToManager(Member member, IStore store, User otherUser, StorePermission permission)
+        public virtual Result RemovePermissionsToManager(Member member, Store store, User otherUser, StorePermission permission)
         {
             if (_appointedManagers.ContainsKey(store))
             {
@@ -702,7 +702,7 @@ namespace eCommerce.Business
         }
 
 
-        public virtual Result UpdatePermissionsToManager(Member member, IStore store, User otherUser,
+        public virtual Result UpdatePermissionsToManager(Member member, Store store, User otherUser,
             IList<StorePermission> permissions)
         {
             if (permissions == null || permissions.Count == 0){
@@ -724,7 +724,7 @@ namespace eCommerce.Business
             return Result.Fail("user\'"+Username+"\' can not remove permissions from given manager");
         }
         
-        public virtual Result HasPermission(Member member, IStore store, StorePermission permission)
+        public virtual Result HasPermission(Member member, Store store, StorePermission permission)
         {
             if(_storesOwned.ContainsKey(store))
             {
@@ -750,12 +750,12 @@ namespace eCommerce.Business
             return _transHistory.GetUserHistory();
         }
 
-        public virtual Result<IList<PurchaseRecord>> GetStoreHistory(IStore store)
+        public virtual Result<IList<PurchaseRecord>> GetStoreHistory(Store store)
         {
             return store.GetPurchaseHistory(this);
         }
         
-        public virtual Result<IList<User>> GetAllStoreStakeholders(Member member, IStore store)
+        public virtual Result<IList<User>> GetAllStoreStakeholders(Member member, Store store)
         {
             throw new NotImplementedException();
         }
@@ -766,10 +766,10 @@ namespace eCommerce.Business
     
     #region Test Oriented Functions
     
-    public ConcurrentDictionary<IStore, IList<ManagerAppointment>> AppointedManagers => _appointedManagers;
-    public ConcurrentDictionary<IStore, IList<OwnerAppointment>> AppointedOwners => _appointedOwners;
-    public ConcurrentDictionary<IStore, ManagerAppointment> StoresManaged => _storesManaged;
-    public ConcurrentDictionary<IStore, OwnerAppointment> StoresOwned => _storesOwned;
+    public ConcurrentDictionary<Store, IList<ManagerAppointment>> AppointedManagers => _appointedManagers;
+    public ConcurrentDictionary<Store, IList<OwnerAppointment>> AppointedOwners => _appointedOwners;
+    public ConcurrentDictionary<Store, ManagerAppointment> StoresManaged => _storesManaged;
+    public ConcurrentDictionary<Store, OwnerAppointment> StoresOwned => _storesOwned;
 
     #endregion
 

@@ -27,7 +27,7 @@ namespace Tests.AcceptanceTests
     public class TestGetPurchaseHistoryOfStore
     {
         private IAuthService _auth;
-        private IStoreService _store;
+        private INStoreService _inStore;
         private ICartService _cart;
         private string storeName = "Yossi's Store";
 
@@ -40,7 +40,7 @@ namespace Tests.AcceptanceTests
             IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
             _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
@@ -52,8 +52,8 @@ namespace Tests.AcceptanceTests
             Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
-            _store.OpenStore(yossiLogInResult.Value, storeName);
-            _store.AddNewItemToStore(yossiLogInResult.Value, product);;
+            _inStore.OpenStore(yossiLogInResult.Value, storeName);
+            _inStore.AddNewItemToStore(yossiLogInResult.Value, product);;
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
@@ -62,7 +62,7 @@ namespace Tests.AcceptanceTests
         public void Teardown()
         {
             _auth = null;
-            _store = null;
+            _inStore = null;
             _cart = null;
         }
 
@@ -71,7 +71,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            Result<SPurchaseHistory> result = _store.GetPurchaseHistoryOfStore(yossiLogInResult.Value, storeName);
+            Result<SPurchaseHistory> result = _inStore.GetPurchaseHistoryOfStore(yossiLogInResult.Value, storeName);
             Assert.True(result.IsSuccess && result.Value.Records.Count == 0);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
@@ -86,7 +86,7 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
             token = _auth.Connect();
             Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            Result<SPurchaseHistory> result = _store.GetPurchaseHistoryOfStore(yossiLogInResult.Value, storeName);
+            Result<SPurchaseHistory> result = _inStore.GetPurchaseHistoryOfStore(yossiLogInResult.Value, storeName);
             Assert.True(result.IsSuccess && result.Value.Records.Count != 0);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
@@ -99,7 +99,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> yossiLogInResult = await _auth.Login(token, member, password, ServiceUserRole.Member);
-            Result<SPurchaseHistory> result = _store.GetPurchaseHistoryOfStore(yossiLogInResult.Value, store);
+            Result<SPurchaseHistory> result = _inStore.GetPurchaseHistoryOfStore(yossiLogInResult.Value, store);
             Assert.True(result.IsFailure);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);

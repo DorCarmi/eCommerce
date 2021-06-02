@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using eCommerce.Adapters;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
@@ -17,7 +17,7 @@ namespace Tests.Business.StoreTests
 {
     public class StoreTest
     {
-        private IStore MyStore;
+        private Store MyStore;
         private User Alice;
         private User Bob;
         private ItemInfo item1;

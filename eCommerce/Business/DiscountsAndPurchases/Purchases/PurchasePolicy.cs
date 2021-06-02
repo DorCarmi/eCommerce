@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.Purchases;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -11,9 +11,9 @@ namespace eCommerce.Business
     public class PurchasePolicy
     {
         private List<Composite> _storeRules;
-        private IStore _store;
+        private Store _store;
 
-        public PurchasePolicy(IStore store)
+        public PurchasePolicy(Store store)
         {
             this._store = store;
             this._storeRules = new List<Composite>();

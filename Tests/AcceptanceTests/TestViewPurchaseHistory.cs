@@ -24,7 +24,7 @@ namespace Tests.AcceptanceTests
     public class TestViewPurchaseHistory
     {
         private IAuthService _auth;
-        private IStoreService _store;
+        private INStoreService _inStore;
         private IUserService _user;
         private ICartService _cart;
         private string storeName = "Darkon";
@@ -38,7 +38,7 @@ namespace Tests.AcceptanceTests
             IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
             _user = UserService.CreateUserServiceForTests(UA, UR, SR);
             _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("AzalinRex", "yossi@gmail.com", "Yossi Park",
@@ -51,8 +51,8 @@ namespace Tests.AcceptanceTests
             Result<string> yossiLogInResult = await _auth.Login(token, "AzalinRex", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
-            _store.OpenStore(yossiLogInResult.Value, storeName);
-            _store.AddNewItemToStore(yossiLogInResult.Value, product);
+            _inStore.OpenStore(yossiLogInResult.Value, storeName);
+            _inStore.AddNewItemToStore(yossiLogInResult.Value, product);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
@@ -61,7 +61,7 @@ namespace Tests.AcceptanceTests
         public void Teardown()
         {
             _auth = null;
-            _store = null;
+            _inStore = null;
             _user = null;
             _cart = null;
         }

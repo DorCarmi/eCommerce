@@ -6,7 +6,7 @@ using System.Text;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.Purchases;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business

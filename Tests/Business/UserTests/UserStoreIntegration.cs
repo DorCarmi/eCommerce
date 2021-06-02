@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using NUnit.Framework;
 using Tests.Business.Mokups;

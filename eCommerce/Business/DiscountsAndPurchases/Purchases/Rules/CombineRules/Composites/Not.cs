@@ -7,7 +7,7 @@ using System.Linq;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.DiscountsAndPurchases.Purchases.Rules.CombineRules;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using Rule = System.Data.Rule;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using eCommerce.Service;
 
@@ -17,7 +17,7 @@ namespace eCommerce.Business
         public int pricePerUnit;
         private Item theItem;
         private double discountFactor;
-        private IStore _store;
+        private Store _store;
 
         public static ItemInfo AnyItem(string storeName) =>
             new ItemInfo(0, "ANY", storeName, "ALL", new List<string>(), 0);
@@ -85,7 +85,7 @@ namespace eCommerce.Business
             this.pricePerUnit = itemInf.pricePerUnit;
         }
 
-        public Result SetItemToStore(IStore store)
+        public Result SetItemToStore(Store store)
         {
             if (store != null)
             {
@@ -99,11 +99,11 @@ namespace eCommerce.Business
         }
         
 
-        public Result<IStore> GetStore()
+        public Result<Store> GetStore()
         {
             if (this._store == null)
             {
-                return Result.Fail<IStore>("No store assigned to item");
+                return Result.Fail<Store>("No store assigned to item");
             }
             else
             {
@@ -112,7 +112,7 @@ namespace eCommerce.Business
             
         }
 
-        public Result AssignStoreToItem(IStore store)
+        public Result AssignStoreToItem(Store store)
         {
             if (store.GetStoreName().Equals(this.storeName))
             {

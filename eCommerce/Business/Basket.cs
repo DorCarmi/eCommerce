@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -10,7 +10,7 @@ namespace eCommerce.Business
     {
         private IList<ItemInfo> _itemsInBasket;
         private IDictionary<string, ItemInfo> _nameToItem;
-        private IStore _store;
+        private Store _store;
         private ICart _cart;
         
 
@@ -32,7 +32,7 @@ namespace eCommerce.Business
             return _store.CheckWithStorePolicy(this, _cart.GetUser());
         }
 
-        public Basket(ICart cart, IStore store)
+        public Basket(ICart cart, Store store)
         {
             if (!store.CheckConnectionToCart(cart))
             {

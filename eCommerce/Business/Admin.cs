@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -30,7 +29,7 @@ namespace eCommerce.Business
         ///  if 'storePermission' is 'GetStoreHistory',
         ///   returns all purchase-records of the store. 
         /// </summary>
-        public override Result HasPermission(User user, IStore store, StorePermission storePermission)
+        public override Result HasPermission(User user, Store store, StorePermission storePermission)
         {
             if (Permissions.Contains(storePermission))
                 return Result.Ok();

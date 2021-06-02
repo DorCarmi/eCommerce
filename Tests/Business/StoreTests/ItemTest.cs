@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+
 using NUnit.Framework;
 using Tests.Business.Mokups;
 
@@ -25,7 +25,7 @@ namespace Tests.Business.StoreTests
         private mokUser alice;
         
 
-        private IStore alenbyStore;
+        private Store alenbyStore;
         
         
         [SetUp]

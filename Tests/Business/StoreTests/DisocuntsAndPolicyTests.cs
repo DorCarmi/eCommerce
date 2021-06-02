@@ -7,7 +7,7 @@ using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.DiscountsAndPurchases.Purchases.RulesInfo;
 using eCommerce.Business.Purchases;
-using eCommerce.Business.Service;
+
 using eCommerce.Controllers;
 using NUnit.Framework;
 using Tests.Business.Mokups;
@@ -18,7 +18,7 @@ namespace Tests.Business.StoreTests
 {
     public class DiscountsAndPolicyTests
     {
-        private IStore MyStore;
+        private Store MyStore;
         private User Alice;
         private User Bob;
         ICart cart;

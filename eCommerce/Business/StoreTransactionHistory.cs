@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -10,9 +10,9 @@ namespace eCommerce.Business
     {
 
         private IList<PurchaseRecord> _history;
-        private IStore _store;
+        private Store _store;
 
-        public StoreTransactionHistory(IStore store)
+        public StoreTransactionHistory(Store store)
         {
             this._store = store;
             this._history = new List<PurchaseRecord>();

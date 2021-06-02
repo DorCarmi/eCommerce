@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using Microsoft.AspNetCore.Rewrite;
 
@@ -12,9 +12,9 @@ namespace eCommerce.Business
         private List<Item> _aquiredItems;
         private Dictionary<string, Item> _nameToItem;
         private Dictionary<string, Item> _nameToAquiredItem;
-        private IStore _belongsToStore;
+        private Store _belongsToStore;
 
-        public ItemsInventory(IStore store)
+        public ItemsInventory(Store store)
         {
             this._belongsToStore = store;
             this._itemsInStore = new List<Item>();

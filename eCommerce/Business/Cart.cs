@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using eCommerce.Business.Service;
 using eCommerce.Common;
-using Microsoft.AspNetCore.Authorization;
 
 namespace eCommerce.Business
 {
@@ -13,13 +10,13 @@ namespace eCommerce.Business
         private readonly User _cartHolder;
         private Transaction _performTransaction;
         
-        private Dictionary<IStore, IBasket> _baskets;
+        private Dictionary<Store, IBasket> _baskets;
         private double _totalPrice;
 
         public Cart(User user)
         {
             this._cartHolder = user;
-            _baskets = new Dictionary<IStore, IBasket>();
+            _baskets = new Dictionary<Store, IBasket>();
             _totalPrice = 0;
         }
 

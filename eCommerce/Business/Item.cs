@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -9,7 +9,7 @@ namespace eCommerce.Business
     {
         private String _name;
         private int _amount;
-        private IStore _belongsToStore;
+        private Store _belongsToStore;
         private Category _category;
         private List<String> _keyWords;
         private PurchaseStrategy _purchaseStrategy;
@@ -25,7 +25,7 @@ namespace eCommerce.Business
             return this._pricePerUnit;
         }
         
-        public Item(String name, Category category, IStore store, int pricePer)
+        public Item(String name, Category category, Store store, int pricePer)
         {
             this._name = name;
             this._category = category;
@@ -36,7 +36,7 @@ namespace eCommerce.Business
             _purchaseStrategy = new DefaultPurchaseStrategy(_belongsToStore);
         }
 
-        public Item(ItemInfo info, IStore store)
+        public Item(ItemInfo info, Store store)
         {
             this._name = info.name;
             this._amount = info.amount;
@@ -77,7 +77,7 @@ namespace eCommerce.Business
             }
         }
 
-        public IStore GetStore()
+        public Store GetStore()
         {
             return this._belongsToStore;
         }

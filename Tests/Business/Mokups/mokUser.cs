@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace Tests.Business.Mokups
@@ -51,7 +51,7 @@ namespace Tests.Business.Mokups
 
         public MemberInfo MemberInfo { get; set; }
 
-        public override Result OpenStore(IStore store)
+        public override Result OpenStore(Store store)
         {
             throw new System.NotImplementedException();
         }
@@ -81,17 +81,17 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public override Result AppointUserToOwner(IStore store, User user)
+        public override Result AppointUserToOwner(Store store, User user)
         {
             throw new System.NotImplementedException();
         }
 
-        public override Result AppointUserToManager(IStore store, User user)
+        public override Result AppointUserToManager(Store store, User user)
         {
             throw new System.NotImplementedException();
         }
 
-        public override Result RemoveOwnerFromStore(IStore store, User user)
+        public override Result RemoveOwnerFromStore(Store store, User user)
         {
             throw new NotImplementedException();
         }
@@ -101,27 +101,27 @@ namespace Tests.Business.Mokups
             return Result.Ok();
         }
 
-        public override Result<OwnerAppointment> MakeOwner(IStore store)
+        public override Result<OwnerAppointment> MakeOwner(Store store)
         {
             throw new System.NotImplementedException();
         }
 
-        public override Result<ManagerAppointment> MakeManager(IStore store)
+        public override Result<ManagerAppointment> MakeManager(Store store)
         {
             throw new System.NotImplementedException();
         }
 
-        public override Result<OwnerAppointment> RemoveOwner(IStore store)
+        public override Result<OwnerAppointment> RemoveOwner(Store store)
         {
             throw new NotImplementedException();
         }
 
-        public override Result<ManagerAppointment> RemoveManager(IStore store)
+        public override Result<ManagerAppointment> RemoveManager(Store store)
         {
             throw new NotImplementedException();
         }
 
-        public override Result AnnexStakeholders(IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
+        public override Result AnnexStakeholders(Store store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
             throw new NotImplementedException();
         }
@@ -141,17 +141,17 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public override Result UpdatePermissionsToManager(IStore store, User user, IList<StorePermission> permission)
+        public override Result UpdatePermissionsToManager(Store store, User user, IList<StorePermission> permission)
         {
             throw new System.NotImplementedException();
         }
 
-        public override Result RemovePermissionsToManager(IStore store, User user, StorePermission permission)
+        public override Result RemovePermissionsToManager(Store store, User user, StorePermission permission)
         {
             throw new System.NotImplementedException();
         }
 
-        public override Result<IList<User>> GetAllStoreStakeholders(Member member, IStore store)
+        public override Result<IList<User>> GetAllStoreStakeholders(Member member, Store store)
         {
             throw new System.NotImplementedException();
         }
@@ -166,12 +166,12 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public override Result<IList<PurchaseRecord>> GetStorePurchaseHistory(IStore store)
+        public override Result<IList<PurchaseRecord>> GetStorePurchaseHistory(Store store)
         {
             throw new System.NotImplementedException();
         }
 
-        public override Result HasPermission(IStore store, StorePermission storePermission)
+        public override Result HasPermission(Store store, StorePermission storePermission)
         {
             return Result.Ok();
         }

@@ -28,7 +28,7 @@ namespace Tests.AcceptanceTests
     {
         private IAuthService _auth;
         private IUserService _user;
-        private IStoreService _store;
+        private INStoreService _inStore;
         
         [SetUpAttribute]
         public async Task SetUp()
@@ -39,7 +39,7 @@ namespace Tests.AcceptanceTests
             IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
             _user = UserService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi11","yossi@gmail.com", "Yossi Park", DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             MemberInfo shiran = new MemberInfo("singerMermaid","shiran@gmail.com", "Shiran Moris", DateTime.ParseExact("25/06/2008", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Rabin 14");
@@ -52,8 +52,8 @@ namespace Tests.AcceptanceTests
             string storeName = "Yossi's Store";
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
-            _store.OpenStore(yossiLogInResult.Value, storeName);
-            _store.AddNewItemToStore(yossiLogInResult.Value, product);
+            _inStore.OpenStore(yossiLogInResult.Value, storeName);
+            _inStore.AddNewItemToStore(yossiLogInResult.Value, product);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
@@ -62,7 +62,7 @@ namespace Tests.AcceptanceTests
         public void Teardown()
         {
             _auth = null;
-            _store = null;
+            _inStore = null;
             _user = null;
         }
         
