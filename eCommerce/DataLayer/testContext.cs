@@ -15,7 +15,6 @@ namespace eCommerce.DataLayer
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging().UseSqlServer(AppConfig.GetInstance().GetData("DBConnectionString"));
-            // optionsBuilder.EnableSensitiveDataLogging().UseSqlServer("Server=localhost;Database=testDB;Trusted_Connection=True;");
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
