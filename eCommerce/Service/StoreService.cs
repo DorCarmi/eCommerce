@@ -25,7 +25,7 @@ namespace eCommerce.Service
         }
 
         public static StoreService CreateUserServiceForTests(IUserAuth userAuth,
-            IRepository<IUser> registeredUsersRepo,
+            IRepository<User> registeredUsersRepo,
             StoreRepository storeRepo)
         {
             IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(userAuth, registeredUsersRepo, storeRepo);

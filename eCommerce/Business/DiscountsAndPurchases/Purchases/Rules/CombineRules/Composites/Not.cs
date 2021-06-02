@@ -22,7 +22,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             this._A = A;
         }
 
-        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
             var aLst = _A.Check(checkItem1, checkItem2);
@@ -36,7 +36,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             return itemsList;
         }
 
-        public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
+        public override bool CheckOneItem(ItemInfo itemInfo, User checkItem2)
         {
             return !_A.CheckOneItem(itemInfo, checkItem2);
         }
@@ -46,7 +46,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             return _A.CheckIfDiscount(); 
         }
 
-        public override Result<double> Get(IBasket basket, IUser user)
+        public override Result<double> Get(IBasket basket, User user)
         {
             if (CheckIfDiscount())
             {
@@ -74,7 +74,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             }
         }
 
-        public override Result<double> GetOneItem(ItemInfo itemInfo, IUser user)
+        public override Result<double> GetOneItem(ItemInfo itemInfo, User user)
         {
             var price = itemInfo.amount * itemInfo.pricePerUnit;
             if (_A.CheckOneItem(itemInfo, user))

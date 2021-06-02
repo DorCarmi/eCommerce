@@ -15,26 +15,26 @@ namespace eCommerce.Auth
             _contextFactory = new UserContextFactory();
         }
 
-        public async Task<bool> Add(User user)
+        public async Task<bool> Add(AuthUser authUser)
         {
             bool added = false;
             using (var context = _contextFactory.Create())
             {
-                await context.User.AddAsync(user);
+                await context.User.AddAsync(authUser);
                 added = await context.SaveChangesAsync() == 1;
             }
 
             return added;
         }
 
-        public async Task<User> GetUserOrNull(string username)
+        public async Task<AuthUser> GetUserOrNull(string username)
         {
-            User user = null;
+            AuthUser authUser = null;
             using (var context = _contextFactory.Create())
             {
                 try
                 {
-                    user = await context.User.SingleAsync(user => user.Username.Equals(username));
+                    authUser = await context.User.SingleAsync(user => user.Username.Equals(username));
                 }
                 catch (InvalidOperationException e)
                 {
@@ -42,7 +42,7 @@ namespace eCommerce.Auth
                 }
             }
 
-            return user;
+            return authUser;
         }
     }
 }

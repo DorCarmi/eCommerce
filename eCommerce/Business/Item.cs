@@ -57,7 +57,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result SetPrice(IUser user,int pricePerUnit)
+        public Result SetPrice(User user,int pricePerUnit)
         {
             if (!user.HasPermission(_belongsToStore, StorePermission.ChangeItemPrice).IsFailure)
             {
@@ -110,7 +110,7 @@ namespace eCommerce.Business
             }
         }
         
-        public Result AddKeyWord(IUser user,String keyWord)
+        public Result AddKeyWord(User user,String keyWord)
         {
             
             if (!user.HasPermission(this._belongsToStore, StorePermission.EditItemDetails).IsFailure)
@@ -232,7 +232,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result AddItems(IUser user,int amount)
+        public Result AddItems(User user,int amount)
         {
             if (amount > 0)
             {
@@ -246,7 +246,7 @@ namespace eCommerce.Business
         }
         
         
-        public Result SubtractItems(IUser user,int amount)
+        public Result SubtractItems(User user,int amount)
         {
             if (this._amount-amount >= 1)
             {

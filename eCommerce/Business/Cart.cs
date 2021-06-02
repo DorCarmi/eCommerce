@@ -10,25 +10,25 @@ namespace eCommerce.Business
 {
     public class Cart : ICart
     {
-        private readonly IUser _cartHolder;
+        private readonly User _cartHolder;
         private Transaction _performTransaction;
         
         private Dictionary<IStore, IBasket> _baskets;
         private double _totalPrice;
 
-        public Cart(IUser user)
+        public Cart(User user)
         {
             this._cartHolder = user;
             _baskets = new Dictionary<IStore, IBasket>();
             _totalPrice = 0;
         }
 
-        public bool CheckForCartHolder(IUser user)
+        public bool CheckForCartHolder(User user)
         {
             return this._cartHolder == user;
         }
 
-        public Result AddItemToCart(IUser user,ItemInfo item)
+        public Result AddItemToCart(User user,ItemInfo item)
         {
             if (user == this._cartHolder)
             {
@@ -72,7 +72,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result EditCartItem(IUser user, ItemInfo item)
+        public Result EditCartItem(User user, ItemInfo item)
         {
             if (user == this._cartHolder)
             {
@@ -123,7 +123,7 @@ namespace eCommerce.Business
         }
         
 
-        public Result BuyWholeCart(IUser user, PaymentInfo paymentInfo)
+        public Result BuyWholeCart(User user, PaymentInfo paymentInfo)
         {
             this._performTransaction = new Transaction(this);
             var result=_performTransaction.BuyWholeCart(paymentInfo);
@@ -147,7 +147,7 @@ namespace eCommerce.Business
             return info;
         }
 
-        public IUser GetUser()
+        public User GetUser()
         {
             return this._cartHolder;
         }

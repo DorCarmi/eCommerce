@@ -37,7 +37,7 @@ namespace eCommerce.Business
             return user.HasPermission(Member.State, store,storePermission);
         }
 
-        public override Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, IUser otherUser)
+        public override Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, User otherUser)
         {
             return otherUser.GetUserPurchaseHistory();
         }

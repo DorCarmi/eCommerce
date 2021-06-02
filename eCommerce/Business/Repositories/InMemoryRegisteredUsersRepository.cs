@@ -1,25 +1,24 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
 using eCommerce.Common;
 
-namespace eCommerce.Business
+namespace eCommerce.Business.Repositories
 {
-    public class RegisteredUsersRepository : IRepository<IUser>
+    public class InMemoryRegisteredUsersRepository : IRepository<User>
     {
 
-        private ConcurrentDictionary<string, IUser> _users;
+        private ConcurrentDictionary<string, User> _users;
 
-        public RegisteredUsersRepository()
+        public InMemoryRegisteredUsersRepository()
         {
-            _users = new ConcurrentDictionary<string, IUser>();
+            _users = new ConcurrentDictionary<string, User>();
         }
         
-        public bool Add(IUser user)
+        public bool Add(User user)
         {
             return _users.TryAdd(user.Username, user);
         }
 
-        public IUser GetOrNull(string id)
+        public User GetOrNull(string id)
         {
             if (!_users.TryGetValue(id, out var data))
             {

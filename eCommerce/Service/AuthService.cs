@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business;
-using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Service
@@ -22,7 +21,7 @@ namespace eCommerce.Service
         }
 
         public static AuthService CreateUserServiceForTests(IUserAuth userAuth,
-            IRepository<IUser> registeredUsersRepo,
+            IRepository<User> registeredUsersRepo,
             StoreRepository storeRepo)
         {
             IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(userAuth, registeredUsersRepo, storeRepo);

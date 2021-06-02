@@ -57,12 +57,12 @@ namespace eCommerce.Business
         }
 
 
-        public Result AppointUserToOwner(User user,IStore store, IUser otherUser)
+        public Result AppointUserToOwner(User user,IStore store, User otherUser)
         {
             return user.AppointUserToOwner(this, store, otherUser);
         }
 
-        public Result AppointUserToManager(User user, IStore store, IUser otherUser)
+        public Result AppointUserToManager(User user, IStore store, User otherUser)
         {
             return user.AppointUserToManager(this, store, otherUser);
         }
@@ -77,17 +77,17 @@ namespace eCommerce.Business
             return user.MakeManager(this, store);
         }
 
-        public Result AddPermissionsToManager(User user, IStore store, IUser otherUser, StorePermission permission)
+        public Result AddPermissionsToManager(User user, IStore store, User otherUser, StorePermission permission)
         {
             return user.AddPermissionsToManager(this,store,otherUser,permission);
         }
 
-        public Result RemovePermissionsToManager(User user, IStore store, IUser otherUser, StorePermission permission)
+        public Result RemovePermissionsToManager(User user, IStore store, User otherUser, StorePermission permission)
         {
             return user.RemovePermissionsToManager(this,store, otherUser,permission);
         }
 
-        public Result UpdatePermissionsToManager(User user, IStore store, IUser otherUser, IList<StorePermission> permissions)
+        public Result UpdatePermissionsToManager(User user, IStore store, User otherUser, IList<StorePermission> permissions)
         {
             return user.UpdatePermissionsToManager(this,store, otherUser,permissions);
         }
@@ -97,7 +97,7 @@ namespace eCommerce.Business
             return user.GetUserHistory();
         }
 
-        public virtual Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, IUser otherUser)
+        public virtual Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, User otherUser)
         {
             return Result.Fail<IList<PurchaseRecord>>("Illegal action for member (GetDiscount-Other-User-History)");
         }
@@ -117,12 +117,12 @@ namespace eCommerce.Business
             return user.EnterRecordToHistory(this, record);
         }
 
-        public Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store)
+        public Result<IList<User>> GetAllStoreStakeholders(User user, IStore store)
         {
             return user.GetAllStoreStakeholders(this, store);
         }
 
-        public Result RemoveOwnerFromStore(User user, IStore store, IUser otherUser)
+        public Result RemoveOwnerFromStore(User user, IStore store, User otherUser)
         {
             return user.RemoveOwnerFromStore(this, store,otherUser);
         }

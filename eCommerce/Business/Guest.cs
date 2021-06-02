@@ -44,12 +44,12 @@ namespace eCommerce.Business
             return Result.Fail<IList<string>>("Illegal action for guest (Get-Managed-Stores-Ids).");
         }
 
-        public Result AppointUserToOwner(User user, IStore store, IUser otherUser)
+        public Result AppointUserToOwner(User user, IStore store, User otherUser)
         {
             return Result.Fail("Illegal action for guest (Appoint-User).");
         }
 
-        public Result AppointUserToManager(User user, IStore store, IUser otherUser)
+        public Result AppointUserToManager(User user, IStore store, User otherUser)
         {
             return Result.Fail("Illegal action for guest (Appoint-User).");
         }
@@ -64,17 +64,17 @@ namespace eCommerce.Business
             return Result.Fail<ManagerAppointment>("Illegal action for guest (Make-Manager).");
         }
 
-        public Result AddPermissionsToManager(User user, IStore store, IUser otherUser, StorePermission permission)
+        public Result AddPermissionsToManager(User user, IStore store, User otherUser, StorePermission permission)
         {
             return Result.Fail("Illegal action for guest (Give-Store-Permissions-To-User).");
         }
 
-        public Result RemovePermissionsToManager(User user, IStore store, IUser otherUser, StorePermission permission)
+        public Result RemovePermissionsToManager(User user, IStore store, User otherUser, StorePermission permission)
         {
             return Result.Fail("Illegal action for guest (Take-Store-Permissions-From-User).");
         }
 
-        public Result UpdatePermissionsToManager(User user, IStore store, IUser user1, IList<StorePermission> permissions)
+        public Result UpdatePermissionsToManager(User user, IStore store, User user1, IList<StorePermission> permissions)
         {
             return Result.Fail("Illegal action for guest (Update-Store-Permissions-From-User).");
         }
@@ -85,7 +85,7 @@ namespace eCommerce.Business
             
         }
 
-        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, IUser otherUser)
+        public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, User otherUser)
         {
             return Result.Fail<IList<PurchaseRecord>>("Illegal action for guest (get-other-user's-purchase-history).");
         }
@@ -106,14 +106,14 @@ namespace eCommerce.Business
             return Result.Fail("Guest has no transaction-history.");
         }
 
-        public Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store)
+        public Result<IList<User>> GetAllStoreStakeholders(User user, IStore store)
         {
-            return Result.Fail<IList<IUser>>("Guest can not view stores stakeholders.");
+            return Result.Fail<IList<User>>("Guest can not view stores stakeholders.");
         }
 
-        public Result RemoveOwnerFromStore(User user, IStore store, IUser otherUser)
+        public Result RemoveOwnerFromStore(User user, IStore store, User otherUser)
         {
-            return Result.Fail<IList<IUser>>("Guest can not remove an owner from a store.");
+            return Result.Fail<IList<User>>("Guest can not remove an owner from a store.");
         }
 
         public Result<OwnerAppointment> RemoveOwner(User user, IStore store)

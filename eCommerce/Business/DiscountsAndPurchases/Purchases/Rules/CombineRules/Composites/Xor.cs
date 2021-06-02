@@ -36,7 +36,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             _itemToCompare = null;
         }
 
-        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             var checkA = _A.Check(checkItem1, checkItem2);
             var checkB = _B.Check(checkItem1, checkItem2);
@@ -70,7 +70,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             return theChosenOne.Check(checkItem1,checkItem2);
         }
 
-        public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
+        public override bool CheckOneItem(ItemInfo itemInfo, User checkItem2)
         {
             throw new NotImplementedException();
         }
@@ -80,7 +80,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             return _A.CheckIfDiscount() && _B.CheckIfDiscount();
         }
 
-        public override Result<double> Get(IBasket basket, IUser user)
+        public override Result<double> Get(IBasket basket, User user)
         {
             if (CheckIfDiscount())
             {
@@ -132,12 +132,12 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             }
         }
 
-        public override Result<double> GetOneItem(ItemInfo itemInfo, IUser user)
+        public override Result<double> GetOneItem(ItemInfo itemInfo, User user)
         {
             throw new NotImplementedException();
         }
 
-        private Result<Composite> HandleFieldToCompare(IBasket basket, IUser user)
+        private Result<Composite> HandleFieldToCompare(IBasket basket, User user)
         {   var getA = _A.Get(basket, user);
             var getB = _B.Get(basket, user);
             if (getA.IsFailure)

@@ -56,9 +56,9 @@ namespace eCommerce.Auth
                 return Result.Fail("Username already taken");
             }
             
-            User newUser = new User(username, HashPassword(password));
+            AuthUser newAuthUser = new AuthUser(username, HashPassword(password));
 
-            if (! await _userRepo.Add(newUser))
+            if (! await _userRepo.Add(newAuthUser))
             {
                 return Result.Fail("Username already taken");
             }
@@ -67,8 +67,8 @@ namespace eCommerce.Auth
 
         public async Task<Result> Authenticate(string username, string password)
         {
-            User user = await _userRepo.GetUserOrNull(username);
-            Result canLogInRes = CanLogIn(user, password);
+            AuthUser authUser = await _userRepo.GetUserOrNull(username);
+            Result canLogInRes = CanLogIn(authUser, password);
             if (canLogInRes.IsFailure)
             {
                 return Result.Fail(canLogInRes.Error);
@@ -183,9 +183,9 @@ namespace eCommerce.Auth
             return errMessage == null ? Result.Ok() : Result.Fail(errMessage);
         }
 
-        private Result CanLogIn(User user, string password)
+        private Result CanLogIn(AuthUser authUser, string password)
         {
-            if (user == null || !user.HashedPassword.SequenceEqual(HashPassword(password)))
+            if (authUser == null || !authUser.HashedPassword.SequenceEqual(HashPassword(password)))
             {
                 return Result.Fail("Invalid username or password or role");
             }

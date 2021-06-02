@@ -75,7 +75,7 @@ namespace eCommerce.Business
             return this._itemsInStore;
         }
 
-        public Result AddNewItem(IUser user, ItemInfo itemInfo)
+        public Result AddNewItem(User user, ItemInfo itemInfo)
         {
             var ans = user.HasPermission(this._belongsToStore, StorePermission.AddItemToStore);
             if(!ans.IsFailure)
@@ -106,7 +106,7 @@ namespace eCommerce.Business
         }
 
 
-        public Result AddExistingItem(IUser user,string itemName, int amount)
+        public Result AddExistingItem(User user,string itemName, int amount)
         {
             if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
             {
@@ -212,7 +212,7 @@ namespace eCommerce.Business
 
         
 
-        public Result RemoveItem(IUser user, ItemInfo newItem)
+        public Result RemoveItem(User user, ItemInfo newItem)
         {
             
             if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
@@ -234,7 +234,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result SubtractItems(IUser user, string newItemName, int newItemAmount)
+        public Result SubtractItems(User user, string newItemName, int newItemAmount)
         {
             if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
             {

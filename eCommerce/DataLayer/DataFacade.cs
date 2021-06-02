@@ -32,9 +32,9 @@ namespace eCommerce.DataLayer
             return Result.Ok();
         }
         
-        public Result<IUser> ReadUser(string username)
+        public Result<User> ReadUser(string username)
         {
-            IUser user = null;
+            User user = null;
             using (var db = new ECommerceContext())
             {
                 try
@@ -49,11 +49,11 @@ namespace eCommerce.DataLayer
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    return Result.Fail<IUser>("Unable to read User");
+                    return Result.Fail<User>("Unable to read User");
                     // add logging here
                 }
             }
-            return Result.Ok<IUser>(user);
+            return Result.Ok<User>(user);
         }
     }
 }

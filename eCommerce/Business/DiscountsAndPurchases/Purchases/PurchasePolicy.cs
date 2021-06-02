@@ -19,7 +19,7 @@ namespace eCommerce.Business
             this._storeRules = new List<Composite>();
         }
 
-        public Result AddRuleToStorePolicy(IUser user, Composite rule)
+        public Result AddRuleToStorePolicy(User user, Composite rule)
         {
             if (user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {
@@ -32,7 +32,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result CheckWithStorePolicy(IBasket basket, IUser user)
+        public Result CheckWithStorePolicy(IBasket basket, User user)
         {
             foreach (var storeRule in _storeRules)
             {
@@ -49,7 +49,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
-        public Result<IList<RuleInfoNode>> GetPolicy(IUser user)
+        public Result<IList<RuleInfoNode>> GetPolicy(User user)
         {
             if (!user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {
@@ -69,7 +69,7 @@ namespace eCommerce.Business
             return Result.Ok(ruleInfoNodes);
         }
 
-        public Result Reset(IUser user)
+        public Result Reset(User user)
         {
             if (!user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {

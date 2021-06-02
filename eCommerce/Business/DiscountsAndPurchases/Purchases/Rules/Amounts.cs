@@ -43,13 +43,13 @@ namespace eCommerce.Business
             return itemsList;
         }
         
-        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             var lst=CheckForSpecificItem(checkItem1);
             return lst;
         }
 
-        public override bool CheckOneItem(ItemInfo item, IUser checkItem2)
+        public override bool CheckOneItem(ItemInfo item, User checkItem2)
         {
             if (item.name.Equals(_item) 
                 && _compare.GetResult(_amount,item.amount)>0)

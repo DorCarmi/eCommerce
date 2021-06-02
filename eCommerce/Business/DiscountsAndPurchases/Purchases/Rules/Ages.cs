@@ -18,7 +18,7 @@ namespace eCommerce.Business.PurchaseRules
             this.compare = compare;
         }
         
-        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
             int currAge = (DateTime.Now.Date-checkItem2.MemberInfo.Birthday.Date).Days/ 365;
@@ -37,7 +37,7 @@ namespace eCommerce.Business.PurchaseRules
             return itemsList;
         }
 
-        public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
+        public override bool CheckOneItem(ItemInfo itemInfo, User checkItem2)
         {
             var compareAns = compare.GetResult(age, (checkItem2.MemberInfo.Birthday.Date - DateTime.Now.Date).Days);
             return compareAns > 0;

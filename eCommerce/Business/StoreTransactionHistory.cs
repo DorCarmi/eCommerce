@@ -25,7 +25,7 @@ namespace eCommerce.Business
             return Result.Ok<PurchaseRecord>(newRecord);
         }
 
-        public Result<IList<PurchaseRecord>> GetHistory(IUser user)
+        public Result<IList<PurchaseRecord>> GetHistory(User user)
         {
             //TODO: Check with sharon, was AdminGetHistory
             if (user.HasPermission(_store, StorePermission.GetStoreHistory).IsFailure)

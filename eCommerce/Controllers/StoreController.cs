@@ -27,7 +27,7 @@ namespace eCommerce.Controllers
     {
         private readonly ILogger<StoreController> _logger;
         private readonly IStoreService _storeService;
-        private readonly IUserService _userService;
+        private readonly UserService _userService;
 
         public StoreController(ILogger<StoreController> logger)
         {

@@ -53,7 +53,7 @@ namespace eCommerce.Business
             return _store.CalculateBasketPrices(this);
         }
 
-        public Result AddItemToBasket(IUser user,ItemInfo item)
+        public Result AddItemToBasket(User user,ItemInfo item)
         {
             if (item.amount <= 0)
             {
@@ -91,7 +91,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result EditItemInBasket(IUser user,ItemInfo item)
+        public Result EditItemInBasket(User user,ItemInfo item)
         {
             if (!_cart.CheckForCartHolder(user))
             {
@@ -172,7 +172,7 @@ namespace eCommerce.Business
             return this._store.GetStoreName();
         }
 
-        public Result<ItemInfo> GetItem(IUser user,string itemName)
+        public Result<ItemInfo> GetItem(User user,string itemName)
         {
             if (!_cart.CheckForCartHolder(user))
             {

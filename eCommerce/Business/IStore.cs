@@ -25,9 +25,9 @@ namespace eCommerce.Business.Service
         public Result<Item> GetItem(string itemId);
         
         // TODO implement, return list of username and there permissions
-        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user);
+        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(User user);
 
-        public Result<IList<StorePermission>> GetPermissions(IUser user);
+        public Result<IList<StorePermission>> GetPermissions(User user);
 
         public List<Item> SearchItem(string stringSearch);
 
@@ -45,28 +45,28 @@ namespace eCommerce.Business.Service
         public Result FinishPurchaseOfItems(ItemInfo itemInfo);
 
 
-        public Result AddItemToStore(ItemInfo newItem, IUser user);
-        public Result EditItemToStore(ItemInfo newItem, IUser user);
+        public Result AddItemToStore(ItemInfo newItem, User user);
+        public Result EditItemToStore(ItemInfo newItem, User user);
         
-        public Result UpdateStock_AddItems(ItemInfo newItem, IUser user);
+        public Result UpdateStock_AddItems(ItemInfo newItem, User user);
         
-        public Result UpdateStock_SubtractItems(ItemInfo newItem, IUser user);
+        public Result UpdateStock_SubtractItems(ItemInfo newItem, User user);
         
         
-        public Result RemoveItemToStore(ItemInfo newItem, IUser user);
-        public Result RemoveItemToStore(string itemID, IUser user);
+        public Result RemoveItemToStore(ItemInfo newItem, User user);
+        public Result RemoveItemToStore(string itemID, User user);
 
-        public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment);
-        public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment);
+        public Result AppointNewOwner(User user, OwnerAppointment ownerAppointment);
+        public Result AppointNewManager(User user, ManagerAppointment managerAppointment);
 
-        public Result<IUser> GetFounder();
+        public Result<User> GetFounder();
 
-        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment);
+        public Result RemoveOwnerFromStore(User theOneWhoFires, User theFierd, OwnerAppointment ownerAppointment);
 
-        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired,
+        public Result RemoveManagerFromStore(User theOneWhoFires, User theFired,
             ManagerAppointment managerAppointment);
 
-        public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user);
+        public Result<IList<PurchaseRecord>> GetPurchaseHistory(User user);
         public Result EnterBasketToHistory(IBasket basket);
 
 
@@ -81,15 +81,15 @@ namespace eCommerce.Business.Service
         
         
         Result<double> CheckDiscount(Basket basket);
-        Result CheckWithStorePolicy(IBasket basket, IUser user);
+        Result CheckWithStorePolicy(IBasket basket, User user);
 
 
-        Result AddDiscountToStore(IUser user,DiscountInfoNode infoNode);
-        Result AddRuleToStorePolicy(IUser user,RuleInfoNode ruleInfoNode);
-        Result<IList<RuleInfoNode>> GetStorePolicy(IUser user);
-        Result<IList<DiscountInfoNode>> GetStoreDiscounts(IUser user);
+        Result AddDiscountToStore(User user,DiscountInfoNode infoNode);
+        Result AddRuleToStorePolicy(User user,RuleInfoNode ruleInfoNode);
+        Result<IList<RuleInfoNode>> GetStorePolicy(User user);
+        Result<IList<DiscountInfoNode>> GetStoreDiscounts(User user);
 
-        Result ResetStorePolicy(IUser user);
-        Result ResetStoreDiscount(IUser user);
+        Result ResetStorePolicy(User user);
+        Result ResetStoreDiscount(User user);
     }
 }

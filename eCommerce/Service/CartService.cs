@@ -20,9 +20,9 @@ namespace eCommerce.Service
         {
             _marketFacade = MarketFacade.GetInstance();
         }
-
+        
         public static CartService CreateUserServiceForTests(IUserAuth userAuth,
-            IRepository<IUser> registeredUsersRepo,
+            IRepository<User> registeredUsersRepo,
             StoreRepository storeRepo)
         {
             IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(userAuth, registeredUsersRepo, storeRepo);
