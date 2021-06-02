@@ -7,8 +7,8 @@
     "Password": "_Admin"
   },
 
-  "DBConnectionString": "server=localhost",
-  "AuthDBConnectionString": "Server=localhost;DataBase=master;Trusted_Connection=True;",
+  "DBConnectionString": "Server=localhost;DataBase=market;Trusted_Connection=True;",
+  "AuthDBConnectionString": "Server=localhost;DataBase=auth;Trusted_Connection=True;",
   
   "JWTKey": "keykeykeykeykeyekeykey"
 }

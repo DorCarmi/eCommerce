@@ -25,7 +25,6 @@
       <Folder Include="Business\DiscountsAndPurchases" />
       <Folder Include="ClientApp\public\Images" />
       <Folder Include="Migrations" />
-      <Folder Include="Persistence" />
     </ItemGroup>
 
     <ItemGroup>
