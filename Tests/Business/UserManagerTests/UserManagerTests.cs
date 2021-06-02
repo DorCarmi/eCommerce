@@ -28,7 +28,7 @@ namespace Tests.Business.UserManagerTests
 
             for (int i = 0; i < 5; i++)
             {
-                Result<IUser> connectRes = _userManager.GetUserIfConnectedOrLoggedIn(_userManager.Connect());
+                Result<User> connectRes = _userManager.GetUserIfConnectedOrLoggedIn(_userManager.Connect());
                 Assert.True(connectRes.IsSuccess,
                     $"The connect method didnt connect the user");
 
@@ -54,7 +54,7 @@ namespace Tests.Business.UserManagerTests
 
             for (var i = 0; i < numberOfTasks; i++)
             {
-                Result<IUser> connectRes = _userManager.GetUserIfConnectedOrLoggedIn(tokens[i]);
+                Result<User> connectRes = _userManager.GetUserIfConnectedOrLoggedIn(tokens[i]);
                 Assert.True(connectRes.IsSuccess,
                     $"The guest is connect therefore the token should be valid\nError: {connectRes.Error}");
                 usernames.Add(connectRes.Value.Username);

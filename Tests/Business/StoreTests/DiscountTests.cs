@@ -14,8 +14,8 @@ namespace Tests.Business.StoreTests
     public class DiscountTests
     {
         private IStore MyStore;
-        private IUser Alice;
-        private IUser Bob;
+        private User Alice;
+        private User Bob;
         private ItemInfo item1;
         private ItemInfo item1b;
         private ItemInfo item2;

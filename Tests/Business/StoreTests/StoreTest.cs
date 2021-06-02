@@ -18,8 +18,8 @@ namespace Tests.Business.StoreTests
     public class StoreTest
     {
         private IStore MyStore;
-        private IUser Alice;
-        private IUser Bob;
+        private User Alice;
+        private User Bob;
         private ItemInfo item1;
         private ItemInfo item1b;
         private ItemInfo item2;
@@ -177,7 +177,7 @@ namespace Tests.Business.StoreTests
             alicecart.AddItemToCart(Alice, item3);
             
             
-            IUser bob = new mokUser("Bob");
+            User bob = new mokUser("Bob");
             ICart bobcart = new Cart(bob);
             bobcart.AddItemToCart(bob, item3);
             

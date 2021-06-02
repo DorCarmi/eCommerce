@@ -38,12 +38,12 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
+        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IList<StorePermission>> GetPermissions(IUser user)
+        public Result<IList<StorePermission>> GetPermissions(User user)
         {
             throw new NotImplementedException();
         }
@@ -88,65 +88,65 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public Result AddItemToStore(ItemInfo newItem, IUser user)
+        public Result AddItemToStore(ItemInfo newItem, User user)
         {
             throw new System.NotImplementedException();
         }
 
-        public Result EditItemToStore(ItemInfo newItem, IUser user)
+        public Result EditItemToStore(ItemInfo newItem, User user)
         {
             throw new System.NotImplementedException();
         }
 
-        public Result UpdateStock_AddItems(ItemInfo newItem, IUser user)
+        public Result UpdateStock_AddItems(ItemInfo newItem, User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result UpdateStock_SubtractItems(ItemInfo newItem, IUser user)
+        public Result UpdateStock_SubtractItems(ItemInfo newItem, User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result RemoveItemToStore(ItemInfo newItem, IUser user)
+        public Result RemoveItemToStore(ItemInfo newItem, User user)
         {
             throw new System.NotImplementedException();
         }
 
-        public Result RemoveItemToStore(string itemID, IUser user)
+        public Result RemoveItemToStore(string itemID, User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment)
+        public Result AppointNewOwner(User user, OwnerAppointment ownerAppointment)
         {
             Console.WriteLine("MokStore: "+user.Username+" Appointed new Owner: "+ownerAppointment.User.Username);
             return Result.Ok();
         }
 
-        public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment)
+        public Result AppointNewManager(User user, ManagerAppointment managerAppointment)
         {
             Console.WriteLine("MokStore: "+user.Username+" Appointed new Manager: "+managerAppointment.User.Username);
             return Result.Ok();
         }
 
-        public Result<IUser> GetFounder()
+        public Result<User> GetFounder()
         {
             throw new NotImplementedException();
         }
 
-        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment)
+        public Result RemoveOwnerFromStore(User theOneWhoFires, User theFierd, OwnerAppointment ownerAppointment)
         {
             Console.WriteLine("MokStore: "+theOneWhoFires.Username+" removed the Owner: "+theFierd.Username);
             return Result.Ok();
         }
 
-        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired, ManagerAppointment managerAppointment)
+        public Result RemoveManagerFromStore(User theOneWhoFires, User theFired, ManagerAppointment managerAppointment)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
+        public Result<IList<PurchaseRecord>> GetPurchaseHistory(User user)
         {
             Console.WriteLine("MokStore: Getting Purchase History (its empty..)");
             return Result.Ok<IList<PurchaseRecord>>(new List<PurchaseRecord>());
@@ -190,67 +190,67 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public Result CheckWithStorePolicy(IBasket basket, IUser user)
+        public Result CheckWithStorePolicy(IBasket basket, User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result AddDiscountToStore(IUser user, DiscountInfoNode infoNode)
+        public Result AddDiscountToStore(User user, DiscountInfoNode infoNode)
         {
             throw new NotImplementedException();
         }
 
-        public Result AddRuleToStorePolicy(IUser user, RuleInfoNode ruleInfoNode)
+        public Result AddRuleToStorePolicy(User user, RuleInfoNode ruleInfoNode)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IList<RuleInfoNode>> GetStorePolicy(IUser user)
+        public Result<IList<RuleInfoNode>> GetStorePolicy(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(IUser user)
+        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result ResetStorePolicy(IUser user)
+        public Result ResetStorePolicy(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result ResetStoreDiscount(IUser user)
+        public Result ResetStoreDiscount(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy)
+        public Result AddPurchaseStrategyToStore(User user, PurchaseStrategyName purchaseStrategy)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(IUser user)
+        public Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result UpdatePurchaseStrategies(IUser user, PurchaseStrategyName purchaseStrategy)
+        public Result UpdatePurchaseStrategies(User user, PurchaseStrategyName purchaseStrategy)
         {
             throw new NotImplementedException();
         }
 
-        public Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        public Result AddPurchaseStrategyToStoreItem(User user, string storeId, string itemId, PurchaseStrategyName strategyName)
         {
             throw new NotImplementedException();
         }
 
-        public Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        public Result RemovePurchaseStrategyToStoreItem(User user, string storeId, string itemId, PurchaseStrategyName strategyName)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(User user, string storeId, string itemId, PurchaseStrategyName strategyName)
         {
             throw new NotImplementedException();
         }

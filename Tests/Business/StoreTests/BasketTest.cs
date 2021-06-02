@@ -10,7 +10,7 @@ namespace Tests.Business.StoreTests
     {
         public IBasket basket;
         public ICart cart;
-        public IUser alice;
+        public User alice;
         
         private Item item1;
         

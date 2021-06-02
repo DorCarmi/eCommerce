@@ -7,12 +7,12 @@ namespace Tests.Business.Mokups
 {
     public class mokCart : ICart
     {
-        public Result AddItemToCart(IUser user, ItemInfo item)
+        public Result AddItemToCart(User user, ItemInfo item)
         {
             throw new System.NotImplementedException();
         }
 
-        public Result EditCartItem(IUser user, ItemInfo item)
+        public Result EditCartItem(User user, ItemInfo item)
         {
             throw new System.NotImplementedException();
         }
@@ -22,17 +22,17 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public Result BuyWholeCart(IUser user, PaymentInfo paymentInfo)
+        public Result BuyWholeCart(User user, PaymentInfo paymentInfo)
         {
             throw new System.NotImplementedException();
         }
 
-        public Result<PurchaseInfo> BuyWholeCart(IUser user)
+        public Result<PurchaseInfo> BuyWholeCart(User user)
         {
             throw new System.NotImplementedException();
         }
 
-        public bool CheckForCartHolder(IUser user)
+        public bool CheckForCartHolder(User user)
         {
             throw new System.NotImplementedException();
         }
@@ -47,7 +47,7 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public IUser GetUser()
+        public User GetUser()
         {
             throw new System.NotImplementedException();
         }

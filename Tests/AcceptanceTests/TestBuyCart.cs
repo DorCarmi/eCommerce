@@ -6,6 +6,7 @@ using eCommerce.Auth;
 using eCommerce.Adapters;
 using System.Threading.Tasks;
 using eCommerce.Business;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
@@ -44,7 +45,7 @@ namespace Tests.AcceptanceTests
             StoreRepository SR = new StoreRepository();
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
-            IRepository<IUser> UR = new RegisteredUsersRepository();
+            IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
             _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
