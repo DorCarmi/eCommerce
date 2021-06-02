@@ -26,6 +26,11 @@
     
 }
 
+.imgSideBar {
+    width: 42px;
+    height: 42px;
+}
+
 @keyframes swing {
     0%,
     30%,

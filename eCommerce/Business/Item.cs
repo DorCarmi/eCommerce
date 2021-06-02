@@ -259,36 +259,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result AssignPurchaseStrategy(User user,PurchaseStrategyName purchaseStrategy)
-        {
-            if (user.HasPermission(_belongsToStore, StorePermission.ChangeItemStrategy).IsSuccess)
-            {
-                if (_belongsToStore.CheckWithPolicy(purchaseStrategy))
-                {
-                    var resStrategy=DefaultPurchaseStrategy.GetPurchaseStrategyByName(purchaseStrategy,_belongsToStore);
-                    if (resStrategy.IsFailure)
-                    {
-                        return Result.Fail(resStrategy.GetErrorReason());
-                    }
-                    else
-                    {
-                        
-                        this._purchaseStrategy = resStrategy.GetValue();
-                        return Result.Ok();
-                    }
-                    
-                }
-                else
-                {
-                    return Result.Fail("Strategy not permitted by store's policy");
-                }
-            }
-            else
-            {
-                return Result.Fail(
-                    "User doesn't have the permission to change the strategy for this item in this store");
-            }
-        }
+        
 
         public Result EditItem(ItemInfo newItem)
         {
@@ -300,6 +271,16 @@ namespace eCommerce.Business
             if (!newItem.storeName.Equals(this._belongsToStore.GetStoreName()))
             {
                 return Result.Fail("Item info is not about the same store");
+            }
+
+            if (newItem.amount < 0)
+            {
+                return Result.Fail("Item in store can't be negative");
+            }
+
+            if (newItem.pricePerUnit <= 0)
+            {
+                return Result.Fail("Item price can't be lower or equal to zero");
             }
             this._amount=newItem.amount;
             this._category = new Category(newItem.category);

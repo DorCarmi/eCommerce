@@ -1,0 +1,43 @@
+﻿[
+  {
+    "Action": "CreateUser",
+    "Data": {
+      "MemberInfo": {
+        "Username": "User1",
+        "Email": "User1@ecommerce.com",
+        "Name": "User1",
+        "Birthday": "01/01/1990",
+        "Address": "Hollywood Street 1"
+      },
+      "Password": "User1"
+    }
+  },
+
+  {
+    "Action": "MemberAction",
+    "Data" : {
+      "Username": "User1",
+      "Password": "User1",
+      "Actions": [
+        {
+          "Action": "OpenStore",
+          "Data": {
+            "StoreName": "Store1(User1)"
+          }
+        },
+
+        {
+          "Action": "AddItem",
+          "Data": {
+            "ItemName": "Watermelon",
+            "StoreName": "Store1(User1)",
+            "Amount": 20,
+            "Category": "Sweat",
+            "KeyWords": ["Summer"],
+            "PricePerUnit": 22
+          }
+        }
+      ]
+    }
+  }
+]

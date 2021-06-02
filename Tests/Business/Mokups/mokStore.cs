@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using eCommerce.Business;
+using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 
@@ -29,7 +30,7 @@ namespace Tests.Business.Mokups
 
         public Result TryGetItems(ItemInfo item)
         {
-            throw new NotImplementedException();
+            return Result.Ok();
         }
 
         public Result<Item> GetItem(string itemId)
@@ -38,6 +39,11 @@ namespace Tests.Business.Mokups
         }
 
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<StorePermission>> GetPermissions(IUser user)
         {
             throw new NotImplementedException();
         }
@@ -135,6 +141,11 @@ namespace Tests.Business.Mokups
             return Result.Ok();
         }
 
+        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired, ManagerAppointment managerAppointment)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
         {
             Console.WriteLine("MokStore: Getting Purchase History (its empty..)");
@@ -179,6 +190,41 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
+        public Result CheckWithStorePolicy(IBasket basket, IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result AddDiscountToStore(IUser user, DiscountInfoNode infoNode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result AddRuleToStorePolicy(IUser user, RuleInfoNode ruleInfoNode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<RuleInfoNode>> GetStorePolicy(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result ResetStorePolicy(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result ResetStoreDiscount(IUser user)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy)
         {
             throw new NotImplementedException();
@@ -205,6 +251,16 @@ namespace Tests.Business.Mokups
         }
 
         public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result AddDiscountToStore(DiscountInfoNode infoNode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
         {
             throw new NotImplementedException();
         }

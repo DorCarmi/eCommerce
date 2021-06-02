@@ -9,14 +9,14 @@ namespace eCommerce.Service
     {
 
         /// <summary>
-        /// Get the user basic info
+        /// GetDiscount the user basic info
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>Basic user info</returns>
         public Result<UserBasicInfo> GetUserBasicInfo(string token);
 
         /// <summary>
-        /// Get the purchase history of the user 
+        /// GetDiscount the purchase history of the user 
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>The purchase history</returns>
@@ -62,7 +62,7 @@ namespace eCommerce.Service
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions);
         
         /// <summary>
-        /// Get the history purchase of a user
+        /// GetDiscount the history purchase of a user
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -71,7 +71,7 @@ namespace eCommerce.Service
         public Result<SPurchaseHistory> AdminGetPurchaseHistoryUser(string token, string ofUserId);
         
         /// <summary>
-        /// Get the history purchase of a store
+        /// GetDiscount the history purchase of a store
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <param name="storeId">The store id</param>
@@ -79,10 +79,18 @@ namespace eCommerce.Service
         public Result<SPurchaseHistory> AdminGetPurchaseHistoryStore(string token, string storeID);
 
         /// <summary>
-        /// Get all the owned store id
+        /// GetDiscount all the owned store id
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>All the owned store id</returns>
         public Result<List<string>> GetAllStoreIds(string token);
+
+        /// <summary>
+        /// Get all the managed store id
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <returns>All the managed store id</returns>
+        public Result<IList<string>> GetAllManagedStoreIds(string token);
+
     }
 }

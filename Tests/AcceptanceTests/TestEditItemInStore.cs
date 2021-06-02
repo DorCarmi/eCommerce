@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading.Tasks;
+using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
+using Tests.AuthTests;
 
 namespace Tests.AcceptanceTests
 {
@@ -21,26 +23,32 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(9)]
     public class TestEditItemInStore
     {
         private IAuthService _auth;
         private IStoreService _store;
-        private string storeName = "Yossi's Store";
+        private string storeName = "Yossi's Store9";
 
-        [SetUp]
+        [SetUpAttribute]
         public async Task SetUp()
         {
-            _auth = new AuthService();
-            _store = new StoreService();
-            MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
+            StoreRepository SR = new StoreRepository();
+            InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
+            IRepository<IUser> UR = new RegisteredUsersRepository();
+
+            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
+            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            MemberInfo yossi = new MemberInfo("Yossi119", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
-            MemberInfo shiran = new MemberInfo("singerMermaid", "shiran@gmail.com", "Shiran Moris",
+            MemberInfo shiran = new MemberInfo("singerMermaid9", "shiran@gmail.com", "Shiran Moris",
                 DateTime.ParseExact("25/06/2008", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Rabin 14");
             string token = _auth.Connect();
-            _auth.Register(token, yossi, "qwerty123");
-            _auth.Register(token, shiran, "130452abc");
-            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            IItem product = new SItem("Tara milk", storeName, 10, "dairy",
+            await _auth.Register(token, yossi, "qwerty123");
+            await _auth.Register(token, shiran, "130452abc");
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi119", "qwerty123", ServiceUserRole.Member);
+            IItem product = new SItem("Tara choclate milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             _store.OpenStore(yossiLogInResult.Value, storeName);
             _store.AddNewItemToStore(yossiLogInResult.Value, product);
@@ -50,24 +58,32 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Tara milk", 15, "dairy",
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
+            _store = null;
+        }
+        
+        [TestCase("Tara choclate milk", 15, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (add)
-        [TestCase("Tara milk", 5, "dairy",
+        [TestCase("Tara choclate milk", 5, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (subtract)
-        [TestCase("Tara milk", 0, "dairy",
+        [TestCase("Tara choclate milk", 0, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (remove)
-        [TestCase("Tara milk", 10, "Tara",
+        [TestCase("Tara choclate milk", 10, "Tara",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit category
-        [TestCase("Tara milk", 10, "dairy",
+        [TestCase("Tara choclate milk", 10, "dairy",
             new string[]{"milk", "Tara"}, (double)5.4)] //edit keywords
-        [TestCase("Tara milk", 10, "dairy",
+        [TestCase("Tara choclate milk", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)6.2)] // edit price
+        [Order(0)]
         [Test]
-        public async Task TestSuccess(string name, int amount, string category, string[] tags,
+        public async Task TestEditItemInStoreSuccess(string name, int amount, string category, string[] tags,
             double price)  
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi119", "qwerty123", ServiceUserRole.Member);
             Result editItemResult = _store.EditItemInStore(yossiLogin.Value,
                 new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsSuccess, "failed to edit item: " + editItemResult.Error);
@@ -75,22 +91,20 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Tara milk", "Yossi's Store", -23, "dairy",
+        [TestCase("Tara choclate milk", "Yossi's Store9", -23, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit amount (invalid subtract)
-        [TestCase("Tara milk", "Yossi's Store", 10, "~~123~~~Tara",
-            new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit invalid category
-        [TestCase("Tara milk", "Yossi's Store", 10, "dairy",
+        [TestCase("Tara choclate milk", "Yossi's Store9", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)-6.2)] // edit invalid price
-        [TestCase("Gans 356 air Rubik's cube", "Yossi's Store", 178, "games",
+        [TestCase("Gans 356 air Rubik's cube", "Yossi's Store9", 178, "games",
             new string[] {"games", "Rubik's cube", "Gans","356 air"}, (double) 114.75)] // edit a non-existing item
-        [TestCase("Tara milk", "prancing dragon", 10, "dairy",
+        [TestCase("Tara choclate milk", "prancing dragon", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)] //edit fail, can't change the store (store doesn't exist)
         [Test] 
-        public async Task TestFailureInvalid(string name, string store, int amount, string category, string[] tags,
+        public async Task TestEditItemInStoreFailureInvalid(string name, string store, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi119", "qwerty123", ServiceUserRole.Member);
             Result editItemResult = _store.EditItemInStore(yossiLogin.Value,
                 new SItem(name, store, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item");
@@ -98,14 +112,14 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Tara milk", 15, "dairy",
+        [TestCase("Tara choclate milk", 15, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)5.4)]
         [Test] 
-        public async Task TestFailureNotOwner(string name, int amount, string category, string[] tags,
+        public async Task TestEditItemInStoreFailureNotOwner(string name, int amount, string category, string[] tags,
             double price)
         {
             string token = _auth.Connect();
-            Result<string> login = await _auth.Login(token, "singerMermaid", "130452abc", ServiceUserRole.Member);
+            Result<string> login = await _auth.Login(token, "singerMermaid9", "130452abc", ServiceUserRole.Member);
             Result editItemResult = _store.EditItemInStore(login.Value,
                 new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item, user doesn't own the store");
@@ -113,10 +127,10 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        [TestCase("Tara milk", 10, "dairy",
+        [TestCase("Tara choclate milk", 10, "dairy",
             new string[]{"dairy", "milk", "Tara"}, (double)6.2)]
         [Test]
-        public void TestFailureNotLoggedIn(string name, int amount, string category, string[] tags,
+        public void TestEditItemInStoreFailureNotLoggedIn(string name, int amount, string category, string[] tags,
             double price)  
         {
             string token = _auth.Connect();

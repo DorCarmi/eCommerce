@@ -16,12 +16,13 @@
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.6" />
+      <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
       <PackageReference Include="NLog" Version="4.7.9" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.10.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Adapters" />
+      <Folder Include="Business\DiscountsAndPurchases" />
       <Folder Include="ClientApp\public\Images" />
       <Folder Include="Migrations" />
       <Folder Include="Persistence" />

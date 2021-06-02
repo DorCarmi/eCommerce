@@ -37,7 +37,7 @@ namespace eCommerce.Auth
         public bool IsValidToken(string token);
         
         /// <summary>
-        /// Get the Auth data if valid
+        /// GetDiscount the Auth data if valid
         /// </summary>
         /// <param name="token">Authorization token</param>
         /// <returns>Authorization data</returns>

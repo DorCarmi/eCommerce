@@ -12,11 +12,11 @@ namespace eCommerce.Business
         private IDictionary<string, ItemInfo> _nameToItem;
         private IStore _store;
         private ICart _cart;
-        public double RegularTotalPrice=>getRegularTotalPrice();
+        
 
         private double currentPrice;
         
-        private double getRegularTotalPrice()
+        public double GetRegularTotalPrice()
         {
             double totalPrice = 0;
             foreach (var itemInfo in _itemsInBasket)
@@ -25,6 +25,11 @@ namespace eCommerce.Business
             }
 
             return totalPrice;
+        }
+
+        public Result CheckWithStorePolicy()
+        {
+            return _store.CheckWithStorePolicy(this, _cart.GetUser());
         }
 
         public Basket(ICart cart, IStore store)
@@ -74,14 +79,14 @@ namespace eCommerce.Business
             else if (this._nameToItem.ContainsKey(item.name))
             {
                 this._nameToItem[item.name].amount += item.amount;
-                this.currentPrice = this.getRegularTotalPrice();
+                this.currentPrice = this.GetRegularTotalPrice();
                 return Result.Ok();
             }
             else
             {
-                this._nameToItem.Add(item.name,item);
+                this._nameToItem.Add(item.name,new ItemInfo(item));
                 this._itemsInBasket.Add(item);
-                this.currentPrice = this.getRegularTotalPrice();
+                this.currentPrice = this.GetRegularTotalPrice();
                 return Result.Ok();
             }
         }
@@ -94,20 +99,24 @@ namespace eCommerce.Business
             }
             if (this._nameToItem.ContainsKey(item.name))
             {
-                if (item.amount == -1)
+                if (item.amount == -1 || item.amount == 0)
                 {
                     this._nameToItem.Remove(item.name);
-                    this.currentPrice = this.getRegularTotalPrice();
+                    this.currentPrice = this.GetRegularTotalPrice();
                     return Result.Ok();
                 }
                 else if (item.amount <= 0)
                 {
                     return Result.Fail("Bad amount for item info");
                 }
+                else if(this._store.TryGetItems(item).IsFailure)
+                {
+                    return Result.Fail("Problem getting items from store");
+                }
                 else
                 {
                     this._nameToItem[item.name].amount = item.amount;
-                    this.currentPrice = this.getRegularTotalPrice();
+                    this.currentPrice = this.GetRegularTotalPrice();
                     return Result.Ok();
                 }
             }
@@ -184,5 +193,20 @@ namespace eCommerce.Business
             BasketInfo basketInfo = new BasketInfo(this);
             return basketInfo;
         }
+
+
+        public Result AddBasketRecords()
+        {
+            var resStore=this._store.AddBasketRecordToStore(this);
+            if (resStore.IsFailure)
+            {
+                return Result.Fail(resStore.Error);
+            }
+
+            var userRes=this.GetCart().GetUser().EnterRecordToHistory(resStore.Value);
+            return userRes;
+        }
     }
+    
+    
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Threading.Tasks;
+using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Service;
@@ -19,25 +20,31 @@ namespace Tests.AcceptanceTests
     /// </Req>
     /// </summary>
     [TestFixture]
+    [Order(14)]
     public class TestRemoveItemFromStore
     {
         private IAuthService _auth;
         private IStoreService _store;
-        private string storeName = "Yossi's Store";
+        private string storeName = "Target";
 
-        [SetUp]
+        [SetUpAttribute]
         public async Task SetUp()
         {
-            _auth = new AuthService();
-            _store = new StoreService();
-            MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
+            StoreRepository SR = new StoreRepository();
+            InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
+            IRepository<IUser> UR = new RegisteredUsersRepository();
+
+            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
+            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            MemberInfo yossi = new MemberInfo("Mechanism1000", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
-            MemberInfo shiran = new MemberInfo("singerMermaid", "shiran@gmail.com", "Shiran Moris",
+            MemberInfo shiran = new MemberInfo("PhrogLiv", "shiran@gmail.com", "Shiran Moris",
                 DateTime.ParseExact("25/06/2008", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Rabin 14");
             string token = _auth.Connect();
-            _auth.Register(token, yossi, "qwerty123");
-            _auth.Register(token, shiran, "130452abc");
-            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            await _auth.Register(token, yossi, "qwerty123");
+            await _auth.Register(token, shiran, "130452abc");
+            Result<string> yossiLogInResult = await _auth.Login(token, "Mechanism1000", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
             _store.OpenStore(yossiLogInResult.Value, storeName);
@@ -48,10 +55,18 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
+        [TearDownAttribute]
+        public void Teardown()
+        {
+            _auth = null;
+            _store = null;
+        }
+        
         [TestCase("Tara milk")]
         [TestCase("iPhone X")]
+        [Order(0)]
         [Test]
-        public async Task TestSuccess(string productName)
+        public async Task TestRemoveItemFromStoreSuccess(string productName)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
@@ -61,11 +76,11 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token); 
         }
         
-        [TestCase("Yossi's Store", "Gans 356 air", "Yossi11", "qwerty123")]
-        [TestCase("dancing doors", "Tara milk", "Yossi11", "qwerty123")] // non existing store
-        [TestCase("Yossi's Store", "Gans 356 air", "singerMermaid", "130452abc")]
+        [TestCase("Target", "Gans 356 air", "Mechanism1000", "qwerty123")]
+        [TestCase("dancing doors", "Tara milk", "Mechanism1000", "qwerty123")] // non existing store
+        [TestCase("Target", "Gans 356 air", "PhrogLiv", "130452abc")]
         [Test]      
-        public async Task TestFailureInvalid(string store, string productName, string member, string password)
+        public async Task TestRemoveItemFromStoreFailureInvalid(string store, string productName, string member, string password)
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = await _auth.Login(token, member, password, ServiceUserRole.Member);
@@ -75,22 +90,12 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token); 
         }
 
-        [Test]
-        public async Task TestRemoveLastProduct()
-        {
-            string token = _auth.Connect();
-            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            _store.RemoveItemFromStore(yossiLogin.Value, storeName, "Tara milk");
-            Result removeItemResult = _store.RemoveItemFromStore(yossiLogin.Value, storeName, "iPhone X");
-            Assert.True(removeItemResult.IsFailure, "can't remove all products from a store");
-            token = _auth.Logout(yossiLogin.Value).Value;
-            _auth.Disconnect(token); 
-        }
+       
         
         [TestCase("Tara milk")]
         [TestCase("iPhone X")]
         [Test]
-        public void TestFailureLogic(string productName)
+        public void TestRemoveItemFromStoreFailureLogic(string productName)
         {
             string token = _auth.Connect();
             Result removeItemResult = _store.RemoveItemFromStore(token, storeName, productName);

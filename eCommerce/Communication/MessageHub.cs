@@ -7,30 +7,34 @@ using eCommerce.Publisher;
 using eCommerce.Service;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.SignalR;
 
 namespace eCommerce.Communication
 {
     public class MessageModel
     {
-        public string UserName { get; set; }
         public string Message { get; set; }
-        public string ToUser { get; set; }
+
+        public MessageModel(string message)
+        {
+            Message = message;
+        }
     }
     
-    public class MessageHub : Hub, UserObserver
+    public class MessageHub : Hub
     {
+        private IHubContext<MessageHub> _hubContext = null;
+        
         private MainPublisher _mainPublisher;
-        private ConcurrentDictionary<string, IList<string>> _userToConnection;
-        private ConcurrentDictionary<string, string> _connectionToUser;
+        private ConnectionRepository _connectionRepository;
         private IAuthService _authService;
         private IUserService _userService;
-        public MessageHub()
+        public MessageHub(IHubContext<MessageHub> hubContext)
         {
+            _hubContext = hubContext;
             _mainPublisher = MainPublisher.Instance;
-            _mainPublisher.Register(this);
-            _userToConnection = new ConcurrentDictionary<string, IList<string>>();
-            _connectionToUser = new ConcurrentDictionary<string, string>();
+            _connectionRepository = ConnectionRepository.Instance;
             _authService = new AuthService();
             _userService = new UserService();
         }
@@ -44,7 +48,7 @@ namespace eCommerce.Communication
                 return base.OnDisconnectedAsync(null);
             }
 
-            var authToken = httpContext.Request.Cookies["authToken"];
+            var authToken = httpContext.Request.Cookies["_auth"];
             if (!_authService.IsUserConnected(authToken))
             {
                 return base.OnDisconnectedAsync(null);
@@ -53,59 +57,24 @@ namespace eCommerce.Communication
             
             var userBasicData = _userService.GetUserBasicInfo(authToken).Value;
             var userId = userBasicData.Username;
-            if (!_userToConnection.TryRemove(userId, out var connectionList))
-            {
-                connectionList = new List<string>();
-            }
-
-            connectionList.Add(Context.ConnectionId);
-            _userToConnection.TryAdd(userId, connectionList);
-            _connectionToUser.TryAdd(Context.ConnectionId, userId);
+            _connectionRepository.AddConnection(Context.ConnectionId, userId);
 
             Console.WriteLine("--> Connection Opened: " + Context.ConnectionId);
-            _mainPublisher.Connect(Context.ConnectionId);
+            _mainPublisher.Connect(userId);
             return base.OnConnectedAsync();
         }
         
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            if (_connectionToUser.TryRemove(Context.ConnectionId, out var userId) &&
-                _userToConnection.TryRemove(userId, out var connectionList))
+            Console.WriteLine("Close connection");
+            if (_connectionRepository.RemoveConnection(Context.ConnectionId, out var userId) == 0 &&
+                userId != null)
             {
-                connectionList.Remove(Context.ConnectionId);
-                _userToConnection.TryAdd(userId, connectionList);
-
-                if (connectionList.Count == 0)
-                {
-                    _mainPublisher.Disconnect(userId);
-                }
+                Console.WriteLine("--> Connection Closed: " + Context.ConnectionId);
+                _mainPublisher.Disconnect(userId);
             }
 
             return base.OnDisconnectedAsync(exception);
-        }
-
-        public async Task Message(MessageModel message)
-        {
-            Console.WriteLine($"Get message {message.Message} from {message.UserName} to {message.ToUser}");
-            MainPublisher mainPublisher = MainPublisher.Instance;
-            mainPublisher.Connect(message.UserName);
-            await Clients.Others.SendAsync("message", message);
-        }
-
-        public async void Notify(string userId, ConcurrentQueue<string> messages)
-        {
-            if (!_userToConnection.TryGetValue(userId, out var connectionsIds))
-            {
-                return;
-            }
-            
-            while (!messages.IsEmpty)
-            {
-                if (messages.TryDequeue(out var message))
-                {
-                    await Clients.Clients(connectionsIds).SendAsync("message", message);
-                }
-            }
         }
     }
 }

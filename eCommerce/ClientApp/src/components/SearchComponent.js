@@ -10,10 +10,15 @@ export class SearchComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            searchQuery: ""
+            searchQuery: "",
+            searchBy : "Item"
         }
         
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.changeFunc = this.changeFunc.bind(this);
+
+
+
     }
 
     handleInputChange(event){
@@ -21,16 +26,28 @@ export class SearchComponent extends Component {
         this.setState({
             searchQuery: value
         });
-    }
+        }
+
+
     
-    render(){
+
+    changeFunc(e) {
+        this.setState({
+            searchBy:(e.target.value)
+        })
+
+    }
+
+        render(){
         return (
-            <div className="searchContainer">
-                <select className="searchOptions">
-                    <option>Item</option>
+            <div id = "selectBox" className="searchContainer">
+                <select className="searchOptions" onChange={(e) => this.changeFunc(e)}>
+                    <option value="Item">Item</option>
+                    <option value="Store">Store</option>
+
                 </select>
                 <input placeholder="Search" value={this.state.searchQuery} onChange={this.handleInputChange}/>
-                <Link className="searchLink" exact to={`/searchItems/${this.state.searchQuery}`}>
+                <Link className="searchLink" exact to={`/searchItems/${this.state.searchBy}/${this.state.searchQuery}`}>
                     <div className="imageDiv">
                         <img src="/Images/search.png" alt="Search" className="imageFitSize"/>
                     </div>
