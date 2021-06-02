@@ -1,15 +1,47 @@
-﻿using eCommerce.Business;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using eCommerce.Business;
 using Microsoft.EntityFrameworkCore;
 
 namespace eCommerce.DataLayer
 {
-    public class ECommerceContext : DbContext
+    public class ECommerceContext: DbContext
     {
         public DbSet<MemberInfo> MemberInfos { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<ListPair<Classroom,Course>> ListPairs { get; set; }
 
-        // The following configures EF to create a Sqlite database file as `C:\blogging.db`.
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite(@"Data Source=.\Persistence\eCommerce.db");
-            // => options.UseSqlite(@"Data Source={AppDir}\Persistence\eCommerce.db");
+        
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.EnableSensitiveDataLogging().UseSqlServer("Server=localhost;Database=CommerceTestDB;Trusted_Connection=True;");
+        }
+        
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<ListPair<Classroom,Course>>()
+                .HasKey(p => new {p.HolderId, p.KeyId});
+            
+
+        }
     }
+
+    public class ListPair<K,V>
+    {
+        public int KeyId { get; set; }
+        public K Key { get; set; }
+        public virtual List<V> ValList { get; set; }
+        public int HolderId { get; set; }
+    }
+    
+    public class Pair<K,V>
+    {
+        public int ClassroomId { get; set; }
+        public K Classroom { get; set; }
+        public int CourseId { get; set; }
+        public V Course { get; set; }
+        public int StudentId { get; set; }
+    }
+
 }

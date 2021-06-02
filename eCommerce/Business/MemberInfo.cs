@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using eCommerce.Common;
 using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
+using eCommerce.Common;
 
 namespace eCommerce.Business
 {
     public class MemberInfo : ICloneable<MemberInfo>
     {
-        public string Id { get; set;}
+        //@TODO::sharon change Primary key from Id to Username
         [Key]
-        public string Username { get; set;}
-        public string Email { get; set;}
-        public string Name { get; set;}
-        public DateTime Birthday { get; set;}
-        public string Address { get; set;}
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string Id { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Name { get; set; }
+        public DateTime Birthday { get; set; }
+        public string Address { get; set; }
 
         public MemberInfo(string username, string email, string name, DateTime birthday, string address)
         {
