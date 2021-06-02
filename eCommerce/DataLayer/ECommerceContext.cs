@@ -15,7 +15,7 @@ namespace eCommerce.DataLayer
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // optionsBuilder.EnableSensitiveDataLogging().UseSqlServer("Server=localhost;Database=CommerceTestDB;Trusted_Connection=True;");
+            //@TODO::sharon - enable test mode for db - use different db + add teardown function to context 
             optionsBuilder.EnableSensitiveDataLogging().UseSqlServer(AppConfig.GetInstance().GetData("DBConnectionString"));
         }
         
