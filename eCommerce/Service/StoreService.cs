@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using eCommerce.Auth;
 using eCommerce.Business;
+using eCommerce.Business.Discounts;
 using eCommerce.Business.Service;
 using eCommerce.Common;
+using eCommerce.Service.StorePolicies;
 
 namespace eCommerce.Service
 {
@@ -22,7 +24,7 @@ namespace eCommerce.Service
             _marketFacade = MarketFacade.GetInstance();
         }
 
-        static StoreService CreateUserServiceForTests(IUserAuth userAuth,
+        public static StoreService CreateUserServiceForTests(IUserAuth userAuth,
             IRepository<IUser> registeredUsersRepo,
             StoreRepository storeRepo)
         {
@@ -46,6 +48,11 @@ namespace eCommerce.Service
             }
 
             return Result.Ok(staffPermissions);
+        }
+
+        public Result<IList<StorePermission>> GetStorePermission(string token, string storeId)
+        {
+            return _marketFacade.GetStorePermission(token, storeId);
         }
 
         public Result<IEnumerable<IItem>> SearchForItem(string token, string query)
@@ -137,6 +144,18 @@ namespace eCommerce.Service
             }
 
             return Result.Ok(new SPurchaseHistory(purchaseRecordRes.Value));
+        }
+
+        public Result AddRuleToStorePolicy(string token, string storeId, SRuleNode sRuleNode)
+        {
+            RuleInfoNode ruleInfoNode = sRuleNode.ParseToRuleInfoNude();
+            return _marketFacade.AddRuleToStorePolicy(token, storeId, ruleInfoNode);
+        }
+
+        public Result AddDiscountToStore(string token, string storeId, SDiscountNode discountNode)
+        {
+            DiscountInfoNode discountInfoNode = discountNode.ParseToDiscountInfoNode();
+            return _marketFacade.AddDiscountToStore(token, storeId, discountInfoNode);
         }
     }
 }

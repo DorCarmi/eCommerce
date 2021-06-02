@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using eCommerce.Business.Discounts;
 using eCommerce.Common;
 
 namespace eCommerce.Business.Service
@@ -25,6 +26,8 @@ namespace eCommerce.Business.Service
         
         // TODO implement, return list of username and there permissions
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user);
+
+        public Result<IList<StorePermission>> GetPermissions(IUser user);
 
         public List<Item> SearchItem(string stringSearch);
 
@@ -60,21 +63,33 @@ namespace eCommerce.Business.Service
 
         public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment);
 
+        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired,
+            ManagerAppointment managerAppointment);
+
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user);
         public Result EnterBasketToHistory(IBasket basket);
 
 
         public String GetStoreName();
-        bool CheckWithPolicy(PurchaseStrategyName purchaseStrategy);
+
         bool TryAddNewCartToStore(ICart cart);
         Result ConnectNewBasketToStore(IBasket newBasket);
         bool CheckConnectionToCart(ICart cart);
+        
+        Result<PurchaseRecord> AddBasketRecordToStore(Basket basket);
+        
+        
+        
         Result<double> CheckDiscount(Basket basket);
-        Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy);
-        Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(IUser user);
-        Result UpdatePurchaseStrategies(IUser user, PurchaseStrategyName purchaseStrategy);
-        Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
-        Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
-        Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName);
+        Result CheckWithStorePolicy(IBasket basket, IUser user);
+
+
+        Result AddDiscountToStore(IUser user,DiscountInfoNode infoNode);
+        Result AddRuleToStorePolicy(IUser user,RuleInfoNode ruleInfoNode);
+        Result<IList<RuleInfoNode>> GetStorePolicy(IUser user);
+        Result<IList<DiscountInfoNode>> GetStoreDiscounts(IUser user);
+
+        Result ResetStorePolicy(IUser user);
+        Result ResetStoreDiscount(IUser user);
     }
 }

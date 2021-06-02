@@ -86,6 +86,7 @@ namespace Tests.Business
         }
 
         [Test]
+        [Order(6)]
         public void PurchaseTest()
         {
             var pstation = new ItemInfo(100, "Playstation4", alenbyStore.GetStoreName(), "Tech",
@@ -114,47 +115,58 @@ namespace Tests.Business
         
         
         [Test]
+        [Order(3)]
         public void AddItemToStoreTest()
         {
             for (int i = 1; i < _itemInfos.Count; i++)
             {
-                Result itemAdditionRes = alenbyStore.AddItemToStore(_itemInfos[i], _user);
+                Result itemAdditionRes = alenbyStore.AddItemToStore(_itemInfos[i], alenbyFounder);
                 Assert.True(itemAdditionRes.IsSuccess,
                     $"Item {_itemInfos[i].name} wasn't added to store\nError: {itemAdditionRes.Error}");
             }
         }
         
         [Test]
+        [Order(5)]
+
         public void AddItemToCartTest()
         {
-            Result<Item> itemRes = alenbyStore.GetItem(_itemInfos[0].name);
-            Assert.True(itemRes.IsSuccess, $"{itemRes.Error}");
+            Result<Item> itemRes1 = alenbyStore.GetItem(_itemInfos[0].name);
+            Assert.False(itemRes1.IsSuccess, $"Expected to fail");
             
-            Result addItemRes = _user.AddItemToCart(itemRes.Value.ShowItem());
+            
+            Result<Item> itemRes2 = alenbyStore.GetItem(_itemInfos[1].name);
+            Assert.True(itemRes2.IsSuccess, $"{itemRes2.Error}");
+
+            var showI = itemRes2.Value.ShowItem();
+            showI.amount = showI.amount / 2;
+            Result addItemRes = alenbySecondManager.AddItemToCart(showI);
             Assert.True(addItemRes.IsSuccess,
                 $"Error {addItemRes.Error}");
         }
         
         [Test]
+        [Order(7)]
         public void AppointNewMangerTest()
         {
             MemberInfo memberInfo = new MemberInfo("User2", "User2@email.com", "TheUser1", DateTime.Now, "The sea 3");
             IUser newUser = new User(Member.State, memberInfo);
             
-            Result addItemRes = _user.AppointUserToManager(alenbyStore, newUser);
+            Result addItemRes = alenbyFounder.AppointUserToManager(alenbyStore, newUser);
             Assert.True(addItemRes.IsSuccess,
                 $"Error {addItemRes.Error}");
         }
         
         [Test]
+        [Order(4)]
         public void SearchItemByCategoryTest()
         {
-            AddItemToStoreTest();
-            IList<Item> searchRes = alenbyStore.SearchItemWithCategoryFilter("Orange", _itemInfos[2].category);
+            IList<Item> searchRes = alenbyStore.SearchItemWithCategoryFilter(_itemInfos[2].name, _itemInfos[2].category);
             Assert.AreEqual(1, searchRes.Count);
         }
 
         [Test]
+        [Order(7)]
         public void AppointUsersTest()
         {
             User alice = new User(new MemberInfo("Alice","email@gmail.com",

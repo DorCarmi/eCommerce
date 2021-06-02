@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
-using eCommerce.Common;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace eCommerce.Auth
 {
     public class User
     {
+        
         private string _username;
         private byte[] _hashedPassword;
 
+        public User()
+        {
+        }
+        
         public User(string username, byte[] hashedPassword)
         {
             _username = username;
@@ -21,11 +21,20 @@ namespace eCommerce.Auth
 
         // ========== Properties ========== //
 
+        [Key]
         public string Username
         {
             get => _username;
+            set => _username = value;
+        }
+        
+        public byte[] Password
+        {
+            get => _hashedPassword;
+            set => _hashedPassword = value;
         }
 
+        [NotMapped]
         public byte[] HashedPassword
         {
             get => _hashedPassword; 

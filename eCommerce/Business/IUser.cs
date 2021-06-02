@@ -14,6 +14,7 @@ namespace eCommerce.Business
         //Facade
         public Result OpenStore(IStore store);
         public Result<List<string>> GetStoreIds();
+        public Result<IList<string>> GetManagedStoreIds();
         public Result AddItemToCart(ItemInfo item);
         public Result<ICart> GetCartInfo();
         public Result EditCart(ItemInfo info);
@@ -37,11 +38,11 @@ namespace eCommerce.Business
         public Result<OwnerAppointment> MakeOwner(IStore store);
         public Result<ManagerAppointment> MakeManager(IStore store);
         public Result<OwnerAppointment> RemoveOwner(IStore store);
-        public Result AnnexStakeholders(IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers);
 
         public Result PublishMessage(string message);
        
         public UserToSystemState GetState();
+        Result<ManagerAppointment> RemoveManager(IStore store);
     }
 
     

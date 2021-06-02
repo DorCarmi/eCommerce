@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using eCommerce.Common;
 using eCommerce.Service;
 using Microsoft.AspNetCore.Http;
@@ -24,11 +25,10 @@ namespace eCommerce.Controllers
             this.Password = password;
         }
     }
-
-
-
+    
+    [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
         private readonly IAuthService _authService;
@@ -38,10 +38,8 @@ namespace eCommerce.Controllers
             _logger = logger;
             _authService = new AuthService();
         }
-
-
-        [HttpGet]
-        [Route("[action]")]
+        
+        [HttpGet("[action]")]
         public string Connect()
         {
             string token = _authService.Connect();
@@ -58,13 +56,12 @@ namespace eCommerce.Controllers
             return token;
         }
         
-        [HttpPost]
-        [Route("[action]")]
-        public Result<string> Login([FromBody] LoginInfo loginInfo)
+        [HttpPost("[action]")]
+        public async Task<Result<string>> Login([FromBody] LoginInfo loginInfo)
         {
             if (Enum.TryParse<ServiceUserRole>(loginInfo.Role, true, out var serviceRole))
             {
-                Result<string> loginRes = _authService.Login((string) HttpContext.Items["authToken"],
+                Result<string> loginRes = await _authService.Login((string) HttpContext.Items["authToken"],
                     loginInfo.Username, loginInfo.Password, serviceRole);
                 if (loginRes.IsSuccess)
                 {
@@ -86,11 +83,32 @@ namespace eCommerce.Controllers
             return Result.Fail<string>("Invalid role");
         }
         
-        [HttpPost]
-        [Route("[action]")]
-        public Result Register([FromBody] MemberInfo memberInfo)
+        [HttpGet("[action]")]
+        public Result<string> Logout()
         {
-            Result registerRes = _authService.Register((string) HttpContext.Items["authToken"],
+            Result<string> logoutRes = _authService.Logout((string) HttpContext.Items["authToken"]);
+
+            if (logoutRes.IsSuccess)
+            {
+                Response.Cookies.Append("_auth", logoutRes.Value, new CookieOptions()
+                {
+                    Path = "/",
+                    Secure = true,
+                    MaxAge = TimeSpan.FromDays(5),
+                    Domain = Request.PathBase.Value,
+                    Expires = DateTimeOffset.Now.AddDays(5),
+                    HttpOnly = true
+                });
+                Response.Headers.Add("RedirectTo", "/");
+            }
+            
+            return logoutRes;
+        }
+        
+        [Route("[action]")]
+        public async Task<Result> Register([FromBody] MemberInfo memberInfo)
+        {
+            Result registerRes = await _authService.Register((string) HttpContext.Items["authToken"],
                 memberInfo, memberInfo.Password);
             if (registerRes.IsSuccess)
             {

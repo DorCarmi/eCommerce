@@ -6,13 +6,14 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using eCommerce.Common;
 
 namespace eCommerce.Auth
 {
     public class UserAuth  : IUserAuth
     {
-        private static readonly UserAuth Instance = new UserAuth(new ConcurrentRegisteredUserRepo());
+        private static readonly UserAuth Instance = new UserAuth(new InMemoryRegisteredUserRepo());
 
         private readonly JWTAuth _jwtAuth;
 
@@ -23,7 +24,8 @@ namespace eCommerce.Auth
 
         private UserAuth(IRegisteredUserRepo repo)
         {
-            _jwtAuth = new JWTAuth("keykeykeykeykeyekeykey");
+            AppConfig config = AppConfig.GetInstance();
+            _jwtAuth = new JWTAuth(config.GetData("JWTKey"));
 
             _hashMutex = new Mutex();
             _sha256 = SHA256.Create();
@@ -41,7 +43,7 @@ namespace eCommerce.Auth
             return new UserAuth(userRepo);
         }
 
-        public Result Register(string username, string password)
+        public async Task<Result> Register(string username, string password)
         {
             Result policyCheck = RegistrationsPolicy(username, password);
             if (policyCheck.IsFailure)
@@ -49,23 +51,23 @@ namespace eCommerce.Auth
                 return policyCheck;
             }
 
-            if (IsRegistered(username))
+            if (await IsRegistered(username))
             {
                 return Result.Fail("Username already taken");
             }
             
             User newUser = new User(username, HashPassword(password));
 
-            if (!_userRepo.Add(newUser))
+            if (! await _userRepo.Add(newUser))
             {
                 return Result.Fail("Username already taken");
             }
             return Result.Ok();
         }
 
-        public Result Authenticate(string username, string password)
+        public async Task<Result> Authenticate(string username, string password)
         {
-            User user = _userRepo.GetUserOrNull(username);
+            User user = await _userRepo.GetUserOrNull(username);
             Result canLogInRes = CanLogIn(user, password);
             if (canLogInRes.IsFailure)
             {
@@ -85,9 +87,9 @@ namespace eCommerce.Auth
             return _jwtAuth.GenerateToken(claims);
         }
 
-        public bool IsRegistered(string username)
+        public async Task<bool> IsRegistered(string username)
         {
-            return _userRepo.GetUserOrNull(username) != null;
+            return await _userRepo.GetUserOrNull(username) != null;
         }
 
         public bool IsValidToken(string token)
@@ -166,11 +168,11 @@ namespace eCommerce.Auth
             String errMessage = null;
             if (string.IsNullOrEmpty(username))
             {
-                errMessage = $"{errMessage}\nUsername cant be empty";
+                errMessage = $"Username cant be empty";
             }
             else if(username.StartsWith("_Guest"))
             {
-                errMessage = $"{errMessage}\nUsername not valid";
+                errMessage = $"Username not valid";
             }
 
             if (string.IsNullOrEmpty(password))

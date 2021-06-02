@@ -7,15 +7,16 @@ export class Layout extends Component {
   static displayName = Layout.name;
 
   render () {
-    let { state } = this.props;
+    let { state, logoutHandler } = this.props;
+    console.log(state)
     return (
       <div>
-        <NavMenu state={state}/>
+        <NavMenu logoutHandler={logoutHandler} state={state}/>
         <div style={{
             display: 'flex',
             position: 'relative'
         }}>
-            {state.isLoggedIn ? <SideBarMenu storeList={state.storeList}/> : null}
+            {state.isLoggedIn ? <SideBarMenu role={state.role} ownedStoreList={state.ownedStoreList} managedStoreList = {state.managedStoreList}/> : null}
             <Container>
               {this.props.children}
             </Container>

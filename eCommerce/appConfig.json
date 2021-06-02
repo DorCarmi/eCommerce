@@ -1,0 +1,14 @@
+﻿{
+  "InitWithData": true,
+
+  "AdminCreationInfo" : {
+    "Username": "_Admin",
+    "Email": "Admin@eCommerce.com",
+    "Password": "_Admin"
+  },
+
+  "DBConnectionString": "Server=localhost;DataBase=market;Trusted_Connection=True;",
+  "AuthDBConnectionString": "Server=localhost;DataBase=auth;Trusted_Connection=True;",
+  
+  "JWTKey": "keykeykeykeykeyekeykey"
+}

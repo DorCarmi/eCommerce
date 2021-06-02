@@ -38,11 +38,17 @@ namespace eCommerce
                 .WithOrigins("null");
             }));
             services.AddSignalR();
+            
+            // init message connection handler
+            services.AddSingleton<MessageConnectionHandler, MessageConnectionHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // init services
+            app.ApplicationServices.GetService(typeof(MessageConnectionHandler));
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

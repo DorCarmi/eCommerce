@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business.Service;
 using eCommerce.Common;
@@ -19,6 +20,7 @@ namespace eCommerce.Business
         
         // token to user
         private ConcurrentDictionary<string, IUser> _connectedUsers;
+        private ConcurrentDictionary<string, bool> _connectedUsersName;
         private IRepository<IUser> _registeredUsersRepo;
         private ConcurrentDictionary<string, IUser> _admins;
 
@@ -29,6 +31,7 @@ namespace eCommerce.Business
         {
             _auth = auth;
             _connectedUsers = new ConcurrentDictionary<string, IUser>();
+            _connectedUsersName = new ConcurrentDictionary<string, bool>();
             // TODO get the initialze id value from DB
             _concurrentIdGenerator = new ConcurrentIdGenerator(0);
             _registeredUsersRepo = registeredUsersRepo;
@@ -69,7 +72,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result Register(string token, MemberInfo memberInfo, string password)
+        public async Task<Result> Register(string token, MemberInfo memberInfo, string password)
         {
             if (!_auth.IsValidToken(token))
             {
@@ -93,7 +96,7 @@ namespace eCommerce.Business
                 return validMemberInfoRes;
             }
 
-            Result authRegistrationRes = RegisterAtAuthorization(memberInfo.Username, password);
+            Result authRegistrationRes = await RegisterAtAuthorization(memberInfo.Username, password);
             if (authRegistrationRes.IsFailure)
             {
                 return authRegistrationRes;
@@ -115,18 +118,18 @@ namespace eCommerce.Business
         public void AddAdmin(MemberInfo adminInfo, string password)
         {
             IUser user = new User(Admin.State, adminInfo);
-            RegisterAtAuthorization(adminInfo.Username, password);
+            RegisterAtAuthorization(adminInfo.Username, password).Wait();
             _registeredUsersRepo.Add(user);
             _admins.TryAdd(adminInfo.Username, user);
         }
         
-        private Result RegisterAtAuthorization(string username, string password)
+        private Task<Result> RegisterAtAuthorization(string username, string password)
         {
             return _auth.Register(username, password);
         }
         
         // TODO: use the role here, how user that is admin can log in as member
-        public Result<string> Login(string guestToken, string username, string password, UserToSystemState role)
+        public async Task<Result<string>> Login(string guestToken, string username, string password, UserToSystemState role)
         {
             if (!_auth.IsValidToken(guestToken))
             {
@@ -144,16 +147,23 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Not connected or not guest");
             }
             
-            Result authLoginRes = _auth.Authenticate(username, password);
+            Result authLoginRes = await _auth.Authenticate(username, password);
             if (authLoginRes.IsFailure)
             {
                 return Result.Fail<string>(authLoginRes.Error);
             }
+
+            if (_connectedUsersName.ContainsKey(username))
+            {
+                return Result.Fail<string>("User is already logged in");
+            }
+            
             string loginToken = _auth.GenerateToken(username);
             
             IUser user = _registeredUsersRepo.GetOrNull(username);
             if (user == null)
             {
+                _logger.Error($"User {username} is registered in auth, but not in usermanger");
                 return Result.Fail<string>("Invalid username or password");
             }
 
@@ -162,7 +172,7 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Guest not connected");
             }
             
-            if (!_connectedUsers.TryAdd(loginToken, user))
+            if (!_connectedUsers.TryAdd(loginToken, user) || !_connectedUsersName.TryAdd(username, true))
             {
                 _logger.Error($"UserAuth created duplicate toekn(already in connected userses dictionry)");
                 return Result.Fail<string>("Error");
@@ -191,7 +201,8 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Guest cant logout");
             }
 
-            if (!_connectedUsers.TryRemove(token, out var tUser1))
+            if (!_connectedUsers.TryRemove(token, out var tUser1) || 
+                !_connectedUsersName.TryRemove(user.Username, out var tbool))
             {
                 _logger.Error($"User logout error");
             }
@@ -269,7 +280,7 @@ namespace eCommerce.Business
         }
         
         /// <summary>
-        /// Get the user
+        /// GetDiscount the user
         /// </summary>
         /// <param name="username">The username</param>
         /// <returns>The user</returns>
@@ -332,13 +343,20 @@ namespace eCommerce.Business
 
         public void CreateMainAdmin()
         {
-            MemberInfo adminInfo = new MemberInfo(
-                "_Admin",
-                "Admin@eCommerce.com",
-                "TheAdmin",
-                DateTime.Now, 
-                null);
-            AddAdmin(adminInfo, "_Admin");
+            AppConfig config = AppConfig.GetInstance();
+            string adminUsername = config.GetData("AdminCreationInfo:Username");
+            string adminPassword = config.GetData("AdminCreationInfo:Password");
+
+            if (_auth.Authenticate(adminUsername, adminPassword).Result.IsFailure)
+            {
+                MemberInfo adminInfo = new MemberInfo(
+                    config.GetData("AdminCreationInfo:Username"),
+                    config.GetData("AdminCreationInfo:Email"),
+                    "TheAdmin",
+                    DateTime.Now,
+                    null);
+                AddAdmin(adminInfo, config.GetData("AdminCreationInfo:Password"));
+            }
         }
     }
 }

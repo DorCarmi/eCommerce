@@ -3,6 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Business.CombineRules;
+using eCommerce.Business.Discounts;
+using eCommerce.Business.DiscountsAndPurchases.Purchases.RulesInfo;
+using eCommerce.Business.Purchases;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using Microsoft.Extensions.Logging;
@@ -19,9 +22,8 @@ namespace eCommerce.Business
 
         //Store's issues
         //Discounts and purchases
-        private List<DiscountComposite> _myDiscountStrategies;
+        private List<Composite> _myDiscountStrategies;
         private List<PurchaseStrategy> _myPurchaseStrategies;
-        private DiscountPolicy _myDiscountPolicy;
         private PurchasePolicy _myPurchasePolicy;
         
         //History and inventory
@@ -41,14 +43,12 @@ namespace eCommerce.Business
         {
             this._storeName = name;
 
-            this._myDiscountStrategies = new List<DiscountComposite>();
-            this._myDiscountStrategies.Add(new DefaultDiscount());
+            this._myDiscountStrategies = new List<Composite>();
             this._myPurchaseStrategies = new List<PurchaseStrategy>();
             this._myPurchaseStrategies.Add(new DefaultPurchaseStrategy(this));
 
             _myPurchasePolicy = new PurchasePolicy(this);
-            _myDiscountPolicy = new DiscountPolicy(this);
-            
+
             _transactionHistory = new StoreTransactionHistory(this);
 
             _inventory = new ItemsInventory(this);
@@ -56,7 +56,9 @@ namespace eCommerce.Business
             this._founder = founder;
 
             _owners = new List<IUser>();
+            _owners.Add(founder);
             _ownersAppointments = new List<OwnerAppointment>();
+            
             _managers = new List<IUser>();
             _managersAppointments = new List<ManagerAppointment>();
             
@@ -123,6 +125,36 @@ namespace eCommerce.Business
 
 
             return Result.Ok<IList<Tuple<string, IList<StorePermission>>>>(netasCrazyList);
+        }
+
+        public Result<IList<StorePermission>> GetPermissions(IUser user)
+        {
+            IList<StorePermission> permissions = null;
+            if (user.Equals(_founder) | _owners.Contains(user))
+            {
+                return Result.Ok<IList<StorePermission>>(Enum.GetValues<StorePermission>());
+            }
+
+            if (!_managers.Contains(user))
+            {
+                return Result.Fail<IList<StorePermission>>("User is not a owner or manager of this store");
+            }
+            
+            foreach (var managerAppointment in _managersAppointments)
+            {
+                if (managerAppointment.User.Equals(user))
+                {
+                    permissions = managerAppointment.GetAllPermissions();
+                }
+            }
+
+            if (permissions == null)
+            {
+                //TODO log it as error
+                return Result.Fail<IList<StorePermission>>("User is not a owner or manager of this store");
+            }
+
+            return Result.Ok(permissions);
         }
 
         public List<Item> SearchItem(string stringSearch)
@@ -388,6 +420,27 @@ namespace eCommerce.Business
             }
         }
         
+        
+        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired, ManagerAppointment managerAppointment)
+        {
+            if (theOneWhoFires.HasPermission(this, StorePermission.RemoveStoreStaff).IsSuccess)
+            {
+                if (this._managersAppointments.Contains(managerAppointment))
+                {
+                    this._managersAppointments.Remove(managerAppointment);
+                    return Result.Ok();
+                }
+                else
+                {
+                    return Result.Fail("Manager appointed not record in store");
+                }
+            }
+            else
+            {
+                return Result.Fail("User doesn't have permissions to remove staff");
+            }
+        }
+        
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
         {
             return this._transactionHistory.GetHistory(user);
@@ -402,12 +455,7 @@ namespace eCommerce.Business
         {
             return this._storeName;
         }
-
-        public bool CheckWithPolicy(PurchaseStrategyName purchaseStrategy)
-        {
-            return this._myPurchasePolicy.checkStrategy(purchaseStrategy);
-        }
-
+        
         public bool TryAddNewCartToStore(ICart cart)
         {
             bool ans=true;
@@ -460,76 +508,132 @@ namespace eCommerce.Business
         public Result<double> CheckDiscount(Basket basket)
         {
             //No double discounts
-            double minValue = basket.GetTotalPrice().Value;
-            foreach (var strategy in this._myDiscountStrategies)
+            
+            double minValue = basket.GetRegularTotalPrice();
+            foreach (var discount in this._myDiscountStrategies)
             {
-                var price = strategy.Get(basket,basket.GetCart().GetUser());
-                if (price.IsFailure)
+                Dictionary<string, ItemInfo> itemsInDiscount = new Dictionary<string, ItemInfo>();
+                var checkIfDiscount = discount.CheckIfDiscount();
+                if (checkIfDiscount)
                 {
-                    return price;
-                }
-                else
-                {
-                    if (price.GetValue() < minValue)
+                    var checkDiscount = discount.Check(basket, basket.GetCart().GetUser());
+                    if (checkDiscount.Count>0)
                     {
-                        minValue = price.GetValue();
+                        
+                        var price = discount.Get(basket, basket.GetCart().GetUser());
+                        if (price.IsFailure)
+                        {
+                            return price;
+                        }
+                        else
+                        {
+                            if (price.GetValue() < minValue)
+                            {
+                                minValue = price.GetValue();
+                            }
+                        }
                     }
                 }
             }
-
             return Result.Ok(minValue);
         }
 
-        public Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy)
+        public Result CheckWithStorePolicy(IBasket basket, IUser user)
         {
-            var res = DefaultPurchaseStrategy.GetPurchaseStrategyByName(purchaseStrategy, this);
-            if (res.IsSuccess)
+            return this._myPurchasePolicy.CheckWithStorePolicy(basket, user);
+        }
+
+
+        public Result AddDiscountToStore(IUser user,DiscountInfoNode infoNode)
+        {
+            if (!user.HasPermission(this, StorePermission.EditStorePolicy).IsSuccess)
             {
-                this._myPurchaseStrategies.Add(res.Value);
-                return Result.Ok();
+                return Result.Fail("User doesn't have the permission to handle store discounts and policies");
             }
-            else
+            var discountRes = DiscountHandler.HandleDiscount(infoNode);
+            if (discountRes.IsFailure)
             {
-                return res;
+                return discountRes;
             }
+            this._myDiscountStrategies.Add(discountRes.Value);
+            return Result.Ok();
         }
 
-        public Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(IUser user)
+        public Result AddRuleToStorePolicy(IUser user,RuleInfoNode ruleInfoNode)
         {
-            List<PurchaseStrategyName> names = new List<PurchaseStrategyName>();
-            foreach (var strategy in this._myPurchaseStrategies)
+            var rule = RuleHandler.HandleRule(ruleInfoNode);
+            if (rule.IsFailure)
             {
-                names.Add(strategy.GetStrategyName());
+                return rule;
             }
-            return Result.Ok<IList<PurchaseStrategyName>>(names);
+            return this._myPurchasePolicy.AddRuleToStorePolicy(user, rule.Value);
         }
 
-        public Result UpdatePurchaseStrategies(IUser user, PurchaseStrategyName purchaseStrategy)
+        public Result<IList<RuleInfoNode>> GetStorePolicy(IUser user)
         {
-            var strategyName = DefaultPurchaseStrategy.GetPurchaseStrategyByName(purchaseStrategy, this);
-            if (strategyName.IsFailure)
+            return this._myPurchasePolicy.GetPolicy(user);
+        }
+
+        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(IUser user)
+        {
+            if (!user.HasPermission(this, StorePermission.EditStorePolicy).IsSuccess)
             {
-                return strategyName;
+                return Result.Fail<IList<DiscountInfoNode>>("User doesn't have the permission to handle store discounts and policies");
             }
-            bool ans=this._myPurchaseStrategies.Remove(strategyName.Value);
-            return ans ? Result.Ok() : Result.Fail("Item doesn't exist");
+            IList<DiscountInfoNode> discountInfoNodes = new List<DiscountInfoNode>();
+            foreach (var discount in this._myDiscountStrategies)
+            {
+                if (!discount.CheckIfDiscount())
+                {
+                    return Result.Fail<IList<DiscountInfoNode>>("Problem with one of the discounts in store");
+                }
+
+                var res = discount.GetDisocuntInfo();
+                if (res.IsFailure)
+                {
+                    return Result.Fail<IList<DiscountInfoNode>>(res.Error);
+                }
+                discountInfoNodes.Add(res.Value);
+            }
+
+            return Result.Ok(discountInfoNodes);
         }
 
-        public Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        public Result ResetStorePolicy(IUser user)
         {
-            throw new NotImplementedException();
+            if (!user.HasPermission(this, StorePermission.EditStorePolicy).IsSuccess)
+            {
+                return Result.Fail<IList<DiscountInfoNode>>("User doesn't have the permission to handle store discounts and policies");
+            }
+
+            return this._myPurchasePolicy.Reset(user);
         }
 
-        public Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        public Result ResetStoreDiscount(IUser user)
         {
-            throw new NotImplementedException();
+            if (!user.HasPermission(this, StorePermission.EditStorePolicy).IsSuccess)
+            {
+                return Result.Fail<IList<DiscountInfoNode>>("User doesn't have the permission to handle store discounts and policies");
+            }
+
+            this._myDiscountStrategies = new List<Composite>();
+            return Result.Ok();
         }
 
-        public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        public Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
         {
-            throw new NotImplementedException();
-        }
+            var purchaseRecord=this._transactionHistory.AddRecordToHistory(basket);
+            foreach (var owner in _owners)
+            {
+                foreach (var item in purchaseRecord.Value.BasketInfo._itemsInBasket)
+                {
+                    owner.PublishMessage(String.Format("User: {0} , bought {1} items of {2} at {3}",
+                        purchaseRecord.Value.Username, item.name, item.name, purchaseRecord.Value.GetDate()));
+                }
+            }
+            return purchaseRecord;
 
+        }
 
         public Result<IUser> GetFounder()
         {

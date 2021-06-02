@@ -36,9 +36,14 @@ namespace eCommerce.Business
 
         public Result<List<string>> GetStoreIds(User user)
         {
-            return Result.Fail<List<string>>("Illegal action for guest (Get-Store-Ids).");
+            return Result.Fail<List<string>>("Illegal action for guest (GetDiscount-Store-Ids).");
         }
-        
+
+        public Result<IList<string>> GetManagedStoreIds(User user)
+        {
+            return Result.Fail<IList<string>>("Illegal action for guest (Get-Managed-Stores-Ids).");
+        }
+
         public Result AppointUserToOwner(User user, IStore store, IUser otherUser)
         {
             return Result.Fail("Illegal action for guest (Appoint-User).");
@@ -114,6 +119,11 @@ namespace eCommerce.Business
         public Result<OwnerAppointment> RemoveOwner(User user, IStore store)
         {
             return Result.Fail<OwnerAppointment>("Guest can not be an owner of a store.");
+        }
+        
+        public Result<ManagerAppointment> RemoveManager(User user, IStore store)
+        {
+            return Result.Fail<ManagerAppointment>("Guest can not be a manager of a store.");
         }
 
         public Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)

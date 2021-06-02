@@ -9,6 +9,7 @@ namespace Tests.Business.Mokups
     public class mokUser : IUser
     {
         private bool isLoggedIn = false;
+        
         private string userName;
 
         public mokUser(string username)
@@ -48,7 +49,7 @@ namespace Tests.Business.Mokups
         }
 
 
-        public MemberInfo MemberInfo { get; }
+        public MemberInfo MemberInfo { get; set; }
 
         public Result OpenStore(IStore store)
         {
@@ -58,6 +59,11 @@ namespace Tests.Business.Mokups
         public Result<List<string>> GetStoreIds()
         {
             throw new System.NotImplementedException();
+        }
+
+        public Result<IList<string>> GetManagedStoreIds()
+        {
+            throw new NotImplementedException();
         }
 
         public Result AddItemToCart(ItemInfo item)
@@ -92,7 +98,7 @@ namespace Tests.Business.Mokups
 
         public Result EnterRecordToHistory(PurchaseRecord record)
         {
-            throw new System.NotImplementedException();
+            return Result.Ok();
         }
 
         public Result<OwnerAppointment> MakeOwner(IStore store)
@@ -106,6 +112,11 @@ namespace Tests.Business.Mokups
         }
 
         public Result<OwnerAppointment> RemoveOwner(IStore store)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<ManagerAppointment> RemoveManager(IStore store)
         {
             throw new NotImplementedException();
         }

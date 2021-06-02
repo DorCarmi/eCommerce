@@ -11,6 +11,7 @@ namespace eCommerce.Business
         public String storeName;
         public BasketInfo(IBasket basket)
         {
+            _itemsInBasket = new List<ItemInfo>();
             var itemsRes = basket.GetAllItems();
             if (!itemsRes.IsFailure)
             {

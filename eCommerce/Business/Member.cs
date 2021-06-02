@@ -37,13 +37,23 @@ namespace eCommerce.Business
         public Result<List<string>> GetStoreIds(User user)
         {
             List<string> storeIds = new List<string>();
-            
             foreach (var store in user.StoresOwned.Keys)
             {
                 storeIds.Add(store.GetStoreName());
             }
 
             return Result.Ok(storeIds);
+        }
+
+        public Result<IList<string>> GetManagedStoreIds(User user)
+        {
+            List<string> storeIds = new List<string>();
+            foreach (var store in user.StoresManaged.Keys)
+            {
+                storeIds.Add(store.GetStoreName());
+            }
+
+            return Result.Ok<IList<string>>(storeIds);
         }
 
 
@@ -89,12 +99,12 @@ namespace eCommerce.Business
 
         public virtual Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, IUser otherUser)
         {
-            return Result.Fail<IList<PurchaseRecord>>("Illegal action for member (Get-Other-User-History)");
+            return Result.Fail<IList<PurchaseRecord>>("Illegal action for member (GetDiscount-Other-User-History)");
         }
 
         public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(User user, IStore store)
         {
-            return user.GetStorePurchaseHistory(store);
+            return store.GetPurchaseHistory(user);
         }
 
         public virtual Result HasPermission(User user, IStore store, StorePermission storePermission)
@@ -120,6 +130,11 @@ namespace eCommerce.Business
         public Result<OwnerAppointment> RemoveOwner(User user, IStore store)
         {
             return user.RemoveOwner(this, store);
+        }
+        
+        public Result<ManagerAppointment> RemoveManager(User user, IStore store)
+        {
+            return user.RemoveManager(this, store);
         }
 
         public Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)

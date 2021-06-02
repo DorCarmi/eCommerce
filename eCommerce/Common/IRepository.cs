@@ -13,7 +13,7 @@ namespace eCommerce.Common
         public bool Add([NotNull] T data);
 
         /// <summary>
-        /// Get the data from the repository by the id
+        /// GetDiscount the data from the repository by the id
         /// </summary>
         /// <param name="id">The id of the required data</param>
         /// <returns>The data if exists else null</returns>

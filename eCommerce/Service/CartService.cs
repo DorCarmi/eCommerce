@@ -21,7 +21,7 @@ namespace eCommerce.Service
             _marketFacade = MarketFacade.GetInstance();
         }
 
-        static CartService CreateUserServiceForTests(IUserAuth userAuth,
+        public static CartService CreateUserServiceForTests(IUserAuth userAuth,
             IRepository<IUser> registeredUsersRepo,
             StoreRepository storeRepo)
         {
@@ -48,7 +48,7 @@ namespace eCommerce.Service
             }
             ICart cart = cartRes.Value;
 
-            return Result.Ok(new SCart(cart.GetBaskets()));
+            return Result.Ok(new SCart(cart.GetBaskets(),cart.GetUser().Username));
         }
 
         public Result<double> GetPurchaseCartPrice(string token)

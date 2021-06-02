@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using eCommerce.Business.Service;
@@ -101,6 +102,7 @@ namespace eCommerce.Business
 
         public Result<double> CalculatePricesForCart()
         {
+            this._totalPrice = 0;
             foreach (var storeBasket in _baskets)
             {
                 var currAns = storeBasket.Key.CalculateBasketPrices(storeBasket.Value);
@@ -148,6 +150,17 @@ namespace eCommerce.Business
         public IUser GetUser()
         {
             return this._cartHolder;
+        }
+
+        public IList<ItemInfo> GetAllItems()
+        {
+            List<ItemInfo> allItems = new List<ItemInfo>();
+            foreach (var basket in _baskets)
+            {
+                allItems.AddRange(basket.Value.GetAllItems().Value);
+            }
+
+            return allItems;
         }
     }
 }

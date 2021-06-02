@@ -21,7 +21,7 @@ namespace eCommerce.Service
             _marketFacade = MarketFacade.GetInstance();
         }
 
-        static UserService CreateUserServiceForTests(IUserAuth userAuth,
+        public static UserService CreateUserServiceForTests(IUserAuth userAuth,
             IRepository<IUser> registeredUsersRepo,
             StoreRepository storeRepo)
         {
@@ -85,6 +85,11 @@ namespace eCommerce.Service
         public Result<List<string>> GetAllStoreIds(string token)
         {
             return _marketFacade.GetStoreIds(token);
+        }
+        
+        public Result<IList<string>> GetAllManagedStoreIds(string token)
+        {
+            return _marketFacade.GetAllManagedStores(token);
         }
     }
 }

@@ -7,7 +7,8 @@ namespace eCommerce.Business
     public class Admin : Member
     {
         private static readonly Admin state = new Admin();
-
+        
+        //TODO: Check with sharon about change, was AdminGetHistory
         private static readonly IList<StorePermission> Permissions = new List<StorePermission>(new []{StorePermission.GetStoreHistory});
         
         

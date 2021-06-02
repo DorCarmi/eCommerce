@@ -1,14 +1,31 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using eCommerce.Adapters;
+using eCommerce.Common;
 
 namespace Tests.Service
 {
     public class mokSupplyService : ISupplyAdapter
     {
-        public async Task<bool> SupplyProducts(string storeName, string[] itemsNames, string userAddress)
+        private bool checkAns;
+        private bool chargeAns;
+        public mokSupplyService(bool checkAns, bool chargeAns)
         {
-            await Task.Delay(5000);
-            return true;
+            this.checkAns = checkAns;
+            this.chargeAns = chargeAns;
+        }
+
+        public async Task<Result<int>> SupplyProducts(string storeName, string[] itemsNames, string userAddress)
+        {
+            await Task.Delay(2000);
+            //TODO may generate id
+            return Result.Ok(100000);
+        }
+
+        public async Task<Result> CheckSupplyInfo(int transactionId)
+        {
+            await Task.Delay(2000);
+            return Result.Ok();
         }
     }
 }
