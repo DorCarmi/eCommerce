@@ -13,12 +13,16 @@ namespace eCommerce.DataLayer
 
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            =>optionsBuilder.EnableSensitiveDataLogging().UseSqlite(@"Data Source=.\Persistence\testSchool.db");
-
+        {
+            optionsBuilder.EnableSensitiveDataLogging().UseSqlServer(AppConfig.GetInstance().GetData("DBConnectionString"));
+            // optionsBuilder.EnableSensitiveDataLogging().UseSqlServer("Server=localhost;Database=testDB;Trusted_Connection=True;");
+        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<MyPair<Classroom,Course>>()
                 .HasKey(p => new {p.StudentId, p.ClassroomId});
+            
+            
         }
     }
 
@@ -46,13 +50,20 @@ namespace eCommerce.DataLayer
         {
             this.dict = new List<MyPair<Classroom,Course>>();
         }
-
+        
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int StudentId { get; set; }
         [Required]
         public string StudentName { get; set; }
 
         [Required]
         public virtual List<MyPair<Classroom,Course>> dict { get; set; }
+
+        public override string ToString()
+        {
+            return "Hey im "+StudentName+", my Id is "+StudentId;
+        }
     }
         
     public class Course
@@ -61,7 +72,8 @@ namespace eCommerce.DataLayer
         {
             this.Students = new HashSet<Student>();
         }
-
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int CourseId { get; set; }
         public string CourseName { get; set; }
 
@@ -71,6 +83,8 @@ namespace eCommerce.DataLayer
 
     public class Classroom
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ClassroomId { get; set; }
     }
 }
