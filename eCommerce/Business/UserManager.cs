@@ -344,14 +344,19 @@ namespace eCommerce.Business
         public void CreateMainAdmin()
         {
             AppConfig config = AppConfig.GetInstance();
-            
-            MemberInfo adminInfo = new MemberInfo(
-                config.GetData("AdminCreationInfo:Username"),
-                config.GetData("AdminCreationInfo:Email"),
-                "TheAdmin",
-                DateTime.Now, 
-                null);
-            AddAdmin(adminInfo, config.GetData("AdminCreationInfo:Password"));
+            string adminUsername = config.GetData("AdminCreationInfo:Username");
+            string adminPassword = config.GetData("AdminCreationInfo:Password");
+
+            if (_auth.Authenticate(adminUsername, adminPassword).Result.IsFailure)
+            {
+                MemberInfo adminInfo = new MemberInfo(
+                    config.GetData("AdminCreationInfo:Username"),
+                    config.GetData("AdminCreationInfo:Email"),
+                    "TheAdmin",
+                    DateTime.Now,
+                    null);
+                AddAdmin(adminInfo, config.GetData("AdminCreationInfo:Password"));
+            }
         }
     }
 }

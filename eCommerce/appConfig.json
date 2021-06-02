@@ -8,5 +8,7 @@
   },
 
   "DBConnectionString": "server=localhost",
-  "AuthDBConnectionString": "AuthDB"
+  "AuthDBConnectionString": "Server=localhost;DataBase=master;Trusted_Connection=True;",
+  
+  "JWTKey": "keykeykeykeykeyekeykey"
 }

@@ -24,7 +24,8 @@ namespace eCommerce.Auth
 
         private UserAuth(IRegisteredUserRepo repo)
         {
-            _jwtAuth = new JWTAuth("keykeykeykeykeyekeykey");
+            AppConfig config = AppConfig.GetInstance();
+            _jwtAuth = new JWTAuth(config.GetData("JWTKey"));
 
             _hashMutex = new Mutex();
             _sha256 = SHA256.Create();
@@ -167,11 +168,11 @@ namespace eCommerce.Auth
             String errMessage = null;
             if (string.IsNullOrEmpty(username))
             {
-                errMessage = $"{errMessage}\nUsername cant be empty";
+                errMessage = $"Username cant be empty";
             }
             else if(username.StartsWith("_Guest"))
             {
-                errMessage = $"{errMessage}\nUsername not valid";
+                errMessage = $"Username not valid";
             }
 
             if (string.IsNullOrEmpty(password))

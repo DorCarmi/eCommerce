@@ -1,19 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using eCommerce.Business;
+using Microsoft.EntityFrameworkCore;
 
 namespace eCommerce.Auth.DAL
 {
     public class UserContext : DbContext
     {
-        private string _connectionString;
-
-        public UserContext(string connectionString)
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            _connectionString = connectionString;
+            options.UseSqlServer(AppConfig.GetInstance().GetData("AuthDBConnectionString"));
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite(_connectionString);
-        
         // DB sets
         public DbSet<User> User { get; set; }
     }
