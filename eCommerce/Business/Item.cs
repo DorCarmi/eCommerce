@@ -13,14 +13,14 @@ namespace eCommerce.Business
         private Category _category;
         private List<String> _keyWords;
         private PurchaseStrategy _purchaseStrategy;
-        private int _pricePerUnit;
+        private double _pricePerUnit;
 
-        public int GetTotalPrice()
+        public double GetTotalPrice()
         {
             return _pricePerUnit * _amount;
         }
 
-        public int GetPricePerUnit()
+        public double GetPricePerUnit()
         {
             return this._pricePerUnit;
         }
@@ -131,7 +131,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result<bool> CheckPricesInBetween(int startPrice, int endPrice)
+        public Result<bool> CheckPricesInBetween(double startPrice, double endPrice)
         {
             if (startPrice > 0 && startPrice <= endPrice)
             {
@@ -287,6 +287,44 @@ namespace eCommerce.Business
             CopyKeyWords(newItem.keyWords);
             this._pricePerUnit = newItem.pricePerUnit;
             return Result.Ok();
+        }
+        
+        // ========== Properties ========== //
+        // TODO make setters for ef or some constructor
+        // TODO make Name and Store as the primary key
+        public string Name
+        {
+            get => _name;
+        }
+
+        public int Amount
+        {
+            get => _amount;
+        }
+
+        public Store InStore
+        {
+            get => _belongsToStore;
+        }
+
+        public Category Category
+        {
+            get => _category;
+        }
+
+        public List<string> KeyWords
+        {
+            get => _keyWords;
+        }
+
+        public PurchaseStrategy PurchaseStrategy
+        {
+            get => _purchaseStrategy;
+        }
+
+        public double PricePerUnit
+        {
+            get => _pricePerUnit;
         }
     }
 }

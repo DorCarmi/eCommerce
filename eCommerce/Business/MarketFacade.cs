@@ -21,18 +21,18 @@ namespace eCommerce.Business
             new MarketFacade(
                 UserAuth.GetInstance(),
                 new InMemoryRegisteredUsersRepository(),
-                new StoreRepository());
+                new InMemoryStoreRepo());
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private StoreRepository _storeRepository;
+        private InMemoryStoreRepo _inMemoryStoreRepo;
         private UserManager _userManager;
         
         private MarketFacade(IUserAuth userAuth,
             IRepository<User> registeredUsersRepo,
-            StoreRepository storeRepo)
+            InMemoryStoreRepo inMemoryStoreRepo)
         {
-            _storeRepository = storeRepo;
+            _inMemoryStoreRepo = inMemoryStoreRepo;
             _userManager = new UserManager(userAuth, registeredUsersRepo);
             CreateMainAdmin();
         }
@@ -44,9 +44,9 @@ namespace eCommerce.Business
 
         public static MarketFacade CreateInstanceForTests(IUserAuth userAuth,
             IRepository<User> registeredUsersRepo,
-            StoreRepository storeRepo)
+            InMemoryStoreRepo inMemoryStoreRepo)
         {
-            return new MarketFacade(userAuth, registeredUsersRepo, storeRepo);
+            return new MarketFacade(userAuth, registeredUsersRepo, inMemoryStoreRepo);
         }
 
         public void CreateMainAdmin()
@@ -310,7 +310,7 @@ namespace eCommerce.Business
 
             _logger.Info($"SearchForItem({userRes.Value.Username}, {query})");
 
-            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItem(query));
+            return Result.Ok<IEnumerable<IItem>>(_inMemoryStoreRepo.SearchForItem(query));
         }
 
         public Result<IEnumerable<IItem>> SearchForItemByPriceRange(string token, string query, double @from = 0, double to = Double.MaxValue)
@@ -328,7 +328,7 @@ namespace eCommerce.Business
             
             _logger.Info($"SearchForItemByPriceRange({userRes.Value.Username}, {query}, {from}, {to})");
 
-            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItemByPrice(query, from, to));
+            return Result.Ok<IEnumerable<IItem>>(_inMemoryStoreRepo.SearchForItemByPrice(query, from, to));
         }
 
         public Result<IEnumerable<IItem>> SearchForItemByCategory(string token, string query, string category)
@@ -341,7 +341,7 @@ namespace eCommerce.Business
 
             _logger.Info($"SearchForItemByCategory({userRes.Value.Username}, {query}, {category})");
 
-            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItemByCategory(query, category));
+            return Result.Ok<IEnumerable<IItem>>(_inMemoryStoreRepo.SearchForItemByCategory(query, category));
         }
 
         public Result<IEnumerable<string>> SearchForStore(string token, string query)
@@ -354,7 +354,7 @@ namespace eCommerce.Business
             
             _logger.Info($"SearchForStore({userRes.Value.Username}, {query})");
 
-            return Result.Ok(_storeRepository.SearchForStore(query));
+            return Result.Ok(_inMemoryStoreRepo.SearchForStore(query));
         }
         
         public Result<Store> GetStore(string token, string storeId)
@@ -570,7 +570,7 @@ namespace eCommerce.Business
             _logger.Info($"OpenStore({user.Username})");
             
             Store newStore = new Store(storeName, user);
-            if (!_storeRepository.Add(newStore))
+            if (!_inMemoryStoreRepo.Add(newStore))
             {
                 return Result.Fail("Store name taken");
             }
@@ -780,7 +780,7 @@ namespace eCommerce.Business
             
             _logger.Info($"GetUserAndStore({user.Username} , {storeId})");
 
-            Store store = _storeRepository.GetOrNull(storeId);
+            Store store = _inMemoryStoreRepo.GetOrNull(storeId);
             if (store == null)
             {
                 _logger.Error($"User {user.Username} requested invalid sotre {storeId}");

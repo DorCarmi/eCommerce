@@ -42,7 +42,7 @@ namespace Tests.AcceptanceTests
             _inStore = new InStoreService();
             _cart = new CartService();
             _user = new UserService();
-            StoreRepository SR = new StoreRepository();
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
             IRepository<User> UR = new InMemoryRegisteredUsersRepository();

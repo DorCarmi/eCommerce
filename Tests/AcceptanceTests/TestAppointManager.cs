@@ -36,7 +36,7 @@ namespace Tests.AcceptanceTests
         {
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
-            StoreRepository SR = new StoreRepository();
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);

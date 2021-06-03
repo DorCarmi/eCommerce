@@ -35,7 +35,7 @@ namespace Tests.AcceptanceTests
         [SetUpAttribute]
         public async Task SetUp()
         {
-            StoreRepository SR = new StoreRepository();
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
             IRepository<User> UR = new InMemoryRegisteredUsersRepository();

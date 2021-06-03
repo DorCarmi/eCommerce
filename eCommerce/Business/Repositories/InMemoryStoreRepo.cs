@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Net.Sockets;
-
 using eCommerce.Common;
 
-namespace eCommerce.Business
+namespace eCommerce.Business.Repositories
 {
-    public class StoreRepository : IRepository<Store>
+    public class InMemoryStoreRepo : IRepository<Store>
     {
         private ConcurrentDictionary<string, Store> _stores;
 
-        public StoreRepository()
+        public InMemoryStoreRepo()
         {
             _stores = new ConcurrentDictionary<string, Store>();
         }

@@ -14,14 +14,15 @@ namespace eCommerce.Business
         public string storeName;
         public string category;
         public List<string> keyWords;
-        public int pricePerUnit;
+        public double pricePerUnit;
         private Item theItem;
         private double discountFactor;
         private Store _store;
 
         public static ItemInfo AnyItem(string storeName) =>
             new ItemInfo(0, "ANY", storeName, "ALL", new List<string>(), 0);
-        public ItemInfo(int amount, string name, string storeName, string category,int pricePerUnit, List<string> keyWords,Item theItem)
+        public ItemInfo(int amount, string name, string storeName, string category,
+            double pricePerUnit, List<string> keyWords,Item theItem)
         {
             this.amount = amount;
             this.name = name;
@@ -45,7 +46,8 @@ namespace eCommerce.Business
             this.theItem = theItem;
         }
         
-        public ItemInfo(int amount, string name, string storeName, string category, List<string> keyWords, int pricePerUnit)
+        public ItemInfo(int amount, string name, string storeName, 
+            string category, List<string> keyWords, double pricePerUnit)
         {
             this.amount = amount;
             this.name = name;
@@ -130,11 +132,35 @@ namespace eCommerce.Business
             this.discountFactor = discountFactor; 
         }
 
+        // ========== Properties ========== //
+        
+        // TODO check how to set store and other properties
+        // that dont have setters
+        
         public string ItemName { get => name; }
         public string StoreName { get => storeName; }
-        public int Amount { get => amount; }
-        public string Category { get => category; }
-        public List<string> KeyWords { get => new List<string>(keyWords); }
-        public double PricePerUnit { get => pricePerUnit; }
+
+        public int Amount
+        {
+            get => amount;
+            set => amount = value;
+        }
+
+        public string Category
+        {
+            get => category;
+            set => category = value;
+        }
+
+        public List<string> KeyWords
+        {
+            get => keyWords;
+            set => keyWords = value;
+        }
+        public double PricePerUnit
+        {
+            get => pricePerUnit;
+            set => pricePerUnit = value;
+        }
     }
 }

@@ -164,8 +164,8 @@ namespace Tests.Business.StoreTests
             //item1.SetPrice()\
             //item1.GetTotalPrice()
             
-            Assert.AreEqual(false,item1.CheckPricesInBetween((int)(pricePer*0.5),pricePer*2).IsFailure);
-            Assert.AreEqual(true,item1.CheckPricesInBetween((int)(pricePer*0.5),pricePer*2).GetValue());
+            Assert.AreEqual(false,item1.CheckPricesInBetween((pricePer*0.5),pricePer*2).IsFailure);
+            Assert.AreEqual(true,item1.CheckPricesInBetween((pricePer*0.5),pricePer*2).GetValue());
             //item1.CheckPricesInBetween()  
         }
 

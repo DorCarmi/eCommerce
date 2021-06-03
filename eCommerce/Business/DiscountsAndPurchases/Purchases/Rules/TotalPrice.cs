@@ -20,7 +20,7 @@ namespace eCommerce.Business
         public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
-            int totalPrice = 0;
+            double totalPrice = 0;
             foreach (var item in checkItem1.GetAllItems().Value)
             {
                 totalPrice += item.amount * item.pricePerUnit;
