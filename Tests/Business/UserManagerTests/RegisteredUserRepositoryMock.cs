@@ -5,21 +5,21 @@ using eCommerce.Common;
 
 namespace Tests.Business.UserManagerTests
 {
-    public class RegisteredUserRepositoryMock : IRepository<IUser>
+    public class RegisteredUserRepositoryMock : IRepository<User>
     {
-        private ConcurrentDictionary<string, IUser> _users;
+        private ConcurrentDictionary<string, User> _users;
 
         public RegisteredUserRepositoryMock()
         {
-            _users = new ConcurrentDictionary<string, IUser>();
+            _users = new ConcurrentDictionary<string, User>();
         }
         
-        public bool Add(IUser user)
+        public bool Add(User user)
         {
             return _users.TryAdd(user.Username, user);
         }
 
-        public IUser GetOrNull(string id)
+        public User GetOrNull(string id)
         {
             if (!_users.TryGetValue(id, out var data))
             {

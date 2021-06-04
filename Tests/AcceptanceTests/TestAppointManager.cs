@@ -5,6 +5,7 @@ using System.Globalization;
 using eCommerce.Auth;
 using System.Threading.Tasks;
 using eCommerce.Business;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
@@ -25,7 +26,7 @@ namespace Tests.AcceptanceTests
     public class TestAppointManager
     {
         private IAuthService _auth;
-        private IStoreService _store;
+        private INStoreService _inStore;
         private IUserService _user;
         private string store = "Yossi's Store";
         
@@ -35,11 +36,11 @@ namespace Tests.AcceptanceTests
         {
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
-            StoreRepository SR = new StoreRepository();
-            IRepository<IUser> UR = new RegisteredUsersRepository();
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
+            IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
             _user = UserService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
@@ -52,7 +53,7 @@ namespace Tests.AcceptanceTests
             await _auth.Register(token, shiran, "130452abc");
             await _auth.Register(token, lior, "987654321");
             Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
-            _store.OpenStore(yossiLogInResult.Value, store);
+            _inStore.OpenStore(yossiLogInResult.Value, store);
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
@@ -60,7 +61,7 @@ namespace Tests.AcceptanceTests
         public void Teardown()
         {
             _auth = null;
-            _store = null;
+            _inStore = null;
             _user = null;
         }
         

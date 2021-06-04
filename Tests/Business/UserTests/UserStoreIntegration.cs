@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using NUnit.Framework;
 using Tests.Business.Mokups;
@@ -14,14 +14,14 @@ namespace Tests.Business
     {
         private const string STORE_NAME = "The store";
         
-        private IUser _user;
+        private User _user;
         private List<ItemInfo> _itemInfos;
         
-        private IUser alenbyFounder;
-        private IUser alenbyOwner;
-        private IUser alenbyCoOwner;
-        private IUser alenbyManager;
-        private IUser alenbySecondManager;
+        private User alenbyFounder;
+        private User alenbyOwner;
+        private User alenbyCoOwner;
+        private User alenbyManager;
+        private User alenbySecondManager;
         private Store alenbyStore;
 
         public UserStoreIntegration()
@@ -104,7 +104,7 @@ namespace Tests.Business
                userName:alenbySecondManager.Username,
                idNumber:alenbySecondManager.MemberInfo.Id,
                creditCardNumber:"1234567789",
-               creditCardExpirationDate:"0322",
+               creditCardExpirationDate:"03-01-22",
                threeDigitsOnBackOfCard:"123",
                fullAddress:"TLV"
                ));
@@ -150,7 +150,7 @@ namespace Tests.Business
         public void AppointNewMangerTest()
         {
             MemberInfo memberInfo = new MemberInfo("User2", "User2@email.com", "TheUser1", DateTime.Now, "The sea 3");
-            IUser newUser = new User(Member.State, memberInfo);
+            User newUser = new User(Member.State, memberInfo);
             
             Result addItemRes = alenbyFounder.AppointUserToManager(alenbyStore, newUser);
             Assert.True(addItemRes.IsSuccess,

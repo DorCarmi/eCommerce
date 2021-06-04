@@ -7,7 +7,7 @@ using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.DiscountsAndPurchases.Purchases.RulesInfo;
 using eCommerce.Business.Purchases;
-using eCommerce.Business.Service;
+
 using eCommerce.Controllers;
 using NUnit.Framework;
 using Tests.Business.Mokups;
@@ -18,9 +18,9 @@ namespace Tests.Business.StoreTests
 {
     public class DiscountsAndPolicyTests
     {
-        private IStore MyStore;
-        private IUser Alice;
-        private IUser Bob;
+        private Store MyStore;
+        private User Alice;
+        private User Bob;
         ICart cart;
         private ItemInfo item1;
         private ItemInfo item1b;
@@ -154,7 +154,7 @@ namespace Tests.Business.StoreTests
         public void TotalPriceOver100()
         {
 
-            IUser Charlie = new mokUser("Charlie");
+            User Charlie = new mokUser("Charlie");
             ICart cartCharlie = new Cart(Charlie);
 
             ItemInfo tomato = new ItemInfo(50, "Tomato", MyStore.GetStoreName(), "Vegtebales", new List<string>(), 5);
@@ -231,7 +231,7 @@ namespace Tests.Business.StoreTests
             var AddTomatoToStoreRes=MyStore.AddItemToStore(bread, Alice);
             Assert.True(AddTomatoToStoreRes.IsSuccess,AddTomatoToStoreRes.Error);
 
-            IUser David = new mokUser("David");
+            User David = new mokUser("David");
             ICart davidCart = new Cart(David);
             foreach (var itemInfo in items)
             {
@@ -312,7 +312,7 @@ namespace Tests.Business.StoreTests
             var AddBansToStoreRes=MyStore.AddItemToStore(bans, Alice);
             Assert.True(AddBansToStoreRes.IsSuccess,AddBansToStoreRes.Error);
 
-            IUser Elie = new mokUser("Elie");
+            User Elie = new mokUser("Elie");
             Cart elieCart = new Cart(Elie);
             
             foreach (var itemInfo in items)
@@ -395,7 +395,7 @@ namespace Tests.Business.StoreTests
             var AddYogurtToStoreRes=MyStore.AddItemToStore(yogurt, Alice);
             Assert.True(AddYogurtToStoreRes.IsSuccess,AddYogurtToStoreRes.Error);
 
-            IUser Fredie = new mokUser("Fredie");
+            User Fredie = new mokUser("Fredie");
             Cart fredieCart = new Cart(Fredie);
             
             foreach (var itemInfo in items)
@@ -462,7 +462,7 @@ namespace Tests.Business.StoreTests
             ItemInfo pasta = items.Where(x => x.name.ToUpper().Equals("PASTA")).FirstOrDefault();
             
             
-            IUser Gool = new mokUser("Gool");
+            User Gool = new mokUser("Gool");
             Cart goolCart = new Cart(Gool);
             
             foreach (var itemInfo in items)
@@ -545,7 +545,7 @@ namespace Tests.Business.StoreTests
             
             ItemInfo milk = items.Where(x => x.name.ToUpper().Equals("MILK")).FirstOrDefault();
 
-            IUser Gool = new mokUser("Gool");
+            User Gool = new mokUser("Gool");
             Cart goolCart = new Cart(Gool);
 
             int i = 1;
@@ -611,7 +611,7 @@ namespace Tests.Business.StoreTests
             
             
 
-            IUser Gool = new mokUser("Gool");
+            User Gool = new mokUser("Gool");
             Cart goolCart = new Cart(Gool);
 
             int i = 1;
@@ -675,7 +675,7 @@ namespace Tests.Business.StoreTests
         [Test]
         public void TestRuleTomatos()
         {
-            IUser Hook = new mokUser("Hook");
+            User Hook = new mokUser("Hook");
             ICart hookCart = new Cart(Hook);
             
             ItemInfo orange = items.Where(x => x.name.ToUpper().Equals("ORANGE")).FirstOrDefault();

@@ -3,17 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace eCommerce.Auth
 {
-    public class User
+    public class AuthUser
     {
         
         private string _username;
         private byte[] _hashedPassword;
 
-        public User()
+        public AuthUser()
         {
         }
         
-        public User(string username, byte[] hashedPassword)
+        public AuthUser(string username, byte[] hashedPassword)
         {
             _username = username;
             _hashedPassword = hashedPassword;

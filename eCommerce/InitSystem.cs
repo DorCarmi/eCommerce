@@ -31,7 +31,7 @@ namespace eCommerce
     {
         private IAuthService _authService;
         private IUserService _userService;
-        private IStoreService _storeService;
+        private INStoreService _inStoreService;
 
         private string _guestToken;
         private string _workingToken;
@@ -39,7 +39,7 @@ namespace eCommerce
         {
             _authService = new AuthService();
             _userService = new UserService();
-            _storeService = new StoreService();
+            _inStoreService = new InStoreService();
 
             _guestToken = _authService.Connect();
         }
@@ -114,7 +114,7 @@ namespace eCommerce
                     case "OpenStore":
                     {
                         string storeName = basicAction.Data["StoreName"].ToString();
-                        Result openStoreRes = _storeService.OpenStore(_workingToken, storeName);
+                        Result openStoreRes = _inStoreService.OpenStore(_workingToken, storeName);
                         if (openStoreRes.IsFailure)
                         {
                             ThrowInvalidException($"Error when opening store {storeName} for {memberAction.Username}",
@@ -125,7 +125,7 @@ namespace eCommerce
                     case "AddItem":
                     {
                         SItem item = basicAction.Data.ToObject<SItem>();
-                        Result addItemRes = _storeService.AddNewItemToStore(_workingToken, item);
+                        Result addItemRes = _inStoreService.AddNewItemToStore(_workingToken, item);
                         if (addItemRes.IsFailure)
                         {
                             ThrowInvalidException($"Error when adding item {item.ItemName} to store {item.StoreName}",

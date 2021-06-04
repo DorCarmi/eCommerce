@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.DiscountsAndPurchases.Purchases.Rules.CombineRules;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business.DiscountPoliciesCombination
@@ -17,7 +17,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             this._A = A;
             this._B = B;
         }
-        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
             foreach (var item in checkItem1.GetAllItems().Value)
@@ -28,7 +28,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             return itemsList;
         }
 
-        public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
+        public override bool CheckOneItem(ItemInfo itemInfo, User checkItem2)
         {
             return true;
         }
@@ -39,7 +39,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
         }
         
         
-        public override Result<double> Get(IBasket basket, IUser user)
+        public override Result<double> Get(IBasket basket, User user)
         {
             if (CheckIfDiscount())
             {
@@ -67,7 +67,7 @@ namespace eCommerce.Business.DiscountPoliciesCombination
             }
         }
 
-        public override Result<double> GetOneItem(ItemInfo itemInfo, IUser user)
+        public override Result<double> GetOneItem(ItemInfo itemInfo, User user)
         {
             var aGet = _A.GetOneItem(itemInfo, user);
             var bGet = _B.GetOneItem(itemInfo, user);

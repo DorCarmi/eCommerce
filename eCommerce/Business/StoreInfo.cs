@@ -1,4 +1,4 @@
-﻿using eCommerce.Business.Service;
+﻿
 
 namespace eCommerce.Business
 {
@@ -6,7 +6,7 @@ namespace eCommerce.Business
     {
         private string _storeName;
 
-        public StoreInfo(IStore store)
+        public StoreInfo(Store store)
         {
             this._storeName = store.GetStoreName();
         }

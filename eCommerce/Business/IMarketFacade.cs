@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using eCommerce.Business.Discounts;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using eCommerce.Service;
 
@@ -207,7 +207,7 @@ namespace eCommerce.Business
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <returns>The store information</returns>
-        public Result<IStore> GetStore(string token, string storeId);
+        public Result<Store> GetStore(string token, string storeId);
         
         /// <summary>
         /// Get all the store items

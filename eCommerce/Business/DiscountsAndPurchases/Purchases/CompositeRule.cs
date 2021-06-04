@@ -13,12 +13,12 @@ namespace eCommerce.Business
             return false;
         }
 
-        public override Result<double> Get(IBasket basket, IUser user)
+        public override Result<double> Get(IBasket basket, User user)
         {
             return Result.Fail<double>("Not a discount, only a rule");
         }
 
-        public override Result<double> GetOneItem(ItemInfo itemInfo, IUser user)
+        public override Result<double> GetOneItem(ItemInfo itemInfo, User user)
         {
             return Result.Fail<double>("Not a discount");
         }

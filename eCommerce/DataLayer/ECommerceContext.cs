@@ -15,6 +15,9 @@ namespace eCommerce.DataLayer
         public DbSet<Pair<Store,OwnerAppointment>> OwnedStores { get; set; }
         public DbSet<ListPair<Classroom,Course>> ListPairs { get; set; }
 
+        public DbSet<Store> Stores { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<ItemsInventory> ItemsInventories { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -27,7 +30,8 @@ namespace eCommerce.DataLayer
             builder.Entity<ListPair<Classroom,Course>>()
                 .HasKey(p => new {p.HolderId, p.KeyId});
             
-
+            builder.Entity<Item>()
+                .HasKey(p => new {p._name, p.StoreId});
         }
     }
 

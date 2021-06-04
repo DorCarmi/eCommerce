@@ -12,7 +12,7 @@ namespace eCommerce.DataLayer
         public Result SaveUser(User user)
         {
             
-            Console.WriteLine("1212Inserting a new User");
+            Console.WriteLine("Inserting a new User");
             using (var db = new ECommerceContext())
             {
                 try
@@ -32,9 +32,9 @@ namespace eCommerce.DataLayer
             return Result.Ok();
         }
         
-        public Result<IUser> ReadUser(string username)
+        public Result<User> ReadUser(string username)
         {
-            IUser user = null;
+            User user = null;
             using (var db = new ECommerceContext())
             {
                 try
@@ -42,18 +42,43 @@ namespace eCommerce.DataLayer
                     Console.WriteLine("fetching saved User");
                     user = db.Users
                         .Include(u => u.MemberInfo)
-                        .Where(u => u.Username == username)
-                        .SingleOrDefault();
+                        .SingleOrDefault(u => u.Username == username);
+
+                    if (user == null)
+                    {
+                        return Result.Fail<User>($"No user called {username}");
+                    }
 
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    return Result.Fail<IUser>("Unable to read User");
+                    return Result.Fail<User>("Unable to read User");
                     // add logging here
                 }
             }
-            return Result.Ok<IUser>(user);
+            return Result.Ok<User>(user);
+        }
+        
+        public Result SaveStore(Store store)
+        {
+            using (var db = new ECommerceContext())
+            {
+                try
+                { 
+                    db.Add(store);
+                    db.Entry(store._founder).State = EntityState.Unchanged;
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException);   
+                    return Result.Fail("Unable to Save Store");
+                    // add logging here
+                }
+
+            }
+            return Result.Ok();
         }
         
         public Result<IUser> DoSomething(string username)

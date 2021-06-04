@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
@@ -27,19 +28,19 @@ namespace Tests.AcceptanceTests
     public class TestEditItemInStore
     {
         private IAuthService _auth;
-        private IStoreService _store;
+        private INStoreService _inStore;
         private string storeName = "Yossi's Store9";
 
         [SetUpAttribute]
         public async Task SetUp()
         {
-            StoreRepository SR = new StoreRepository();
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
-            IRepository<IUser> UR = new RegisteredUsersRepository();
+            IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi119", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             MemberInfo shiran = new MemberInfo("singerMermaid9", "shiran@gmail.com", "Shiran Moris",
@@ -50,9 +51,9 @@ namespace Tests.AcceptanceTests
             Result<string> yossiLogInResult = await _auth.Login(token, "Yossi119", "qwerty123", ServiceUserRole.Member);
             IItem product = new SItem("Tara choclate milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
-            _store.OpenStore(yossiLogInResult.Value, storeName);
-            _store.AddNewItemToStore(yossiLogInResult.Value, product);
-            _store.AddNewItemToStore(yossiLogInResult.Value, new SItem("iPhone X", storeName, 35, "smartphones", 
+            _inStore.OpenStore(yossiLogInResult.Value, storeName);
+            _inStore.AddNewItemToStore(yossiLogInResult.Value, product);
+            _inStore.AddNewItemToStore(yossiLogInResult.Value, new SItem("iPhone X", storeName, 35, "smartphones", 
                 new List<string>{"smartphone", "iPhone", "Apple", "Iphone X"}, (double) 5000.99));
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
@@ -62,7 +63,7 @@ namespace Tests.AcceptanceTests
         public void Teardown()
         {
             _auth = null;
-            _store = null;
+            _inStore = null;
         }
         
         [TestCase("Tara choclate milk", 15, "dairy",
@@ -84,7 +85,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = await _auth.Login(token, "Yossi119", "qwerty123", ServiceUserRole.Member);
-            Result editItemResult = _store.EditItemInStore(yossiLogin.Value,
+            Result editItemResult = _inStore.EditItemInStore(yossiLogin.Value,
                 new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsSuccess, "failed to edit item: " + editItemResult.Error);
             token = _auth.Logout(yossiLogin.Value).Value;
@@ -105,7 +106,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> yossiLogin = await _auth.Login(token, "Yossi119", "qwerty123", ServiceUserRole.Member);
-            Result editItemResult = _store.EditItemInStore(yossiLogin.Value,
+            Result editItemResult = _inStore.EditItemInStore(yossiLogin.Value,
                 new SItem(name, store, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item");
             token = _auth.Logout(yossiLogin.Value).Value;
@@ -120,7 +121,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> login = await _auth.Login(token, "singerMermaid9", "130452abc", ServiceUserRole.Member);
-            Result editItemResult = _store.EditItemInStore(login.Value,
+            Result editItemResult = _inStore.EditItemInStore(login.Value,
                 new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail to edit item, user doesn't own the store");
             token = _auth.Logout(login.Value).Value;
@@ -134,7 +135,7 @@ namespace Tests.AcceptanceTests
             double price)  
         {
             string token = _auth.Connect();
-            Result editItemResult = _store.EditItemInStore(token,
+            Result editItemResult = _inStore.EditItemInStore(token,
                 new SItem(name, storeName, amount, category, new List<string>(tags), price));
             Assert.True(editItemResult.IsFailure, "was suppose to fail. user is not logged in");
             _auth.Disconnect(token);

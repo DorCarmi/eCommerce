@@ -7,15 +7,15 @@ namespace eCommerce.Auth
         /// <summary>
         /// Add a user to the repository if not already exists
         /// </summary>
-        /// <param name="user">The user</param>
+        /// <param name="authUser">The user</param>
         /// <returns>True if the user have been added</returns>
-        public Task<bool> Add(User user);
+        public Task<bool> Add(AuthUser authUser);
 
         /// <summary>
         /// GetDiscount the user
         /// </summary>
         /// <param name="username">The user name</param>
         /// <returns>Return a User of exists</returns>
-        public Task<User> GetUserOrNull(string username);
+        public Task<AuthUser> GetUserOrNull(string username);
     }
 }

@@ -1,47 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
-using eCommerce.Business.Service;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography;
 using eCommerce.Common;
 
 namespace eCommerce.Business
 {
     public class Item
     {
-        private String _name;
-        private int _amount;
-        private IStore _belongsToStore;
-        private Category _category;
-        private List<String> _keyWords;
-        private PurchaseStrategy _purchaseStrategy;
-        private int _pricePerUnit;
+        public String _name { get; private set; }
+        public int _amount { get; private set; }
+        [ForeignKey("Store")]
+        public string StoreId { get; private set; }
+        public Store _belongsToStore { get; private set; }
+        public Category _category { get; private set; }
+        // TODO add class and map it
+        [NotMapped]
+        public List<String> _keyWords { get; private set; }
+        [NotMapped]
+        public PurchaseStrategy _purchaseStrategy { get; private set; }
+        public double _pricePerUnit { get; private set; }
 
-        public int GetTotalPrice()
+        public double GetTotalPrice()
         {
             return _pricePerUnit * _amount;
         }
 
-        public int GetPricePerUnit()
+        public double GetPricePerUnit()
         {
             return this._pricePerUnit;
         }
+
+        public Item()
+        {
+            _keyWords = new List<string>();
+        }
+
+        public Item(string name, int amount, Store belongsToStore, Category category, List<string> keyWords, double pricePerUnit)
+        {
+            _name = name;
+            _amount = amount;
+            _belongsToStore = belongsToStore;
+            StoreId = _belongsToStore.StoreName;
+            _category = category;
+            _keyWords = keyWords;
+            _pricePerUnit = pricePerUnit;
+        }
         
-        public Item(String name, Category category, IStore store, int pricePer)
+        public Item(String name, Category category, Store store, int pricePer)
         {
             this._name = name;
             this._category = category;
             this._belongsToStore = store;
+            StoreId = _belongsToStore.StoreName;
             _amount = 1;
             this._keyWords=new List<string>();
             this._pricePerUnit = pricePer;
             _purchaseStrategy = new DefaultPurchaseStrategy(_belongsToStore);
         }
 
-        public Item(ItemInfo info, IStore store)
+        public Item(ItemInfo info, Store store)
         {
             this._name = info.name;
             this._amount = info.amount;
             this._category = new Category(info.category);
             this._belongsToStore = store;
+            StoreId = _belongsToStore.StoreName;
             CopyKeyWords(info.keyWords);
             this._purchaseStrategy = new DefaultPurchaseStrategy(_belongsToStore);
             this._pricePerUnit = info.pricePerUnit;
@@ -57,7 +82,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result SetPrice(IUser user,int pricePerUnit)
+        public Result SetPrice(User user,int pricePerUnit)
         {
             if (!user.HasPermission(_belongsToStore, StorePermission.ChangeItemPrice).IsFailure)
             {
@@ -77,7 +102,7 @@ namespace eCommerce.Business
             }
         }
 
-        public IStore GetStore()
+        public Store GetStore()
         {
             return this._belongsToStore;
         }
@@ -110,7 +135,7 @@ namespace eCommerce.Business
             }
         }
         
-        public Result AddKeyWord(IUser user,String keyWord)
+        public Result AddKeyWord(User user,String keyWord)
         {
             
             if (!user.HasPermission(this._belongsToStore, StorePermission.EditItemDetails).IsFailure)
@@ -131,7 +156,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result<bool> CheckPricesInBetween(int startPrice, int endPrice)
+        public Result<bool> CheckPricesInBetween(double startPrice, double endPrice)
         {
             if (startPrice > 0 && startPrice <= endPrice)
             {
@@ -232,7 +257,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result AddItems(IUser user,int amount)
+        public Result AddItems(User user,int amount)
         {
             if (amount > 0)
             {
@@ -246,7 +271,7 @@ namespace eCommerce.Business
         }
         
         
-        public Result SubtractItems(IUser user,int amount)
+        public Result SubtractItems(User user,int amount)
         {
             if (this._amount-amount >= 1)
             {

@@ -8,22 +8,22 @@ namespace eCommerce.Business
 {
     public interface ICart
     {
-        public Result AddItemToCart(IUser user,ItemInfo item);
+        public Result AddItemToCart(User user,ItemInfo item);
         
-        public Result EditCartItem(IUser user,ItemInfo item);
+        public Result EditCartItem(User user,ItemInfo item);
         
 
         public Result<double> CalculatePricesForCart();
 
-        public Result BuyWholeCart(IUser user, PaymentInfo paymentInfo);
-        public bool CheckForCartHolder(IUser user);
+        public Result BuyWholeCart(User user, PaymentInfo paymentInfo);
+        public bool CheckForCartHolder(User user);
 
         public IList<IBasket> GetBaskets();
 
 
         public CartInfo GetCartInfo();
 
-        public IUser GetUser();
+        public User GetUser();
         IList<ItemInfo> GetAllItems();
     }
 }

@@ -5,6 +5,7 @@ using System.Globalization;
 using eCommerce.Auth;
 using System.Threading.Tasks;
 using eCommerce.Business;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
@@ -24,18 +25,18 @@ namespace Tests.AcceptanceTests
     public class TestOpenStore
     {
         private IAuthService _auth;
-        private IStoreService _store;
+        private INStoreService _inStore;
 
         [SetUpAttribute]
         public async Task SetUp()
         {
-            StoreRepository SR = new StoreRepository();
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
-            IRepository<IUser> UR = new RegisteredUsersRepository();
+            IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Mechanism100", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             MemberInfo shiran = new MemberInfo("PhroggyPal", "shiran@gmail.com", "Shiran Moris",
@@ -50,7 +51,7 @@ namespace Tests.AcceptanceTests
         public void Teardown()
         {
             _auth = null;
-            _store = null;
+            _inStore = null;
         }
         
         
@@ -62,7 +63,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> login = await _auth.Login(token, member, password, ServiceUserRole.Member);
-            Result result = _store.OpenStore(login.Value, store);
+            Result result = _inStore.OpenStore(login.Value, store);
             Assert.True(result.IsSuccess, result.Error);
             _auth.Logout(login.Value);
             _auth.Disconnect(token);
@@ -75,11 +76,11 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> login = await _auth.Login(token, firstMember, firstPassword, ServiceUserRole.Member);
-            Result result = _store.OpenStore(login.Value, firstStore);
+            Result result = _inStore.OpenStore(login.Value, firstStore);
             Assert.True(result.IsSuccess, result.Error);
             token = _auth.Logout(login.Value).Value;
             login = await _auth.Login(token, secondMember, secondPassword, ServiceUserRole.Member);
-            result = _store.OpenStore(login.Value, secondStore);
+            result = _inStore.OpenStore(login.Value, secondStore);
             Assert.True(result.IsSuccess, result.Error);
             token = _auth.Logout(login.Value).Value;
             _auth.Disconnect(token);
@@ -92,7 +93,7 @@ namespace Tests.AcceptanceTests
         { 
             string token = _auth.Connect();
             Result<string> login = await _auth.Login(token, member, password, ServiceUserRole.Member);
-            Result result = _store.OpenStore(login.Value, storeName);
+            Result result = _inStore.OpenStore(login.Value, storeName);
             Assert.True(result.IsFailure, "store opening was suppose to fail");
             _auth.Logout(login.Value);
             _auth.Disconnect(token);
@@ -104,10 +105,10 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> login = await _auth.Login(token, firstMember, firstPassword, ServiceUserRole.Member);
-            _store.OpenStore(login.Value, store);
+            _inStore.OpenStore(login.Value, store);
             token = _auth.Logout(login.Value).Value;
             login = await _auth.Login(token, secondMember, secondPassword, ServiceUserRole.Member);
-            Result result = _store.OpenStore(login.Value, store);
+            Result result = _inStore.OpenStore(login.Value, store);
             Assert.True(result.IsFailure, "store name already used. expected fail");
             token = _auth.Logout(login.Value).Value;
             _auth.Disconnect(token);
@@ -119,7 +120,7 @@ namespace Tests.AcceptanceTests
         public void TestOpenStoreFailureNotLoggedIn(string storeName)
         { 
             string token = _auth.Connect();
-            Result result = _store.OpenStore(token, storeName);
+            Result result = _inStore.OpenStore(token, storeName);
             Assert.True(result.IsFailure, "store opening was suppose to fail, user not logged in");
             _auth.Disconnect(token);
         }

@@ -12,6 +12,6 @@ namespace eCommerce.Auth.DAL
         }
 
         // DB sets
-        public DbSet<User> User { get; set; }
+        public DbSet<AuthUser> User { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -29,7 +29,7 @@ namespace eCommerce.Business
             return user.Logout(this, toGuestName);
         }
 
-        public Result OpenStore(User user,IStore store)
+        public Result OpenStore(User user,Store store)
         {
             return user.OpenStore(this, store);
         }
@@ -57,37 +57,37 @@ namespace eCommerce.Business
         }
 
 
-        public Result AppointUserToOwner(User user,IStore store, IUser otherUser)
+        public Result AppointUserToOwner(User user,Store store, User otherUser)
         {
             return user.AppointUserToOwner(this, store, otherUser);
         }
 
-        public Result AppointUserToManager(User user, IStore store, IUser otherUser)
+        public Result AppointUserToManager(User user, Store store, User otherUser)
         {
             return user.AppointUserToManager(this, store, otherUser);
         }
 
-        public Result<OwnerAppointment> MakeOwner(User user, IStore store)
+        public Result<OwnerAppointment> MakeOwner(User user, Store store)
         {
             return user.MakeOwner(this, store);
         }
 
-        public Result<ManagerAppointment> MakeManager(User user, IStore store)
+        public Result<ManagerAppointment> MakeManager(User user, Store store)
         {
             return user.MakeManager(this, store);
         }
 
-        public Result AddPermissionsToManager(User user, IStore store, IUser otherUser, StorePermission permission)
+        public Result AddPermissionsToManager(User user, Store store, User otherUser, StorePermission permission)
         {
             return user.AddPermissionsToManager(this,store,otherUser,permission);
         }
 
-        public Result RemovePermissionsToManager(User user, IStore store, IUser otherUser, StorePermission permission)
+        public Result RemovePermissionsToManager(User user, Store store, User otherUser, StorePermission permission)
         {
             return user.RemovePermissionsToManager(this,store, otherUser,permission);
         }
 
-        public Result UpdatePermissionsToManager(User user, IStore store, IUser otherUser, IList<StorePermission> permissions)
+        public Result UpdatePermissionsToManager(User user, Store store, User otherUser, IList<StorePermission> permissions)
         {
             return user.UpdatePermissionsToManager(this,store, otherUser,permissions);
         }
@@ -97,17 +97,17 @@ namespace eCommerce.Business
             return user.GetUserHistory();
         }
 
-        public virtual Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, IUser otherUser)
+        public virtual Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, User otherUser)
         {
             return Result.Fail<IList<PurchaseRecord>>("Illegal action for member (GetDiscount-Other-User-History)");
         }
 
-        public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(User user, IStore store)
+        public Result<IList<PurchaseRecord>> GetStorePurchaseHistory(User user, Store store)
         {
             return store.GetPurchaseHistory(user);
         }
 
-        public virtual Result HasPermission(User user, IStore store, StorePermission storePermission)
+        public virtual Result HasPermission(User user, Store store, StorePermission storePermission)
         {
             return user.HasPermission(this, store,storePermission);
         }
@@ -117,27 +117,27 @@ namespace eCommerce.Business
             return user.EnterRecordToHistory(this, record);
         }
 
-        public Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store)
+        public Result<IList<User>> GetAllStoreStakeholders(User user, Store store)
         {
             return user.GetAllStoreStakeholders(this, store);
         }
 
-        public Result RemoveOwnerFromStore(User user, IStore store, IUser otherUser)
+        public Result RemoveOwnerFromStore(User user, Store store, User otherUser)
         {
             return user.RemoveOwnerFromStore(this, store,otherUser);
         }
 
-        public Result<OwnerAppointment> RemoveOwner(User user, IStore store)
+        public Result<OwnerAppointment> RemoveOwner(User user, Store store)
         {
             return user.RemoveOwner(this, store);
         }
         
-        public Result<ManagerAppointment> RemoveManager(User user, IStore store)
+        public Result<ManagerAppointment> RemoveManager(User user, Store store)
         {
             return user.RemoveManager(this, store);
         }
 
-        public Result AnnexStakeholders(User user, IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
+        public Result AnnexStakeholders(User user, Store store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
             return user.AnnexStakeholders(this, store, owners, managers);
         }

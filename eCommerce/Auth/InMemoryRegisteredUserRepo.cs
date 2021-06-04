@@ -9,26 +9,26 @@ namespace eCommerce.Auth
 {
     public class InMemoryRegisteredUserRepo : IRegisteredUserRepo
     {
-        private ConcurrentDictionary<string, User> _dictionary;
+        private ConcurrentDictionary<string, AuthUser> _dictionary;
 
         public InMemoryRegisteredUserRepo()
         {
-            _dictionary = new ConcurrentDictionary<string, User>();
+            _dictionary = new ConcurrentDictionary<string, AuthUser>();
         }
         
-        public async Task<bool> Add(User user)
+        public async Task<bool> Add(AuthUser authUser)
         {
-            return _dictionary.TryAdd(user.Username, user);
+            return _dictionary.TryAdd(authUser.Username, authUser);
         }
         
-        public async Task<User> GetUserOrNull(string username)
+        public async Task<AuthUser> GetUserOrNull(string username)
         {
-            User user;
-            if (!_dictionary.TryGetValue(username, out user))
+            AuthUser authUser;
+            if (!_dictionary.TryGetValue(username, out authUser))
             {
-                user = null;
+                authUser = null;
             }
-            return user;
+            return authUser;
         }
     }
 }
