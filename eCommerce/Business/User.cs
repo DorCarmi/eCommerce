@@ -7,22 +7,21 @@ using System.Linq;
 using eCommerce.Business.Service;
 using eCommerce.Common;
 using eCommerce.Publisher;
+using eCommerce.DataLayer;
 
 namespace eCommerce.Business
 {
     public class User : IUser
     {
-        [NotMapped]
         private bool _isRegistered;
-        [NotMapped]
         private UserToSystemState _systemState;
-        [NotMapped]
         private MemberInfo _memberInfo { get; set; }
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Username { get; set; }
-        
+        // [NotMapped]
+
         public MemberInfo MemberInfo
         {
             get
@@ -34,28 +33,43 @@ namespace eCommerce.Business
                 _memberInfo = value;
             }
         }
-        [NotMapped]
+
+        public virtual List<Pair<Store, OwnerAppointment>> storesOwnedBackup 
+        {
+            get
+            {
+                return syncFromDict(_storesOwned);
+            }
+            set
+            {
+                syncToDict(_storesOwned, value);
+            }
+        }
+
         private ICart _myCart;
-        [NotMapped]
         private Object dataLock;
+
+
         //MemberData:
-        [NotMapped]
         private ConcurrentDictionary<IStore, bool> _storesFounded;
-        [NotMapped]
         private ConcurrentDictionary<IStore, OwnerAppointment> _storesOwned;
-        [NotMapped]
         private ConcurrentDictionary<IStore, ManagerAppointment> _storesManaged;
-        [NotMapped]
         private ConcurrentDictionary<IStore, IList<OwnerAppointment>> _appointedOwners;
-        [NotMapped]
         private ConcurrentDictionary<IStore, IList<ManagerAppointment>> _appointedManagers;
-        [NotMapped]
         private UserTransactionHistory _transHistory ;
         
 
         //constructors
+        public User()
+        {
+            _isRegistered = false;
+            dataLock = new Object();
+        }
+
         public User(string Username)
         {
+            
+            Console.WriteLine("test cons. - Username");
             this.Username = Username;
             _memberInfo = new MemberInfo(Username, null,null,DateTime.Now, null);
             _systemState = Guest.State;
@@ -65,6 +79,8 @@ namespace eCommerce.Business
         }
         public User(MemberInfo MemberInfo)
         {
+            
+            Console.WriteLine("test cons. - memberInfo");
             _isRegistered = true;
             Username = MemberInfo.Username;
             _memberInfo = MemberInfo;
@@ -81,6 +97,8 @@ namespace eCommerce.Business
         } 
         public User(UserToSystemState state, MemberInfo MemberInfo)
         {
+            
+            Console.WriteLine("test cons. - memberInfo + state");
             _isRegistered = true;
             Username = MemberInfo.Username;
             _memberInfo = MemberInfo;
@@ -784,7 +802,33 @@ namespace eCommerce.Business
 
     #endregion
 
+   
+    #region DAL Oriented Functions
 
+    public List<Pair<Store, V>> syncFromDict<V>(IDictionary<IStore,V> dict)
+    {
+        Console.WriteLine("getting pairs!");
+        List<Pair<Store, V>> list = new List<Pair<Store, V>>();
+        lock (dataLock)
+        {
+            foreach (IStore key in dict.Keys)
+            {
+                list.Add(new Pair<Store, V>(){Key = (Store)key, Value = dict[key], HolderId = this.Username});
+            }
+        }
+        return list;
+    }
+    
+    public void syncToDict<V>(IDictionary<IStore,V> dict, List<Pair<Store,V>> list)
+    {
+        Console.WriteLine("setting pairs!");
+        foreach (Pair<Store,V> p in list)
+        {
+            dict.TryAdd(p.Key, p.Value);
+        }
+    }
+
+    #endregion
     
     }
     

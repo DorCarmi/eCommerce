@@ -31,5 +31,20 @@ namespace Tests.DataLayer
             var username = "Ja Morant";
             Assert.True(df.ReadUser(username).IsSuccess);
         }
+        
+        
+        [Test]
+        public void aTest()
+        {
+            var username = "Ja Morant";
+            Assert.True(df.DoSomething(username).IsSuccess);
+        }
+
+        [Test]
+        public void MemberInfoDateTimeTest()
+        {
+            
+        }
+
     }
 }

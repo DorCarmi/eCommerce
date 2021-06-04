@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
@@ -15,7 +17,9 @@ namespace eCommerce.Business
     public class Store : IStore
     {
         //Individual
-        private String _storeName;
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public String _storeName { get; set; }
         
         //General
         private MarketFacade _marketFacade;
@@ -38,6 +42,11 @@ namespace eCommerce.Business
         private List<IUser> _managers;
         
         private List<IBasket> _basketsOfThisStore;
+
+        public Store()
+        {
+            Console.WriteLine("test store cons. - Default");
+        }
 
         public Store(String name, IUser founder)
         {

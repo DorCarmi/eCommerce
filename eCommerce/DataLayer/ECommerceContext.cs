@@ -10,9 +10,12 @@ namespace eCommerce.DataLayer
     {
         public DbSet<MemberInfo> MemberInfos { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<OwnerAppointment> OwnerAppointments { get; set; }
+        // public DbSet<ManagerAppointment> ManagerAppointments { get; set; }
+        public DbSet<Pair<Store,OwnerAppointment>> OwnedStores { get; set; }
         public DbSet<ListPair<Classroom,Course>> ListPairs { get; set; }
 
-        
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //@TODO::sharon - enable test mode for db - use different db + add teardown function to context 
@@ -38,11 +41,11 @@ namespace eCommerce.DataLayer
     
     public class Pair<K,V>
     {
-        public int ClassroomId { get; set; }
-        public K Classroom { get; set; }
-        public int CourseId { get; set; }
-        public V Course { get; set; }
-        public int StudentId { get; set; }
+        // public int KeyId { get; set; }
+        public K Key { get; set; }
+        // public int ValueId { get; set; }
+        public V Value { get; set; }
+        public string HolderId { get; set; }
     }
 
 }

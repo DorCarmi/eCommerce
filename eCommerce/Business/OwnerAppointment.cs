@@ -8,7 +8,12 @@ namespace eCommerce.Business
     public class OwnerAppointment
     {
         public IUser User { get; set; }
-        private ConcurrentDictionary<StorePermission,bool> _permissions;
+        private ConcurrentDictionary<StorePermission, bool> _permissions { get; set; }
+
+        public OwnerAppointment()
+        {
+            Console.WriteLine("test owner cons. - default");
+        }
 
         public OwnerAppointment(IUser user)
         {
@@ -19,13 +24,6 @@ namespace eCommerce.Business
             {
                 _permissions.TryAdd((StorePermission)permission,true);
             }
-            // _permissions.TryAdd(StorePermission.GetStoreHistory,true);
-            // _permissions.TryAdd(StorePermission.AddItemToStore,true);
-            // _permissions.TryAdd(StorePermission.ChangeItemPrice,true);
-            // _permissions.TryAdd(StorePermission.EditItemDetails,true);
-            // _permissions.TryAdd(StorePermission.EditStorePolicy,true);
-            // _permissions.TryAdd(StorePermission.ChangeItemStrategy,true);
-            // _permissions.TryAdd(StorePermission.ControlStaffPermission,true);
         }
 
         public Result HasPermission(StorePermission permission)
