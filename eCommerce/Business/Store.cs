@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using eCommerce.Business.CombineRules;
@@ -44,7 +45,6 @@ namespace eCommerce.Business
         public Store(String name, User founder)
         {
             this._storeName = name;
-
             this._myDiscountStrategies = new List<Composite>();
             this._myPurchaseStrategies = new List<PurchaseStrategy>();
             this._myPurchaseStrategies.Add(new DefaultPurchaseStrategy(this));
@@ -56,7 +56,6 @@ namespace eCommerce.Business
             _inventory = new ItemsInventory(this);
 
             this._founder = founder;
-            // TODO add founer with all permissions
             _ownersAppointments = new List<OwnerAppointment>();
             
             _managersAppointments = new List<ManagerAppointment>();

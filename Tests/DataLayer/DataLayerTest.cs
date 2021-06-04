@@ -5,31 +5,41 @@ using NUnit.Framework;
 
 namespace Tests.DataLayer
 {
+    /**
+     * DB should be clear
+     */
     public class DataLayerTest
     {
         private DataFacade df;
-        
-        [SetUp]
-        public void Setup()
+        private User _ja;
+        public DataLayerTest()
         {
             df = new DataFacade();
-            //clear database
+            var info = new MemberInfo("Ja Morant", "ja@mail.com", "Ja", DateTime.Now, "Memphis");
+            info.Id = "12";
+            _ja = new User(info);
         }
 
         [Test]
+        [Order(1)]
         public void SaveUserTest()
         {
-            var info = new MemberInfo("Ja Morant", "ja@mail.com", "Ja", DateTime.Now, "Memphis");
-            info.Id = "12";
-            var  ja = new User(info);
-            Assert.True(df.SaveUser(ja).IsSuccess);
+            Assert.True(df.SaveUser(_ja).IsSuccess);
         }
         
         [Test]
+        [Order(2)]
         public void ReadUserTest()
         {
-            var username = "Ja Morant";
-            Assert.True(df.ReadUser(username).IsSuccess);
+            Assert.True(df.ReadUser(_ja.Username).IsSuccess);
+        }
+
+        [Test]
+        [Order(3)]
+        public void SaveStoreTest()
+        {
+            var store = new Store("Store", df.ReadUser(_ja.Username).Value);
+            Assert.True(df.SaveStore(store).IsSuccess);
         }
     }
 }

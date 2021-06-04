@@ -59,5 +59,26 @@ namespace eCommerce.DataLayer
             }
             return Result.Ok<User>(user);
         }
+        
+        public Result SaveStore(Store store)
+        {
+            using (var db = new ECommerceContext())
+            {
+                try
+                { 
+                    db.Add(store);
+                    db.Entry(store._founder).State = EntityState.Unchanged;
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException);   
+                    return Result.Fail("Unable to Save Store");
+                    // add logging here
+                }
+
+            }
+            return Result.Ok();
+        }
     }
 }
