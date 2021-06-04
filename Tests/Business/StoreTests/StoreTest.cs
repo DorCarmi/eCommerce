@@ -160,7 +160,7 @@ namespace Tests.Business.StoreTests
             cart.AddItemToCart(Alice, item2);
 
             var buyRes = cart.BuyWholeCart(Alice,
-                new PaymentInfo("Alice", "369852147", "7894789478947894", "05/23", "123",
+                new PaymentInfo("Alice", "369852147", "7894789478947894", "05-01-23", "123",
                     "Even Gavirol 30, TLV, Israel"));
             Assert.AreEqual(true,buyRes.IsSuccess, buyRes.Error);
 
@@ -182,11 +182,11 @@ namespace Tests.Business.StoreTests
             bobcart.AddItemToCart(bob, item3);
             
             Assert.AreEqual("",bobcart.BuyWholeCart(bob,
-                new PaymentInfo("Bob", "369852147", "7894789478947894", "05/23", "123",
+                new PaymentInfo("Bob", "369852147", "7894789478947894", "05-01-23", "123",
                     "Even Gavirol 30, TLV, Israel")).Error);
             
             Assert.AreEqual(false,alicecart.BuyWholeCart(Alice,
-                new PaymentInfo("Alice", "369852147", "7894789478947894", "05/23", "123",
+                new PaymentInfo("Alice", "369852147", "7894789478947894", "05-01-23", "123",
                     "Even Gavirol 30, TLV, Israel")).IsSuccess);
 
         }

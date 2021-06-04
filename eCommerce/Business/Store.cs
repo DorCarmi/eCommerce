@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
@@ -15,11 +17,9 @@ namespace eCommerce.Business
     public class Store
     {
         //Individual
-        private String _storeName;
+        [Key]
+        public String _storeName { get; private set; }
         
-        //General
-        private MarketFacade _marketFacade;
-
         //Store's issues
         //Discounts and purchases
         private List<Composite> _myDiscountStrategies;
@@ -28,16 +28,18 @@ namespace eCommerce.Business
         
         //History and inventory
         private StoreTransactionHistory _transactionHistory;
-        private ItemsInventory _inventory;
+        public ItemsInventory _inventory { get; private set; }
 
         //User issues
-        private User _founder;
+        public User _founder { get; private set; }
         private List<OwnerAppointment> _ownersAppointments;
-        private List<User> _owners;
         private List<ManagerAppointment> _managersAppointments;
-        private List<User> _managers;
         
         private List<IBasket> _basketsOfThisStore;
+
+        public Store()
+        {
+        }
 
         public Store(String name, User founder)
         {
@@ -54,20 +56,13 @@ namespace eCommerce.Business
             _inventory = new ItemsInventory(this);
 
             this._founder = founder;
-
-            _owners = new List<User>();
-            _owners.Add(founder);
+            // TODO add founer with all permissions
             _ownersAppointments = new List<OwnerAppointment>();
             
-            _managers = new List<User>();
             _managersAppointments = new List<ManagerAppointment>();
             
             _basketsOfThisStore = new List<IBasket>();
         }
-        
-        
-        
-        
 
         public virtual IList<Item> GetAllItems()
         {
@@ -130,12 +125,12 @@ namespace eCommerce.Business
         public virtual Result<IList<StorePermission>> GetPermissions(User user)
         {
             IList<StorePermission> permissions = null;
-            if (user.Equals(_founder) | _owners.Contains(user))
+            if (user.Equals(_founder) | _ownersAppointments.Find(u => u.User.Equals(user)) != null)
             {
                 return Result.Ok<IList<StorePermission>>(Enum.GetValues<StorePermission>());
             }
 
-            if (!_managers.Contains(user))
+            if (_managersAppointments.Find(u => u.User.Equals(user)) != null)
             {
                 return Result.Fail<IList<StorePermission>>("User is not a owner or manager of this store");
             }
@@ -623,8 +618,9 @@ namespace eCommerce.Business
         public virtual Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
         {
             var purchaseRecord=this._transactionHistory.AddRecordToHistory(basket);
-            foreach (var owner in _owners)
+            foreach (var ownerAppointment in _ownersAppointments)
             {
+                User owner = ownerAppointment.User;
                 foreach (var item in purchaseRecord.Value.BasketInfo._itemsInBasket)
                 {
                     owner.PublishMessage(String.Format("User: {0} , bought {1} items of {2} at {3}",
@@ -639,5 +635,10 @@ namespace eCommerce.Business
         {
             return Result.Ok(this._founder);
         }
+
+        public string StoreName
+        {
+            get => _storeName;
+        } 
     }
 }

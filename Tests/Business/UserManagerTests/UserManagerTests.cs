@@ -125,6 +125,7 @@ namespace Tests.Business.UserManagerTests
                 $"All logging in should have been successful but {registeredSuccessfully} succeeded");
         }
         
+        /* Only one user can login
         [Test]
         public async Task ConcurrentLoginSameUserDifferentGuestsTest()
         {
@@ -159,7 +160,7 @@ namespace Tests.Business.UserManagerTests
             Assert.AreEqual(numberOfTasks,
                 registeredSuccessfully,
                 $"All logging in should have been successful but {registeredSuccessfully} succeeded");
-        }
+        }*/
 
         [Test]
         public async Task ConcurrentLoginFewUsersTest()

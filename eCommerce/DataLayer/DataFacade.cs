@@ -12,7 +12,7 @@ namespace eCommerce.DataLayer
         public Result SaveUser(User user)
         {
             
-            Console.WriteLine("1212Inserting a new User");
+            Console.WriteLine("Inserting a new User");
             using (var db = new ECommerceContext())
             {
                 try
@@ -42,8 +42,12 @@ namespace eCommerce.DataLayer
                     Console.WriteLine("fetching saved User");
                     user = db.Users
                         .Include(u => u.MemberInfo)
-                        .Where(u => u.Username == username)
-                        .SingleOrDefault();
+                        .SingleOrDefault(u => u.Username == username);
+
+                    if (user == null)
+                    {
+                        return Result.Fail<User>($"No user called {username}");
+                    }
 
                 }
                 catch (Exception e)

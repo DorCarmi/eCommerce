@@ -1,19 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography;
 using eCommerce.Common;
 
 namespace eCommerce.Business
 {
     public class Item
     {
-        private String _name;
-        private int _amount;
-        private Store _belongsToStore;
-        private Category _category;
-        private List<String> _keyWords;
-        private PurchaseStrategy _purchaseStrategy;
-        private double _pricePerUnit;
+        public String _name { get; private set; }
+        public int _amount { get; private set; }
+        [ForeignKey("Store")]
+        public string StoreId { get; private set; }
+        public Store _belongsToStore { get; private set; }
+        public Category _category { get; private set; }
+        // TODO add class and map it
+        [NotMapped]
+        public List<String> _keyWords { get; private set; }
+        [NotMapped]
+        public PurchaseStrategy _purchaseStrategy { get; private set; }
+        public double _pricePerUnit { get; private set; }
 
         public double GetTotalPrice()
         {
@@ -24,12 +31,29 @@ namespace eCommerce.Business
         {
             return this._pricePerUnit;
         }
+
+        public Item()
+        {
+            _keyWords = new List<string>();
+        }
+
+        public Item(string name, int amount, Store belongsToStore, Category category, List<string> keyWords, double pricePerUnit)
+        {
+            _name = name;
+            _amount = amount;
+            _belongsToStore = belongsToStore;
+            StoreId = _belongsToStore.StoreName;
+            _category = category;
+            _keyWords = keyWords;
+            _pricePerUnit = pricePerUnit;
+        }
         
         public Item(String name, Category category, Store store, int pricePer)
         {
             this._name = name;
             this._category = category;
             this._belongsToStore = store;
+            StoreId = _belongsToStore.StoreName;
             _amount = 1;
             this._keyWords=new List<string>();
             this._pricePerUnit = pricePer;
@@ -42,6 +66,7 @@ namespace eCommerce.Business
             this._amount = info.amount;
             this._category = new Category(info.category);
             this._belongsToStore = store;
+            StoreId = _belongsToStore.StoreName;
             CopyKeyWords(info.keyWords);
             this._purchaseStrategy = new DefaultPurchaseStrategy(_belongsToStore);
             this._pricePerUnit = info.pricePerUnit;
@@ -287,44 +312,6 @@ namespace eCommerce.Business
             CopyKeyWords(newItem.keyWords);
             this._pricePerUnit = newItem.pricePerUnit;
             return Result.Ok();
-        }
-        
-        // ========== Properties ========== //
-        // TODO make setters for ef or some constructor
-        // TODO make Name and Store as the primary key
-        public string Name
-        {
-            get => _name;
-        }
-
-        public int Amount
-        {
-            get => _amount;
-        }
-
-        public Store InStore
-        {
-            get => _belongsToStore;
-        }
-
-        public Category Category
-        {
-            get => _category;
-        }
-
-        public List<string> KeyWords
-        {
-            get => _keyWords;
-        }
-
-        public PurchaseStrategy PurchaseStrategy
-        {
-            get => _purchaseStrategy;
-        }
-
-        public double PricePerUnit
-        {
-            get => _pricePerUnit;
         }
     }
 }

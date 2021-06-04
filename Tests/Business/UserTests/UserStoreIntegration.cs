@@ -104,7 +104,7 @@ namespace Tests.Business
                userName:alenbySecondManager.Username,
                idNumber:alenbySecondManager.MemberInfo.Id,
                creditCardNumber:"1234567789",
-               creditCardExpirationDate:"0322",
+               creditCardExpirationDate:"03-01-22",
                threeDigitsOnBackOfCard:"123",
                fullAddress:"TLV"
                ));

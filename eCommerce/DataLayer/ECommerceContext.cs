@@ -10,9 +10,12 @@ namespace eCommerce.DataLayer
     {
         public DbSet<MemberInfo> MemberInfos { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<ListPair<Classroom,Course>> ListPairs { get; set; }
+       // public DbSet<ListPair<Classroom,Course>> ListPairs { get; set; }
 
-        
+        public DbSet<Store> Stores { get; set; }
+        public DbSet<Item> Items { get; set; }
+        public DbSet<ItemsInventory> ItemsInventories { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //@TODO::sharon - enable test mode for db - use different db + add teardown function to context 
@@ -21,10 +24,11 @@ namespace eCommerce.DataLayer
         
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<ListPair<Classroom,Course>>()
-                .HasKey(p => new {p.HolderId, p.KeyId});
+           /* builder.Entity<ListPair<Classroom,Course>>()
+                .HasKey(p => new {p.HolderId, p.KeyId});*/
             
-
+            builder.Entity<Item>()
+                .HasKey(p => new {p._name, p.StoreId});
         }
     }
 

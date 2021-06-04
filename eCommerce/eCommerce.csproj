@@ -12,6 +12,7 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.5" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0-preview.4.21253.1">
+        <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="6.0.0-preview.4.21253.1" />
