@@ -38,20 +38,20 @@ class AddRule extends Component {
         console.log(comperatorIdx)
         console.log(Comperators.NOT_EQUALS)
         event.preventDefault();
-        const res = await this.storeApi.addRuleToStorePolicy(storeId,makeRuleNodeLeaf(makeRuleInfo(parseInt(ruleType),whatIsTheRuleOf,
-                                                                                        itemId,parseInt(selectedComperator))))
-
-        if(res && res.isSuccess) {
-            alert('add rule succeed')
-            this.redirectToHome(`/store/${storeId}`)
-        }
-        else{
-            if(res) {
-                alert(`add rule failed because- ${res.error}`)
-            }
-        }
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
+        // const res = await this.storeApi.addRuleToStorePolicy(storeId,makeRuleNodeLeaf(makeRuleInfo(parseInt(ruleType),whatIsTheRuleOf,
+        //                                                                                 itemId,parseInt(selectedComperator))))
+        
+        // if(res && res.isSuccess) {
+        //     alert('add rule succeed')
+        //     this.redirectToHome(`/store/${storeId}`)
+        // }
+        // else{
+        //     if(res) {
+        //         alert(`add rule failed because- ${res.error}`)
+        //     }
+        // }
+        this.props.addRule((makeRuleInfo(parseInt(ruleType),whatIsTheRuleOf, itemId,parseInt(selectedComperator))))
+        alert("Rule Has Been Added")
     }
 
 
@@ -71,7 +71,7 @@ class AddRule extends Component {
         console.log(comperatorValue)
         console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
         return (
-            <main className="RegisterMain">
+            // <main className="RegisterMain">
                 <div className="RegisterWindow">
                     <div className="CenterItemContainer">
                         <h3>{`Add Rule For Item: ${itemId} In Store: ${storeId}`}</h3>
@@ -94,11 +94,12 @@ class AddRule extends Component {
                             </select>
                         </label></div>
                         <div className="CenterItemContainer">
-                            <input className="action" type="submit" value="submit"/>
+                            <input className="action" type="submit" value="Add Rule"/>
                         </div>
                     </form>
-                </div>
-            </main>
+            
+            </div>
+            // </main>
         );
     }
 }
