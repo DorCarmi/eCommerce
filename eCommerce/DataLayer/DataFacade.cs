@@ -11,14 +11,15 @@ namespace eCommerce.DataLayer
 
         public Result SaveUser(User user)
         {
-            
+            user.storesOwnedBackup = user.syncFromDict(user.StoresOwned);
             Console.WriteLine("Inserting a new User");
             using (var db = new ECommerceContext())
             {
                 try
                 {
-                    Console.WriteLine("Inserting a new User");
+                    
                     db.Add(user);
+                    Console.WriteLine("Inserting a new User!!!");
                     db.SaveChanges();
                 }
                 catch (Exception e)
@@ -42,6 +43,7 @@ namespace eCommerce.DataLayer
                     Console.WriteLine("fetching saved User");
                     user = db.Users
                         .Include(u => u.MemberInfo)
+                        .Include(u=> u.storesOwnedBackup)
                         .SingleOrDefault(u => u.Username == username);
 
                     if (user == null)
@@ -57,6 +59,7 @@ namespace eCommerce.DataLayer
                     // add logging here
                 }
             }
+            user.syncToDict(user.StoresOwned,user.storesOwnedBackup);
             return Result.Ok<User>(user);
         }
         
@@ -68,6 +71,7 @@ namespace eCommerce.DataLayer
                 { 
                     db.Add(store);
                     db.Entry(store._founder).State = EntityState.Unchanged;
+                    db.Entry(store._founder.MemberInfo).State = EntityState.Unchanged;
                     db.SaveChanges();
                 }
                 catch (Exception e)
@@ -81,11 +85,11 @@ namespace eCommerce.DataLayer
             return Result.Ok();
         }
         
-        public Result<IUser> DoSomething(string username)
+        public Result DoSomething(string username)
         {
-            IUser user1 = null;
+            User user1 = null;
             
-            IUser user2 = null;
+            User user2 = null;
 
             using (var db = new ECommerceContext())
             {
@@ -101,18 +105,40 @@ namespace eCommerce.DataLayer
                         .Include(u => u.MemberInfo)
                         .Where(u => u.Username == username)
                         .SingleOrDefault();
-
+                    if(user1 != user2)
+                        return Result.Fail("user instances are not equal");
                     Console.WriteLine("are equal? {0}",user1 == user2);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    return Result.Fail<IUser>("Unable to read User");
+                    return Result.Fail("Unable to read User");
                     // add logging here
                 }
                 
             }
-            return Result.Fail<IUser>("bad.. very very bad..");
+            return Result.Ok();
+        }
+
+        public Result ClearTables()
+        {
+            using (var db = new ECommerceContext())
+            {
+                try
+                {
+                    Console.WriteLine("clearing DB!");
+                    db.Database.EnsureDeleted();
+                    db.Database.EnsureCreated();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return Result.Fail("Unable to read User");
+                    // add logging here
+                }
+                
+            }
+            return Result.Ok();
         }
     }
 }

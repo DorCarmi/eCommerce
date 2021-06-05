@@ -7,6 +7,7 @@ using System.Linq;
 
 using eCommerce.Common;
 using eCommerce.Publisher;
+using eCommerce.DataLayer;
 
 namespace eCommerce.Business
 {
@@ -31,6 +32,20 @@ namespace eCommerce.Business
                 _memberInfo = value;
             }
         }
+
+        public virtual List<Pair<Store, OwnerAppointment>> storesOwnedBackup 
+        { get; set; }
+        // {
+        //     get
+        //     {
+        //         return syncFromDict(_storesOwned);
+        //     }
+        //     set
+        //     {
+        //         syncToDict(_storesOwned, value);
+        //     }
+        // }
+        
         private ICart _myCart;
         private Object dataLock;
         //MemberData:
@@ -43,6 +58,12 @@ namespace eCommerce.Business
         
 
         //constructors
+        public User()
+        {
+            _isRegistered = false;
+            dataLock = new Object();
+        }
+        
         public User(string Username)
         {
             this.Username = Username;
@@ -387,7 +408,7 @@ namespace eCommerce.Business
         public virtual Result OpenStore(Member member, Store store)
         {
             // adds store to both Owned-By and Founded-By
-            OwnerAppointment owner = new OwnerAppointment(this);
+            OwnerAppointment owner = new OwnerAppointment(this, store.StoreName);
 
             bool res =_storesFounded.TryAdd(store,true) && _storesOwned.TryAdd(store,owner);
             if (res)
@@ -460,7 +481,7 @@ namespace eCommerce.Business
 
         public virtual Result<OwnerAppointment> MakeOwner(Member member, Store store)
         {
-            OwnerAppointment newOwner = new OwnerAppointment(this);
+            OwnerAppointment newOwner = new OwnerAppointment(this,store.StoreName);
             if (_storesOwned.TryAdd(store, newOwner))
             {
                 return Result.Ok<OwnerAppointment>(newOwner);
@@ -773,7 +794,36 @@ namespace eCommerce.Business
 
     #endregion
 
+    
+    #region DAL Oriented Functions
 
+    public List<Pair<Store, V>> syncFromDict<V>(IDictionary<Store,V> dict)
+    {
+        if (dict == null)
+            return new List<Pair<Store, V>>();
+        
+        Console.WriteLine("getting pairs!");
+        List<Pair<Store, V>> list = new List<Pair<Store, V>>();
+        lock (dataLock)
+        {
+            foreach (Store key in dict.Keys)
+            {
+                list.Add(new Pair<Store, V>(){Key = key, KeyId = key.StoreName, Value = dict[key], HolderId = this.Username});
+            }
+        }
+        return list;
+    }
+    
+    public void syncToDict<V>(IDictionary<Store,V> dict, List<Pair<Store,V>> list)
+    {
+        Console.WriteLine("setting pairs!");
+        foreach (Pair<Store,V> p in list)
+        {
+            dict.TryAdd(p.Key, p.Value);
+        }
+    }
+
+    #endregion
     
     }
     

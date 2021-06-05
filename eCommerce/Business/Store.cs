@@ -19,6 +19,7 @@ namespace eCommerce.Business
     {
         //Individual
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public String _storeName { get; private set; }
         
         //Store's issues

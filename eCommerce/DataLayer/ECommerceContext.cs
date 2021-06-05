@@ -29,6 +29,10 @@ namespace eCommerce.DataLayer
         {
             builder.Entity<ListPair<Classroom,Course>>()
                 .HasKey(p => new {p.HolderId, p.KeyId});
+            builder.Entity<Pair<Store,OwnerAppointment>>()
+                .HasKey(p => new {p.HolderId, p.KeyId});
+            builder.Entity<OwnerAppointment>()
+                .HasKey(o => new {o.Username, o.Storename});
             
             builder.Entity<Item>()
                 .HasKey(p => new {p._name, p.StoreId});
@@ -37,15 +41,15 @@ namespace eCommerce.DataLayer
 
     public class ListPair<K,V>
     {
-        public int KeyId { get; set; }
+        public string KeyId { get; set; }
         public K Key { get; set; }
         public virtual List<V> ValList { get; set; }
-        public int HolderId { get; set; }
+        public string HolderId { get; set; }
     }
     
     public class Pair<K,V>
     {
-        // public int KeyId { get; set; }
+        public string KeyId { get; set; }
         public K Key { get; set; }
         // public int ValueId { get; set; }
         public V Value { get; set; }
