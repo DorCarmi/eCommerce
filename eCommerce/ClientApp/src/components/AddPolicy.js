@@ -3,7 +3,7 @@ import "./Register.css"
 import {StoreApi} from '../Api/StoreApi'
 import {withRouter} from "react-router-dom";
 import {
-    makeRuleNodeComposite
+    makeRuleNodeComposite, makeRuleNodeLeaf
 } from '../Data/StorePolicies/RuleInfo'
 import AddRule from "./AddRule";
 import {CombinationsNames} from "../Data/StorePolicies/Combinations";
@@ -21,7 +21,6 @@ class AddPolicy extends Component {
             toggler:false,
             firstRule:undefined,
             secondRule:undefined,
-            items:[]
         }
         this.storeApi = new StoreApi();
 
@@ -37,15 +36,7 @@ class AddPolicy extends Component {
     //     if(history) history.push(path);
     // }
     
-    async componentDidMount() {
-        const fetchedItems = await this.storeApi.getAllItems(this.props.storeId)
-        if (fetchedItems && fetchedItems.isSuccess) {
-            this.setState({
-                items: fetchedItems.value
-            })
-        }
 
-    }
 
     async handleSubmit(event){
         const {firstRule,secondRule,selectedCombination,discount} = this.state
@@ -53,11 +44,11 @@ class AddPolicy extends Component {
         event.preventDefault();
         if(firstRule) {
             let res = undefined
-            let rule = firstRule
+            let rule = makeRuleNodeLeaf(firstRule)
             if(secondRule){
-                rule = makeRuleNodeComposite(firstRule, secondRule, parseInt(selectedCombination));
+                rule = makeRuleNodeComposite(makeRuleNodeLeaf(firstRule), makeRuleNodeLeaf(secondRule), parseInt(selectedCombination));
             }
-            const discountNodeLeaf = makeDiscountNodeLeaf(rule,discount);
+            const discountNodeLeaf = makeDiscountNodeLeaf(rule,parseInt(discount));
             res = await this.storeApi.addDiscountToStore(storeId, discountNodeLeaf)
 
             if(res && res.isSuccess) {
@@ -72,7 +63,6 @@ class AddPolicy extends Component {
         }
 
 
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
 
@@ -114,27 +104,21 @@ class AddPolicy extends Component {
                 <div className="RegisterWindow">
                         <h3>{`Add Policy For The Store: ${storeId}`}</h3>
                     <form  onSubmit={this.handleSubmit}>
-                        <label>
-                            Choose An Item:
-                            <select  onChange={this.handleChange} name="selectedCombination" className="searchContainer">
-                                {items.map((item) => <option  value={item}>{item}</option>)}
-                            </select>
-                        </label>
-                        <AddRule addRule={(rule) =>this.addFirstRule(rule)}/>
+                        <AddRule addRule={(rule) =>this.addFirstRule(rule)} storeId={storeId}/>
                          <button onClick={this.toggle}>{`${toggler? "Don't " : ''}Combine Another Rule`}</button>
                         {
                             toggler ?
                                 <>
                                 <div>
                                     <label>
-                                        Choose Compbination:
+                                        Choose Combination:
                                         
-                                        <select  onChange={this.handleChange} name="selectedCombination" className="searchContainer">
-                                            {CombinationsNames.map((combination,index) => <option  value={index}>{combinatorValue}</option>)}
+                                        <select  onChange={this.handleInputChange} name="selectedCombination" className="searchContainer">
+                                            {CombinationsNames.map((combination,index) => <option  value={index}>{combination}</option>)}
                                         </select>
                                     </label>
                                 </div>
-                                <AddRule addRule={(rule) =>this.addSecondRule(rule)}/></>:
+                                <AddRule addRule={(rule) =>this.addSecondRule(rule)} storeId={storeId}/></>:
                                     null
                         }
                         <div><label>Enter Discount</label>
