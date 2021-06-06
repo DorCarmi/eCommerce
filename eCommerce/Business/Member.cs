@@ -77,7 +77,7 @@ namespace eCommerce.Business
             return user.MakeManager(this, store);
         }
 
-        public Result AddPermissionsToManager(User user, Store store, User otherUser, StorePermission permission)
+       /* public Result AddPermissionsToManager(User user, Store store, User otherUser, StorePermission permission)
         {
             return user.AddPermissionsToManager(this,store,otherUser,permission);
         }
@@ -85,7 +85,7 @@ namespace eCommerce.Business
         public Result RemovePermissionsToManager(User user, Store store, User otherUser, StorePermission permission)
         {
             return user.RemovePermissionsToManager(this,store, otherUser,permission);
-        }
+        }*/
 
         public Result UpdatePermissionsToManager(User user, Store store, User otherUser, IList<StorePermission> permissions)
         {

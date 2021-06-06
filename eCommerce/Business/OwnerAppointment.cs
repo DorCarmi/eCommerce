@@ -1,36 +1,45 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using eCommerce.Common;
 
 namespace eCommerce.Business
 {
     public class OwnerAppointment
     {
-        public User User { get; set; }
-        private ConcurrentDictionary<StorePermission,bool> _permissions;
+        [ForeignKey("User")]
+        public String Username;
+        public User User { get; private set; }
+        
+        [ForeignKey("Store")]
+        public String StoreName;
+        public Store Store { get; private set; }
+        public List<StorePermission> _permissions { get; private set; }
 
-        public OwnerAppointment(User user)
+        // for ef
+        public OwnerAppointment()
+        {
+        }
+        
+        public OwnerAppointment(User user, Store store)
         {
             this.User = user;
-            this._permissions = new ConcurrentDictionary<StorePermission, bool>();
+            Username = user.Username;
+            Store = store;
+            StoreName = Store._storeName;
+            this._permissions = new List<StorePermission>();
 
-            foreach (var permission in Enum.GetValues(typeof(StorePermission)))
+            foreach (var permission in Enum.GetValues<StorePermission>())
             {
-                _permissions.TryAdd((StorePermission)permission,true);
+                _permissions.Add(permission);
             }
-            // _permissions.TryAdd(StorePermission.GetStoreHistory,true);
-            // _permissions.TryAdd(StorePermission.AddItemToStore,true);
-            // _permissions.TryAdd(StorePermission.ChangeItemPrice,true);
-            // _permissions.TryAdd(StorePermission.EditItemDetails,true);
-            // _permissions.TryAdd(StorePermission.EditStorePolicy,true);
-            // _permissions.TryAdd(StorePermission.ChangeItemStrategy,true);
-            // _permissions.TryAdd(StorePermission.ControlStaffPermission,true);
         }
 
         public Result HasPermission(StorePermission permission)
         {
-            if(_permissions.ContainsKey(permission))
+            if(_permissions.Find(p => p == permission) != null)
                 return Result.Ok();
             return Result.Fail("Owner does not have the required permission");
         }

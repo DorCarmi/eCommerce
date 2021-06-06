@@ -45,6 +45,7 @@ namespace eCommerce.Business
         //constructors
         public User(string Username)
         {
+            Console.WriteLine("a");
             this.Username = Username;
             _memberInfo = new MemberInfo(Username, null,null,DateTime.Now, null);
             _systemState = Guest.State;
@@ -54,6 +55,8 @@ namespace eCommerce.Business
         }
         public User(MemberInfo MemberInfo)
         {
+            Console.WriteLine("a1");
+
             _isRegistered = true;
             Username = MemberInfo.Username;
             _memberInfo = MemberInfo;
@@ -237,10 +240,10 @@ namespace eCommerce.Business
             return _systemState.UpdatePermissionsToManager(this, store, user, permissions);
         }
 
-        public virtual Result RemovePermissionsToManager(Store store, User user, StorePermission permission)
+       /* public virtual Result RemovePermissionsToManager(Store store, User user, StorePermission permission)
         {
             return _systemState.RemovePermissionsToManager(this, store, user, permission);
-        }
+        }*/
         
         /// <TEST> UserTest.TestUserPurchaseHistory </TEST>
         /// <UC> 'Review purchase history' </UC>
@@ -387,8 +390,9 @@ namespace eCommerce.Business
         public virtual Result OpenStore(Member member, Store store)
         {
             // adds store to both Owned-By and Founded-By
-            OwnerAppointment owner = new OwnerAppointment(this);
+            OwnerAppointment owner = new OwnerAppointment(this, store);
 
+            // TODO clean up if _storesOwned return error
             bool res =_storesFounded.TryAdd(store,true) && _storesOwned.TryAdd(store,owner);
             if (res)
             {
@@ -426,6 +430,7 @@ namespace eCommerce.Business
                     _appointedOwners[store].Add(newOwner);
                 }
             }//release lock
+            // TODO clean up if store return error
             return store.AppointNewOwner(this,newOwner);
         }
 
@@ -460,7 +465,7 @@ namespace eCommerce.Business
 
         public virtual Result<OwnerAppointment> MakeOwner(Member member, Store store)
         {
-            OwnerAppointment newOwner = new OwnerAppointment(this);
+            OwnerAppointment newOwner = new OwnerAppointment(this, store);
             if (_storesOwned.TryAdd(store, newOwner))
             {
                 return Result.Ok<OwnerAppointment>(newOwner);
@@ -470,7 +475,7 @@ namespace eCommerce.Business
 
         public virtual Result<ManagerAppointment> MakeManager(Member member, Store store)
         {
-            ManagerAppointment newManager = new ManagerAppointment(this);
+            ManagerAppointment newManager = new ManagerAppointment(this, store);
             if (!_storesOwned.ContainsKey(store) && _storesManaged.TryAdd(store, newManager))
             {
                 return Result.Ok<ManagerAppointment>(newManager);
@@ -671,7 +676,7 @@ namespace eCommerce.Business
         }
 
 
-        public virtual Result AddPermissionsToManager(Member member, Store store, User otherUser, StorePermission permission)
+        /*public virtual Result AddPermissionsToManager(Member member, Store store, User otherUser, StorePermission permission)
         {
             ManagerAppointment manager = null;
             var res = FindCoManager(store, otherUser);
@@ -699,7 +704,7 @@ namespace eCommerce.Business
                 }
             }
             return Result.Fail("user\'"+Username+"\' can not remove permissions from given manager");
-        }
+        }*/
 
 
         public virtual Result UpdatePermissionsToManager(Member member, Store store, User otherUser,

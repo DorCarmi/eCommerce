@@ -15,8 +15,8 @@ namespace eCommerce.Business
         Result AppointUserToManager(User user,Store store, User otherUser);
         Result<OwnerAppointment> MakeOwner(User user,Store store);
         Result<ManagerAppointment> MakeManager(User user,Store store);
-        Result AddPermissionsToManager(User user,Store store, User otherUser, StorePermission permission);
-        Result RemovePermissionsToManager(User user,Store store, User otherUser, StorePermission permission);
+        /*Result AddPermissionsToManager(User user,Store store, User otherUser, StorePermission permission);
+        Result RemovePermissionsToManager(User user,Store store, User otherUser, StorePermission permission);*/
         Result UpdatePermissionsToManager(User user, Store store, User otherUser, IList<StorePermission> permissions);
         public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user);
         public Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, User otherUser);

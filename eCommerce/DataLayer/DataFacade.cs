@@ -32,6 +32,26 @@ namespace eCommerce.DataLayer
             return Result.Ok();
         }
         
+        public Result UpdateUser(User user)
+        {
+            using (var db = new ECommerceContext())
+            {
+                try
+                { 
+                    db.Update(user);
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);   
+                    return Result.Fail("Unable to Update User");
+                    // add logging here
+                }
+
+            }
+            return Result.Ok();
+        }
+        
         public Result<User> ReadUser(string username)
         {
             User user = null;
@@ -68,6 +88,7 @@ namespace eCommerce.DataLayer
                 { 
                     db.Add(store);
                     db.Entry(store._founder).State = EntityState.Unchanged;
+                    db.Entry(store._ownersAppointments).State = EntityState.Modified;
                     db.SaveChanges();
                 }
                 catch (Exception e)
