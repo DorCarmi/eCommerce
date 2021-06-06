@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 using eCommerce.Common;
+using eCommerce.DataLayer;
 using eCommerce.Publisher;
 
 namespace eCommerce.Business
@@ -31,6 +32,20 @@ namespace eCommerce.Business
                 _memberInfo = value;
             }
         }
+
+        public virtual List<Pair<Store, OwnerAppointment>> storesOwnedBackup 
+        { get; set; }
+        // {
+        //     get
+        //     {
+        //         return syncFromDict(_storesOwned);
+        //     }
+        //     set
+        //     {
+        //         syncToDict(_storesOwned, value);
+        //     }
+        // }
+        
         private ICart _myCart;
         private Object dataLock;
         //MemberData:
@@ -43,9 +58,14 @@ namespace eCommerce.Business
         
 
         //constructors
+        public User()
+        {
+            _isRegistered = false;
+            dataLock = new Object();
+        }
+        
         public User(string Username)
         {
-            Console.WriteLine("a");
             this.Username = Username;
             _memberInfo = new MemberInfo(Username, null,null,DateTime.Now, null);
             _systemState = Guest.State;
@@ -55,8 +75,6 @@ namespace eCommerce.Business
         }
         public User(MemberInfo MemberInfo)
         {
-            Console.WriteLine("a1");
-
             _isRegistered = true;
             Username = MemberInfo.Username;
             _memberInfo = MemberInfo;
@@ -778,7 +796,36 @@ namespace eCommerce.Business
 
     #endregion
 
+    
+    #region DAL Oriented Functions
 
+    public List<Pair<Store, V>> syncFromDict<V>(IDictionary<Store,V> dict)
+    {
+        if (dict == null)
+            return new List<Pair<Store, V>>();
+        
+        Console.WriteLine("getting pairs!");
+        List<Pair<Store, V>> list = new List<Pair<Store, V>>();
+        lock (dataLock)
+        {
+            foreach (Store key in dict.Keys)
+            {
+                list.Add(new Pair<Store, V>(){Key = key, KeyId = key.StoreName, Value = dict[key], HolderId = this.Username});
+            }
+        }
+        return list;
+    }
+    
+    public void syncToDict<V>(IDictionary<Store,V> dict, List<Pair<Store,V>> list)
+    {
+        Console.WriteLine("setting pairs!");
+        foreach (Pair<Store,V> p in list)
+        {
+            dict.TryAdd(p.Key, p.Value);
+        }
+    }
+
+    #endregion
     
     }
     
