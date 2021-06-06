@@ -1,7 +1,7 @@
 ﻿import React, {Component} from "react";
 import "./Register.css"
 import {StoreApi} from '../Api/StoreApi'
-import {withRouter} from "react-router-dom";
+import {Redirect, withRouter} from "react-router-dom";
 import {
     makeRuleNodeComposite, makeRuleNodeLeaf
 } from '../Data/StorePolicies/RuleInfo'
@@ -21,6 +21,7 @@ class AddPolicy extends Component {
             toggler:false,
             firstRule:undefined,
             secondRule:undefined,
+            submitted:false
         }
         this.storeApi = new StoreApi();
 
@@ -53,7 +54,9 @@ class AddPolicy extends Component {
 
             if(res && res.isSuccess) {
                 alert('add discount succeed')
-                this.redirectToHome(`/store/${storeId}`)
+                this.setState({
+                    submitted:true
+                })
             }
             else{
                 if(res) {
@@ -95,10 +98,13 @@ class AddPolicy extends Component {
         });
     }
     render () {
-        const {toggler,items} = this.state
+        const {toggler,items,submitted} = this.state
         const {storeId} = this.props
         const combinatorValue = CombinationsNames[this.state.selectedCombination]
-
+        if(submitted){
+            return <Redirect exact to="/"/>
+        }
+        else{
         return (
             // <main className="RegisterMain">
                 <div className="RegisterWindow">
@@ -132,6 +138,6 @@ class AddPolicy extends Component {
             // </main>
         );
     }
-}
+}}
 
 export default withRouter(AddPolicy);
