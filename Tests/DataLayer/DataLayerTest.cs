@@ -17,7 +17,7 @@ namespace Tests.DataLayer
             df = new DataFacade();
             var info = new MemberInfo("Ja Morant", "ja@mail.com", "Ja", DateTime.Now, "Memphis");
             info.Id = "12";
-            _ja = new User(info);
+            _ja = new User(Member.State, info);
         }
 
         [Test]
@@ -38,7 +38,10 @@ namespace Tests.DataLayer
         [Order(3)]
         public void SaveStoreTest()
         {
+            User founder = df.ReadUser(_ja.Username).Value;
             var store = new Store("Store", df.ReadUser(_ja.Username).Value);
+            //Assert.True(df.SaveUser(founder).IsSuccess);
+            founder.OpenStore(store);
             Assert.True(df.SaveStore(store).IsSuccess);
         }
     }
