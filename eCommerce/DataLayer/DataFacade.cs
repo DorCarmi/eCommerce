@@ -8,16 +8,32 @@ namespace eCommerce.DataLayer
 {
     public class DataFacade
     {
+        private ECommerceContext db;
+
+        public void init()
+        {
+            try
+            {
+
+                db = new ECommerceContext();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //add logging
+            }
+        }
 
         public Result SaveUser(User user)
         {
-            user.storesOwnedBackup = user.syncFromDict(user.StoresOwned);
+            // synchronize all fields which arent compatible with EF (all dictionary properties)
+            user.SyncFromBusiness();
+            
             Console.WriteLine("Inserting a new User");
-            using (var db = new ECommerceContext())
+            //using (var db = new ECommerceContext())
             {
                 try
                 {
-                    
                     db.Add(user);
                     Console.WriteLine("Inserting a new User!!!");
                     db.SaveChanges();
@@ -35,11 +51,12 @@ namespace eCommerce.DataLayer
         
         public Result UpdateUser(User user)
         {
-            using (var db = new ECommerceContext())
+            //using (var db = new ECommerceContext())
             {
                 try
-                { 
-                    db.Update(user);
+                {
+                    // db.Update(user);
+                    user.SyncFromBusiness();
                     db.SaveChanges();
                 }
                 catch (Exception e)
@@ -56,7 +73,7 @@ namespace eCommerce.DataLayer
         public Result<User> ReadUser(string username)
         {
             User user = null;
-            using (var db = new ECommerceContext())
+            //using (var db = new ECommerceContext())
             {
                 try
                 {
@@ -88,6 +105,7 @@ namespace eCommerce.DataLayer
                         .Include(u=> u.appointedManagersBackup)
                         .ThenInclude(p => p.ValList)
                         .ThenInclude(m => m.User)
+                        .SingleOrDefault(u => u.Username == username);
 
                     if (user == null)
                     {
@@ -102,13 +120,15 @@ namespace eCommerce.DataLayer
                     // add logging here
                 }
             }
+            // synchronize all fields which arent compatible with EF (all dictionary properties) 
             user.SyncToBusiness();
             return Result.Ok<User>(user);
         }
         
+        
         public Result SaveStore(Store store)
         {
-            using (var db = new ECommerceContext())
+            //using (var db = new ECommerceContext())
             {
                 try
                 { 
@@ -130,58 +150,20 @@ namespace eCommerce.DataLayer
             return Result.Ok();
         }
         
-        public Result DoSomething(string username)
-        {
-            User user1 = null;
-            
-            User user2 = null;
-
-            using (var db = new ECommerceContext())
-            {
-                try
-                {
-                    Console.WriteLine("fetching saved User1");
-                    user1 = db.Users
-                        .Include(u => u.MemberInfo)
-                        .Where(u => u.Username == username)
-                        .SingleOrDefault();
-                    Console.WriteLine("fetching saved User2");
-                    user2 = db.Users
-                        .Include(u => u.MemberInfo)
-                        .Where(u => u.Username == username)
-                        .SingleOrDefault();
-                    if(user1 != user2)
-                        return Result.Fail("user instances are not equal");
-                    Console.WriteLine("are equal? {0}",user1 == user2);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    return Result.Fail("Unable to read User");
-                    // add logging here
-                }
-                
-            }
-            return Result.Ok();
-        }
-
         public Result ClearTables()
         {
-            using (var db = new ECommerceContext())
+            try
             {
-                try
-                {
-                    Console.WriteLine("clearing DB!");
-                    db.Database.EnsureDeleted();
-                    db.Database.EnsureCreated();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    return Result.Fail("Unable to read User");
-                    // add logging here
-                }
-                
+                db = new ECommerceContext();
+                Console.WriteLine("clearing DB!");
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Result.Fail("Unable to read User");
+                // add logging here
             }
             return Result.Ok();
         }

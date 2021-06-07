@@ -241,10 +241,12 @@ namespace eCommerce.Business
             return _systemState.UpdatePermissionsToManager(this, store, user, permissions);
         }
 
-        public virtual Result RemovePermissionsToManager(Store store, User user, StorePermission permission)
-        {
-            return _systemState.RemovePermissionsToManager(this, store, user, permission);
-        }
+        /* @Deprecated */
+        // public virtual Result RemovePermissionsToManager(Store store, User user, StorePermission permission)
+        // {
+        //     return _systemState.RemovePermissionsToManager(this, store, user, permission);
+        // }
+        //
         
         /// <TEST> UserTest.TestUserPurchaseHistory </TEST>
         /// <UC> 'Review purchase history' </UC>

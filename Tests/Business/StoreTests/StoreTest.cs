@@ -49,8 +49,8 @@ namespace Tests.Business.StoreTests
         [Test]
         public void TestUsersInStore()
         {
-            ManagerAppointment managerAppointment = new ManagerAppointment(Bob, MyStore);
-            OwnerAppointment ownerAppointment = new OwnerAppointment(Bob, MyStore);
+            ManagerAppointment managerAppointment = new ManagerAppointment(Bob, MyStore.StoreName);
+            OwnerAppointment ownerAppointment = new OwnerAppointment(Bob, MyStore.StoreName);
             var manager = this.MyStore.AppointNewManager(Alice, managerAppointment);
             var owner = this.MyStore.AppointNewOwner(Alice, ownerAppointment);
             
