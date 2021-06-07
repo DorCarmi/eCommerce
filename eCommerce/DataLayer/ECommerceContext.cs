@@ -11,9 +11,11 @@ namespace eCommerce.DataLayer
         public DbSet<MemberInfo> MemberInfos { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<OwnerAppointment> OwnerAppointments { get; set; }
-        // public DbSet<ManagerAppointment> ManagerAppointments { get; set; }
+        public DbSet<ManagerAppointment> ManagerAppointments { get; set; }
         public DbSet<Pair<Store,OwnerAppointment>> OwnedStores { get; set; }
-        public DbSet<ListPair<Classroom,Course>> ListPairs { get; set; }
+        public DbSet<Pair<Store,ManagerAppointment>> ManagedStores { get; set; }
+        public DbSet<ListPair<Store,OwnerAppointment>> AppointedOwners { get; set; }
+        public DbSet<ListPair<Store,ManagerAppointment>> AppointedManagers { get; set; }
 
         public DbSet<Store> Stores { get; set; }
         public DbSet<Item> Items { get; set; }
@@ -27,13 +29,32 @@ namespace eCommerce.DataLayer
         
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<ListPair<Classroom,Course>>()
-                .HasKey(p => new {p.HolderId, p.KeyId});
+            //set composite Primary-Key for entities of type OwnerAppointment
+            builder.Entity<OwnerAppointment>()
+                .HasKey(o => new {o.Ownername, o.OwnedStorename});
+            
+            //set composite Primary-Key for entities of type ManagerAppointment
+            builder.Entity<ManagerAppointment>()
+                .HasKey(o => new {o.Managername, o.ManagedStorename});
+            
+            //set composite Primary-Key for every entity of type Pair<Store,OwnerAppointment>
             builder.Entity<Pair<Store,OwnerAppointment>>()
                 .HasKey(p => new {p.HolderId, p.KeyId});
-            builder.Entity<OwnerAppointment>()
-                .HasKey(o => new {o.Username, o.Storename});
             
+            //set composite Primary-Key for every entity of type Pair<Store,ManagerAppointment>
+            builder.Entity<Pair<Store,ManagerAppointment>>()
+                .HasKey(p => new {p.HolderId, p.KeyId});
+            
+            //set composite Primary-Key for every entity of type Pair<Store,OwnerAppointment>
+            builder.Entity<ListPair<Store,OwnerAppointment>>()
+                .HasKey(p => new {p.HolderId, p.KeyId});
+            
+            //set composite Primary-Key for every entity of type Pair<Store,ManagerAppointment>
+            builder.Entity<ListPair<Store,ManagerAppointment>>()
+                .HasKey(p => new {p.HolderId, p.KeyId});
+            
+            
+            //set composite Primary-Key for entities of type Item
             builder.Entity<Item>()
                 .HasKey(p => new {p._name, p.StoreId});
         }
@@ -51,7 +72,6 @@ namespace eCommerce.DataLayer
     {
         public string KeyId { get; set; }
         public K Key { get; set; }
-        // public int ValueId { get; set; }
         public V Value { get; set; }
         public string HolderId { get; set; }
     }

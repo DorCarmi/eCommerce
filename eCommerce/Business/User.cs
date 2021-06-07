@@ -33,18 +33,6 @@ namespace eCommerce.Business
             }
         }
 
-        public virtual List<Pair<Store, OwnerAppointment>> storesOwnedBackup 
-        { get; set; }
-        // {
-        //     get
-        //     {
-        //         return syncFromDict(_storesOwned);
-        //     }
-        //     set
-        //     {
-        //         syncToDict(_storesOwned, value);
-        //     }
-        // }
         
         private ICart _myCart;
         private Object dataLock;
@@ -58,12 +46,7 @@ namespace eCommerce.Business
         
 
         //constructors
-        public User()
-        {
-            _isRegistered = false;
-            dataLock = new Object();
-        }
-        
+
         public User(string Username)
         {
             this.Username = Username;
@@ -491,7 +474,7 @@ namespace eCommerce.Business
 
         public virtual Result<ManagerAppointment> MakeManager(Member member, Store store)
         {
-            ManagerAppointment newManager = new ManagerAppointment(this);
+            ManagerAppointment newManager = new ManagerAppointment(this, store.StoreName);
             if (!_storesOwned.ContainsKey(store) && _storesManaged.TryAdd(store, newManager))
             {
                 return Result.Ok<ManagerAppointment>(newManager);
@@ -791,35 +774,127 @@ namespace eCommerce.Business
     public ConcurrentDictionary<Store, IList<OwnerAppointment>> AppointedOwners => _appointedOwners;
     public ConcurrentDictionary<Store, ManagerAppointment> StoresManaged => _storesManaged;
     public ConcurrentDictionary<Store, OwnerAppointment> StoresOwned => _storesOwned;
+    public ConcurrentDictionary<Store, bool> StoresFounded => _storesFounded;
 
     #endregion
 
     
     #region DAL Oriented Functions
 
-    public List<Pair<Store, V>> syncFromDict<V>(IDictionary<Store,V> dict)
+    public virtual List<Store> storesFoundedBackup { get; set; }
+    public virtual List<Pair<Store, OwnerAppointment>> storesOwnedBackup 
+    { get; set; }
+    public virtual List<Pair<Store, ManagerAppointment>> storesManagedBackup 
+    { get; set; }
+    public virtual List<ListPair<Store, OwnerAppointment>> appointedOwnersBackup { get; set; }
+    public virtual List<ListPair<Store, ManagerAppointment>> appointedManagersBackup { get; set; }
+
+
+    public User()
     {
-        if (dict == null)
-            return new List<Pair<Store, V>>();
-        
-        Console.WriteLine("getting pairs!");
-        List<Pair<Store, V>> list = new List<Pair<Store, V>>();
-        lock (dataLock)
-        {
-            foreach (Store key in dict.Keys)
-            {
-                list.Add(new Pair<Store, V>(){Key = key, KeyId = key.StoreName, Value = dict[key], HolderId = this.Username});
-            }
-        }
-        return list;
+        _isRegistered = false;
+        dataLock = new Object();
+        _systemState = Member.State;
+        _storesFounded = new ConcurrentDictionary<Store, bool>();
+        _storesOwned = new ConcurrentDictionary<Store, OwnerAppointment>();
+        _storesManaged = new ConcurrentDictionary<Store, ManagerAppointment>();
+        _appointedOwners = new ConcurrentDictionary<Store, IList<OwnerAppointment>>();
+        _appointedManagers = new ConcurrentDictionary<Store, IList<ManagerAppointment>>();
+        _transHistory = new UserTransactionHistory();
     }
-    
-    public void syncToDict<V>(IDictionary<Store,V> dict, List<Pair<Store,V>> list)
+
+    public void SyncToBusiness()
     {
         Console.WriteLine("setting pairs!");
-        foreach (Pair<Store,V> p in list)
+
+        if(storesFoundedBackup != null)
         {
-            dict.TryAdd(p.Key, p.Value);
+            foreach (Store store in storesFoundedBackup)
+            {
+                StoresFounded.TryAdd(store, true);
+            }
+        }
+        
+        if(storesOwnedBackup != null)
+        {
+            foreach (Pair<Store, OwnerAppointment> p in storesOwnedBackup)
+            {
+                StoresOwned.TryAdd(p.Key, p.Value);
+            }
+        }
+
+        if (storesManagedBackup != null)
+        {
+            foreach (Pair<Store, ManagerAppointment> p in storesManagedBackup)
+            {
+                p.Value.syncToDict();
+                StoresManaged.TryAdd(p.Key, p.Value);
+            }
+        }
+
+        if (appointedOwnersBackup != null)
+        {
+            foreach (ListPair<Store, OwnerAppointment> p in appointedOwnersBackup)
+            {
+                AppointedOwners.TryAdd(p.Key, p.ValList);
+            }
+        }
+
+        if (appointedManagersBackup != null)
+        {
+            foreach (ListPair<Store, ManagerAppointment> p in appointedManagersBackup)
+            {
+                foreach (var manager in p.ValList)
+                {
+                    manager.syncToDict();
+                }
+                AppointedManagers.TryAdd(p.Key, p.ValList);
+            }
+        }
+        
+    }
+    
+    
+    public void SyncFromBusiness()
+    {
+        Console.WriteLine("getting pairs!");
+        lock (dataLock)
+        {
+            storesFoundedBackup = new List<Store>(_storesFounded.Keys);
+            
+            storesOwnedBackup = new List<Pair<Store, OwnerAppointment>>();
+            foreach (Store key in StoresOwned.Keys)
+            {
+                storesOwnedBackup.Add(new Pair<Store, OwnerAppointment>(){Key = key,KeyId = key.StoreName, Value = StoresOwned[key], HolderId = this.Username});
+            }
+
+            storesManagedBackup = new List<Pair<Store, ManagerAppointment>>();
+            foreach (Store key in StoresManaged.Keys)
+            {
+                var val = StoresManaged[key];
+                val.syncFromDict();
+                storesManagedBackup.Add(new Pair<Store, ManagerAppointment>(){Key = key,KeyId = key.StoreName, Value = val, HolderId = this.Username});
+            }
+
+            appointedOwnersBackup = new List<ListPair<Store,OwnerAppointment>>();
+            foreach (Store key in AppointedOwners.Keys)
+            {
+                appointedOwnersBackup.Add(new ListPair<Store, OwnerAppointment>(){Key = key,KeyId = key.StoreName, ValList = new List<OwnerAppointment>(AppointedOwners[key]), HolderId = this.Username});
+            }
+
+            appointedManagersBackup = new List<ListPair<Store,ManagerAppointment>>();
+            foreach (Store key in AppointedManagers.Keys)
+            {
+                var managers = new List<ManagerAppointment>(AppointedManagers[key]);
+
+                foreach (var manager in managers)
+                {
+                    manager.syncFromDict();
+                }
+                appointedManagersBackup.Add(new ListPair<Store, ManagerAppointment>(){Key = key,KeyId = key.StoreName, ValList = managers, HolderId = this.Username});
+            }
+
+            
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using eCommerce.Business;
 using eCommerce.DataLayer;
 using NUnit.Framework;
@@ -12,24 +13,34 @@ namespace Tests.DataLayer
     public class DataLayerTest
     {
         private DataFacade df;
-        private User _ja;
+        private User ja;
+        private User jaren;
         private Store store1;
         private Store store2;
        
         public DataLayerTest()
         {
             df = new DataFacade();
-            var info = new MemberInfo("Ja Morant", "ja@mail.com", "Ja", DateTime.Now, "Memphis");
-            info.Id = "12";
-            
-            store1= new Store("BasketBall stuff.. buy here",_ja);
-            store2= new Store("More(!) BasketBall stuff.. buy here",_ja);
-            _ja = new User(info);
+            df.init();
         }
+
+        
 
         [SetUp]
         public void Setup()
         {
+            // set up business users and stores
+            var info1 = new MemberInfo("Ja Morant", "ja@mail.com", "Ja", DateTime.Now, "Memphis");
+            info1.Id = "12";
+            var info2 = new MemberInfo("Jaren Jackson Jr.", "jjj@mail.com", "Jaren", DateTime.Now, "Memphis");
+            info2.Id = "13";
+
+            ja = new User(info1);
+            jaren = new User(info2);
+            store1= new Store("BasketBall stuff.. buy here",ja);
+            store2= new Store("More(!) BasketBall stuff.. buy here",ja);
+
+            //clear DB
             df.ClearTables();
         }
 
@@ -37,7 +48,7 @@ namespace Tests.DataLayer
         [Order(1)]
         public void SaveUserTest()
         {
-            Assert.True(df.SaveUser(_ja).IsSuccess);
+            Assert.True(df.SaveUser(ja).IsSuccess);
         }
         
         [Test]
@@ -45,7 +56,52 @@ namespace Tests.DataLayer
         public void ReadUserTest()
         {
             SaveUserTest();
-            Assert.True(df.ReadUser(_ja.Username).IsSuccess);
+            Assert.True(df.ReadUser(ja.Username).IsSuccess);
+        }
+
+        [Test]
+        public void SaveUserWithStoreTest_Fail()
+        {
+            // incorrect order of operations. correct order is
+            // create user > save user
+            // save founder & save store > founder.open(Store)
+            // save co-owner > owner.appoint(co-owner)  ...  (same for manager)
+            // update user at any time (after save)
+            
+            var store3= new Store("EVEN MORE!! BasketBall stuff.. buy here",ja);
+            var store4= new Store("ok we had too much BasketBall stuff.. buy here",ja);
+            ja.OpenStore(store1);
+            ja.OpenStore(store2);
+            ja.OpenStore(store3);
+            ja.OpenStore(store4);
+            ja.AppointUserToManager(store1,jaren);
+            ja.AppointUserToManager(store2,jaren);
+            ja.AppointUserToOwner(store3, jaren);
+            ja.AppointUserToOwner(store4, jaren);
+            var prems = new List<StorePermission>() {StorePermission.ChangeItemPrice, StorePermission.ControlStaffPermission, StorePermission.EditStorePolicy, StorePermission.AddItemToStore};
+            ja.UpdatePermissionsToManager(store2,jaren, prems);
+            Assert.True(df.SaveUser(ja).IsSuccess);
+            Assert.True(df.SaveUser(jaren).IsFailure);
+            
+        } [Test]
+        public void SaveUserWithStoreTest_Success()
+        {
+            Assert.True(df.SaveUser(ja).IsSuccess);
+            var store3= new Store("EVEN MORE!! BasketBall stuff.. buy here",ja);
+            var store4= new Store("ok we had too much BasketBall stuff.. buy here",ja);
+            ja.OpenStore(store1);
+            ja.OpenStore(store2);
+            ja.OpenStore(store3);
+            ja.OpenStore(store4);
+            Assert.True(df.SaveUser(jaren).IsSuccess);
+            ja.AppointUserToManager(store1,jaren);
+            ja.AppointUserToManager(store2,jaren);
+            ja.AppointUserToOwner(store3, jaren);
+            ja.AppointUserToOwner(store4, jaren);
+            var prems = new List<StorePermission>() {StorePermission.ChangeItemPrice, StorePermission.ControlStaffPermission, StorePermission.EditStorePolicy, StorePermission.AddItemToStore};
+            ja.UpdatePermissionsToManager(store2,jaren, prems);
+            Assert.True(df.UpdateUser(ja).IsSuccess);
+            Assert.True(df.UpdateUser(jaren).IsSuccess);
         }
 
         [Test]
@@ -53,25 +109,20 @@ namespace Tests.DataLayer
         public void SaveStoreTest()
         {
             SaveUserTest();
-            var store = new Store("Store", df.ReadUser(_ja.Username).Value);
+            var store = new Store("Store", df.ReadUser(ja.Username).Value);
             Assert.True(df.SaveStore(store).IsSuccess);
         }
 
 
         [Test]
-        public void aTest()
+        public void ReadUserWithStoreTest()
         {
-            _ja.OpenStore(store1);
-            _ja.OpenStore(store2);
-            Assert.True(df.SaveUser(_ja).IsSuccess);
+            SaveUserWithStoreTest_Success();
+            var username = ja.Username;
+            var res = df.ReadUser(username);
+            Assert.True(res.IsSuccess);
         }
-
-        [Test]
-        public void bTest()
-        {
-            var username = "Ja Morant";
-            Assert.True(df.DoSomething(username).IsSuccess);
-        }
+        
 
 
     }
