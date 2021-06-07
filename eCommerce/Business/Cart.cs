@@ -162,5 +162,15 @@ namespace eCommerce.Business
 
             return allItems;
         }
+
+        public void Free()
+        {
+            foreach (var basket in _baskets)
+            {
+                basket.Value.Free();
+            }
+
+            this._baskets.Clear();
+        }
     }
 }

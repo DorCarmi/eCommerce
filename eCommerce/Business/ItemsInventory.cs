@@ -106,23 +106,17 @@ namespace eCommerce.Business
         }
 
 
-        public Result AddExistingItem(IUser user,string itemName, int amount)
+        public Result AddExistingItem(string itemName, int amount)
         {
-            if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
+            if (this._nameToItem.ContainsKey(itemName))
             {
-                if (this._nameToItem.ContainsKey(itemName))
-                {
-                    return this._nameToItem[itemName].AddItems(user, amount);
-                }
-                else
-                {
-                    return Result.Fail("Item doesn't exist in store");
-                }
+                return this._nameToItem[itemName].AddItems(amount);
             }
             else
             {
-                return Result.Fail("User doesn't have permission to add item to store");
+                return Result.Fail("Item doesn't exist in store");
             }
+            
         }
 
 

@@ -102,6 +102,11 @@ namespace eCommerce.Business
             
             foreach (var owner in _ownersAppointments)
             {
+                if (owner.User == _founder)
+                {
+                    continue;
+                    //Founder permissions alone, next in this code
+                }
                 List<StorePermission> ownerPerm = new List<StorePermission>();
                 foreach (var perm in Enum.GetValues(typeof(StorePermission)).Cast<StorePermission>())
                 {
@@ -310,14 +315,19 @@ namespace eCommerce.Business
             }
             else
             {
-                if (this._inventory.GetItem(newItem).IsFailure)
-                {
-                    return Result.Fail("Item doesn't exist in store");
-                }
-                else
-                {
-                    return this._inventory.AddExistingItem(user, newItem.name, newItem.amount);
-                }
+                return TheStockUpdate_Add(newItem);
+            }
+        }
+
+        private Result TheStockUpdate_Add(ItemInfo newItem)
+        {
+            if (this._inventory.GetItem(newItem).IsFailure)
+            {
+                return Result.Fail("Item doesn't exist in store");
+            }
+            else
+            {
+                return this._inventory.AddExistingItem(newItem.name, newItem.amount);
             }
         }
 
@@ -618,6 +628,16 @@ namespace eCommerce.Business
 
             this._myDiscountStrategies = new List<Composite>();
             return Result.Ok();
+        }
+
+        public Result ReturnItemsToStore(ItemInfo itemInfo)
+        {
+            return this.TheStockUpdate_Add(itemInfo);
+        }
+
+        public void FreeBasket(Basket basket)
+        {
+            this._basketsOfThisStore.Remove(basket);
         }
 
         public Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)

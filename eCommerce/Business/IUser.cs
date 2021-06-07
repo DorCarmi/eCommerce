@@ -43,6 +43,7 @@ namespace eCommerce.Business
        
         public UserToSystemState GetState();
         Result<ManagerAppointment> RemoveManager(IStore store);
+        void FreeCart();
     }
 
     

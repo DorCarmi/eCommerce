@@ -25,5 +25,6 @@ namespace eCommerce.Business
 
         public IUser GetUser();
         IList<ItemInfo> GetAllItems();
+        void Free();
     }
 }

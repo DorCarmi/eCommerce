@@ -32,6 +32,24 @@ namespace eCommerce.Business
             return _store.CheckWithStorePolicy(this, _cart.GetUser());
         }
 
+        public Result ReturnAllItemsToStore()
+        {
+            foreach (var itemInfo in _itemsInBasket)
+            {
+                var res=this._store.ReturnItemsToStore(itemInfo);
+                if (res.IsFailure)
+                {
+                    return res;
+                }
+            }
+            return Result.Ok();
+        }
+
+        public void Free()
+        {
+            this._store.FreeBasket(this);
+        }
+
         public Basket(ICart cart, IStore store)
         {
             if (!store.CheckConnectionToCart(cart))

@@ -283,6 +283,12 @@ namespace eCommerce.Business
             return _systemState.RemoveManager(this, store);
         }
 
+        public void FreeCart()
+        {
+            this._myCart.Free();
+            this._myCart = new Cart(this);
+        }
+
         public Result AnnexStakeholders(IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
             return _systemState.AnnexStakeholders(this,store,owners,managers);

@@ -121,6 +121,11 @@ namespace Tests.Business.Mokups
             throw new NotImplementedException();
         }
 
+        public void FreeCart()
+        {
+            throw new NotImplementedException();
+        }
+
         public Result AnnexStakeholders(IStore store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
             throw new NotImplementedException();

@@ -232,7 +232,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result AddItems(IUser user,int amount)
+        public Result AddItems(int amount)
         {
             if (amount > 0)
             {

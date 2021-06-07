@@ -88,7 +88,7 @@ namespace Tests.Business.StoreTests
             
             
             int amount = item1.GetAmount();
-            item1.AddItems(alice, 80);
+            item1.AddItems(80);
             Assert.AreEqual(amount+80,item1.GetAmount());
             Assert.AreEqual(amount + 80, item1.ShowItem().amount);
             

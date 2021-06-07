@@ -56,5 +56,10 @@ namespace Tests.Business.Mokups
         {
             throw new System.NotImplementedException();
         }
+
+        public void Free()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

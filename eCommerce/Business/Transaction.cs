@@ -27,7 +27,8 @@ namespace eCommerce.Business
                 var res = basket.CheckWithStorePolicy();
                 if (res.IsFailure)
                 {
-                    return res;
+                    return Result.Fail("<Policy>"+res.Error);
+                    
                 }
             }
             
@@ -41,6 +42,9 @@ namespace eCommerce.Business
                 }
             }
             //Finish buying items
+            //$$$$$$$$$$$
+            //Change 1: items stock
+            //$$$$$$$$$$$
             foreach (var basket in this._cart.GetBaskets())
             {
                 var res = basket.BuyWholeBasket();
@@ -58,25 +62,24 @@ namespace eCommerce.Business
 
             if (totalPriceForAllBaskets <= 0)
             {
+                //retrieve ItemsToStock
                 return Result.Fail("<TotalPrice>Problem with calculating prices: can't charge negative price");
             }
-
-            var paymentInfoRes = _payment.CheckPaymentInfo(paymentInfo.UserName, paymentInfo.IdNumber,
-                paymentInfo.CreditCardNumber, paymentInfo.CreditCardExpirationDate,
-                paymentInfo.ThreeDigitsOnBackOfCard);
-            paymentInfoRes.Wait();
-            if (!paymentInfoRes.Result)
-            {
-                return Result.Fail("<PaymentInfo>Payment info found incorrect by payment system");
-            }
             
+            
+            //$$$$$$$$$$$
+            //Change 2: Pay
+            //$$$$$$$$$$$
             var payTask=this._payment.Charge(totalPriceForAllBaskets, paymentInfo.UserName, paymentInfo.IdNumber,
                 paymentInfo.CreditCardNumber, paymentInfo.CreditCardExpirationDate,
                 paymentInfo.ThreeDigitsOnBackOfCard);
             payTask.Wait();
             if (!payTask.Result)
             {
-                //Undo get all items
+                foreach (var basket in _cart.GetBaskets())
+                {
+                    basket.ReturnAllItemsToStore();
+                }
                 return Result.Fail("<Payment>Payment process didn't succeed");
             }
 
@@ -88,64 +91,38 @@ namespace eCommerce.Business
                     itemNames.Add(item.name);
                 }
 
-                var supplyInfoCheck =
-                    _supply.CheckSupplyInfo(basket.GetStoreName(), itemNames.ToArray(), paymentInfo.FullAddress);
-                supplyInfoCheck.Wait();
-                if (!supplyInfoCheck.Result)
+                var supply =
+                    _supply.SupplyProducts(basket.GetStoreName(), itemNames.ToArray(), paymentInfo.FullAddress);
+                supply.Wait();
+                if (!supply.Result)
                 {
                     this._payment.Refund(totalPriceForAllBaskets, paymentInfo.UserName, paymentInfo.IdNumber,
                         paymentInfo.CreditCardNumber, paymentInfo.CreditCardExpirationDate,
                         paymentInfo.ThreeDigitsOnBackOfCard);
-                    return Result.Fail("<SupplyInfo>Supply info found incorrect by supply system");
+                    foreach (var basket1 in _cart.GetBaskets())
+                    {
+                        basket.ReturnAllItemsToStore();
+                    }
+                    return Result.Fail("<Supply>Supply info found incorrect by supply system");
                 }
             }
-
-            List<string> supplyProblems = new List<string>();
-            foreach (var basket in this._cart.GetBaskets())
-            {
-                List<string> itemNames = new List<string>();
-                double totalPriceForBasket = basket.GetTotalPrice().Value;
-                foreach (var item in basket.GetAllItems().GetValue())
-                {
-                    itemNames.Add(item.name);
-                }
-
-                
-                var resSup=this._supply.SupplyProducts(basket.GetStoreName(), itemNames.ToArray(), paymentInfo.FullAddress);
-                resSup.Wait();
-                if (!resSup.Result)
-                {
-                    _payment.Refund(totalPriceForBasket, paymentInfo.UserName, paymentInfo.IdNumber,
-                        paymentInfo.CreditCardNumber, paymentInfo.CreditCardExpirationDate,
-                        paymentInfo.ThreeDigitsOnBackOfCard);
-                    supplyProblems.Add(basket.GetStoreName());
-                }
-            }
+            
 
             foreach (var basket in _cart.GetBaskets())
             {
-                if (supplyProblems.FirstOrDefault(x => x.Equals(basket.GetStoreName())) == null)
+                var res=basket.AddBasketRecords();
+                if (res.IsFailure)
                 {
-                    basket.AddBasketRecords();
+                    return res;
                 }
             }
 
-            if (supplyProblems.Count > 0)
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append("<Supply>Some of the stores had problems with supply. Stores are: ");
-                foreach (var supplyProblem in supplyProblems)
-                {
-                    stringBuilder.Append(supplyProblem + ", ");
-                }
-
-                stringBuilder.Append(".");
-                return Result.Fail(stringBuilder.ToString());
-            }
+            this._cart.GetUser().FreeCart();
 
             return Result.Ok();
-
-
+            
         }
+
+        
     }
 }

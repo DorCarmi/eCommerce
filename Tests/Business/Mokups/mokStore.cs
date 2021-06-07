@@ -225,6 +225,16 @@ namespace Tests.Business.Mokups
             throw new NotImplementedException();
         }
 
+        public Result ReturnItemsToStore(ItemInfo itemInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void FreeBasket(Basket basket)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy)
         {
             throw new NotImplementedException();

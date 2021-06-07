@@ -15,6 +15,7 @@ namespace eCommerce.Business
         {
             this._storeInfo = new StoreInfo(store);
             this._basketInfo = new BasketInfo(basket);
+            this._username = basket.GetCart().GetUser().Username;
             this._dateTime = now;
         }
 

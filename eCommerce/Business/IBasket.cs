@@ -22,5 +22,7 @@ namespace eCommerce.Business
         public Result AddBasketRecords();
         public double GetRegularTotalPrice();
         Result CheckWithStorePolicy();
+        Result ReturnAllItemsToStore();
+        void Free();
     }
 }

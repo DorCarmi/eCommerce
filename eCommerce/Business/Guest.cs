@@ -103,7 +103,7 @@ namespace eCommerce.Business
 
         public Result EnterRecordToHistory(User user, PurchaseRecord record)
         {
-            return Result.Fail("Guest has no transaction-history.");
+            return Result.Ok();
         }
 
         public Result<IList<IUser>> GetAllStoreStakeholders(User user, IStore store)

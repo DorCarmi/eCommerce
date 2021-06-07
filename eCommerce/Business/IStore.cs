@@ -91,5 +91,7 @@ namespace eCommerce.Business.Service
 
         Result ResetStorePolicy(IUser user);
         Result ResetStoreDiscount(IUser user);
+        Result ReturnItemsToStore(ItemInfo itemInfo);
+        void FreeBasket(Basket basket);
     }
 }
