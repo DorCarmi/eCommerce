@@ -34,11 +34,12 @@ namespace eCommerce.Business
 
         //User issues
         public User _founder { get; private set; }
-        private List<OwnerAppointment> _ownersAppointments;
-        private List<ManagerAppointment> _managersAppointments;
+        public List<OwnerAppointment> _ownersAppointments { get; private set; }
+        public List<ManagerAppointment> _managersAppointments { get; private set; }
         
         private List<IBasket> _basketsOfThisStore;
 
+        // for ef
         public Store()
         {
         }

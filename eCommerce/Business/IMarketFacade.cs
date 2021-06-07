@@ -122,7 +122,7 @@ namespace eCommerce.Business
         /// <returns>Result of the update</returns>
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions);
         
-        // TODO how to define and send the permission
+        /*// TODO how to define and send the permission
         /// <summary>
         /// Remove the manager permission
         /// </summary>
@@ -132,7 +132,7 @@ namespace eCommerce.Business
         /// <param name="permissions">The updated permission</param>
         /// <returns>Result of the remove</returns>
         public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
-            IList<StorePermission> permissions);
+            IList<StorePermission> permissions);*/
 
 
         /// <summary>

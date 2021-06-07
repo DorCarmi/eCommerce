@@ -213,7 +213,7 @@ namespace eCommerce.Business
         }
         
         //<CNAME>RemoveManagerPermissions</CNAME>
-        public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
+        /*public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
             IList<StorePermission> permissions)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -242,7 +242,7 @@ namespace eCommerce.Business
             }
 
             return Result.Ok();
-        }
+        }*/
         //<CNAME:GetStoreStaff</CNAME>
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(string token,
             string storeId)

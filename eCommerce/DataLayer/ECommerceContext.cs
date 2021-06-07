@@ -59,7 +59,7 @@ namespace eCommerce.DataLayer
                 .HasKey(p => new {p._name, p.StoreId});
         }
     }
-
+    
     public class ListPair<K,V>
     {
         public string KeyId { get; set; }
@@ -75,5 +75,4 @@ namespace eCommerce.DataLayer
         public V Value { get; set; }
         public string HolderId { get; set; }
     }
-
 }

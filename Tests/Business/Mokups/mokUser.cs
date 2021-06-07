@@ -146,10 +146,10 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public override Result RemovePermissionsToManager(Store store, User user, StorePermission permission)
+        /*public override Result RemovePermissionsToManager(Store store, User user, StorePermission permission)
         {
             throw new System.NotImplementedException();
-        }
+        }*/
 
         public override Result<IList<User>> GetAllStoreStakeholders(Member member, Store store)
         {
