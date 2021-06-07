@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using eCommerce.Common;
 
 namespace eCommerce.Adapters
 {
@@ -10,6 +11,8 @@ namespace eCommerce.Adapters
         public static int REAL_HITS = 0;
         public static int PROXY_HITS = 0;
         
+        private int _transactionId;
+
         public static void AssignSupplyService(ISupplyAdapter supplyAdapter)
         {
             _adapter = supplyAdapter;
@@ -17,19 +20,22 @@ namespace eCommerce.Adapters
 
         public SupplyProxy()
         {
-            
+            _transactionId = 10000;
+            _adapter = new WSEPSupplyAdapter();
         }
 
-        public async Task<bool> SupplyProducts(string storeName, string[] itemsNames, string userAddress)
+        public async Task<Result<int>> SupplyProducts(string storeName, string[] itemsNames, string userAddress)
         {
             if (_adapter == null)
             {
+                int transactionId = _transactionId;
+                transactionId++;
                 await Task.Delay(100);
                 PROXY_HITS++;
-                return true;
+                return Result.Ok(transactionId);
             }
-            var ans=await _adapter.SupplyProducts(storeName, itemsNames, userAddress);
-            if (ans)
+            var ans= await _adapter.SupplyProducts(storeName, itemsNames, userAddress);
+            if (ans.IsSuccess)
             {
                 REAL_HITS++;
             }
@@ -38,15 +44,15 @@ namespace eCommerce.Adapters
 
         }
 
-        public async Task<bool> CheckSupplyInfo(string storeName, string[] itemsNames, string userAddress)
+        public async Task<Result> CheckSupplyInfo(int transactionId)
         {
             if (_adapter == null)
             {
                 await Task.Delay(100);
-                return true;
+                return Result.Ok();
             }
 
-            return await _adapter.CheckSupplyInfo(storeName, itemsNames, userAddress);
+            return await _adapter.CheckSupplyInfo(transactionId);
         }
     }
 }

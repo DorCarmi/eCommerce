@@ -1,10 +1,12 @@
 ﻿{
-  "DBConnectionString": "a",
+  "InitWithData": true,
+
   "AdminCreationInfo" : {
     "Username": "_Admin",
     "Email": "Admin@eCommerce.com",
     "Password": "_Admin"
   },
 
+  "DBConnectionString": "server=localhost",
   "AuthDBConnectionString": "AuthDB"
 }

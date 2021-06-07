@@ -31,13 +31,11 @@ namespace Tests.Business.StoreTests
             this.MyStore = new Store("Alenby", Alice);
             SupplyProxy.AssignSupplyService(new mokSupplyService(true,true));
             PaymentProxy.AssignPaymentService(new mokPaymentService(true,true,true));
-            
         }
         
         [SetUp]
         public void Setup()
         {
-            
             item1 = new ItemInfo(50, "IPhone", "Alenby", "Tech", new List<string>(), 5000);
             item1.AssignStoreToItem(MyStore);
             item1b = new ItemInfo(50, "IPhone", "Alenby", "Computers", new List<string>(){"A"}, 3000);

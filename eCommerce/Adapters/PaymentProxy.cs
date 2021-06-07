@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using eCommerce.Business;
+using eCommerce.Common;
 
 namespace eCommerce.Adapters
 {
@@ -11,8 +12,11 @@ namespace eCommerce.Adapters
         public static int REAL_HITS = 0;
         public static int PROXY_HITS = 0;
 
+        private int _transactionId;
         public PaymentProxy()
         {
+            _transactionId = 10000;
+            _adapter = new WSEPPaymentAdapter();
         }
 
         public static void AssignPaymentService(IPaymentAdapter paymentAdapter)
@@ -20,16 +24,18 @@ namespace eCommerce.Adapters
             _adapter = paymentAdapter;
         }
         
-        public async Task<bool> Charge(double price, string paymentInfoUserName, string paymentInfoIDNumber, string paymentInfoCreditCardNumber, string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)
+        public async Task<Result<int>> Charge(double price, string paymentInfoUserName, string paymentInfoIDNumber, string paymentInfoCreditCardNumber, string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)
         {
             if (_adapter == null)
             {
+                int transactionId = _transactionId;
+                transactionId++;
                 await Task.Delay(5000);
                 PROXY_HITS++;
-                return true;
+                return Result.Ok(transactionId);
             }
-            var ans=await _adapter.Charge(price,paymentInfoUserName,paymentInfoIDNumber, paymentInfoCreditCardNumber,paymentInfoCreditCardExpirationDate, paymentInfoThreeDigitsOnBackOfCard );
-            if (ans)
+            var ans = await _adapter.Charge(price,paymentInfoUserName,paymentInfoIDNumber, paymentInfoCreditCardNumber,paymentInfoCreditCardExpirationDate, paymentInfoThreeDigitsOnBackOfCard );
+            if (ans.IsSuccess)
             {
                 REAL_HITS++;
             }
@@ -49,19 +55,18 @@ namespace eCommerce.Adapters
             return ans;
         }
 
-        public async Task<bool> Refund(double price, string paymentInfoUserName, string paymentInfoIdNumber, string paymentInfoCreditCardNumber,
-            string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)
+        public async Task<Result> Refund(int transactionId)
         {
             if (_adapter == null)
             {
                 await Task.Delay(5000);
                 PROXY_REFUNDS++;
-                return true;
+                return Result.Ok();
             }
 
             
-            var ans=await _adapter.Refund(price,paymentInfoUserName,paymentInfoIdNumber, paymentInfoCreditCardNumber,paymentInfoCreditCardExpirationDate, paymentInfoThreeDigitsOnBackOfCard );
-            if (ans)
+            var ans = await _adapter.Refund(transactionId);
+            if (ans.IsSuccess)
             {
                 REAL_REFUNDS++;
             }

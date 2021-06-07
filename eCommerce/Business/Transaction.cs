@@ -21,6 +21,8 @@ namespace eCommerce.Business
 
         public Result BuyWholeCart(PaymentInfo paymentInfo)
         {
+            int paymentTransactionId;
+            int supplyTransactionId;
             //Check with store policy
             foreach (var basket in this._cart.GetBaskets())
             {
@@ -74,7 +76,7 @@ namespace eCommerce.Business
                 paymentInfo.CreditCardNumber, paymentInfo.CreditCardExpirationDate,
                 paymentInfo.ThreeDigitsOnBackOfCard);
             payTask.Wait();
-            if (!payTask.Result)
+            if (!payTask.Result.IsSuccess)
             {
                 foreach (var basket in _cart.GetBaskets())
                 {
@@ -82,6 +84,8 @@ namespace eCommerce.Business
                 }
                 return Result.Fail("<Payment>Payment process didn't succeed");
             }
+
+            paymentTransactionId = payTask.Result.Value;
 
             foreach (var basket in this._cart.GetBaskets())
             {
@@ -94,11 +98,9 @@ namespace eCommerce.Business
                 var supply =
                     _supply.SupplyProducts(basket.GetStoreName(), itemNames.ToArray(), paymentInfo.FullAddress);
                 supply.Wait();
-                if (!supply.Result)
+                if (!supply.Result.IsSuccess)
                 {
-                    this._payment.Refund(totalPriceForAllBaskets, paymentInfo.UserName, paymentInfo.IdNumber,
-                        paymentInfo.CreditCardNumber, paymentInfo.CreditCardExpirationDate,
-                        paymentInfo.ThreeDigitsOnBackOfCard);
+                    this._payment.Refund(paymentTransactionId);
                     foreach (var basket1 in _cart.GetBaskets())
                     {
                         basket.ReturnAllItemsToStore();
@@ -106,6 +108,7 @@ namespace eCommerce.Business
                     return Result.Fail("<Supply>Supply info found incorrect by supply system");
                 }
             }
+            //TODO: save in history transcation id
             
 
             foreach (var basket in _cart.GetBaskets())

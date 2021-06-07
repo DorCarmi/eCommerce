@@ -13,7 +13,7 @@ import AddItem from './components/AddItem'
 import EditItem from './components/EditItem'
 import PurchaseHistory from './components/PurchaseHistory'
 import ManagePermissions from './components/ManagePermissions'
-import AddRule from './components/AddRule'
+
 import {BrowserRouter, Link, useHistory} from "react-router-dom";
 import {UserApi} from "./Api/UserApi";
 import {ItemSearchDisplay} from "./components/ItemsSearchDisplay";
@@ -23,32 +23,35 @@ import {HttpTransportType, HubConnectionBuilder, LogLevel} from "@microsoft/sign
 import {StoreApi} from "./Api/StoreApi";
 import {AppointManager} from "./components/AppointManager";
 
-import {StorePermission} from "./Data/StorePermission";
-import {NavLink} from "reactstrap";
 import {AdminPurchaseHistory} from "./components/AdminPurchaseHistory";
+import {UserRole} from "./Data/UserRole";
+import {makeRuleInfo, makeRuleNodeComposite, makeRuleNodeLeaf, RuleType} from "./Data/StorePolicies/RuleInfo";
+import {Comperators} from "./Data/StorePolicies/Comperators";
+import {Combinations} from "./Data/StorePolicies/Combinations";
+import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "./Data/StorePolicies/DiscountInfoTree";
 
 export default class App extends Component {
-  static displayName = App.name;
-  
-  constructor(props) {
-      super(props)
-      this.state = {
-          isLoggedIn: false,
-          ownedStoreList:[],
-          userName:'',
-          role: undefined,
-          
-          messages: [],
-          webSocketConnection: undefined
-      }
-      this.userApi = new UserApi();
-      this.storeApi = new StoreApi();
-      
-      this.addOwnedStoreHandler = this.addOwnedStoreHandler.bind(this);
-      this.updateLoginHandler = this.updateLoginHandler.bind(this);
-      this.updateLogoutHandler = this.updateLogoutHandler.bind(this);
+    static displayName = App.name;
 
-  }
+    constructor(props) {
+        super(props)
+        this.state = {
+            isLoggedIn: false,
+            ownedStoreList:[],
+            userName:'',
+            role: undefined,
+
+            messages: [],
+            webSocketConnection: undefined
+        }
+        this.userApi = new UserApi();
+        this.storeApi = new StoreApi();
+
+        this.addOwnedStoreHandler = this.addOwnedStoreHandler.bind(this);
+        this.updateLoginHandler = this.updateLoginHandler.bind(this);
+        this.updateLogoutHandler = this.updateLogoutHandler.bind(this);
+
+    }
 
     addOwnedStoreHandler(store){
         this.setState({
@@ -57,24 +60,26 @@ export default class App extends Component {
     }
 
     async updateLoginHandler(username, role){
-      this.setState({
-          isLoggedIn: true,
-          userName: username,
-          role: role,
-      })
+        this.setState({
+            isLoggedIn: true,
+            userName: username,
+            role: role,
+        })
     }
 
     async updateLogoutHandler(){
         const userBasicInfo = await this.userApi.getUserBasicInfo();
+        await this.state.webSocketConnection.stop();
         this.setState({
             isLoggedIn: userBasicInfo.isLoggedIn,
             userName: userBasicInfo.username,
             role: userBasicInfo.userRole,
             ownedStoreList: [],
-            managedStoreList:[]
+            managedStoreList:[],
+            webSocketConnection: undefined
         })
     }
-    
+
     async connectToWebSocket(){
         const socketConnection = new HubConnectionBuilder()
             .configureLogging(LogLevel.Debug)
@@ -87,7 +92,6 @@ export default class App extends Component {
         //console.log("socketConnection")
 
         await socketConnection.start();
-
         if(socketConnection) {
             //console.log("socketConnection on")
 
@@ -100,13 +104,13 @@ export default class App extends Component {
                 });
             });
         }
-        
+
         this.setState({
             messages: [],
             webSocketConnection: socketConnection
         });
     }
-    
+
     redirectToHome = (path) => {
         alert(path)
         const { history } = this.props;
@@ -116,11 +120,35 @@ export default class App extends Component {
         }
     }
 
+    async policyExample(){
+        console.log("Policy example: ==========")
+        const ruleInfo1 = makeRuleInfo(RuleType.Amount, "10", "3", Comperators.EQUALS);
+        const ruleInfo2 = makeRuleInfo(RuleType.Category, "watermelon", "1", Comperators.BIGGER);
+
+        const ruleNodeLeaf1 = makeRuleNodeLeaf(ruleInfo1);
+        const ruleNodeLeaf2 = makeRuleNodeLeaf(ruleInfo2);
+        console.log(await this.storeApi.addRuleToStorePolicy("a", ruleNodeLeaf1));
+
+        const ruleNodeComposite = makeRuleNodeComposite(ruleNodeLeaf1, ruleNodeLeaf2, Combinations.XOR);
+        console.log(await this.storeApi.addRuleToStorePolicy("a", ruleNodeComposite));
+
+        const discountNodeLeaf = makeDiscountNodeLeaf(ruleNodeComposite, 10);
+        console.log(await this.storeApi.addDiscountToStore("a", discountNodeLeaf));
+
+        const discountCompositeNode = makeDiscountCompositeNode(discountNodeLeaf, discountNodeLeaf, Combinations.XOR);
+        console.log(await this.storeApi.addDiscountToStore("a", discountCompositeNode));
+        console.log("==========");
+    }
+
     async componentDidMount() {
         const userBasicInfo = await this.userApi.getUserBasicInfo();
         console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
-        await this.connectToWebSocket()
-        
+        if(userBasicInfo.userRole !== UserRole.Guest){
+            await this.connectToWebSocket();
+
+            await this.policyExample();
+        }
+
         const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()
         const fetchedManagedStoredList = await this.userApi.getAllManagedStoreIds()
 
@@ -137,15 +165,15 @@ export default class App extends Component {
                         managedStoreList: fetchedManagedStoredList.value
 
                     })}
-                    else{
-                        this.setState({
-                            isLoggedIn: userBasicInfo.isLoggedIn,
-                            userName: userBasicInfo.username,
-                            role: userBasicInfo.userRole,
-                            ownedStoreList: fetchedOwnedStoredList.value,
-                        })
-                    }
+                else{
+                    this.setState({
+                        isLoggedIn: userBasicInfo.isLoggedIn,
+                        userName: userBasicInfo.username,
+                        role: userBasicInfo.userRole,
+                        ownedStoreList: fetchedOwnedStoredList.value,
+                    })
                 }
+            }
             else{
                 this.setState({
                     isLoggedIn: userBasicInfo.isLoggedIn,
@@ -154,77 +182,76 @@ export default class App extends Component {
                 })
             }
 
-            
+
         }
-        
+
     }
 
-     async componentDidUpdate(prevProps,prevState) {
-         /*if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
-             //console.log("componentDidUpdate")
-             await this.connectToWebSocket();
-         }*/
-         
-         if(prevState.userName !== this.state.userName){
-             if(this.state.isLoggedIn){
-                 const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()
-                 const fetchedManagedStoredList = await this.userApi.getAllManagedStoreIds()
-                 if (fetchedOwnedStoredList && fetchedOwnedStoredList.isSuccess) {
-                     if (fetchedManagedStoredList && fetchedManagedStoredList.isSuccess) {
-                         this.setState({
-                             managedStoreList: fetchedManagedStoredList.value,
-                             ownedStoreList: fetchedOwnedStoredList.value
-                         })
-                     }
-                     else {
-                         this.setState({
-                             ownedStoreList: fetchedOwnedStoredList.value
-                         })
-                     }
-                 }
-             else if (fetchedOwnedStoredList && fetchedOwnedStoredList.isSuccess) {
-                     this.setState({
-                         managedStoreList: fetchedManagedStoredList.value
-                     })
-                 }
+    async componentDidUpdate(prevProps,prevState) {
+        if(!prevState.isLoggedIn && this.state.isLoggedIn && !this.state.webSocketConnection){
+            //console.log("componentDidUpdate")
+            await this.connectToWebSocket();
+        }
 
-             }
-         }
-     }
-    
+        if(prevState.userName !== this.state.userName){
+            if(this.state.isLoggedIn){
+                const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()
+                const fetchedManagedStoredList = await this.userApi.getAllManagedStoreIds()
+                if (fetchedOwnedStoredList && fetchedOwnedStoredList.isSuccess) {
+                    if (fetchedManagedStoredList && fetchedManagedStoredList.isSuccess) {
+                        this.setState({
+                            managedStoreList: fetchedManagedStoredList.value,
+                            ownedStoreList: fetchedOwnedStoredList.value
+                        })
+                    }
+                    else {
+                        this.setState({
+                            ownedStoreList: fetchedOwnedStoredList.value
+                        })
+                    }
+                }
+                else if (fetchedOwnedStoredList && fetchedOwnedStoredList.isSuccess) {
+                    this.setState({
+                        managedStoreList: fetchedManagedStoredList.value
+                    })
+                }
+
+            }
+        }
+    }
+
     render () {
-    return (
-        <BrowserRouter>
-          <Layout logoutHandler={this.updateLogoutHandler} state={this.state}>
-            <Route exact path='/' component={Home} />
-            <Route exact path='/login' component={() => <Login isLoggedIn={this.state.isLoggedIn} loginUpdateHandler={this.updateLoginHandler}/>} />
+        return (
+            <BrowserRouter>
+                <Layout logoutHandler={this.updateLogoutHandler} state={this.state}>
+                    <Route exact path='/' component={Home} />
+                    <Route exact path='/login' component={() => <Login isLoggedIn={this.state.isLoggedIn} loginUpdateHandler={this.updateLoginHandler}/>} />
 
-            <Route exact path='/register' component={Register}/>
-            
-            <Route exact path='/cart' component={Cart} />
-            <Route exact path='/purchaseCart' component={() => <PurchaseCart username={this.state.userName}/>} />
-            
-            <Route exact path="/store/:id" render={({match}) => (<Store  storeId={match.params.id} 
-                                                                        ownedStoreList={this.state.ownedStoreList} redirect={this.redirectToHome}/>
-            )} />            
-            <Route exact path='/openStore' component={() => <OpenStore addStoreToState={this.addOwnedStoreHandler}/>} />
-            <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
-            <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
-            <Route exact path="/purchaseHistory/:storeId?/:userId?/:isAdmin?" render={({match}) => <PurchaseHistory storeId ={match.params.storeId} userId={match.params.userId} isAdmin={match.params.isAdmin}/>} />
-            <Route exact path="/AdminPurchaseHistory/:term" render={({match}) => <AdminPurchaseHistory term={match.params.term}/>}/>
+                    <Route exact path='/register' component={Register}/>
 
+                    <Route exact path='/cart' component={Cart} />
+                    <Route exact path='/purchaseCart' component={() => <PurchaseCart username={this.state.userName}/>} />
 
+                    <Route exact path="/store/:id" render={({match}) => (<Store  storeId={match.params.id}
+                                                                                 ownedStoreList={this.state.ownedStoreList} redirect={this.redirectToHome}/>
+                    )} />
+                    <Route exact path='/openStore' component={() => <OpenStore addStoreToState={this.addOwnedStoreHandler}/>} />
+                    <Route exact path="/store/:id/addItem" render={({match}) => <AddItem storeId ={match.params.id}/>} />
+                    <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
+                    <Route exact path="/purchaseHistory/:storeId?/:userId?/:isAdmin?" render={({match}) => <PurchaseHistory storeId ={match.params.storeId} userId={match.params.userId} isAdmin={match.params.isAdmin}/>} />
+                    <Route exact path="/AdminPurchaseHistory/:term" render={({match}) => <AdminPurchaseHistory term={match.params.term}/>}/>
 
 
-              <Route exact path="/searchItems/Item/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query}  />} />
-              <Route exact path="/searchItems/Store/:query" render={({match}) => <Store  storeId={match.params.query}/>} />
 
-              <Route exact path="/managePermissions/:id/appointManager" render={({match}) => <AppointManager storeId ={match.params.id}/>} />
-                <Route exact path="/managePermissions/:storeId/" render={({match}) => <ManagePermissions storeId ={match.params.storeId}/>}/>
-              <Route exact path="/store/:id/addRule/:itemId" render={({match}) => <AddRule storeId ={match.params.id} itemId ={match.params.itemId}/>} />
 
-          </Layout>
-        </BrowserRouter>
-    );
-  }
+                    <Route exact path="/searchItems/Item/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query}  />} />
+                    <Route exact path="/searchItems/Store/:query" render={({match}) => <Store  storeId={match.params.query}/>} />
+
+                    <Route exact path="/managePermissions/:id/appointManager" render={({match}) => <AppointManager storeId ={match.params.id}/>} />
+                    <Route exact path="/managePermissions/:storeId/" render={({match}) => <ManagePermissions storeId ={match.params.storeId}/>}/>
+
+                </Layout>
+            </BrowserRouter>
+        );
+    }
 }
