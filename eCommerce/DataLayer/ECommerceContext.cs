@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using eCommerce.Business;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace eCommerce.DataLayer
 {
@@ -53,10 +57,14 @@ namespace eCommerce.DataLayer
             builder.Entity<ListPair<Store,ManagerAppointment>>()
                 .HasKey(p => new {p.HolderId, p.KeyId});
             
-            
+            var stringListConverter = new ValueConverter<List<string>, string>(
+                v => string.Join(",", v),
+                v => v.Split(",", StringSplitOptions.None).ToList());
+
             //set composite Primary-Key for entities of type Item
             builder.Entity<Item>()
                 .HasKey(p => new {p._name, p.StoreId});
+            builder.Entity<Item>().Property(nameof(Item._keyWords)).HasConversion(stringListConverter);
         }
     }
     

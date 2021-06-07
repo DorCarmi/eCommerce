@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using eCommerce.Business;
+using eCommerce.Common;
 using eCommerce.DataLayer;
 using NUnit.Framework;
 
@@ -112,6 +113,23 @@ namespace Tests.DataLayer
             var store = new Store("Store", df.ReadUser(ja.Username).Value);
             Assert.True(df.SaveStore(store).IsSuccess);
         }
+        
+        [Test]
+        public void SaveStoreWithItemTest()
+        {
+            SaveUserTest();
+            User user = df.ReadUser(ja.Username).Value;
+            
+            Store store = new Store("Store", df.ReadUser(ja.Username).Value);
+            Result openRes = user.OpenStore(store);
+            Assert.True(openRes.IsSuccess, $"Opening store error {openRes.Error}");
+            
+            Result addRes = store.AddItemToStore(new ItemInfo(10, "item1", store._storeName, "items",
+                new List<string>() {"keyword1", "keyword1"}, 10.0), user);
+            Assert.True(addRes.IsSuccess, $"Adding item to store error {addRes.Error}");
+            
+            Assert.True(df.SaveStore(store).IsSuccess, "Save store to db");
+        }
 
 
         [Test]
@@ -122,8 +140,5 @@ namespace Tests.DataLayer
             var res = df.ReadUser(username);
             Assert.True(res.IsSuccess);
         }
-        
-
-
     }
 }

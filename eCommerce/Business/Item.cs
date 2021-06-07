@@ -15,8 +15,6 @@ namespace eCommerce.Business
         public string StoreId { get; private set; }
         public Store _belongsToStore { get; private set; }
         public Category _category { get; private set; }
-        // TODO add class and map it
-        [NotMapped]
         public List<String> _keyWords { get; private set; }
         [NotMapped]
         public PurchaseStrategy _purchaseStrategy { get; private set; }
