@@ -31,6 +31,7 @@ import {Combinations} from "./Data/StorePolicies/Combinations";
 import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "./Data/StorePolicies/DiscountInfoTree";
 import AddPolicy from "./components/AddPolicy";
 import AddRule from "./components/AddRule";
+import {AppointOwner} from "./components/AppointOwner";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -251,6 +252,9 @@ export default class App extends Component {
                     <Route exact path="/searchItems/Store/:query" render={({match}) => <Store  storeId={match.params.query}/>} />
 
                     <Route exact path="/managePermissions/:id/appointManager" render={({match}) => <AppointManager storeId ={match.params.id}/>} />
+
+                    <Route exact path="/managePermissions/:id/appointOwner" render={({match}) => <AppointOwner storeId ={match.params.id}/>} />
+
                     <Route exact path="/managePermissions/:storeId/" render={({match}) => <ManagePermissions storeId ={match.params.storeId}/>}/>
 
                 </Layout>
