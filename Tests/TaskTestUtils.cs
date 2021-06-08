@@ -40,7 +40,13 @@ namespace Tests
 
             return tasks;
         }
-    
+
+        public static Task<T[]> RunAndWaitAll<T>(Task<T>[] tasks)
+        {
+            RunTasks(tasks);
+            return Task.WhenAll<T>(tasks);
+        }
+        
         public static void RunTasksVoid(Task[] tasks)
         {
             foreach (var task in tasks)
@@ -48,7 +54,7 @@ namespace Tests
                 task.Start();
             }
         }
-        
+
         public static void RunTasks<T>(Task<T>[] tasks)
         {
             foreach (var task in tasks)

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using eCommerce.Business.Service;
+
 
 namespace eCommerce.Business
 {
@@ -9,11 +9,11 @@ namespace eCommerce.Business
         
         public string Username { get => MemberInfo.Username; }
         public ICart Cart { get; }
-        public ConcurrentDictionary<IStore, bool> StoresFounded{ get; }
-        public ConcurrentDictionary<IStore, OwnerAppointment> StoresOwned{ get; }
-        public ConcurrentDictionary<IStore, ManagerAppointment> StoresManaged{ get; }
-        public ConcurrentDictionary<IStore, IList<OwnerAppointment>> AppointedOwners{ get; }
-        public ConcurrentDictionary<IStore, IList<ManagerAppointment>> AppointedManagers{ get; }
+        public ConcurrentDictionary<Store, bool> StoresFounded{ get; }
+        public ConcurrentDictionary<Store, OwnerAppointment> StoresOwned{ get; }
+        public ConcurrentDictionary<Store, ManagerAppointment> StoresManaged{ get; }
+        public ConcurrentDictionary<Store, IList<OwnerAppointment>> AppointedOwners{ get; }
+        public ConcurrentDictionary<Store, IList<ManagerAppointment>> AppointedManagers{ get; }
         public UserTransactionHistory History { get; }
         
         public MemberInfo MemberInfo;
@@ -24,7 +24,7 @@ namespace eCommerce.Business
             MemberInfo = memberInfo;
         }
 
-        public MemberData(UserTransactionHistory history, MemberInfo memberInfo, ICart cart, ConcurrentDictionary<IStore, bool> storesFounded, ConcurrentDictionary<IStore, OwnerAppointment> storesOwned, ConcurrentDictionary<IStore, ManagerAppointment> storesManaged, ConcurrentDictionary<IStore, IList<ManagerAppointment>> appointedManagers, ConcurrentDictionary<IStore, IList<OwnerAppointment>> appointedOwners)
+        public MemberData(UserTransactionHistory history, MemberInfo memberInfo, ICart cart, ConcurrentDictionary<Store, bool> storesFounded, ConcurrentDictionary<Store, OwnerAppointment> storesOwned, ConcurrentDictionary<Store, ManagerAppointment> storesManaged, ConcurrentDictionary<Store, IList<ManagerAppointment>> appointedManagers, ConcurrentDictionary<Store, IList<OwnerAppointment>> appointedOwners)
         {
             History = history;
             MemberInfo = memberInfo;

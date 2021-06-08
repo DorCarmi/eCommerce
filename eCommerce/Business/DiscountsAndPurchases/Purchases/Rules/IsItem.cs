@@ -15,7 +15,7 @@ namespace eCommerce.Business.PurchaseRules
         {
             this._itemName = itemName;
         }
-        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
             foreach (var item in checkItem1.GetAllItems().Value)
@@ -34,7 +34,7 @@ namespace eCommerce.Business.PurchaseRules
             return itemsList;
         }
 
-        public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
+        public override bool CheckOneItem(ItemInfo itemInfo, User checkItem2)
         {
             return this._itemName.Equals(itemInfo.name);
         }

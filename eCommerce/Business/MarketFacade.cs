@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business.Discounts;
-using eCommerce.Business.Service;
+using eCommerce.Business.Repositories;
+
 using eCommerce.Common;
 using eCommerce.Service;
 using NLog;
@@ -18,19 +20,20 @@ namespace eCommerce.Business
         private static MarketFacade _instance =
             new MarketFacade(
                 UserAuth.GetInstance(),
-                new RegisteredUsersRepository(),
-                new StoreRepository());
+                new InMemoryRegisteredUsersRepository(),
+                //new PersistenceRegisteredUsersRepo(),
+                new InMemoryStoreRepo());
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private StoreRepository _storeRepository;
+        private InMemoryStoreRepo _inMemoryStoreRepo;
         private UserManager _userManager;
         
         private MarketFacade(IUserAuth userAuth,
-            IRepository<IUser> registeredUsersRepo,
-            StoreRepository storeRepo)
+            IRepository<User> registeredUsersRepo,
+            InMemoryStoreRepo inMemoryStoreRepo)
         {
-            _storeRepository = storeRepo;
+            _inMemoryStoreRepo = inMemoryStoreRepo;
             _userManager = new UserManager(userAuth, registeredUsersRepo);
             CreateMainAdmin();
         }
@@ -41,10 +44,10 @@ namespace eCommerce.Business
         }
 
         public static MarketFacade CreateInstanceForTests(IUserAuth userAuth,
-            IRepository<IUser> registeredUsersRepo,
-            StoreRepository storeRepo)
+            IRepository<User> registeredUsersRepo,
+            InMemoryStoreRepo inMemoryStoreRepo)
         {
-            return new MarketFacade(userAuth, registeredUsersRepo, storeRepo);
+            return new MarketFacade(userAuth, registeredUsersRepo, inMemoryStoreRepo);
         }
 
         public void CreateMainAdmin()
@@ -67,13 +70,13 @@ namespace eCommerce.Business
         }
 
         // <CNAME>Register</CNAME>
-        public Result Register(string token, MemberInfo memberInfo, string password)
+        public Task<Result> Register(string token, MemberInfo memberInfo, string password)
         {
             return _userManager.Register(token, memberInfo, password);
         }
 
         // <CNAME>Login</CNAME>
-        public Result<string> Login(string guestToken, string username, string password, UserToSystemState role)
+        public Task<Result<string>> Login(string guestToken, string username, string password, UserToSystemState role)
         {
             return _userManager.Login(guestToken, username, password, role);
         }
@@ -91,12 +94,12 @@ namespace eCommerce.Business
 
         public Result<UserBasicInfo> GetUserBasicInfo(string token)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<UserBasicInfo>(userRes.Error);
             }
-            IUser user = userRes.Value;
+            User user = userRes.Value;
 
             UserBasicInfo userBasicInfo = new UserBasicInfo(user.Username, true,
                 UserSystemStateToUserRole(user.GetState()));
@@ -111,12 +114,12 @@ namespace eCommerce.Business
         //<CNAME>PersonalPurchaseHistory</CNAME>
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(string token)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<IList<PurchaseRecord>>(userRes.Error);
             }
-            IUser user = userRes.Value;
+            User user = userRes.Value;
 
             var result = user.GetUserPurchaseHistory();
 
@@ -133,22 +136,22 @@ namespace eCommerce.Business
          //<CNAME>AppointCoOwner</CNAME>
         public Result AppointCoOwner(string token, string storeId, string appointedUserId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
             
             _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
             
-            Result<IUser> appointedUserRes = _userManager.GetUser(appointedUserId);
+            Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
             if (appointedUserRes.IsFailure)
             {
                 return appointedUserRes;
             }
-            IUser appointedUser = appointedUserRes.Value;
+            User appointedUser = appointedUserRes.Value;
 
             return user.AppointUserToOwner(store, appointedUser);
         }
@@ -156,80 +159,80 @@ namespace eCommerce.Business
         //<CNAME>AppointManager</CNAME>
         public Result AppointManager(string token, string storeId, string appointedManagerUserId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
             
             _logger.Info($"AppointManager({user.Username}, {store.GetStoreName()}, {appointedManagerUserId})");
             
-            Result<IUser> appointedUserRes = _userManager.GetUser(appointedManagerUserId);
+            Result<User> appointedUserRes = _userManager.GetUser(appointedManagerUserId);
             if (appointedUserRes.IsFailure)
             {
                 return appointedUserRes;
             }
-            IUser appointedUser = appointedUserRes.Value;
+            User appointedUser = appointedUserRes.Value;
 
             return user.AppointUserToManager(store, appointedUser);
         }
 
         public Result<IList<StorePermission>> GetStorePermission(string token, string storeId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return  Result.Fail<IList<StorePermission>>(userAndStoreRes.Error);
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             return store.GetPermissions(user);
         }
 
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
             
             _logger.Info($"UpdateManagerPermission({user.Username}, {store.GetStoreName()}, {managersUserId}, {permissions})");
 
-            Result<IUser> mangerUserRes = _userManager.GetUser(managersUserId);
+            Result<User> mangerUserRes = _userManager.GetUser(managersUserId);
             if (mangerUserRes.IsFailure)
             {
                 return mangerUserRes;
             }
-            IUser managerUser = mangerUserRes.Value;
+            User managerUser = mangerUserRes.Value;
             return user.UpdatePermissionsToManager(store, managerUser, permissions);
         }
         
         //<CNAME>RemoveManagerPermissions</CNAME>
-        public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
+        /*public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
             IList<StorePermission> permissions)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
             
             _logger.Info($"RemoveManagerPermission({user.Username}, {store.GetStoreName()}, {managersUserId}, {permissions})");
 
-            Result<IUser> mangerUserRes = _userManager.GetUser(managersUserId);
+            Result<User> mangerUserRes = _userManager.GetUser(managersUserId);
             if (mangerUserRes.IsFailure)
             {
                 return mangerUserRes;
             }
-            IUser managerUser = mangerUserRes.Value;
+            User managerUser = mangerUserRes.Value;
             foreach (var permission in permissions)
             {
                 var res = user.RemovePermissionsToManager(store, managerUser, permission);
@@ -240,18 +243,18 @@ namespace eCommerce.Business
             }
 
             return Result.Ok();
-        }
+        }*/
         //<CNAME:GetStoreStaff</CNAME>
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(string token,
             string storeId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return Result.Fail<IList<Tuple<string, IList<StorePermission>>>>(userAndStoreRes.Error);
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             _logger.Info($"GetStoreStaffAndTheirPermissions({user.Username}, {store.GetStoreName()})");
 
@@ -266,7 +269,7 @@ namespace eCommerce.Business
                  return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
              }
              
-             IUser user = userAndStoreRes.Value;
+             User user = userAndStoreRes.Value;
              
              _logger.Info($"AdminGetPurchaseHistoryUser({user.Username}, {ofUserId})");
 
@@ -282,13 +285,13 @@ namespace eCommerce.Business
          //<CNAME>AdminGetStoreHistory</CNAME>
          public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryStore(string token, string storeId)
          {
-             Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
              if (userAndStoreRes.IsFailure)
              {
                  return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
              }
-             IUser user = userAndStoreRes.Value.Item1;
-             IStore store = userAndStoreRes.Value.Item2;
+             User user = userAndStoreRes.Value.Item1;
+             Store store = userAndStoreRes.Value.Item2;
 
              _logger.Info($"AdminGetPurchaseHistoryStore({user.Username}, {store.GetStoreName()})");
 
@@ -300,7 +303,7 @@ namespace eCommerce.Business
         //<CNAME>SearchForProducts</CNAME>
         public Result<IEnumerable<IItem>> SearchForItem(string token, string query)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<IEnumerable<IItem>>(userRes.Error);
@@ -308,12 +311,12 @@ namespace eCommerce.Business
 
             _logger.Info($"SearchForItem({userRes.Value.Username}, {query})");
 
-            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItem(query));
+            return Result.Ok<IEnumerable<IItem>>(_inMemoryStoreRepo.SearchForItem(query));
         }
 
         public Result<IEnumerable<IItem>> SearchForItemByPriceRange(string token, string query, double @from = 0, double to = Double.MaxValue)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<IEnumerable<IItem>>(userRes.Error);
@@ -326,12 +329,12 @@ namespace eCommerce.Business
             
             _logger.Info($"SearchForItemByPriceRange({userRes.Value.Username}, {query}, {from}, {to})");
 
-            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItemByPrice(query, from, to));
+            return Result.Ok<IEnumerable<IItem>>(_inMemoryStoreRepo.SearchForItemByPrice(query, from, to));
         }
 
         public Result<IEnumerable<IItem>> SearchForItemByCategory(string token, string query, string category)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<IEnumerable<IItem>>(userRes.Error);
@@ -339,12 +342,12 @@ namespace eCommerce.Business
 
             _logger.Info($"SearchForItemByCategory({userRes.Value.Username}, {query}, {category})");
 
-            return Result.Ok<IEnumerable<IItem>>(_storeRepository.SearchForItemByCategory(query, category));
+            return Result.Ok<IEnumerable<IItem>>(_inMemoryStoreRepo.SearchForItemByCategory(query, category));
         }
 
         public Result<IEnumerable<string>> SearchForStore(string token, string query)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<IEnumerable<string>>(userRes.Error);
@@ -352,18 +355,18 @@ namespace eCommerce.Business
             
             _logger.Info($"SearchForStore({userRes.Value.Username}, {query})");
 
-            return Result.Ok(_storeRepository.SearchForStore(query));
+            return Result.Ok(_inMemoryStoreRepo.SearchForStore(query));
         }
         
-        public Result<IStore> GetStore(string token, string storeId)
+        public Result<Store> GetStore(string token, string storeId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
-                return Result.Fail<IStore>(userAndStoreRes.Error);
+                return Result.Fail<Store>(userAndStoreRes.Error);
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             _logger.Info($"GetStore({user.Username}, {storeId})");
 
@@ -371,13 +374,13 @@ namespace eCommerce.Business
         } 
         public Result<IEnumerable<IItem>> GetAllStoreItems(string token, string storeId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return Result.Fail<IEnumerable<IItem>>(userAndStoreRes.Error);
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             IList<IItem> storeItems = new List<IItem>();
             foreach (var item in store.GetAllItems())
@@ -393,13 +396,13 @@ namespace eCommerce.Business
         
         public Result<IItem> GetItem(string token, string storeId, string itemId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return Result.Fail<IItem>(userAndStoreRes.Error);
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             Result<Item> itemRes = store.GetItem(itemId);
             if (itemRes.IsFailure)
@@ -414,24 +417,24 @@ namespace eCommerce.Business
 
         public Result<List<string>> GetStoreIds(string token)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<List<string>>(userRes.Error);
             }
-            IUser user = userRes.Value;
+            User user = userRes.Value;
 
             return user.GetStoreIds();
         }
 
         public Result<IList<string>> GetAllManagedStores(string token)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<IList<string>>(userRes.Error);
             }
-            IUser user = userRes.Value;
+            User user = userRes.Value;
 
             return user.GetManagedStoreIds();
         }
@@ -443,13 +446,13 @@ namespace eCommerce.Business
         //<CNAME>AddItemToCart</CNAME>
         public Result AddItemToCart(string token, string productId, string storeId, int amount)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             _logger.Info($"AddItemToCart({user.Username}, {productId}, {storeId}, {amount})");
 
@@ -467,13 +470,13 @@ namespace eCommerce.Business
         //<CNAME>EditCart</CNAME>  
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
             
             _logger.Info($"EditItemAmountOfCart({user.Username}, {itemId}, {storeId}, {amount})");
 
@@ -490,12 +493,12 @@ namespace eCommerce.Business
         //<CNAME>GetCart</CNAME>
         public Result<ICart> GetCart(string token)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<ICart>(userRes.Error);
             }
-            IUser user = userRes.Value;
+            User user = userRes.Value;
 
             _logger.Info($"GetCart({user.Username})");
 
@@ -504,12 +507,12 @@ namespace eCommerce.Business
         
         public Result<double> GetPurchaseCartPrice(string token)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<double>(userRes.Error);
             }
-            IUser user = userRes.Value;
+            User user = userRes.Value;
 
             _logger.Info($"GetPurchaseCartPrice({user.Username})");
 
@@ -526,12 +529,12 @@ namespace eCommerce.Business
         //<CNAME>BuyWholeCart</CNAME>
         public Result PurchaseCart(string token, PaymentInfo paymentInfo)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail<double>(userRes.Error);
             }
-            IUser user = userRes.Value;
+            User user = userRes.Value;
 
             _logger.Info($"PurchaseCart({user.Username} {paymentInfo})");
             
@@ -558,17 +561,17 @@ namespace eCommerce.Business
         public Result OpenStore(string token, string storeName)
         {
             // TODO check with user and store
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail(userRes.Error);
             }
-            IUser user = userRes.Value;
+            User user = userRes.Value;
             
             _logger.Info($"OpenStore({user.Username})");
             
-            IStore newStore = new Store(storeName, user);
-            if (!_storeRepository.Add(newStore))
+            Store newStore = new Store(storeName, user);
+            if (!_inMemoryStoreRepo.Add(newStore))
             {
                 return Result.Fail("Store name taken");
             }
@@ -584,13 +587,13 @@ namespace eCommerce.Business
         //<CNAME>ItemsToStore</CNAME>
         public Result AddNewItemToStore(string token, IItem item)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             _logger.Info($"AddNewItemToStore({user.Username} ,{item})");
 
@@ -600,13 +603,13 @@ namespace eCommerce.Business
         //<CNAME>ItemsInStore</CNAME>
         public Result RemoveItemFromStore(string token, string storeId, string itemId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             _logger.Info($"RemoveItemFromStore({user.Username} ,{storeId}, {itemId})");
 
@@ -615,13 +618,13 @@ namespace eCommerce.Business
 
         public Result EditItemInStore(string token, IItem item)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
             
             _logger.Info($"EditItemInStore({user.Username} , {item})");
 
@@ -635,26 +638,26 @@ namespace eCommerce.Business
 
         public Result UpdateStock_AddItems(string token, IItem item)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             return store.UpdateStock_AddItems(DtoUtils.ItemDtoToProductInfo(item), user);
         }
         
         public Result UpdateStock_SubtractItems(string token, IItem item)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
             if (userAndStoreRes.IsFailure)
             {
                 return userAndStoreRes;
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             return store.UpdateStock_SubtractItems(DtoUtils.ItemDtoToProductInfo(item), user);
         }
@@ -662,13 +665,13 @@ namespace eCommerce.Business
         //<CNAME>GetStoreHistory</CNAME>
         public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             _logger.Info($"GetPurchaseHistoryOfStore({user.Username} , {storeId})");
 
@@ -683,13 +686,13 @@ namespace eCommerce.Business
 
         public Result AddRuleToStorePolicy(string token, string storeId, RuleInfoNode ruleInfoNode)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             _logger.Info($"AddRuleToStorePolicy({user.Username} , {storeId})");
 
@@ -704,13 +707,13 @@ namespace eCommerce.Business
 
         public Result AddDiscountToStore(string token, string storeId, DiscountInfoNode discountInfoNode)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             _logger.Info($"AddDiscountToStore({user.Username} , {storeId})");
 
@@ -725,13 +728,13 @@ namespace eCommerce.Business
 
         public Result<IList<RuleInfoNode>> GetStorePolicyRules(string token, string storeId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return Result.Fail<IList<RuleInfoNode>>(userAndStoreRes.Error);
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             _logger.Info($"GetStorePolicyRules({user.Username} , {storeId})");
 
@@ -746,13 +749,13 @@ namespace eCommerce.Business
 
         public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId)
         {
-            Result<Tuple<IUser, IStore>> userAndStoreRes = GetUserAndStore(token, storeId);
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
             if (userAndStoreRes.IsFailure)
             {
                 return Result.Fail<IList<DiscountInfoNode>>(userAndStoreRes.Error);
             }
-            IUser user = userAndStoreRes.Value.Item1;
-            IStore store = userAndStoreRes.Value.Item2;
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
 
             _logger.Info($"GetStorePolicyRules({user.Username} , {storeId})");
 
@@ -767,25 +770,25 @@ namespace eCommerce.Business
 
         #endregion
 
-        private Result<Tuple<IUser, IStore>> GetUserAndStore(string token, string storeId)
+        private Result<Tuple<User, Store>> GetUserAndStore(string token, string storeId)
         {
-            Result<IUser> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
-                return Result.Fail<Tuple<IUser, IStore>>(userRes.Error);
+                return Result.Fail<Tuple<User, Store>>(userRes.Error);
             }
-            IUser user = userRes.Value;
+            User user = userRes.Value;
             
             _logger.Info($"GetUserAndStore({user.Username} , {storeId})");
 
-            IStore store = _storeRepository.GetOrNull(storeId);
+            Store store = _inMemoryStoreRepo.GetOrNull(storeId);
             if (store == null)
             {
                 _logger.Error($"User {user.Username} requested invalid sotre {storeId}");
-                return Result.Fail<Tuple<IUser, IStore>>("Store doesn't exist");
+                return Result.Fail<Tuple<User, Store>>("Store doesn't exist");
             }
 
-            return Result.Ok(new Tuple<IUser, IStore>(user, store));
+            return Result.Ok(new Tuple<User, Store>(user, store));
         }
         
         private UserRole UserSystemStateToUserRole(UserToSystemState userToSystemState)

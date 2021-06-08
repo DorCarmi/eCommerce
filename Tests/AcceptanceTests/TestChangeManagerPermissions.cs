@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Service;
 using NUnit.Framework;
@@ -25,21 +27,21 @@ namespace Tests.AcceptanceTests
     public class TestChangeManagerPermissions
     {
         private IAuthService _auth;
-        private IStoreService _store;
+        private INStoreService _inStore;
         private IUserService _user;
         private string store = "Yossi's Store7";
         
         
         [SetUpAttribute]
-        public void SetUp()
+        public async Task SetUp()
         {
-            StoreRepository SR = new StoreRepository();
-            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
+            InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
-            IRepository<IUser> UR = new RegisteredUsersRepository();
+            IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
             _user = UserService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo yossi = new MemberInfo("Yossi117", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
@@ -48,11 +50,11 @@ namespace Tests.AcceptanceTests
             MemberInfo lior = new MemberInfo("Liorwork347","lior@gmail.com", "Lior Lee", 
                 DateTime.ParseExact("05/07/1996", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Carl Neter 14");
             string token = _auth.Connect();
-            _auth.Register(token, yossi, "qwerty123");
-            _auth.Register(token, shiran, "130452abc");
-            _auth.Register(token, lior, "987654321");
-            Result<string> yossiLogInResult = _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
-            _store.OpenStore(yossiLogInResult.Value, store);
+            await _auth.Register(token, yossi, "qwerty123");
+            await _auth.Register(token, shiran, "130452abc");
+            await _auth.Register(token, lior, "987654321");
+            Result<string> yossiLogInResult = await _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
+            _inStore.OpenStore(yossiLogInResult.Value, store);
             _user.AppointManager(yossiLogInResult.Value, store, "singerMermaid7");
             token = _auth.Logout(yossiLogInResult.Value).Value;
             _auth.Disconnect(token);
@@ -62,17 +64,17 @@ namespace Tests.AcceptanceTests
         public void Teardown()
         {
             _auth = null;
-            _store = null;
+            _inStore = null;
             _user = null;
         }
 
         [TestCase("singerMermaid7")]
         [Order(0)]
         [Test]
-        public void TestChangeManagerPermissionsSuccessAdd(string manager)
+        public async Task TestChangeManagerPermissionsSuccessAdd(string manager)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
             StorePermission[] perms = new[]
                 {StorePermission.ChangeItemStrategy, StorePermission.AddItemToStore, StorePermission.ChangeItemPrice};
             List<StorePermission> permissions = new List<StorePermission>(perms);
@@ -84,10 +86,10 @@ namespace Tests.AcceptanceTests
         
         [TestCase("singerMermaid7")]
         [Test]
-        public void TestChangeManagerPermissionsSuccessRemove(string manager)
+        public async Task TestChangeManagerPermissionsSuccessRemove(string manager)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
             StorePermission[] oldPerms = new[]
                 {StorePermission.ChangeItemStrategy, StorePermission.AddItemToStore, StorePermission.ChangeItemPrice};
             List<StorePermission> permissions = new List<StorePermission>(oldPerms);
@@ -102,10 +104,10 @@ namespace Tests.AcceptanceTests
         
         [TestCase("Liorwork347")]
         [Test]
-        public void TestChangeManagerPermissionsFailureInvalid(string manager)
+        public async Task TestChangeManagerPermissionsFailureInvalid(string manager)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
             StorePermission[] perms = new[]
                 {StorePermission.ChangeItemStrategy, StorePermission.AddItemToStore, StorePermission.ChangeItemPrice};
             List<StorePermission> permissions = new List<StorePermission>(perms);
@@ -118,10 +120,10 @@ namespace Tests.AcceptanceTests
         [TestCase("singerMermaid7", "prancing dragon")]
         [TestCase("Tamir123", "prancing dragon")]
         [Test]
-        public void TestChangeManagerPermissionsFailureLogic(string manager, string storeName)
+        public async Task TestChangeManagerPermissionsFailureLogic(string manager, string storeName)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi117", "qwerty123", ServiceUserRole.Member);
             StorePermission[] perms = new[]
                 {StorePermission.ChangeItemStrategy, StorePermission.AddItemToStore, StorePermission.ChangeItemPrice};
             List<StorePermission> permissions = new List<StorePermission>(perms);

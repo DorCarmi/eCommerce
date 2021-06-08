@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.Purchases;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business.CombineRules
@@ -25,7 +25,7 @@ namespace eCommerce.Business.CombineRules
             _theItemsToPerformTheDiscountOn = null;
         }
 
-        public Result<double> GetDiscount(IBasket basket, IUser user)
+        public Result<double> GetDiscount(IBasket basket, User user)
         {
             double newPrice = basket.GetRegularTotalPrice();
             var lst = this._rule.Check(basket,user);
@@ -57,7 +57,7 @@ namespace eCommerce.Business.CombineRules
             return Result.Ok(newPrice);
         }
 
-        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             if (_rule == null)
             {
@@ -66,7 +66,7 @@ namespace eCommerce.Business.CombineRules
             return _rule.Check(checkItem1, checkItem2);
         }
 
-        public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
+        public override bool CheckOneItem(ItemInfo itemInfo, User checkItem2)
         {
             throw new System.NotImplementedException();
         }
@@ -76,12 +76,12 @@ namespace eCommerce.Business.CombineRules
             return true;
         }
 
-        public override Result<double> Get(IBasket basket, IUser user)
+        public override Result<double> Get(IBasket basket, User user)
         {
             return GetDiscount(basket, user);
         }
 
-        public override Result<double> GetOneItem(ItemInfo itemInfo, IUser user)
+        public override Result<double> GetOneItem(ItemInfo itemInfo, User user)
         {
             return Result.Ok(itemInfo.amount * itemInfo.pricePerUnit * _theDiscount);
         }

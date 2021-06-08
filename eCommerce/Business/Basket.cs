@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using eCommerce.Business.Service;
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -10,7 +9,7 @@ namespace eCommerce.Business
     {
         private IList<ItemInfo> _itemsInBasket;
         private IDictionary<string, ItemInfo> _nameToItem;
-        private IStore _store;
+        private Store _store;
         private ICart _cart;
         
 
@@ -32,7 +31,25 @@ namespace eCommerce.Business
             return _store.CheckWithStorePolicy(this, _cart.GetUser());
         }
 
-        public Basket(ICart cart, IStore store)
+        public Result ReturnAllItemsToStore()
+        {
+            foreach (var itemInfo in _itemsInBasket)
+            {
+                var res=this._store.ReturnItemsToStore(itemInfo);
+                if (res.IsFailure)
+                {
+                    return res;
+                }
+            }
+            return Result.Ok();
+        }
+
+        public void Free()
+        {
+            this._store.FreeBasket(this);
+        }
+        
+        public Basket(ICart cart, Store store)
         {
             if (!store.CheckConnectionToCart(cart))
             {
@@ -53,7 +70,7 @@ namespace eCommerce.Business
             return _store.CalculateBasketPrices(this);
         }
 
-        public Result AddItemToBasket(IUser user,ItemInfo item)
+        public Result AddItemToBasket(User user,ItemInfo item)
         {
             if (item.amount <= 0)
             {
@@ -91,7 +108,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result EditItemInBasket(IUser user,ItemInfo item)
+        public Result EditItemInBasket(User user,ItemInfo item)
         {
             if (!_cart.CheckForCartHolder(user))
             {
@@ -172,7 +189,7 @@ namespace eCommerce.Business
             return this._store.GetStoreName();
         }
 
-        public Result<ItemInfo> GetItem(IUser user,string itemName)
+        public Result<ItemInfo> GetItem(User user,string itemName)
         {
             if (!_cart.CheckForCartHolder(user))
             {

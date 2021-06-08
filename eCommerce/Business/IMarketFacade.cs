@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using eCommerce.Business.Discounts;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using eCommerce.Service;
 
@@ -36,7 +37,7 @@ namespace eCommerce.Business
         /// <param name="memberInfoDto">The user information</param>
         /// <param name="password">The user password</param>
         /// <returns>Successful Result if the user has been successfully registered</returns>
-        public Result Register(string token, MemberInfo memberInfo, string password);
+        public Task<Result> Register(string token, MemberInfo memberInfo, string password);
         
         /// <summary>
         /// Log in to the system
@@ -50,7 +51,7 @@ namespace eCommerce.Business
         /// <param name="password">The user password</param>
         /// <param name="role">The user role</param>
         /// <returns>Authorization token</returns>
-        public Result<string> Login(string guestToken ,string username, string password, UserToSystemState role);
+        public Task<Result<string>> Login(string guestToken ,string username, string password, UserToSystemState role);
         
         /// <summary>
         /// Logout a user form the system.
@@ -121,7 +122,7 @@ namespace eCommerce.Business
         /// <returns>Result of the update</returns>
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions);
         
-        // TODO how to define and send the permission
+        /*// TODO how to define and send the permission
         /// <summary>
         /// Remove the manager permission
         /// </summary>
@@ -131,7 +132,7 @@ namespace eCommerce.Business
         /// <param name="permissions">The updated permission</param>
         /// <returns>Result of the remove</returns>
         public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
-            IList<StorePermission> permissions);
+            IList<StorePermission> permissions);*/
 
 
         /// <summary>
@@ -206,7 +207,7 @@ namespace eCommerce.Business
         /// <param name="token">The Authorization token</param>
         /// <param name="storeId">The store id</param>
         /// <returns>The store information</returns>
-        public Result<IStore> GetStore(string token, string storeId);
+        public Result<Store> GetStore(string token, string storeId);
         
         /// <summary>
         /// Get all the store items
@@ -363,7 +364,6 @@ namespace eCommerce.Business
         /// <returns>List of the purchase history in a store</returns>
         public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId);
         
-        
         /// <summary>
         /// Adding a rule to the store to modify what can or cannot happen.
         /// The rule can be simple or a combination of number of rules combined with logical combination functions (and,or..)
@@ -382,7 +382,6 @@ namespace eCommerce.Business
         /// <param name="storeId">The storeId</param>
         /// <param name="discountInfoNode">The discount: Leaf (simple) or Composite (Combined)</param>
         public Result AddDiscountToStore(string token, string storeId, DiscountInfoNode discountInfoNode);
-        
         
         /// <summary>
         /// Returns all the rules in store's policy

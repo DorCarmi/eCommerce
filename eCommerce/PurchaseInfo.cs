@@ -7,9 +7,9 @@ namespace eCommerce
     {
         private List<ItemInfo> allItems;
         private double totalPrice;
-        private IUser user;
+        private User user;
 
-        public PurchaseInfo(List<ItemInfo> allItems, double totalPrice, IUser user)
+        public PurchaseInfo(List<ItemInfo> allItems, double totalPrice, User user)
         {
             this.allItems = allItems;
             this.totalPrice = totalPrice;
@@ -26,7 +26,7 @@ namespace eCommerce
             return totalPrice;
         }
 
-        public IUser GetUser()
+        public User GetUser()
         {
             return user;
         }

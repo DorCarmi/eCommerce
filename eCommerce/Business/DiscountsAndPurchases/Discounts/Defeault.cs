@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.DiscountPoliciesCombination;
 using eCommerce.Business.Discounts;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business

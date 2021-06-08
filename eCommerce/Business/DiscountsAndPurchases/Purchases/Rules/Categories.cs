@@ -4,7 +4,7 @@ using System.Linq;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.Purchases;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -17,7 +17,7 @@ namespace eCommerce.Business
             this._category = category;
         }
         
-        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             bool ans = false;
             Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
@@ -36,7 +36,7 @@ namespace eCommerce.Business
             return itemsList;
         }
 
-        public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
+        public override bool CheckOneItem(ItemInfo itemInfo, User checkItem2)
         {
             if (itemInfo.category.Equals(_category))
             {

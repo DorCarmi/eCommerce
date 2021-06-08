@@ -17,6 +17,20 @@ namespace eCommerce.Service.StorePolicies
         public SRuleNode RuleA { get; set; }
         public SRuleNode RuleB { get; set; }
         public Combinations Combination { get; set; }
+        
+        public SRuleNode(SRuleNodeType type, SRuleInfo ruleInfo)
+        {
+            Type = type;
+            RuleInfo = ruleInfo;
+        }
+
+        public SRuleNode(SRuleNodeType type,SRuleNode ruleA, SRuleNode ruleB, Combinations combination)
+        {
+            Type = type;
+            RuleA = ruleA;
+            RuleB = ruleB;
+            Combination = combination;
+        }
 
         public RuleInfoNode ParseToRuleInfoNude()
         {

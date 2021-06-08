@@ -1,29 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
-using eCommerce.Business.Service;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using eCommerce.Common;
-using Microsoft.AspNetCore.Rewrite;
 
 namespace eCommerce.Business
 {
     public class ItemsInventory
     {
-        private List<Item> _itemsInStore;
-        private List<Item> _aquiredItems;
-        private Dictionary<string, Item> _nameToItem;
-        private Dictionary<string, Item> _nameToAquiredItem;
-        private IStore _belongsToStore;
+        [NotMapped] //TODO is this field needed
+        public List<Item> _aquiredItems { get; private set; }
+        private Dictionary<string, Item> _nameToAquiredItem { get; set; }
+        
+        [Key] [ForeignKey("Store")]
+        public string StoreId { get; private set; }
+        public Store _belongsToStore { get; private set; }
+        public List<Item> _itemsInStore { get; private set; }
+        
+        // for ef
+        public ItemsInventory()
+        {
+            this._aquiredItems = new List<Item>();
+            this._nameToAquiredItem = new Dictionary<string, Item>();
+        }
 
-        public ItemsInventory(IStore store)
+        public ItemsInventory(Store store)
         {
             this._belongsToStore = store;
             this._itemsInStore = new List<Item>();
-            _aquiredItems = new List<Item>();
             this._aquiredItems = new List<Item>();
-            this._nameToItem = new Dictionary<string, Item>();
             this._nameToAquiredItem = new Dictionary<string, Item>();
         }
-        
+
+        public ItemsInventory(List<Item> itemsInStore, List<Item> aquiredItems, Store belongsToStore)
+        {
+            _itemsInStore = itemsInStore;
+            _aquiredItems = aquiredItems;
+            _nameToAquiredItem = new Dictionary<string, Item>();
+            _belongsToStore = belongsToStore;
+
+            foreach (var aquiredItem in aquiredItems)
+            {
+                _nameToAquiredItem.Add(aquiredItem._name, aquiredItem);
+            }
+        }
+
         //Searches
 
         public List<Item> SearchItem(string stringSearch)
@@ -75,12 +96,12 @@ namespace eCommerce.Business
             return this._itemsInStore;
         }
 
-        public Result AddNewItem(IUser user, ItemInfo itemInfo)
+        public Result AddNewItem(User user, ItemInfo itemInfo)
         {
             var ans = user.HasPermission(this._belongsToStore, StorePermission.AddItemToStore);
             if(!ans.IsFailure)
             {
-                if (this._nameToItem.ContainsKey(itemInfo.name) || this._nameToAquiredItem.ContainsKey(itemInfo.name))
+                if (HasItem(itemInfo.name) || this._nameToAquiredItem.ContainsKey(itemInfo.name))
                 {
                     return Result.Fail("Item already exist in store");
                 } else if(itemInfo.pricePerUnit <= 0)
@@ -95,7 +116,6 @@ namespace eCommerce.Business
                     var newItem = new Item(itemInfo, _belongsToStore);
 
                     this._itemsInStore.Add(newItem);
-                    this._nameToItem.Add(itemInfo.name, newItem);
                     return Result.Ok();
                 }
             }
@@ -106,37 +126,34 @@ namespace eCommerce.Business
         }
 
 
-        public Result AddExistingItem(IUser user,string itemName, int amount)
+        public Result AddExistingItem(string itemName, int amount)
         {
-            if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
+            
+            Item item = GetItemOrNull(itemName);
+            if (item != null)
             {
-                if (this._nameToItem.ContainsKey(itemName))
-                {
-                    return this._nameToItem[itemName].AddItems(user, amount);
-                }
-                else
-                {
-                    return Result.Fail("Item doesn't exist in store");
-                }
+                return item.AddItems(amount);
             }
             else
             {
-                return Result.Fail("User doesn't have permission to add item to store");
+                return Result.Fail("Item doesn't exist in store");
             }
+                
         }
 
 
         public Result<ItemInfo> GetItems(string itemName, int amount)
         {
-            if (this._nameToItem.ContainsKey(itemName))
+            Item item = GetItemOrNull(itemName);
+            if (item != null)
             {
-                if (_nameToItem[itemName].GetAmount() - amount <= 1)
+                if (item.GetAmount() - amount <= 1)
                 {
                     return Result.Fail<ItemInfo>("Amount requested will leave store with under limit amount of items");
                 }
                 else
                 {
-                    return _nameToItem[itemName].GetItems(amount);    
+                    return item.GetItems(amount);    
                 }
             
                 
@@ -149,15 +166,16 @@ namespace eCommerce.Business
 
         public Result FinalizeGetItems(string itemName, int amount)
         {
-            if (this._nameToItem.ContainsKey(itemName))
+            Item item = GetItemOrNull(itemName);
+            if (item != null)
             {
-                if (_nameToItem[itemName].GetAmount() - amount <= 1)
+                if (item.GetAmount() - amount <= 1)
                 {
                     return Result.Fail<ItemInfo>("Amount requested will leave store with under limit amount of items");
                 }
                 else
                 {
-                    return _nameToItem[itemName].FinalizeGetItems(amount);    
+                    return item.FinalizeGetItems(amount);    
                 }
             }
             else
@@ -200,9 +218,10 @@ namespace eCommerce.Business
         
         public Result<Item> GetItem(string itemID)
         {
-            if(this._nameToItem.ContainsKey(itemID))
+            Item item = GetItemOrNull(itemID);
+            if (item != null) 
             {
-                return Result.Ok<Item>(this._nameToItem[itemID]);
+                return Result.Ok(item);
             }
             else
             {
@@ -212,15 +231,15 @@ namespace eCommerce.Business
 
         
 
-        public Result RemoveItem(IUser user, ItemInfo newItem)
+        public Result RemoveItem(User user, ItemInfo newItem)
         {
             
             if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
             {
-                if (this._nameToItem.ContainsKey(newItem.name))
+                Item item = GetItemOrNull(newItem.name);
+                if (item != null)
                 {
-                    this._itemsInStore.Remove(_nameToItem[newItem.name]);
-                    this._nameToItem.Remove(newItem.name);
+                    this._itemsInStore.Remove(item);
                     return Result.Ok();
                 }
                 else
@@ -234,13 +253,14 @@ namespace eCommerce.Business
             }
         }
 
-        public Result SubtractItems(IUser user, string newItemName, int newItemAmount)
+        public Result SubtractItems(User user, string newItemName, int newItemAmount)
         {
             if (!user.HasPermission(_belongsToStore, StorePermission.AddItemToStore).IsFailure)
             {
-                if (this._nameToItem.ContainsKey(newItemName))
+                Item item = GetItemOrNull(newItemName);
+                if (item != null)
                 {
-                    return this._nameToItem[newItemName].SubtractItems(user, newItemAmount);
+                    return item.SubtractItems(user, newItemAmount);
                 }
                 else
                 {
@@ -251,6 +271,16 @@ namespace eCommerce.Business
             {
                 return Result.Fail("User doesn't have permission to add item to store");
             }
+        }
+
+        private bool HasItem(string itemName)
+        {
+            return GetItemOrNull(itemName) != null;
+        }
+
+        private Item GetItemOrNull(string itemName)
+        {
+            return _itemsInStore.Find(item => item._name.Equals(itemName));
         }
     }
 }
