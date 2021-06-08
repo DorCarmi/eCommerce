@@ -45,5 +45,10 @@ namespace eCommerce.Business.Repositories
         {
             throw new System.NotImplementedException();
         }
+
+        public void Update(User user)
+        {
+            _dataFacade.UpdateUser(user);
+        }
     }
 }

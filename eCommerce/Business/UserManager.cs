@@ -374,5 +374,10 @@ namespace eCommerce.Business
                 AddAdmin(adminInfo, config.GetData("AdminCreationInfo:Password"));
             }
         }
+
+        public void UpdateUser(User user)
+        {
+            _registeredUsersRepo.Update(user);
+        }
     }
 }

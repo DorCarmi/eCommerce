@@ -21,8 +21,8 @@ namespace eCommerce.Business
         private static MarketFacade _instance =
             new MarketFacade(
                 UserAuth.GetInstance(),
-                new InMemoryRegisteredUsersRepository(),
-                //new PersistenceRegisteredUsersRepo(),
+                //new InMemoryRegisteredUsersRepository(),
+                new PersistenceRegisteredUsersRepo(),
                 new InMemoryStoreRepo());
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
@@ -586,6 +586,7 @@ namespace eCommerce.Business
                 return Result.Fail("Error opening store");
             }
 
+            _userManager.UpdateUser(user);
             return Result.Ok();
         }
         

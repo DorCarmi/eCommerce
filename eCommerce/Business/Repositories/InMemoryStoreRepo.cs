@@ -36,6 +36,11 @@ namespace eCommerce.Business.Repositories
             throw new System.NotImplementedException();
         }
 
+        public void Update(Store data)
+        {
+            
+        }
+
         public IEnumerable<ItemInfo> SearchForItem(string query)
         {
             IList<ItemInfo> queryMatches = new List<ItemInfo>();
