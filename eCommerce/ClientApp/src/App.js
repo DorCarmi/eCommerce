@@ -30,6 +30,7 @@ import {Comperators} from "./Data/StorePolicies/Comperators";
 import {Combinations} from "./Data/StorePolicies/Combinations";
 import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "./Data/StorePolicies/DiscountInfoTree";
 import AddPolicy from "./components/AddPolicy";
+import AddRule from "./components/AddRule";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -244,6 +245,7 @@ export default class App extends Component {
                     <Route exact path="/addPolicy/:storeId" render={({match}) => <AddPolicy storeId={match.params.storeId}/>}/>
 
 
+                    <Route exact path="/addRule/:storeId" render={({match}) => <AddRule storeId={match.params.storeId}/>}/>
 
                     <Route exact path="/searchItems/Item/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query}  />} />
                     <Route exact path="/searchItems/Store/:query" render={({match}) => <Store  storeId={match.params.query}/>} />

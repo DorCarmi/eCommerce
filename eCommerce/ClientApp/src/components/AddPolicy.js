@@ -6,8 +6,9 @@ import {
     makeRuleNodeComposite, makeRuleNodeLeaf
 } from '../Data/StorePolicies/RuleInfo'
 import AddRule from "./AddRule";
-import {CombinationsNames} from "../Data/StorePolicies/Combinations";
-import {makeDiscountNodeLeaf} from "../Data/StorePolicies/DiscountInfoTree";
+import {Combinations, CombinationsNames} from "../Data/StorePolicies/Combinations";
+import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "../Data/StorePolicies/DiscountInfoTree";
+import AddDiscount from "./AddDiscount";
 
 class AddPolicy extends Component {
     static displayName = AddPolicy.name;
@@ -19,8 +20,8 @@ class AddPolicy extends Component {
             discount:0,
             selectedCombination:0,
             toggler:false,
-            firstRule:undefined,
-            secondRule:undefined,
+            firstDiscount:undefined,
+            secondDiscount:undefined,
             submitted:false
         }
         this.storeApi = new StoreApi();
@@ -36,31 +37,30 @@ class AddPolicy extends Component {
     //     const { history } = this.props;
     //     if(history) history.push(path);
     // }
-    
+
 
 
     async handleSubmit(event){
-        const {firstRule,secondRule,selectedCombination,discount} = this.state
+        const {firstDiscount,secondDiscount,selectedCombination,discount} = this.state
         const {storeId} = this.props
         event.preventDefault();
-        if(firstRule) {
+        if(firstDiscount) {
             let res = undefined
-            let rule = makeRuleNodeLeaf(firstRule)
-            if(secondRule){
-                rule = makeRuleNodeComposite(makeRuleNodeLeaf(firstRule), makeRuleNodeLeaf(secondRule), parseInt(selectedCombination));
+            let discount = firstDiscount
+            if(secondDiscount){
+                discount = makeDiscountCompositeNode(firstDiscount, secondDiscount, parseInt(selectedCombination));
             }
-            const discountNodeLeaf = makeDiscountNodeLeaf(rule,parseInt(discount));
-            res = await this.storeApi.addDiscountToStore(storeId, discountNodeLeaf)
+            res = await this.storeApi.addDiscountToStore(storeId, discount)
 
             if(res && res.isSuccess) {
-                alert('add discount succeed')
+                alert('add policy succeed')
                 this.setState({
                     submitted:true
                 })
             }
             else{
                 if(res) {
-                    alert(`add discount failed because- ${res.error}`)
+                    alert(`add policy failed because- ${res.error}`)
                 }
             }
         }
@@ -69,23 +69,23 @@ class AddPolicy extends Component {
     }
 
 
-    
+
 
     toggle(event){
         this.setState({
             toggler:!this.state.toggler
         })
     }
-    
-    addFirstRule(rule){
+
+    addFirstDiscount(discount){
         this.setState({
-            firstRule:rule
+            firstDiscount:discount
         })
     }
 
-    addSecondRule(rule){
+    addSecondDiscount(discount){
         this.setState({
-            secondRule:rule
+            secondDiscount:discount
         })
     }
 
@@ -105,39 +105,36 @@ class AddPolicy extends Component {
             return <Redirect exact to="/"/>
         }
         else{
-        return (
-            // <main className="RegisterMain">
+            return (
+                // <main className="RegisterMain">
                 <div className="RegisterWindow">
-                        <h3>{`Add Policy For The Store: ${storeId}`}</h3>
+                    <h3>{`Add Policy For The Store: ${storeId}`}</h3>
                     <form  onSubmit={this.handleSubmit}>
-                        <AddRule addRule={(rule) =>this.addFirstRule(rule)} storeId={storeId}/>
-                         <button onClick={this.toggle}>{`${toggler? "Don't " : ''}Combine Another Rule`}</button>
+                        <AddDiscount addDiscount={(discount) =>this.addFirstDiscount(discount)} storeId={storeId}/>
+                        <button onClick={this.toggle}>{`${toggler? "Don't " : ''}Combine Another Discount`}</button>
                         {
                             toggler ?
                                 <>
-                                <div>
-                                    <label>
-                                        Choose Combination:
-                                        
-                                        <select  onChange={this.handleInputChange} name="selectedCombination" className="searchContainer">
-                                            {CombinationsNames.map((combination,index) => <option  value={index}>{combination}</option>)}
-                                        </select>
-                                    </label>
-                                </div>
-                                <AddRule addRule={(rule) =>this.addSecondRule(rule)} storeId={storeId}/></>:
-                                    null
+                                    <div>
+                                        <label>
+                                            Choose Combination:
+
+                                            <select  onChange={this.handleInputChange} name="selectedCombination" className="searchContainer">
+                                                {CombinationsNames.map((combination,index) => <option  value={index}>{combination}</option>)}
+                                            </select>
+                                        </label>
+                                    </div>
+                                    <AddDiscount addDiscount={(discount) =>this.addSecondDiscount(discount)} storeId={storeId}/></>:
+                                null
                         }
-                        <div><label>Enter Discount</label>
-                            <input type="number" name="discount" value={this.state.discount} onChange={this.handleInputChange}
-                                    placeholder={'Enter Discount'} required/></div>
                         <div className="CenterItemContainer">
-                            <input className="action" type="submit" value="Add Discount"/>
+                            <input className="action" type="submit" value="Add Policy"/>
                         </div>
                     </form>
                 </div>
-            // </main>
-        );
-    }
-}}
+                // </main>
+            );
+        }
+    }}
 
 export default withRouter(AddPolicy);
