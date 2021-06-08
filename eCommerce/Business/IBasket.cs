@@ -11,7 +11,7 @@ namespace eCommerce.Business
         public Result EditItemInBasket(User user,ItemInfo item);
         public Result BuyWholeBasket();
         public Result<double>GetTotalPrice();
-        public Result<IList<ItemInfo>> GetAllItems();
+        public Result<List<ItemInfo>> GetAllItems();
         public ICart GetCart();
         Result SetTotalPrice();
         public void SetTotalPrice(double newTotalPrice);

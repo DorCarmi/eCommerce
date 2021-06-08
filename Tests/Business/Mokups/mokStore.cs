@@ -70,7 +70,7 @@ namespace Tests.Business.Mokups
             return true;
         }
 
-        public override Result ConnectNewBasketToStore(IBasket newBasket)
+        public override Result ConnectNewBasketToStore(Basket newBasket)
         {
             Console.WriteLine("MockStore: Connected new basket to store");
             return Result.Ok();

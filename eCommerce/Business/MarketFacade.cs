@@ -501,8 +501,12 @@ namespace eCommerce.Business
             User user = userRes.Value;
 
             _logger.Info($"GetCart({user.Username})");
-
-            return user.GetCartInfo();
+            var resCart=user.GetCartInfo();
+            if (resCart.IsFailure)
+            {
+                return Result.Fail<ICart>(resCart.Error);
+            }
+            return new Result<ICart>(resCart.Value, resCart.IsSuccess, resCart.Error);
         }
         
         public Result<double> GetPurchaseCartPrice(string token)
@@ -516,7 +520,7 @@ namespace eCommerce.Business
 
             _logger.Info($"GetPurchaseCartPrice({user.Username})");
 
-            Result<ICart> cartRes = user.GetCartInfo();
+            Result<Cart> cartRes = user.GetCartInfo();
             if (cartRes.IsFailure)
             {
                 return Result.Fail<double>(cartRes.Error);
@@ -538,7 +542,7 @@ namespace eCommerce.Business
 
             _logger.Info($"PurchaseCart({user.Username} {paymentInfo})");
             
-            Result<ICart> cartRes = user.GetCartInfo();
+            Result<Cart> cartRes = user.GetCartInfo();
             if (cartRes.IsFailure)
             {
                 return Result.Fail<double>(cartRes.Error);

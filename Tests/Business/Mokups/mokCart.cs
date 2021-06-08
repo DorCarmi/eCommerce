@@ -37,7 +37,7 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public IList<IBasket> GetBaskets()
+        public List<Basket> GetBaskets()
         {
             throw new System.NotImplementedException();
         }
@@ -52,7 +52,7 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public IList<ItemInfo> GetAllItems()
+        public List<ItemInfo> GetAllItems()
         {
             throw new System.NotImplementedException();
         }

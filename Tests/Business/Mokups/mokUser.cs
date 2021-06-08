@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using eCommerce.Business;
 
 using eCommerce.Common;
+using eCommerce.Publisher;
 
 namespace Tests.Business.Mokups
 {
@@ -10,7 +11,6 @@ namespace Tests.Business.Mokups
     {
         private bool isLoggedIn = false;
         
-        private string userName;
 
         public mokUser(string username) : base(username)
         {
@@ -128,7 +128,12 @@ namespace Tests.Business.Mokups
 
         public override Result PublishMessage(string message)
         {
-            throw new NotImplementedException();
+            MainPublisher publisher = MainPublisher.Instance;
+            if (publisher == null)
+                return Result.Fail("user can not access publisher");
+            //@TODO_sharon:: find out whether 'userID' or 'Username' sould be passed
+            publisher.AddMessageToUser(this.Username, message);
+            return Result.Ok();
         }
 
         public override UserToSystemState GetState()
