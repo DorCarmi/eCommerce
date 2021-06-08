@@ -39,14 +39,15 @@ namespace Tests.AcceptanceTests
         private bool shouldTearDown = false;
         private string IvanLoginToken;
 
+        
         public TestBuyCart()
         {
             PaymentProxy.AssignPaymentService(new mokPaymentService(true,true,true));
             SupplyProxy.AssignSupplyService(new mokSupplyService(true,true));
-            _auth = new AuthService();
-            _inStore = new InStoreService();
-            _cart = new CartService();
-            _user = new UserService();
+            // _auth = new AuthService();
+            // _inStore = new InStoreService();
+            // _cart = new CartService();
+            // _user = new UserService();
             InMemoryStoreRepo SR = new InMemoryStoreRepo();
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
@@ -55,6 +56,7 @@ namespace Tests.AcceptanceTests
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
             _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
             _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
+            _user = UserService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo Ivan = new MemberInfo("Ivan11", "Ivan@gmail.com", "Ivan Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();
@@ -196,7 +198,7 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             string ITEM_NAME = "Tara milk";
             
-            var IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInTask =  _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
             var IvanLogInResult = IvanLogInTask.Result;
             Assert.True(IvanLogInResult.IsSuccess,IvanLogInResult.Error);
             this.IvanLoginToken = IvanLogInResult.Value;
@@ -226,7 +228,7 @@ namespace Tests.AcceptanceTests
         //payment fail
         //supply fail
         [TestCase(10)]
-        [Order(2)]
+        [Order(3)]
         // Policy -> Discounts -> GetItems -> Pay -> X
         public void TestBuyCartPaymentFail(int amount)
         {

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using eCommerce.Adapters;
 using eCommerce.Common;
 
 namespace eCommerce.Business.Repositories
@@ -15,6 +16,8 @@ namespace eCommerce.Business.Repositories
         public PersistenceStoreRepo()
         {
             _stores = new ConcurrentDictionary<string, Store>();
+            PaymentProxy._adapter = new WSEPPaymentAdapter();
+            SupplyProxy._adapter = new WSEPSupplyAdapter();
         }
 
         public bool Add([NotNull] Store store)

@@ -6,18 +6,19 @@ namespace eCommerce.Adapters
 {
     public class PaymentProxy : IPaymentAdapter
     {
-        private static IPaymentAdapter _adapter;
+        public static IPaymentAdapter _adapter;
         public static int PROXY_REFUNDS=0;
         public static int REAL_REFUNDS=0;
         public static int REAL_HITS = 0;
         public static int PROXY_HITS = 0;
 
-        private int _transactionId;
+        private static int _transactionId=1000;
         public PaymentProxy()
         {
-            _transactionId = 10000;
-            _adapter = new WSEPPaymentAdapter();
+            
         }
+        
+        
 
         public static void AssignPaymentService(IPaymentAdapter paymentAdapter)
         {

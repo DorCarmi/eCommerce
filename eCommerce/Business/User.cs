@@ -34,7 +34,7 @@ namespace eCommerce.Business
         }
 
         
-        private ICart _myCart;
+        private Cart _myCart;
         private Object dataLock;
         //MemberData:
         private ConcurrentDictionary<Store, bool> _storesFounded;
@@ -159,9 +159,9 @@ namespace eCommerce.Business
         ///  gets the information from the cart. 
         /// </summary>
         /// <returns>Result, ICart. </returns>
-        public virtual Result<ICart> GetCartInfo()
+        public virtual Result<Cart> GetCartInfo()
         {
-            return Result.Ok<ICart>(_myCart);
+            return Result.Ok<Cart>(_myCart);
         }
 
         /// <TEST>  </TEST>

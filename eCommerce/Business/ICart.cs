@@ -18,13 +18,13 @@ namespace eCommerce.Business
         public Result BuyWholeCart(User user, PaymentInfo paymentInfo);
         public bool CheckForCartHolder(User user);
 
-        public IList<IBasket> GetBaskets();
+        public List<Basket> GetBaskets();
 
 
         public CartInfo GetCartInfo();
 
         public User GetUser();
-        IList<ItemInfo> GetAllItems();
+        List<ItemInfo> GetAllItems();
         void Free();
     }
 }

@@ -8,6 +8,7 @@ using eCommerce.Adapters;
 using eCommerce.Business;
 
 using eCommerce.Common;
+using eCommerce.Publisher;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
 using Tests.Business.Mokups;
@@ -24,6 +25,9 @@ namespace Tests.Business.StoreTests
         private ItemInfo item1b;
         private ItemInfo item2;
         private ItemInfo item3;
+
+        private mokPublisherListener _mokObserver;
+        private MainPublisher _mainPublisher;
         public StoreTest()
         {
             Alice = new mokUser("Alice");
@@ -31,6 +35,10 @@ namespace Tests.Business.StoreTests
             this.MyStore = new Store("Alenby", Alice);
             SupplyProxy.AssignSupplyService(new mokSupplyService(true,true));
             PaymentProxy.AssignPaymentService(new mokPaymentService(true,true,true));
+
+            _mokObserver = new mokPublisherListener();
+            _mainPublisher=MainPublisher.Instance;
+            _mainPublisher.Register(_mokObserver);
         }
         
         [SetUp]
@@ -157,11 +165,13 @@ namespace Tests.Business.StoreTests
             MyStore.AddItemToStore(item2, Alice);
             ICart cart = new Cart(Alice);
             item2.amount = 10;
+            int countMessages = _mokObserver.count;
             cart.AddItemToCart(Alice, item2);
 
             var buyRes = cart.BuyWholeCart(Alice,
-                new PaymentInfo("Alice", "369852147", "7894789478947894", "05-01-23", "123",
+                new PaymentInfo("Alice", "369852147", "7894789478947894", "01/23", "123",
                     "Even Gavirol 30, TLV, Israel"));
+            
             Assert.AreEqual(true,buyRes.IsSuccess, buyRes.Error);
 
         }
@@ -182,11 +192,11 @@ namespace Tests.Business.StoreTests
             bobcart.AddItemToCart(bob, item3);
             
             Assert.AreEqual("",bobcart.BuyWholeCart(bob,
-                new PaymentInfo("Bob", "369852147", "7894789478947894", "05-01-23", "123",
+                new PaymentInfo("Bob", "369852147", "7894789478947894", "01/23", "123",
                     "Even Gavirol 30, TLV, Israel")).Error);
             
             Assert.AreEqual(false,alicecart.BuyWholeCart(Alice,
-                new PaymentInfo("Alice", "369852147", "7894789478947894", "05-01-23", "123",
+                new PaymentInfo("Alice", "369852147", "7894789478947894", "01/23", "123",
                     "Even Gavirol 30, TLV, Israel")).IsSuccess);
 
         }
@@ -208,10 +218,10 @@ namespace Tests.Business.StoreTests
         public void TestBasketsInStore()
         {
             MyStore.AddItemToStore(item2, Alice);
-            ICart cart = new Cart(Alice);
+            Cart cart = new Cart(Alice);
             Assert.AreEqual(false, MyStore.CheckConnectionToCart(cart));
             Assert.AreEqual(true,MyStore.TryAddNewCartToStore(cart));
-            IBasket basket = new Basket(cart, MyStore);
+            Basket basket = new Basket(cart, MyStore);
             var resBasket=MyStore.ConnectNewBasketToStore(basket);
             Assert.AreEqual(true,resBasket.IsSuccess);
             resBasket = MyStore.ConnectNewBasketToStore(basket);

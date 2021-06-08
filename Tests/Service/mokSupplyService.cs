@@ -19,7 +19,14 @@ namespace Tests.Service
         {
             await Task.Delay(2000);
             //TODO may generate id
-            return Result.Ok(100000);
+            if (chargeAns)
+            {
+                return Result.Ok(100000);
+            }
+            else
+            {
+                return Result.Fail<int>("Couldn't supply");
+            }
         }
 
         public async Task<Result> CheckSupplyInfo(int transactionId)

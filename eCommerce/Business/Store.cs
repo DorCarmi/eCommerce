@@ -37,7 +37,7 @@ namespace eCommerce.Business
         public List<OwnerAppointment> _ownersAppointments { get; private set; }
         public List<ManagerAppointment> _managersAppointments { get; private set; }
         
-        private List<IBasket> _basketsOfThisStore;
+        public List<Basket> _basketsOfThisStore { get; private set; }
 
         // for ef
         public Store()
@@ -62,7 +62,7 @@ namespace eCommerce.Business
             
             _managersAppointments = new List<ManagerAppointment>();
             
-            _basketsOfThisStore = new List<IBasket>();
+            _basketsOfThisStore = new List<Basket>();
         }
 
         public virtual IList<Item> GetAllItems()
@@ -174,7 +174,7 @@ namespace eCommerce.Business
         }
 
 
-        public virtual Result AddBasketToStore(IBasket basket)
+        public virtual Result AddBasketToStore(Basket basket)
         {
             if (this._basketsOfThisStore.FirstOrDefault(x => x.GetCart() == basket.GetCart()) != null)
             {
@@ -477,7 +477,7 @@ namespace eCommerce.Business
 
         }
 
-        public virtual Result ConnectNewBasketToStore(IBasket newBasket)
+        public virtual Result ConnectNewBasketToStore(Basket newBasket)
         {
             if (_basketsOfThisStore.Count == 0)
             {
@@ -639,6 +639,7 @@ namespace eCommerce.Business
         public virtual Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
         {
             var purchaseRecord=this._transactionHistory.AddRecordToHistory(basket);
+
             foreach (var ownerAppointment in _ownersAppointments)
             {
                 User owner = ownerAppointment.User;

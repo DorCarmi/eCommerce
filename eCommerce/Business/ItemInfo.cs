@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
 using eCommerce.Common;
 using eCommerce.Service;
 
@@ -9,18 +12,62 @@ namespace eCommerce.Business
 {
     public class ItemInfo : IItem
     {
-        public int amount;
-        public string name;
-        public string storeName;
-        public string category;
+        private string id;
+        [Key]
+        public string ItemID
+        {
+            get
+            {
+                return storeName + "-" + name;
+            }
+            set
+            {
+                id = value;
+            }
+        }
+        [NotMapped]
+        public int amount { get; set; }
+        [NotMapped]
+        public string name { get; set; }
+        [NotMapped]
+        public string storeName { get; set; }
+        [NotMapped]
+        public string category { get; set; }
+        
+        [NotMapped]
         public List<string> keyWords;
-        public double pricePerUnit;
-        private Item theItem;
-        private double discountFactor;
-        private Store _store;
+
+        public string keyWordsString
+        {
+            get
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (var keyWord in keyWords)
+                {
+                    stringBuilder.Append(keyWord + ";");
+                }
+
+                return stringBuilder.ToString();
+            }
+            set
+            {
+                string[] arr = value.Split(';');
+                this.keyWords=arr.ToList();
+            }
+        }
+        [NotMapped]
+        public double pricePerUnit { get; private set; }
+        
+        public Item theItem { get; private set; }
+        public Store _store { get; private set; }
 
         public static ItemInfo AnyItem(string storeName) =>
             new ItemInfo(0, "ANY", storeName, "ALL", new List<string>(), 0);
+
+        public ItemInfo()
+        {
+            this.keyWords = new List<string>();
+        }
         public ItemInfo(int amount, string name, string storeName, string category,
             double pricePerUnit, List<string> keyWords,Item theItem)
         {
@@ -75,7 +122,6 @@ namespace eCommerce.Business
             this.amount = itemInf.amount;
             this.category = itemInf.category;
             this.name = itemInf.name;
-            this.discountFactor = itemInf.discountFactor;
             this.keyWords = new List<string>();
             foreach (var keyWord in itemInf.keyWords)
             {
@@ -126,32 +172,33 @@ namespace eCommerce.Business
                 return Result.Fail("Store assigned doesn't match item's store name");
             }
         }
-
-        public void ApplyUniqueDiscountOnProduct(double discountFactor)
-        {
-            this.discountFactor = discountFactor; 
-        }
+        
 
         // ========== Properties ========== //
         
         // TODO check how to set store and other properties
         // that dont have setters
         
-        public string ItemName { get => name; }
-        public string StoreName { get => storeName; }
+        public string ItemName { get => name;
+            private set { this.name = value; }
+        }
+        public string StoreName { get => storeName;
+            private set { this.storeName = value; }
+        }
 
         public int Amount
         {
             get => amount;
-            set => amount = value;
+            set => this.amount = value;
         }
 
         public string Category
         {
             get => category;
-            set => category = value;
+            set => this.category = value;
         }
 
+        [NotMapped]
         public List<string> KeyWords
         {
             get => keyWords;
@@ -160,7 +207,7 @@ namespace eCommerce.Business
         public double PricePerUnit
         {
             get => pricePerUnit;
-            set => pricePerUnit = value;
+            set => this.pricePerUnit = value;
         }
     }
 }

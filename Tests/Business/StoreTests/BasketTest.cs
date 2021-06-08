@@ -8,8 +8,8 @@ namespace Tests.Business.StoreTests
 {
     public class BasketTest
     {
-        public IBasket basket;
-        public ICart cart;
+        public Basket basket;
+        public Cart cart;
         public User alice;
         
         private Item item1;

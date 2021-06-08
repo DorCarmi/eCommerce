@@ -15,8 +15,8 @@ namespace eCommerce.Business
         public Transaction(ICart cart)
         {
             this._cart = cart;
-            _supply = new SupplyProxy();
-            _payment = new PaymentProxy();
+            this._payment = new PaymentProxy();
+            this._supply = new SupplyProxy();
         }
 
         public Result BuyWholeCart(PaymentInfo paymentInfo)
