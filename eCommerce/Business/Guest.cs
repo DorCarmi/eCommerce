@@ -130,5 +130,10 @@ namespace eCommerce.Business
         {
             return Result.Fail("Guest can not be an founder of a store.");
         }
+
+        public string GetRole()
+        {
+            return "Guest";
+        }
     }  
 }

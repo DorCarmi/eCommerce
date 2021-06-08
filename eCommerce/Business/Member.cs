@@ -141,5 +141,10 @@ namespace eCommerce.Business
         {
             return user.AnnexStakeholders(this, store, owners, managers);
         }
+        
+        public string GetRole()
+        {
+            return "Member";
+        }
     }
 }

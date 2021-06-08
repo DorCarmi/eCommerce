@@ -33,8 +33,10 @@ namespace eCommerce.Business
             }
         }
 
-        
         private ICart _myCart;
+        private UserTransactionHistory _transHistory ;
+
+        
         private Object dataLock;
         //MemberData:
         private ConcurrentDictionary<Store, bool> _storesFounded;
@@ -42,8 +44,7 @@ namespace eCommerce.Business
         private ConcurrentDictionary<Store, ManagerAppointment> _storesManaged;
         private ConcurrentDictionary<Store, IList<OwnerAppointment>> _appointedOwners;
         private ConcurrentDictionary<Store, IList<ManagerAppointment>> _appointedManagers;
-        private UserTransactionHistory _transHistory ;
-        
+
 
         //constructors
 
@@ -55,6 +56,7 @@ namespace eCommerce.Business
             _myCart = new Cart(this);
             _isRegistered = false;
             dataLock = new Object();
+            role = _systemState.GetRole();
         }
         public User(MemberInfo MemberInfo)
         {
@@ -63,8 +65,9 @@ namespace eCommerce.Business
             _memberInfo = MemberInfo;
             dataLock = new Object();
             _systemState = Member.State;
+            role = _systemState.GetRole();
             _myCart = new Cart(this);
-            // _userName = memberData.Username;
+            
             _storesFounded = new ConcurrentDictionary<Store, bool>();
             _storesOwned = new ConcurrentDictionary<Store, OwnerAppointment>();
             _storesManaged = new ConcurrentDictionary<Store, ManagerAppointment>();
@@ -79,6 +82,7 @@ namespace eCommerce.Business
             _memberInfo = MemberInfo;
             dataLock = new Object();
             _systemState = state;
+            role = _systemState.GetRole();
             _myCart = new Cart(this);
             _storesFounded = new ConcurrentDictionary<Store, bool>();
             _storesOwned = new ConcurrentDictionary<Store, OwnerAppointment>();
@@ -347,7 +351,31 @@ namespace eCommerce.Business
         {
             return _systemState.EnterRecordToHistory(this, record);
         }
-    #endregion User Facade Interface
+
+        public virtual Result IsAdmin()
+        {
+            if (role.Equals(Admin.State.GetRole()))
+                return Result.Ok();
+            return Result.Fail("Error deciding user Role");
+        }
+
+        public virtual Result<string> GetUserCategory()
+        {
+            if (_systemState.GetRole().Equals(Guest.State.GetRole()))
+                return Result.Ok("Guest");
+            if (_systemState.GetRole().Equals(Admin.State.GetRole()))
+                return Result.Ok("Admin");
+            string category = "Member";
+            bool manager = StoresManaged.Count > 0;
+            bool owner = StoresOwned.Count > 0;
+            if (owner)
+                category += " (Store Owner)";
+            else if (manager)
+                category += " (Store Manager)";
+            return Result.Ok<string>(category);
+        }
+
+        #endregion User Facade Interface
 
 
     #region Admin Functions
@@ -784,19 +812,17 @@ namespace eCommerce.Business
     #region DAL Oriented Functions
 
     public virtual List<Store> storesFoundedBackup { get; set; }
-    public virtual List<Pair<Store, OwnerAppointment>> storesOwnedBackup 
-    { get; set; }
-    public virtual List<Pair<Store, ManagerAppointment>> storesManagedBackup 
-    { get; set; }
+    public virtual List<Pair<Store, OwnerAppointment>> storesOwnedBackup { get; set; }
+    public virtual List<Pair<Store, ManagerAppointment>> storesManagedBackup { get; set; }
     public virtual List<ListPair<Store, OwnerAppointment>> appointedOwnersBackup { get; set; }
     public virtual List<ListPair<Store, ManagerAppointment>> appointedManagersBackup { get; set; }
 
+    public string role { get; set; }
 
     public User()
     {
         _isRegistered = false;
         dataLock = new Object();
-        _systemState = Member.State;
         _storesFounded = new ConcurrentDictionary<Store, bool>();
         _storesOwned = new ConcurrentDictionary<Store, OwnerAppointment>();
         _storesManaged = new ConcurrentDictionary<Store, ManagerAppointment>();
@@ -807,8 +833,16 @@ namespace eCommerce.Business
 
     public void SyncToBusiness()
     {
-        Console.WriteLine("setting pairs!");
+        if (role.Equals(Admin.State.GetRole()))
+        {
+            _systemState = Admin.State;
+        }
+        else
+        {
+            _systemState = Member.State;
+        }
 
+        
         if(storesFoundedBackup != null)
         {
             foreach (Store store in storesFoundedBackup)

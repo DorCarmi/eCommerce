@@ -14,8 +14,24 @@ namespace eCommerce.DataLayer
         {
             try
             {
-
                 db = new ECommerceContext();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //add logging
+            }
+        }
+        public void init(bool test)
+        {
+            try
+            {
+                if(test)
+                    db = new testContext();
+                else
+                {
+                    db = new ECommerceContext();
+                }
             }
             catch (Exception e)
             {
@@ -150,11 +166,12 @@ namespace eCommerce.DataLayer
             return Result.Ok();
         }
         
+        //ClearTables function is reserved for Testing purposes.  
         public Result ClearTables()
         {
             try
             {
-                db = new ECommerceContext();
+                db = new testContext();
                 Console.WriteLine("clearing DB!");
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();

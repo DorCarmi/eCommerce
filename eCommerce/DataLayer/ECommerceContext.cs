@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Common;
 using eCommerce.Business;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,7 @@ namespace eCommerce.DataLayer
 {
     public class ECommerceContext: DbContext
     {
+        private string ConnectionString;
         public DbSet<MemberInfo> MemberInfos { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<OwnerAppointment> OwnerAppointments { get; set; }
@@ -20,6 +22,7 @@ namespace eCommerce.DataLayer
         public DbSet<Store> Stores { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemsInventory> ItemsInventories { get; set; }
+        
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

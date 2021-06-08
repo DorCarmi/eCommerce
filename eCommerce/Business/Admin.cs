@@ -41,6 +41,9 @@ namespace eCommerce.Business
             return otherUser.GetUserPurchaseHistory();
         }
 
-
+        public string GetRole()
+        {
+            return "Admin";
+        }
     }
 }
