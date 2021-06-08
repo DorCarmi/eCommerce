@@ -6,6 +6,7 @@ using eCommerce.Business.Discounts;
 
 using eCommerce.Common;
 using eCommerce.Service;
+using eCommerce.Statistics;
 
 namespace eCommerce.Business
 {
@@ -400,5 +401,13 @@ namespace eCommerce.Business
         public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId);
         
         #endregion
+
+        /// <summary>
+        /// Get the login stats
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="date">Date of the stats</param>
+        /// <returns>The stats</returns>
+        Result<LoginDateStat> AdminGetLoginStats(string token, DateTime date);
     }
 }

@@ -8,10 +8,9 @@ namespace eCommerce.Business
 {
     public class MemberInfo : ICloneable<MemberInfo>
     {
-        //@TODO::sharon change Primary key from Id to Username
+        public string Id { get; set; }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }

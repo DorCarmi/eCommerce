@@ -29,6 +29,11 @@ import {makeRuleInfo, makeRuleNodeComposite, makeRuleNodeLeaf, RuleType} from ".
 import {Comperators} from "./Data/StorePolicies/Comperators";
 import {Combinations} from "./Data/StorePolicies/Combinations";
 import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "./Data/StorePolicies/DiscountInfoTree";
+import AddPolicy from "./components/AddPolicy";
+import AddRule from "./components/AddRule";
+import {AppointOwner} from "./components/AppointOwner";
+import {ShowStatsInput} from "./components/ShowStatsInput";
+import ShowStatsOutput from "./components/ShowStatsOutput";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -240,15 +245,25 @@ export default class App extends Component {
                     <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
                     <Route exact path="/purchaseHistory/:storeId?/:userId?/:isAdmin?" render={({match}) => <PurchaseHistory storeId ={match.params.storeId} userId={match.params.userId} isAdmin={match.params.isAdmin}/>} />
                     <Route exact path="/AdminPurchaseHistory/:term" render={({match}) => <AdminPurchaseHistory term={match.params.term}/>}/>
+                    <Route exact path="/addPolicy/:storeId" render={({match}) => <AddPolicy storeId={match.params.storeId}/>}/>
 
 
-
+                    <Route exact path="/addRule/:storeId" render={({match}) => <AddRule storeId={match.params.storeId}/>}/>
 
                     <Route exact path="/searchItems/Item/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query}  />} />
                     <Route exact path="/searchItems/Store/:query" render={({match}) => <Store  storeId={match.params.query}/>} />
 
                     <Route exact path="/managePermissions/:id/appointManager" render={({match}) => <AppointManager storeId ={match.params.id}/>} />
+
+                    <Route exact path="/managePermissions/:id/appointOwner" render={({match}) => <AppointOwner storeId ={match.params.id}/>} />
+
                     <Route exact path="/managePermissions/:storeId/" render={({match}) => <ManagePermissions storeId ={match.params.storeId}/>}/>
+
+                    <Route exact path="/showStats" render={({match}) => <ShowStatsInput storeId ={match.params.storeId}/>}/>
+
+                    <Route exact path="/showStats/:date" render={({match}) => <ShowStatsOutput date ={match.params.date}/>}/>
+
+
 
                 </Layout>
             </BrowserRouter>

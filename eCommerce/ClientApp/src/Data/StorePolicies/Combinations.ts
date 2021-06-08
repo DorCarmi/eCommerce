@@ -9,3 +9,5 @@
     PLUS,
 
 }
+
+export var CombinationsNames = ["AND","OR","XOR","NOT","MAX","MIN","PLUS"]

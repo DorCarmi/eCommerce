@@ -17,6 +17,8 @@ class AddRule extends Component {
             ruleType:0,
             whatIsTheRuleOf:'',
             selectedComperator:0,
+            selectedItem:'',
+            items:[],
         }
         this.storeApi = new StoreApi();
 
@@ -29,17 +31,42 @@ class AddRule extends Component {
         if(history) history.push(path);
     }
 
+    async componentDidMount() {
+        const fetchedItems = await this.storeApi.getAllItems(this.props.storeId)
+        if (fetchedItems && fetchedItems.isSuccess) {
+            console.log(fetchedItems)
+            
+            this.setState({
+                items: fetchedItems.value,
+                selectedItem:fetchedItems.value.length > 0 ? fetchedItems.value[0].itemName : ''
+            })
+        }
+        else{
+            alert("fetch item failed")
+        }
+
+    }
+    
+    componentDidUpdate(prevProps, prevState, snapshot){
+        const {ruleType,whatIsTheRuleOf,selectedComperator,selectedItem} = this.state
+        if(this.state !== prevState && this.props.addRule) {
+            // alert(ruleType)
+            this.props.addRule((makeRuleInfo(parseInt(ruleType), whatIsTheRuleOf
+                , selectedItem, parseInt(selectedComperator))))
+        }
+    }
+
     async handleSubmit(event){
-        const {ruleType,whatIsTheRuleOf,selectedComperator} = this.state
-        const {itemId,storeId} = this.props
-        const ruleTypeIdx=ruleType
-        const comperatorIdx = selectedComperator
-        console.log(ruleTypeIdx)
-        console.log(comperatorIdx)
-        console.log(Comperators.NOT_EQUALS)
+        const {storeId} = this.props
+        const {ruleType,whatIsTheRuleOf,selectedItem,selectedComperator} = this.state
+        // const ruleTypeIdx=ruleType
+        // const comperatorIdx = selectedComperator
+        // console.log(ruleTypeIdx)
+        // console.log(comperatorIdx)
+        // console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
         event.preventDefault();
         const res = await this.storeApi.addRuleToStorePolicy(storeId,makeRuleNodeLeaf(makeRuleInfo(parseInt(ruleType),whatIsTheRuleOf,
-                                                                                        itemId,parseInt(selectedComperator))))
+            selectedItem,parseInt(selectedComperator))))
 
         if(res && res.isSuccess) {
             alert('add rule succeed')
@@ -50,33 +77,41 @@ class AddRule extends Component {
                 alert(`add rule failed because- ${res.error}`)
             }
         }
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
+        // alert("Rule Has Been Added")
     }
 
 
     
     handleInputChange(event){
+        const {ruleType,whatIsTheRuleOf,selectedComperator,selectedItem} = this.state
         const target = event.target;
+        console.log(target.name)
         this.setState({
             [target.name]: target.value
         });
+
+
     }
 
     render () {
-        const {storeId,itemId} = this.props
+        const {items} = this.state
         const comperatorValue = ComperatorsNames[this.state.selectedComperator]
         const ruleTypeValue = RuleTypesOptions[this.state.ruleType]
-        console.log(ruleTypeValue)
-        console.log(comperatorValue)
-        console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+        // console.log(ruleTypeValue)
+        // console.log(comperatorValue)
         return (
-            <main className="RegisterMain">
+            // <main className="RegisterMain">
                 <div className="RegisterWindow">
                     <div className="CenterItemContainer">
-                        <h3>{`Add Rule For Item: ${itemId} In Store: ${storeId}`}</h3>
+                        <h3>{`Add Rule`}</h3>
                     </div>
                     <form  onSubmit={this.handleSubmit}>
+                        <div><label>
+                            Choose An Item:
+                            <select  onChange={this.handleInputChange} name="selectedItem" className="searchContainer">
+                                {items.map((item) => <option  value={item.itemName}>{item.itemName}</option>)}
+                            </select>
+                        </label></div>
                         <label>
                             Choose Rule Type:
                             <select  onChange={this.handleInputChange} name="ruleType" className="searchContainer">
@@ -93,12 +128,16 @@ class AddRule extends Component {
                                 {ComperatorsNames.map((comperator,index) => <option  value={index}>{comperator}</option>)}
                             </select>
                         </label></div>
-                        <div className="CenterItemContainer">
-                            <input className="action" type="submit" value="submit"/>
-                        </div>
+                    {
+                        !this.props.addRule?
+                            <div className="CenterItemContainer">
+                                <input className="action" type="submit" value="Add Rule"/>
+                            </div>
+                         : null
+                    }
                     </form>
-                </div>
-            </main>
+            </div>
+            // </main>
         );
     }
 }

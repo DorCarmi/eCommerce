@@ -1,9 +1,11 @@
-﻿    using System.Collections.Generic;
+﻿    using System;
+    using System.Collections.Generic;
 using eCommerce.Business;
 
 using eCommerce.Common;
+    using eCommerce.Statistics;
 
-namespace eCommerce.Service
+    namespace eCommerce.Service
 {
     public interface IUserService
     {
@@ -92,5 +94,12 @@ namespace eCommerce.Service
         /// <returns>All the managed store id</returns>
         public Result<IList<string>> GetAllManagedStoreIds(string token);
 
+        /// <summary>
+        /// Get the login stats
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="date">Date of the stats</param>
+        /// <returns>The stats</returns>
+        public Result<LoginDateStat> AdminGetLoginStats(string token, DateTime date);
     }
 }

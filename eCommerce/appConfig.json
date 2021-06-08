@@ -9,8 +9,8 @@
 
   "DBConnectionString": "Server=localhost;DataBase=market;Trusted_Connection=True;",
   "AuthDBConnectionString": "Server=localhost;DataBase=auth;Trusted_Connection=True;",
-  "SupplyServiceConnection": "",
-  "PaymentServiceConnection" : "",
-  
+  "StatsDBConnectionString": "Server=localhost;DataBase=stats;Trusted_Connection=True;",
+
+
   "JWTKey": "keykeykeykeykeyekeykey"
 }
