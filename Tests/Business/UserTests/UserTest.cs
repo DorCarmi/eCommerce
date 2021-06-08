@@ -202,16 +202,7 @@ namespace Tests.Business.UserTests
             Assert.True(result.IsSuccess);
             Assert.True(result.Value.Contains(purchaseRecord));
         } 
-        [Test]
-        public void TestUserPurchaseHistory_Fail()
-        {
-            var result = tempguy.GetUserPurchaseHistory();
-            Assert.False(result.IsSuccess);
-            var purchaseRecord = new PurchaseRecord(store1,new MokBasket(tempguy.GetCartInfo().Value,store1),DateTime.Now);
-            Assert.False(tempguy.EnterRecordToHistory(purchaseRecord).IsSuccess);
-            result = tempguy.GetUserPurchaseHistory();
-            Assert.False(result.IsSuccess);
-        }
+
         
         [Test]
         public void TestUserPurchaseHistory_Concurrent()

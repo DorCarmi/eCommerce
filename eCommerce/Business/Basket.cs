@@ -103,7 +103,8 @@ namespace eCommerce.Business
         }
         public Basket(Cart cart, Store store)
         {
-            BasketGuid = new Guid();
+            BasketGuid = Guid.NewGuid();
+            
             if (!store.CheckConnectionToCart(cart))
             {
                 this._cart = cart;

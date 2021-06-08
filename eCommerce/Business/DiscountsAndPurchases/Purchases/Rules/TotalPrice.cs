@@ -7,7 +7,7 @@ namespace eCommerce.Business
 {
     public class TotalPrice : CompositeRule
     {
-        private int _totalPrice;
+        private double _totalPrice;
         private Compare _compare;
 
         public TotalPrice(int totalPrice,Compare compare)

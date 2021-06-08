@@ -71,7 +71,7 @@ namespace Tests.Business.StoreTests
         }
 
         [Test]
-        [Order(0)]
+        [Order(1)]
         public void TestSuccessDiscountRulesComposite()
         {
             double theDiscount = 0.5;
@@ -107,7 +107,7 @@ namespace Tests.Business.StoreTests
         }
         
         [Test]
-        [Order(0)]
+        [Order(2)]
         public void TestSuccessDiscountComposite()
         {
             double theDiscount = 0.5;
@@ -147,7 +147,7 @@ namespace Tests.Business.StoreTests
         }
 
         [Test]
-        [Order(0)]
+        [Order(3)]
         public void TestOrBothForDiscountAndRules()
         {
             double theDiscount = 0.5;
