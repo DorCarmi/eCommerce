@@ -360,20 +360,22 @@ namespace eCommerce.Business
             return Result.Fail("Error deciding user Role");
         }
 
-        public virtual Result<string> GetUserCategory()
+        public virtual string GetUserCategory()
         {
             if (_systemState.GetRole().Equals(Guest.State.GetRole()))
-                return Result.Ok("Guest");
+                return "Guest";
             if (_systemState.GetRole().Equals(Admin.State.GetRole()))
-                return Result.Ok("Admin");
+                return "Admin";
             string category = "Member";
             bool manager = StoresManaged.Count > 0;
             bool owner = StoresOwned.Count > 0;
-            if (owner)
-                category += " (Store Owner)";
-            else if (manager)
-                category += " (Store Manager)";
-            return Result.Ok<string>(category);
+            if (!owner & manager)
+                category = "Manager";
+            else if (owner)
+                category = "Owner";
+            else
+                category = "Member";
+            return category;
         }
 
         #endregion User Facade Interface

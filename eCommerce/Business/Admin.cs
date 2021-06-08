@@ -49,7 +49,7 @@ namespace eCommerce.Business
             return statisticsService.GetLoginStatsOn(date);
         }
 
-        public string GetRole()
+        public override string GetRole()
         {
             return "Admin";
         }
