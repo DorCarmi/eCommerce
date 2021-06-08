@@ -797,7 +797,6 @@ namespace eCommerce.Business
             Store store = _inMemoryStoreRepo.GetOrNull(storeId);
             if (store == null)
             {
-                _logger.Error($"User {user.Username} requested invalid sotre {storeId}");
                 return Result.Fail<Tuple<User, Store>>("Store doesn't exist");
             }
 

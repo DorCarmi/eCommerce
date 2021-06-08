@@ -49,6 +49,9 @@ namespace eCommerce.Business
             return statisticsService.GetLoginStatsOn(date);
         }
 
-
+        public override string GetRole()
+        {
+            return "Admin";
+        }
     }
 }

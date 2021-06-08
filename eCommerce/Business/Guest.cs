@@ -132,6 +132,11 @@ namespace eCommerce.Business
             return Result.Fail("Guest can not be an founder of a store.");
         }
 
+        public string GetRole()
+        {
+            return "Guest";
+        }
+
         public Result<LoginDateStat> GetLoginStats(DateTime date)
         {
             return Result.Fail<LoginDateStat>("Guest can not get stats");

@@ -147,5 +147,10 @@ namespace eCommerce.Business
         {
             return Result.Fail<LoginDateStat>("Guest can not get stats");
         }
+        
+        public virtual string GetRole()
+        {
+            return "Member";
+        }
     }
 }
