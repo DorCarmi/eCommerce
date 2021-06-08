@@ -9,6 +9,7 @@ using eCommerce.Business.Repositories;
 
 using eCommerce.Common;
 using eCommerce.Service;
+using eCommerce.Statistics;
 using NLog;
 
 namespace eCommerce.Business
@@ -772,6 +773,18 @@ namespace eCommerce.Business
             return res;
         }
 
+        public Result<LoginDateStat> AdminGetLoginStats(string token, DateTime date)
+        {
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<LoginDateStat>(userRes.Error);
+            }
+            User user = userRes.Value;
+
+            return user.GetLoginStats(date);
+        }
+
         #endregion
 
         private Result<Tuple<User, Store>> GetUserAndStore(string token, string storeId)
@@ -788,7 +801,6 @@ namespace eCommerce.Business
             Store store = _inMemoryStoreRepo.GetOrNull(storeId);
             if (store == null)
             {
-                _logger.Error($"User {user.Username} requested invalid sotre {storeId}");
                 return Result.Fail<Tuple<User, Store>>("Store doesn't exist");
             }
 

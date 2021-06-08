@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using NLog;
 
 namespace eCommerce.Business
 {
     public class MarketState
     {
+        private Logger _logger;
         private static MarketState _instance = new MarketState();
         public bool ValidState { get; private set; }
         private string _errMessage;
@@ -14,6 +16,7 @@ namespace eCommerce.Business
         {
             ValidState = true;
             _errMessage = null;
+            _logger = LogManager.GetCurrentClassLogger();
         }
 
         public static MarketState GetInstance()
@@ -25,9 +28,10 @@ namespace eCommerce.Business
         {
             ValidState = false;
             _errMessage = message;
-
+            
             Task checker = new Task(() => CheckServiceAndUpdateState(serviceValidityChecker));
             checker.Start();
+            _logger.Error(message);
         }
 
         public bool TryGetErrMessage(out string message)

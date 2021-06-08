@@ -8,6 +8,7 @@ using System.Linq;
 using eCommerce.Common;
 using eCommerce.Publisher;
 using eCommerce.DataLayer;
+using eCommerce.Statistics;
 
 namespace eCommerce.Business
 {
@@ -55,6 +56,7 @@ namespace eCommerce.Business
             _myCart = new Cart(this);
             _isRegistered = false;
             dataLock = new Object();
+            role = _systemState.GetRole();
         }
         public User(MemberInfo MemberInfo)
         {
@@ -63,6 +65,7 @@ namespace eCommerce.Business
             _memberInfo = MemberInfo;
             dataLock = new Object();
             _systemState = Member.State;
+            role = _systemState.GetRole();
             _myCart = new Cart(this);
             // _userName = memberData.Username;
             _storesFounded = new ConcurrentDictionary<Store, bool>();
@@ -79,6 +82,7 @@ namespace eCommerce.Business
             _memberInfo = MemberInfo;
             dataLock = new Object();
             _systemState = state;
+            role = _systemState.GetRole();
             _myCart = new Cart(this);
             _storesFounded = new ConcurrentDictionary<Store, bool>();
             _storesOwned = new ConcurrentDictionary<Store, OwnerAppointment>();
@@ -354,12 +358,42 @@ namespace eCommerce.Business
         {
             return _systemState.EnterRecordToHistory(this, record);
         }
-    #endregion User Facade Interface
+
+        public virtual Result IsAdmin()
+        {
+            if (role.Equals(Admin.State.GetRole()))
+                return Result.Ok();
+            return Result.Fail("Error deciding user Role");
+        }
+
+        public virtual string GetUserCategory()
+        {
+            if (_systemState.GetRole().Equals(Guest.State.GetRole()))
+                return "Guest";
+            if (_systemState.GetRole().Equals(Admin.State.GetRole()))
+                return "Admin";
+            string category = "Member";
+            bool manager = StoresManaged.Count > 0;
+            bool owner = StoresOwned.Count > 0;
+            if (!owner & manager)
+                category = "Manager";
+            else if (owner)
+                category = "Owner";
+            else
+                category = "Member";
+            return category;
+        }
+
+        #endregion User Facade Interface
 
 
     #region Admin Functions
     
-
+    public virtual Result<LoginDateStat> GetLoginStats(DateTime date)
+    {
+        return _systemState.GetLoginStats(date);
+    }
+    
     #endregion Admin Functions
     
     
@@ -791,19 +825,17 @@ namespace eCommerce.Business
     #region DAL Oriented Functions
 
     public virtual List<Store> storesFoundedBackup { get; set; }
-    public virtual List<Pair<Store, OwnerAppointment>> storesOwnedBackup 
-    { get; set; }
-    public virtual List<Pair<Store, ManagerAppointment>> storesManagedBackup 
-    { get; set; }
+    public virtual List<Pair<Store, OwnerAppointment>> storesOwnedBackup { get; set; }
+    public virtual List<Pair<Store, ManagerAppointment>> storesManagedBackup { get; set; }
     public virtual List<ListPair<Store, OwnerAppointment>> appointedOwnersBackup { get; set; }
     public virtual List<ListPair<Store, ManagerAppointment>> appointedManagersBackup { get; set; }
 
+    public string role { get; set; }
 
     public User()
     {
         _isRegistered = false;
         dataLock = new Object();
-        _systemState = Member.State;
         _storesFounded = new ConcurrentDictionary<Store, bool>();
         _storesOwned = new ConcurrentDictionary<Store, OwnerAppointment>();
         _storesManaged = new ConcurrentDictionary<Store, ManagerAppointment>();
@@ -814,8 +846,16 @@ namespace eCommerce.Business
 
     public void SyncToBusiness()
     {
-        Console.WriteLine("setting pairs!");
+        if (role.Equals(Admin.State.GetRole()))
+        {
+            _systemState = Admin.State;
+        }
+        else
+        {
+            _systemState = Member.State;
+        }
 
+        
         if(storesFoundedBackup != null)
         {
             foreach (Store store in storesFoundedBackup)

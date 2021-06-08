@@ -22,7 +22,7 @@ namespace Tests.DataLayer
         public DataLayerTest()
         {
             df = new DataFacade();
-            df.init();
+            df.init(true);
         }
 
         

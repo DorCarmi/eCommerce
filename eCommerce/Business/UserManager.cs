@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using eCommerce.Auth;
 
 using eCommerce.Common;
+using eCommerce.Statistics;
 using NLog;
 
 namespace eCommerce.Business
@@ -22,9 +23,9 @@ namespace eCommerce.Business
         private ConcurrentDictionary<string, User> _connectedUsers;
         private ConcurrentDictionary<string, bool> _connectedUsersName;
         private IRepository<User> _registeredUsersRepo;
-        private ConcurrentDictionary<string, User> _admins;
 
         private ConcurrentIdGenerator _concurrentIdGenerator;
+        private IStatisticsService _statisticsService;
 
 
         public UserManager(IUserAuth auth, IRepository<User> registeredUsersRepo)
@@ -35,7 +36,7 @@ namespace eCommerce.Business
             // TODO get the initialze id value from DB
             _concurrentIdGenerator = new ConcurrentIdGenerator(0);
             _registeredUsersRepo = registeredUsersRepo;
-            _admins = new ConcurrentDictionary<string, User>();
+            _statisticsService = Statistics.Statistics.GetInstance();
         }
 
         public string Connect()
@@ -45,8 +46,13 @@ namespace eCommerce.Business
 
             User newUser = CreateGuestUser(guestUsername);
             _connectedUsers.TryAdd(token, newUser);
-            
+
+            DateTime date = DateTime.Now;
             _logger.Info($"New guest: {guestUsername}");
+            if (_statisticsService.AddLoggedIn(date, guestUsername, newUser.GetUserCategory()).IsFailure)
+            {
+                _logger.Warn($"Didnt add to stats {guestUsername} at {date} as guest");
+            }
             return token;
         }
         
@@ -120,7 +126,6 @@ namespace eCommerce.Business
             User user = new User(Admin.State, adminInfo);
             RegisterAtAuthorization(adminInfo.Username, password).Wait();
             _registeredUsersRepo.Add(user);
-            _admins.TryAdd(adminInfo.Username, user);
         }
         
         private Task<Result> RegisterAtAuthorization(string username, string password)
@@ -128,7 +133,6 @@ namespace eCommerce.Business
             return _auth.Register(username, password);
         }
         
-        // TODO: use the role here, how user that is admin can log in as member
         public async Task<Result<string>> Login(string guestToken, string username, string password, UserToSystemState role)
         {
             if (!_auth.IsValidToken(guestToken))
@@ -146,7 +150,7 @@ namespace eCommerce.Business
             {
                 return Result.Fail<string>("Not connected or not guest");
             }
-            
+
             Result authLoginRes = await _auth.Authenticate(username, password);
             if (authLoginRes.IsFailure)
             {
@@ -158,8 +162,6 @@ namespace eCommerce.Business
                 return Result.Fail<string>("User is already logged in");
             }
             
-            string loginToken = _auth.GenerateToken(username);
-            
             User user = _registeredUsersRepo.GetOrNull(username);
             if (user == null)
             {
@@ -167,15 +169,29 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Invalid username or password");
             }
 
+            if (role == Admin.State & user.IsAdmin().IsFailure)
+            {
+                return Result.Fail<string>("User is not a admin");
+            }
+
             if (!_connectedUsers.TryRemove(guestToken, out var tUser1))
             {
                 return Result.Fail<string>("Guest not connected");
             }
             
+            string loginToken = _auth.GenerateToken(username);
+
             if (!_connectedUsers.TryAdd(loginToken, user) || !_connectedUsersName.TryAdd(username, true))
             {
                 _logger.Error($"UserAuth created duplicate toekn(already in connected userses dictionry)");
                 return Result.Fail<string>("Error");
+            }
+            
+            DateTime date = DateTime.Now;
+            string category = user.GetUserCategory();
+            if (_statisticsService.AddLoggedIn(date, username, category).IsFailure)
+            {
+                _logger.Warn($"Didnt add to stats {username} at {date} as {category}");
             }
             
             _logger.Info($"User {user.Username} logged in. Token {loginToken}");
