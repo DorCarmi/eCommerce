@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.Purchases;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business
@@ -11,15 +11,15 @@ namespace eCommerce.Business
     public class PurchasePolicy
     {
         private List<Composite> _storeRules;
-        private IStore _store;
+        private Store _store;
 
-        public PurchasePolicy(IStore store)
+        public PurchasePolicy(Store store)
         {
             this._store = store;
             this._storeRules = new List<Composite>();
         }
 
-        public Result AddRuleToStorePolicy(IUser user, Composite rule)
+        public Result AddRuleToStorePolicy(User user, Composite rule)
         {
             if (user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {
@@ -32,7 +32,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result CheckWithStorePolicy(IBasket basket, IUser user)
+        public Result CheckWithStorePolicy(IBasket basket, User user)
         {
             foreach (var storeRule in _storeRules)
             {
@@ -49,7 +49,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
-        public Result<IList<RuleInfoNode>> GetPolicy(IUser user)
+        public Result<IList<RuleInfoNode>> GetPolicy(User user)
         {
             if (!user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {
@@ -69,7 +69,7 @@ namespace eCommerce.Business
             return Result.Ok(ruleInfoNodes);
         }
 
-        public Result Reset(IUser user)
+        public Result Reset(User user)
         {
             if (!user.HasPermission(_store, StorePermission.EditStorePolicy).IsSuccess)
             {

@@ -6,7 +6,7 @@ using eCommerce.Service.StorePolicies;
 
 namespace eCommerce.Service
 {
-    public interface IStoreService
+    public interface INStoreService
     {
         /// <summary>
         /// GetDiscount all the staff of the store and their permissions

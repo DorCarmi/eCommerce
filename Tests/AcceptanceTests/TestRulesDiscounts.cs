@@ -5,6 +5,7 @@ using eCommerce.Adapters;
 using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.CombineRules;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Service;
 using eCommerce.Service.StorePolicies;
@@ -18,7 +19,7 @@ namespace Tests.AcceptanceTests
     public class TestRulesDiscounts
     {
         private IAuthService _auth;
-        private IStoreService _store;
+        private INStoreService _store;
         private ICartService _cart;
         private IUserService _user;
         private string store_name = "Borca";
@@ -31,25 +32,27 @@ namespace Tests.AcceptanceTests
         // Policy -> Discounts -> GetItems -> Pay -> Supply -> History -> :-)
         public void SetUp()
         {
+            
             PaymentProxy.AssignPaymentService(new mokPaymentService(true,true,true));
             SupplyProxy.AssignSupplyService(new mokSupplyService(true,true));
                 _auth = new AuthService();
-            _store = new StoreService();
+                _store = new InStoreService();
             _cart = new CartService();
             _user = new UserService();
-            StoreRepository SR = new StoreRepository();
-            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
+            InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
-            IRepository<IUser> UR = new RegisteredUsersRepository();
+            IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _store = eCommerce.Service.InStoreService.CreateUserServiceForTests(UA, UR, SR);
             _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo Ivan = new MemberInfo("Ivan11", "Ivan@gmail.com", "Ivan Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();
             _auth.Register(token, Ivan, "qwerty123");
-            Result<string> IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInResult = IvanLogInTask.Result;
             IItem product = new SItem("Tara milk", store_name, 10, "dairy",
                 new List<string> {"dairy", "milk", "Tara"}, (double) 5.4);
             IItem product2 = new SItem("Chocolate milk", store_name, 200, "Sweet",
@@ -87,7 +90,8 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             string ITEM_NAME = "Vodka";
             string CATEGORY_NAME = "Alcohol";
-            Result<string> IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInResult = IvanLogInTask.Result;
             Assert.True(IvanLogInResult.IsSuccess,IvanLogInResult.Error);
             this.IvanLoginToken = IvanLogInResult.Value;
             this.shouldTearDown = true;
@@ -124,7 +128,8 @@ namespace Tests.AcceptanceTests
                 DateTime.ParseExact("19/04/2015", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string tokenJake = _auth.Connect();
             _auth.Register(tokenJake, Jake, "qwerty123");
-            Result<string> JakeLogInResult = _auth.Login(tokenJake, "Jake11", "qwerty123", ServiceUserRole.Member);
+            var JakeLogInTask = _auth.Login(tokenJake, "Jake11", "qwerty123", ServiceUserRole.Member);
+            var JakeLogInResult = JakeLogInTask.Result;
             
             
             var resAddItemToCart = _cart.AddItemToCart(JakeLogInResult.Value, ITEM_NAME, store_name, amount);
@@ -139,7 +144,8 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
             
             token = _auth.Connect();
-            IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            IvanLogInResult = IvanLogInTask.Result;
             Assert.True(IvanLogInResult.IsSuccess,IvanLogInResult.Error);
             
             //Make sure nothing changed
@@ -164,7 +170,8 @@ namespace Tests.AcceptanceTests
             string token = _auth.Connect();
             string ITEM_NAME = "Vodka";
             string CATEGORY_NAME = "Alcohol";
-            Result<string> IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInResult = IvanLogInTask.Result;
             Assert.True(IvanLogInResult.IsSuccess,IvanLogInResult.Error);
             this.IvanLoginToken = IvanLogInResult.Value;
             this.shouldTearDown = true;
@@ -201,7 +208,8 @@ namespace Tests.AcceptanceTests
                 DateTime.ParseExact("19/04/2015", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string tokenJake = _auth.Connect();
             _auth.Register(tokenJake, Jake, "qwerty123");
-            Result<string> JakeLogInResult = _auth.Login(tokenJake, "Jake11", "qwerty123", ServiceUserRole.Member);
+            var JakeLogInTask = _auth.Login(tokenJake, "Jake11", "qwerty123", ServiceUserRole.Member);
+            var JakeLogInResult = JakeLogInTask.Result;
             
             
             var resAddItemToCart = _cart.AddItemToCart(JakeLogInResult.Value, ITEM_NAME, store_name, amount);
@@ -216,7 +224,8 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
             
             token = _auth.Connect();
-            IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            IvanLogInResult = IvanLogInTask.Result;
             Assert.True(IvanLogInResult.IsSuccess,IvanLogInResult.Error);
             
             //Make sure nothing changed

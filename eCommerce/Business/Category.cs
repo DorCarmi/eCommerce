@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace eCommerce.Business
 {
     public class Category
     {
-        private static Dictionary<string, double> StoreToDiscount = new Dictionary<string, double>();
-        private String name;
+        [Key]
+        public string name { get; private set; }
 
         public Category(string name)
         {

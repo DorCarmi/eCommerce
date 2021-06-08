@@ -2,185 +2,81 @@
 using System.Collections.Generic;
 using eCommerce.Business;
 using eCommerce.Business.Discounts;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace Tests.Business.Mokups
 {
-    public class mokStore: IStore
+    public class mokStore: Store
     {
         public string storeName { get; set; }
         public Item item;
         public ICart cart;
 
-        public mokStore(string storeName)
+        public mokStore(string storeName): base(storeName, null)
         {
             this.storeName = storeName;
         }
-        
-        public IList<Item> GetAllItems()
-        {
-            throw new System.NotImplementedException();
-        }
 
-        public Result<Item> GetItem(ItemInfo item)
+        public override Result<Item> GetItem(ItemInfo item)
         {
             return Result.Ok<Item>(this.item);
         }
 
-        public Result TryGetItems(ItemInfo item)
+        public override Result TryGetItems(ItemInfo item)
         {
             return Result.Ok();
         }
 
-        public Result<Item> GetItem(string itemId)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<IList<StorePermission>> GetPermissions(IUser user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<Item> SearchItem(string stringSearch)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public List<Item> SearchItemWithPriceFilter(string stringSearch, int startPrice, int endPrice)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public List<Item> SearchItemWithCategoryFilter(string stringSearch, string category)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result AddBasketToStore(IBasket basket)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result CalculateBasketPrices(IBasket basket)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result CatchAllBasketProducts(IBasket basket)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result FinishPurchaseOfBasket(IBasket basket)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result FinishPurchaseOfItems(ItemInfo itemInfo)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result AddItemToStore(ItemInfo newItem, IUser user)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result EditItemToStore(ItemInfo newItem, IUser user)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result UpdateStock_AddItems(ItemInfo newItem, IUser user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result UpdateStock_SubtractItems(ItemInfo newItem, IUser user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result RemoveItemToStore(ItemInfo newItem, IUser user)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Result RemoveItemToStore(string itemID, IUser user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment)
+        public override Result AppointNewOwner(User user, OwnerAppointment ownerAppointment)
         {
             Console.WriteLine("MokStore: "+user.Username+" Appointed new Owner: "+ownerAppointment.User.Username);
             return Result.Ok();
         }
 
-        public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment)
+        public override Result AppointNewManager(User user, ManagerAppointment managerAppointment)
         {
             Console.WriteLine("MokStore: "+user.Username+" Appointed new Manager: "+managerAppointment.User.Username);
             return Result.Ok();
         }
 
-        public Result<IUser> GetFounder()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFierd, OwnerAppointment ownerAppointment)
+        public override Result RemoveOwnerFromStore(User theOneWhoFires, User theFierd, OwnerAppointment ownerAppointment)
         {
             Console.WriteLine("MokStore: "+theOneWhoFires.Username+" removed the Owner: "+theFierd.Username);
             return Result.Ok();
         }
+        
 
-        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired, ManagerAppointment managerAppointment)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
+        public override Result<IList<PurchaseRecord>> GetPurchaseHistory(User user)
         {
             Console.WriteLine("MokStore: Getting Purchase History (its empty..)");
             return Result.Ok<IList<PurchaseRecord>>(new List<PurchaseRecord>());
         }
 
-        public Result EnterBasketToHistory(IBasket basket)
+        public override Result EnterBasketToHistory(IBasket basket)
         {
             Console.WriteLine("MokStore: Entered Basket to History.");
             return  Result.Ok();
         }
 
-        public string GetStoreName()
+        public override string GetStoreName()
         {
             return this.storeName;
         }
 
-        public bool CheckWithPolicy(PurchaseStrategyName purchaseStrategy)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public bool TryAddNewCartToStore(ICart cart)
+        public override bool TryAddNewCartToStore(ICart cart)
         {
             Console.WriteLine("MokStore: Added New Cart To Store");
             return true;
         }
 
-        public Result ConnectNewBasketToStore(IBasket newBasket)
+        public override Result ConnectNewBasketToStore(IBasket newBasket)
         {
             Console.WriteLine("MockStore: Connected new basket to store");
             return Result.Ok();
         }
 
-        public bool CheckConnectionToCart(ICart cart)
+        public override bool CheckConnectionToCart(ICart cart)
         {
             return cart == this.cart;
         }
@@ -190,37 +86,37 @@ namespace Tests.Business.Mokups
             throw new System.NotImplementedException();
         }
 
-        public Result CheckWithStorePolicy(IBasket basket, IUser user)
+        public Result CheckWithStorePolicy(IBasket basket, User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result AddDiscountToStore(IUser user, DiscountInfoNode infoNode)
+        public Result AddDiscountToStore(User user, DiscountInfoNode infoNode)
         {
             throw new NotImplementedException();
         }
 
-        public Result AddRuleToStorePolicy(IUser user, RuleInfoNode ruleInfoNode)
+        public Result AddRuleToStorePolicy(User user, RuleInfoNode ruleInfoNode)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IList<RuleInfoNode>> GetStorePolicy(IUser user)
+        public Result<IList<RuleInfoNode>> GetStorePolicy(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(IUser user)
+        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result ResetStorePolicy(IUser user)
+        public Result ResetStorePolicy(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result ResetStoreDiscount(IUser user)
+        public Result ResetStoreDiscount(User user)
         {
             throw new NotImplementedException();
         }
@@ -235,32 +131,32 @@ namespace Tests.Business.Mokups
             throw new NotImplementedException();
         }
 
-        public Result AddPurchaseStrategyToStore(IUser user, PurchaseStrategyName purchaseStrategy)
+        public Result AddPurchaseStrategyToStore(User user, PurchaseStrategyName purchaseStrategy)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(IUser user)
+        public Result<IList<PurchaseStrategyName>> GetStorePurchaseStrategy(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Result UpdatePurchaseStrategies(IUser user, PurchaseStrategyName purchaseStrategy)
+        public Result UpdatePurchaseStrategies(User user, PurchaseStrategyName purchaseStrategy)
         {
             throw new NotImplementedException();
         }
 
-        public Result AddPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        public Result AddPurchaseStrategyToStoreItem(User user, string storeId, string itemId, PurchaseStrategyName strategyName)
         {
             throw new NotImplementedException();
         }
 
-        public Result RemovePurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        public Result RemovePurchaseStrategyToStoreItem(User user, string storeId, string itemId, PurchaseStrategyName strategyName)
         {
             throw new NotImplementedException();
         }
 
-        public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(IUser user, string storeId, string itemId, PurchaseStrategyName strategyName)
+        public Result<IList<PurchaseStrategyName>> GetPurchaseStrategyToStoreItem(User user, string storeId, string itemId, PurchaseStrategyName strategyName)
         {
             throw new NotImplementedException();
         }

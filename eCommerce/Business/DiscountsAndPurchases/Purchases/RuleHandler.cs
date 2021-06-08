@@ -198,7 +198,7 @@ namespace eCommerce.Business.Purchases
 
     public class DefaultRule : CompositeRule
     {
-        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             Dictionary<string, ItemInfo> items = new Dictionary<string, ItemInfo>();
             foreach (var item in checkItem1.GetAllItems().Value)
@@ -209,12 +209,12 @@ namespace eCommerce.Business.Purchases
             return items;
         }
 
-        public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
+        public override bool CheckOneItem(ItemInfo itemInfo, User checkItem2)
         {
             return true;
         }
         
-        public override Result<double> Get(IBasket basket, IUser user)
+        public override Result<double> Get(IBasket basket, User user)
         {
             double price = 0;
             
@@ -226,7 +226,7 @@ namespace eCommerce.Business.Purchases
             return Result.Ok(price);
         }
 
-        public override Result<double> GetOneItem(ItemInfo itemInfo, IUser user)
+        public override Result<double> GetOneItem(ItemInfo itemInfo, User user)
         {
             return Result.Ok<double>(itemInfo.amount * itemInfo.pricePerUnit);
         }

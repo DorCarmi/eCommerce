@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using eCommerce.Adapters;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NUnit.Framework;
@@ -17,9 +17,9 @@ namespace Tests.Business.StoreTests
 {
     public class StoreTest
     {
-        private IStore MyStore;
-        private IUser Alice;
-        private IUser Bob;
+        private Store MyStore;
+        private User Alice;
+        private User Bob;
         private ItemInfo item1;
         private ItemInfo item1b;
         private ItemInfo item2;
@@ -49,8 +49,8 @@ namespace Tests.Business.StoreTests
         [Test]
         public void TestUsersInStore()
         {
-            ManagerAppointment managerAppointment = new ManagerAppointment(Bob);
-            OwnerAppointment ownerAppointment = new OwnerAppointment(Bob);
+            ManagerAppointment managerAppointment = new ManagerAppointment(Bob, MyStore.StoreName);
+            OwnerAppointment ownerAppointment = new OwnerAppointment(Bob, MyStore.StoreName);
             var manager = this.MyStore.AppointNewManager(Alice, managerAppointment);
             var owner = this.MyStore.AppointNewOwner(Alice, ownerAppointment);
             
@@ -160,7 +160,7 @@ namespace Tests.Business.StoreTests
             cart.AddItemToCart(Alice, item2);
 
             var buyRes = cart.BuyWholeCart(Alice,
-                new PaymentInfo("Alice", "369852147", "7894789478947894", "05/23", "123",
+                new PaymentInfo("Alice", "369852147", "7894789478947894", "05-01-23", "123",
                     "Even Gavirol 30, TLV, Israel"));
             Assert.AreEqual(true,buyRes.IsSuccess, buyRes.Error);
 
@@ -177,16 +177,16 @@ namespace Tests.Business.StoreTests
             alicecart.AddItemToCart(Alice, item3);
             
             
-            IUser bob = new mokUser("Bob");
+            User bob = new mokUser("Bob");
             ICart bobcart = new Cart(bob);
             bobcart.AddItemToCart(bob, item3);
             
             Assert.AreEqual("",bobcart.BuyWholeCart(bob,
-                new PaymentInfo("Bob", "369852147", "7894789478947894", "05/23", "123",
+                new PaymentInfo("Bob", "369852147", "7894789478947894", "05-01-23", "123",
                     "Even Gavirol 30, TLV, Israel")).Error);
             
             Assert.AreEqual(false,alicecart.BuyWholeCart(Alice,
-                new PaymentInfo("Alice", "369852147", "7894789478947894", "05/23", "123",
+                new PaymentInfo("Alice", "369852147", "7894789478947894", "05-01-23", "123",
                     "Even Gavirol 30, TLV, Israel")).IsSuccess);
 
         }

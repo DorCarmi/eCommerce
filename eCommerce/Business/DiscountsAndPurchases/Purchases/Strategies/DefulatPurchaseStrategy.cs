@@ -1,13 +1,13 @@
 ﻿using System;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business
 {
     public class DefaultPurchaseStrategy : PurchaseStrategy
     {
-        private IStore _store;
-        public static Result<PurchaseStrategy> GetPurchaseStrategyByName(PurchaseStrategyName purchaseStrategyName, IStore store)
+        private Store _store;
+        public static Result<PurchaseStrategy> GetPurchaseStrategyByName(PurchaseStrategyName purchaseStrategyName, Store store)
         {
             if (PurchaseStrategyName.Regular == purchaseStrategyName)
             {
@@ -19,7 +19,7 @@ namespace eCommerce.Business
             }
         }
 
-        public DefaultPurchaseStrategy(IStore store)
+        public DefaultPurchaseStrategy(Store store)
         {
             this._store = store;
         }

@@ -4,10 +4,12 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using eCommerce.Auth;
 using eCommerce.Adapters;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.Purchases;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Service;
 using eCommerce.Service.StorePolicies;
@@ -30,53 +32,56 @@ namespace Tests.AcceptanceTests
     public class TestBuyCart
     {
         private IAuthService _auth;
-        private IStoreService _store;
+        private INStoreService _inStore;
         private ICartService _cart;
         private IUserService _user;
         private string store_name = "Borca";
         private bool shouldTearDown = false;
         private string IvanLoginToken;
 
-
-        [SetUp]
-        //The process:
-        // Policy -> Discounts -> GetItems -> Pay -> Supply -> History -> :-)
-        public void SetUp()
+        public TestBuyCart()
         {
             PaymentProxy.AssignPaymentService(new mokPaymentService(true,true,true));
             SupplyProxy.AssignSupplyService(new mokSupplyService(true,true));
-                _auth = new AuthService();
-            _store = new StoreService();
+            _auth = new AuthService();
+            _inStore = new InStoreService();
             _cart = new CartService();
             _user = new UserService();
-            StoreRepository SR = new StoreRepository();
-            TRegisteredUserRepo RP = new TRegisteredUserRepo();
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
+            InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
             UserAuth UA = UserAuth.CreateInstanceForTests(RP);
-            IRepository<IUser> UR = new RegisteredUsersRepository();
+            IRepository<User> UR = new InMemoryRegisteredUsersRepository();
 
             _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _store = StoreService.CreateUserServiceForTests(UA, UR, SR);
+            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
             _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
             MemberInfo Ivan = new MemberInfo("Ivan11", "Ivan@gmail.com", "Ivan Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();
             _auth.Register(token, Ivan, "qwerty123");
-            Result<string> IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInResult = IvanLogInTask.Result;
             IItem product = new SItem("Tara milk", store_name, 10, "dairy",
                 new List<string> {"dairy", "milk", "Tara"}, (double) 5.4);
             IItem product2 = new SItem("Chocolate milk", store_name, 200, "Sweet",
                 new List<string> {"dairy", "milk", "sweet"}, (double) 3.5);
-            _store.OpenStore(IvanLogInResult.Value, store_name);
-            _store.AddNewItemToStore(IvanLogInResult.Value, product);
-            _store.AddNewItemToStore(IvanLogInResult.Value, product2);
+            _inStore.OpenStore(IvanLogInResult.Value, store_name);
+            _inStore.AddNewItemToStore(IvanLogInResult.Value, product);
+            _inStore.AddNewItemToStore(IvanLogInResult.Value, product2);
             token = _auth.Logout(IvanLogInResult.Value).Value;
             _auth.Disconnect(token);
+        }
+        
+        [SetUp]
+        //The process:
+        // Policy -> Discounts -> GetItems -> Pay -> Supply -> History -> :-)
+        public async Task SetUp()
+        {
+           
         }
         [TearDown]
         public void Teardown()
         {
-            
-
             if (shouldTearDown)
             {
                 string token = _auth.Logout(IvanLoginToken).Value;
@@ -101,29 +106,31 @@ namespace Tests.AcceptanceTests
         
         [Test]
         [TestCase(5)]
+        [Order(2)]
         public void TestBuyCartFailurePolicy(int amount)
         {
             string token = _auth.Connect();
             string ITEM_NAME = "Vodka";
             string CATEGORY_NAME = "Alcohol";
-            Result<string> IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
-            Assert.True(IvanLogInResult.IsSuccess,IvanLogInResult.Error);
-            this.IvanLoginToken = IvanLogInResult.Value;
+            var IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanTaskRes = IvanLogInResult.Result;
+            Assert.True(IvanTaskRes.IsSuccess,IvanTaskRes.Error);
+            this.IvanLoginToken = IvanTaskRes.Value;
             this.shouldTearDown = true;
             
             IItem vodka = new SItem(ITEM_NAME, store_name, 20, CATEGORY_NAME,
                 new List<string> {"Alcohol"}, (double) 70);
-            _store.AddNewItemToStore(IvanLogInResult.Value, vodka);
+            _inStore.AddNewItemToStore(IvanTaskRes.Value, vodka);
             
             //To check later
-            Result<SPurchaseHistory> historyResult = _store.GetPurchaseHistoryOfStore(IvanLogInResult.Value, store_name);
+            Result<SPurchaseHistory> historyResult = _inStore.GetPurchaseHistoryOfStore(IvanTaskRes.Value, store_name);
             Assert.True(historyResult.IsSuccess,historyResult.Error);
             int countStoreHistory = historyResult.Value.Records.Count;
-            int userHistory = _user.GetPurchaseHistory(IvanLogInResult.Value).Value.Records.Count;
+            int userHistory = _user.GetPurchaseHistory(IvanTaskRes.Value).Value.Records.Count;
             int countRealPaymentHits = PaymentProxy.REAL_HITS;
             int countRealRefund = PaymentProxy.REAL_REFUNDS;
             int countRealSupplyHits = SupplyProxy.REAL_HITS;
-            var resGetItem = _store.GetItem(IvanLogInResult.Value, store_name, ITEM_NAME);
+            var resGetItem = _inStore.GetItem(IvanTaskRes.Value, store_name, ITEM_NAME);
             Assert.True(resGetItem.IsSuccess,resGetItem.Error);
             int itemsInStock = resGetItem.Value.Amount;
 
@@ -135,11 +142,11 @@ namespace Tests.AcceptanceTests
             
             SRuleNode ruleCombiAnd = new SRuleNode(SRuleNodeType.Composite,ruleNodeAlco,ruleNodeAge,Combinations.AND);
 
-            var resAddToPolicy=_store.AddRuleToStorePolicy(IvanLogInResult.Value, store_name,ruleCombiAnd);
+            var resAddToPolicy=_inStore.AddRuleToStorePolicy(IvanTaskRes.Value, store_name,ruleCombiAnd);
             
             Assert.True(resAddToPolicy.IsSuccess);
             
-            token = _auth.Logout(IvanLogInResult.Value).Value;
+            token = _auth.Logout(IvanTaskRes.Value).Value;
             _auth.Disconnect(token);
             
             
@@ -147,7 +154,8 @@ namespace Tests.AcceptanceTests
                 DateTime.ParseExact("19/04/2015", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string tokenJake = _auth.Connect();
             _auth.Register(tokenJake, Jake, "qwerty123");
-            Result<string> JakeLogInResult = _auth.Login(tokenJake, "Jake11", "qwerty123", ServiceUserRole.Member);
+            var JakeLogInTask = _auth.Login(tokenJake, "Jake11", "qwerty123", ServiceUserRole.Member);
+            var JakeLogInResult = JakeLogInTask.Result;
             
             
             var resAddItemToCart = _cart.AddItemToCart(JakeLogInResult.Value, ITEM_NAME, store_name, amount);
@@ -163,19 +171,18 @@ namespace Tests.AcceptanceTests
             
             token = _auth.Connect();
             IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
-            Assert.True(IvanLogInResult.IsSuccess,IvanLogInResult.Error);
+            Assert.True(IvanTaskRes.IsSuccess,IvanTaskRes.Error);
             
             //Make sure nothing changed
             
-            Assert.AreEqual(itemsInStock,_store.GetItem(IvanLogInResult.Value,store_name,ITEM_NAME).Value.Amount);
+            Assert.AreEqual(itemsInStock,_inStore.GetItem(IvanTaskRes.Value,store_name,ITEM_NAME).Value.Amount);
             
             Assert.AreEqual(countStoreHistory,historyResult.Value.Records.Count);
-            Assert.AreEqual(userHistory,_user.GetPurchaseHistory(IvanLogInResult.Value).Value.Records.Count);
+            Assert.AreEqual(userHistory,_user.GetPurchaseHistory(IvanTaskRes.Value).Value.Records.Count);
             Assert.AreEqual(countRealPaymentHits,PaymentProxy.REAL_HITS);
             Assert.AreEqual(countRealRefund,PaymentProxy.REAL_REFUNDS);
             Assert.AreEqual(countRealSupplyHits,SupplyProxy.REAL_HITS);
-            token = _auth.Logout(IvanLogInResult.Value).Value;
-            _auth.Disconnect(token);
+            _auth.Logout(IvanTaskRes.Value);
         }
         
         [TestCase(10)]
@@ -184,25 +191,26 @@ namespace Tests.AcceptanceTests
         [Order(1)]
         [Test]
         // Policy -> Discounts -> GetItems -> X
-        public void TestBuyCartFailureGetItems(int amount)
+        public async Task TestBuyCartFailureGetItems(int amount)
         {
             string token = _auth.Connect();
             string ITEM_NAME = "Tara milk";
             
-            Result<string> IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInResult = IvanLogInTask.Result;
             Assert.True(IvanLogInResult.IsSuccess,IvanLogInResult.Error);
             this.IvanLoginToken = IvanLogInResult.Value;
             this.shouldTearDown = true;
             
             //To check later
-            Result<SPurchaseHistory> historyResult = _store.GetPurchaseHistoryOfStore(IvanLogInResult.Value, store_name);
+            Result<SPurchaseHistory> historyResult = _inStore.GetPurchaseHistoryOfStore(IvanLogInResult.Value, store_name);
             Assert.True(historyResult.IsSuccess,historyResult.Error);
             int countStoreHistory = historyResult.Value.Records.Count;
             int userHistory = _user.GetPurchaseHistory(IvanLogInResult.Value).Value.Records.Count;
             int countRealPaymentHits = PaymentProxy.REAL_HITS;
             int countRealRefund = PaymentProxy.REAL_REFUNDS;
             int countRealSupplyHits = SupplyProxy.REAL_HITS;
-            var resGetItem = _store.GetItem(IvanLogInResult.Value, store_name, ITEM_NAME);
+            var resGetItem = _inStore.GetItem(IvanLogInResult.Value, store_name, ITEM_NAME);
             Assert.True(resGetItem.IsSuccess,resGetItem.Error);
             int itemsInStock = resGetItem.Value.Amount;
 
@@ -224,17 +232,18 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             string ITEM_NAME = "Chocolate milk";
-            Result<string> IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInResult = IvanLogInTask.Result;
             Assert.True(IvanLogInResult.IsSuccess,IvanLogInResult.Error);
             
             //To check later
-            Result<SPurchaseHistory> historyResult = _store.GetPurchaseHistoryOfStore(IvanLogInResult.Value, store_name);
+            Result<SPurchaseHistory> historyResult = _inStore.GetPurchaseHistoryOfStore(IvanLogInResult.Value, store_name);
             int countStoreHistory = historyResult.Value.Records.Count;
             int userHistory = _user.GetPurchaseHistory(IvanLogInResult.Value).Value.Records.Count;
             int countRealPaymentHits = PaymentProxy.REAL_HITS;
             int countRealRefund = PaymentProxy.REAL_REFUNDS;
             int countRealSupplyHits = SupplyProxy.REAL_HITS;
-            var resGetItem = _store.GetItem(IvanLogInResult.Value, store_name, ITEM_NAME);
+            var resGetItem = _inStore.GetItem(IvanLogInResult.Value, store_name, ITEM_NAME);
             Assert.True(resGetItem.IsSuccess,resGetItem.Error);
             int itemsInStock = resGetItem.Value.Amount;
             
@@ -249,7 +258,7 @@ namespace Tests.AcceptanceTests
             
             //Make sure nothing changed
             Assert.True(purchaseResult.Error.Contains("<Payment>"),purchaseResult.Error);
-            Assert.AreEqual(itemsInStock,_store.GetItem(IvanLogInResult.Value,store_name,ITEM_NAME).Value.Amount);
+            Assert.AreEqual(itemsInStock,_inStore.GetItem(IvanLogInResult.Value,store_name,ITEM_NAME).Value.Amount);
             
             Assert.AreEqual(countStoreHistory,historyResult.Value.Records.Count);
             Assert.AreEqual(userHistory,_user.GetPurchaseHistory(IvanLogInResult.Value).Value.Records.Count);
@@ -261,29 +270,27 @@ namespace Tests.AcceptanceTests
             _auth.Disconnect(token);
         }
         
-        
-        
-        
         // Policy -> Discounts -> GetItems -> Pay -> Supply -> X
         [TestCase(10)]
-        [Order(3)]
-        public void TestBuyCartSupplyProcessFail(int amount)
+        [Order(4)]
+        public async Task TestBuyCartSupplyProcessFail(int amount)
         {
             string token = _auth.Connect();
             string ITEM_NAME = "Chocolate milk";
             
-            Result<string> IvanLogInResult = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
+            var IvanLogInResult = IvanLogInTask.Result;
             Assert.True(IvanLogInResult.IsSuccess,IvanLogInResult.Error);
             this.shouldTearDown = true;
             this.IvanLoginToken = IvanLogInResult.Value;
             
-            Result<SPurchaseHistory> historyResult = _store.GetPurchaseHistoryOfStore(IvanLogInResult.Value, store_name);
+            Result<SPurchaseHistory> historyResult = _inStore.GetPurchaseHistoryOfStore(IvanLogInResult.Value, store_name);
             int countStoreHistory = historyResult.Value.Records.Count;
             int userHistory = _user.GetPurchaseHistory(IvanLogInResult.Value).Value.Records.Count;
             int countRealPaymentHits = PaymentProxy.REAL_HITS;
             int countRealRefund = PaymentProxy.REAL_REFUNDS;
             int countRealSupplyHits = SupplyProxy.REAL_HITS;
-            var resGetItem = _store.GetItem(IvanLogInResult.Value, store_name, ITEM_NAME);
+            var resGetItem = _inStore.GetItem(IvanLogInResult.Value, store_name, ITEM_NAME);
             Assert.True(resGetItem.IsSuccess,resGetItem.Error);
             int itemsInStock = resGetItem.Value.Amount;
             
@@ -297,7 +304,7 @@ namespace Tests.AcceptanceTests
                 new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12/34", "123", "address"));
 
             Assert.False(purchaseResult.IsSuccess);
-            Assert.AreEqual(itemsInStock,_store.GetItem(IvanLogInResult.Value,store_name,ITEM_NAME).Value.Amount);
+            Assert.AreEqual(itemsInStock,_inStore.GetItem(IvanLogInResult.Value,store_name,ITEM_NAME).Value.Amount);
             Assert.True(purchaseResult.Error.Contains("<Supply>"),purchaseResult.Error);
             Assert.AreEqual(countStoreHistory,historyResult.Value.Records.Count);
             Assert.AreEqual(userHistory,_user.GetPurchaseHistory(IvanLogInResult.Value).Value.Records.Count);

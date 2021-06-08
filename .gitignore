@@ -167,6 +167,9 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 
+# Migration folder
+**/Migrations
+
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
@@ -231,6 +234,9 @@ UpgradeLog*.htm
 # SQL Server files
 *.mdf
 *.ldf
+
+# DB
+*.[Dd][Bb]
 
 # Business Intelligence projects
 *.rdl.data

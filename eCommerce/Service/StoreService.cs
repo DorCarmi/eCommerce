@@ -4,32 +4,32 @@ using System.Collections.Generic;
 using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Discounts;
-using eCommerce.Business.Service;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Service.StorePolicies;
 
 namespace eCommerce.Service
 {
-    public class StoreService : IStoreService
+    public class InStoreService : INStoreService
     {
         private IMarketFacade _marketFacade;
 
-        internal StoreService(IMarketFacade marketFacade)
+        internal InStoreService(IMarketFacade marketFacade)
         {
             _marketFacade = MarketFacade.GetInstance();
         }
         
-        public StoreService()
+        public InStoreService()
         {
             _marketFacade = MarketFacade.GetInstance();
         }
 
-        public static StoreService CreateUserServiceForTests(IUserAuth userAuth,
-            IRepository<IUser> registeredUsersRepo,
-            StoreRepository storeRepo)
+        public static InStoreService CreateUserServiceForTests(IUserAuth userAuth,
+            IRepository<User> registeredUsersRepo,
+            InMemoryStoreRepo inMemoryStoreRepo)
         {
-            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(userAuth, registeredUsersRepo, storeRepo);
-            return new StoreService(marketFacade);
+            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(userAuth, registeredUsersRepo, inMemoryStoreRepo);
+            return new InStoreService(marketFacade);
         }
 
         public Result<IList<StaffPermission>> GetStoreStaffAndTheirPermissions(string token, string storeId)
@@ -77,12 +77,12 @@ namespace eCommerce.Service
 
         public Result<ServiceStore> GetStore(string token, string storeId)
         {
-            Result<IStore> storeRes = _marketFacade.GetStore(token, storeId);
+            Result<Store> storeRes = _marketFacade.GetStore(token, storeId);
             if (storeRes.IsFailure)
             {
                 return Result.Fail<ServiceStore>(storeRes.Error);
             }
-            IStore store = storeRes.Value;
+            Store store = storeRes.Value;
             
             IList<IItem> storeItems = new List<IItem>();
             foreach (var item in store.GetAllItems())
