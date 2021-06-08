@@ -11,6 +11,12 @@ namespace eCommerce.Business.Repositories
         public PersistenceRegisteredUsersRepo()
         {
             _dataFacade = new DataFacade();
+            _dataFacade.init();
+        }
+
+        public void ClearTables()
+        {
+            _dataFacade.ClearTables();
         }
         
         public bool Add(User user)

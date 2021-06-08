@@ -103,7 +103,7 @@ namespace Tests.AcceptanceTests
         //payment fail
         //supply fail
         [TestCase(10)]
-        [Order(2)]
+        [Order(1)]
         public async Task TestBuyCartPaymentInfoFail(int amount)
         {
             string token = _auth.Connect();
@@ -122,7 +122,7 @@ namespace Tests.AcceptanceTests
             Result purchaseResult = _cart.PurchaseCart(IvanLogInResult.Value,
                 new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12/34", "123", "address"));
             
-            Assert.False(purchaseResult.IsSuccess);
+            Assert.False(purchaseResult.IsSuccess,purchaseResult.Error);
             Assert.True(purchaseResult.Error.Contains("<PaymentInfo>"),purchaseResult.Error);
             Assert.AreEqual(countStoreHistory,historyResult.Value.Records.Count);
             Assert.AreEqual(userHistory,_user.GetPurchaseHistory(IvanLogInResult.Value).Value.Records.Count);
@@ -155,7 +155,7 @@ namespace Tests.AcceptanceTests
             Result purchaseResult = _cart.PurchaseCart(IvanLogInResult.Value,
                 new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12/34", "123", "address"));
             
-            Assert.False(purchaseResult.IsSuccess);
+            Assert.False(purchaseResult.IsSuccess,purchaseResult.Error);
             Assert.False(purchaseResult.Error.Contains("<PaymentInfo>"),purchaseResult.Error);
             Assert.True(purchaseResult.Error.Contains("<Payment>"),purchaseResult.Error);
             Assert.AreEqual(countStoreHistory,historyResult.Value.Records.Count);
@@ -199,7 +199,7 @@ namespace Tests.AcceptanceTests
         }
         
         [TestCase(10)]
-        [Order(3)]
+        [Order(4)]
         public async Task TestBuyCartSupplyProcessFail(int amount)
         {
             string token = _auth.Connect();
@@ -220,7 +220,7 @@ namespace Tests.AcceptanceTests
             Result purchaseResult = _cart.PurchaseCart(IvanLogInResult.Value,
                 new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12/34", "123", "address"));
             
-            Assert.False(purchaseResult.IsSuccess);
+            Assert.False(purchaseResult.IsSuccess,purchaseResult.Error);
             Assert.False(purchaseResult.Error.Contains("<SupplyInfo>"),purchaseResult.Error);
             Assert.True(purchaseResult.Error.Contains("<Supply>"),purchaseResult.Error);
             Assert.AreEqual(countStoreHistory,historyResult.Value.Records.Count);

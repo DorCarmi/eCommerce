@@ -21,6 +21,7 @@ namespace eCommerce.Business
             new MarketFacade(
                 UserAuth.GetInstance(),
                 new InMemoryRegisteredUsersRepository(),
+                //new PersistenceRegisteredUsersRepo(),
                 new InMemoryStoreRepo());
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
