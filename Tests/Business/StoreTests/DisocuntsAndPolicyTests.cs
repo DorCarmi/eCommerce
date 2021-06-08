@@ -378,7 +378,7 @@ namespace Tests.Business.StoreTests
         }
         
         [Test]
-        [Order(3)]
+        [Order(4)]
         public void MilksOr()
         {
             ItemInfo kotej = new ItemInfo(50, "Kotej", MyStore.GetStoreName(), "Milk", new List<string>(), 11);
@@ -457,6 +457,7 @@ namespace Tests.Business.StoreTests
         }
         
         [Test]
+        [Order(5)]
         public void TotalPriceAndPasta()
         {
             ItemInfo pasta = items.Where(x => x.name.ToUpper().Equals("PASTA")).FirstOrDefault();
@@ -539,6 +540,7 @@ namespace Tests.Business.StoreTests
         }
         
         [Test]
+        [Order(6)]
         public void TotalMax()
         {
             ItemInfo pasta = items.Where(x => x.name.ToUpper().Equals("PASTA")).FirstOrDefault();
@@ -606,6 +608,7 @@ namespace Tests.Business.StoreTests
         }
         
         [Test]
+        [Order(7)]
         public void PlusTest()
         {
             
@@ -673,6 +676,7 @@ namespace Tests.Business.StoreTests
 
 
         [Test]
+        [Order(8)]
         public void TestRuleTomatos()
         {
             User Hook = new mokUser("Hook");
@@ -712,12 +716,14 @@ namespace Tests.Business.StoreTests
         
         
         [Test]
+        [Order(9)]
         public void TestRuleAlcohol()
         {
             mokUser Hook = new mokUser("Hook");
+            //public MemberInfo(string username, string email, string name, DateTime birthday, string address)
             MemberInfo memberInfo =
-                new eCommerce.Controllers.MemberInfo("Hook", "", "", new DateTime(2000, 5, 3), "", "");
-            Hook.MemberInfo = memberInfo;
+                new MemberInfo("Hook", "", "", new DateTime(2000, 5, 3), "");
+            Hook.SetMemberInfo(memberInfo);
             ICart hookCart = new Cart(Hook);
             
             ItemInfo vodka = items.FirstOrDefault(x => x.name.ToUpper().Equals("VODKA"));

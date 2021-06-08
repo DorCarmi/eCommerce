@@ -74,7 +74,7 @@ namespace eCommerce.Business
             this._cartHolder = user;
             _baskets = new Dictionary<Store, Basket>();
             _totalPrice = 0;
-            CartGuid = new Guid();
+            CartGuid = Guid.NewGuid();
         }
 
         public bool CheckForCartHolder(User user)

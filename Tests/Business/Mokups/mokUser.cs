@@ -49,7 +49,22 @@ namespace Tests.Business.Mokups
         }
 
 
-        public MemberInfo MemberInfo { get; set; }
+        public MemberInfo MemberInfo
+        {
+            get
+            {
+                return base.MemberInfo;
+            }
+            set
+            {
+                base.MemberInfo = value;
+            }
+        }
+
+        public void SetMemberInfo(MemberInfo memberInfo)
+        {
+            this.MemberInfo = memberInfo;
+        }
 
         public override Result OpenStore(Store store)
         {
