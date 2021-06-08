@@ -34,8 +34,8 @@ namespace eCommerce.Business
             }
         }
 
-        
-        private Cart _myCart;
+        [NotMapped]
+        public Cart _myCart { get; private set; }
         private Object dataLock;
         //MemberData:
         private ConcurrentDictionary<Store, bool> _storesFounded;
@@ -43,7 +43,7 @@ namespace eCommerce.Business
         private ConcurrentDictionary<Store, ManagerAppointment> _storesManaged;
         private ConcurrentDictionary<Store, IList<OwnerAppointment>> _appointedOwners;
         private ConcurrentDictionary<Store, IList<ManagerAppointment>> _appointedManagers;
-        private UserTransactionHistory _transHistory ;
+        private UserTransactionHistory _transHistory;
         
 
         //constructors

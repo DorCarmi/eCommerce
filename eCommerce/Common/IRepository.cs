@@ -24,5 +24,7 @@ namespace eCommerce.Common
         /// </summary>
         /// <param name="id">The user id</param>
         public void Remove([NotNull] string id);
+
+        void Update(T data);
     }
 }

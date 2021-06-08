@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using eCommerce.Business;
 using eCommerce.Common;
 
@@ -35,8 +36,15 @@ namespace eCommerce.Adapters
                 PROXY_HITS++;
                 return Result.Ok(transactionId);
             }
-            var ans = await _adapter.Charge(price,paymentInfoUserName,paymentInfoIDNumber, paymentInfoCreditCardNumber,paymentInfoCreditCardExpirationDate, paymentInfoThreeDigitsOnBackOfCard );
-            if (ans.IsSuccess)
+            
+            
+
+            Result<int> ans;
+            ans = await _adapter.Charge(price, paymentInfoUserName, paymentInfoIDNumber,
+                    paymentInfoCreditCardNumber, paymentInfoCreditCardExpirationDate,
+                    paymentInfoThreeDigitsOnBackOfCard);
+
+                if (ans.IsSuccess)
             {
                 REAL_HITS++;
             }

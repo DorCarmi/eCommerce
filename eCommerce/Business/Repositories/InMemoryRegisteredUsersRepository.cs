@@ -38,5 +38,10 @@ namespace eCommerce.Business.Repositories
         {
             throw new System.NotImplementedException();
         }
+
+        public void Update(User data)
+        {
+            
+        }
     }
 }
