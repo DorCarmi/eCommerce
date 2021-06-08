@@ -34,10 +34,8 @@ namespace eCommerce.Business
             }
         }
 
-        private ICart _myCart;
-        private UserTransactionHistory _transHistory ;
-
         
+        private Cart _myCart;
         private Object dataLock;
         //MemberData:
         private ConcurrentDictionary<Store, bool> _storesFounded;
@@ -45,7 +43,8 @@ namespace eCommerce.Business
         private ConcurrentDictionary<Store, ManagerAppointment> _storesManaged;
         private ConcurrentDictionary<Store, IList<OwnerAppointment>> _appointedOwners;
         private ConcurrentDictionary<Store, IList<ManagerAppointment>> _appointedManagers;
-
+        private UserTransactionHistory _transHistory ;
+        
 
         //constructors
 
@@ -68,7 +67,7 @@ namespace eCommerce.Business
             _systemState = Member.State;
             role = _systemState.GetRole();
             _myCart = new Cart(this);
-            
+            // _userName = memberData.Username;
             _storesFounded = new ConcurrentDictionary<Store, bool>();
             _storesOwned = new ConcurrentDictionary<Store, OwnerAppointment>();
             _storesManaged = new ConcurrentDictionary<Store, ManagerAppointment>();
@@ -164,9 +163,9 @@ namespace eCommerce.Business
         ///  gets the information from the cart. 
         /// </summary>
         /// <returns>Result, ICart. </returns>
-        public virtual Result<ICart> GetCartInfo()
+        public virtual Result<Cart> GetCartInfo()
         {
-            return Result.Ok<ICart>(_myCart);
+            return Result.Ok<Cart>(_myCart);
         }
 
         /// <TEST>  </TEST>

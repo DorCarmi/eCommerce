@@ -1,23 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using eCommerce.Common;
+using eCommerce.DataLayer;
 
 namespace eCommerce.Business
 {
     public class Cart : ICart
     {
-        private readonly User _cartHolder;
-        private Transaction _performTransaction;
+        private Guid CartGuid;
+
+        [Key]
+        public string CardID
+        {
+            get
+            {
+                return CartGuid.ToString();
+            }
+            set
+            {
+                Guid currGuid;
+                var guidRes=Guid.TryParse(value, out currGuid);
+                if (guidRes)
+                {
+                    CartGuid = currGuid;
+                }
+            }
+        }
+        public User _cartHolder { get; set; }
         
-        private Dictionary<Store, IBasket> _baskets;
+        public Transaction _performTransaction;
+        
+        [NotMapped]
+        public Dictionary<Store, Basket> _baskets;
+
+
+        public List<Pair<Store, Basket>> _basketsPairs
+        {
+            get
+            {
+                List<Pair<Store, Basket>> pairs = new List<Pair<Store, Basket>>();
+                foreach (var basketPair in _baskets)
+                {
+                    pairs.Add(new Pair<Store, Basket>(){HolderId = CardID,Key = basketPair.Key,KeyId = basketPair.Key.StoreName,Value = basketPair.Value});
+                }
+
+                return pairs;
+            }
+            set
+            {
+                foreach (var pair in value)
+                {
+                    if(!_baskets.ContainsKey(pair.Key))
+                    {
+                        _baskets.Add(pair.Key,pair.Value);
+                    }
+                }
+            }
+        }
+        
         private double _totalPrice;
+
+        public Cart()
+        {
+            _baskets = new Dictionary<Store, Basket>();
+            _totalPrice = 0;
+        }
 
         public Cart(User user)
         {
             this._cartHolder = user;
-            _baskets = new Dictionary<Store, IBasket>();
+            _baskets = new Dictionary<Store, Basket>();
             _totalPrice = 0;
+            CartGuid = new Guid();
         }
 
         public bool CheckForCartHolder(User user)
@@ -126,7 +183,7 @@ namespace eCommerce.Business
             var result=_performTransaction.BuyWholeCart(paymentInfo);
             return result;
         }
-        public IList<IBasket> GetBaskets()
+        public List<Basket> GetBaskets()
         {
             return this._baskets.Values.ToList();
         }
@@ -149,7 +206,7 @@ namespace eCommerce.Business
             return this._cartHolder;
         }
 
-        public IList<ItemInfo> GetAllItems()
+        public List<ItemInfo> GetAllItems()
         {
             List<ItemInfo> allItems = new List<ItemInfo>();
             foreach (var basket in _baskets)

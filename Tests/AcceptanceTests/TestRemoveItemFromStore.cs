@@ -28,6 +28,11 @@ namespace Tests.AcceptanceTests
         private INStoreService _inStore;
         private string storeName = "Target";
 
+        public TestRemoveItemFromStore()
+        {
+            
+        }
+        
         [SetUpAttribute]
         public async Task SetUp()
         {
@@ -43,16 +48,19 @@ namespace Tests.AcceptanceTests
             MemberInfo shiran = new MemberInfo("PhrogLiv", "shiran@gmail.com", "Shiran Moris",
                 DateTime.ParseExact("25/06/2008", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Rabin 14");
             string token = _auth.Connect();
-            await _auth.Register(token, yossi, "qwerty123");
-            await _auth.Register(token, shiran, "130452abc");
-            Result<string> yossiLogInResult = await _auth.Login(token, "Mechanism1000", "qwerty123", ServiceUserRole.Member);
+            var resReg=_auth.Register(token, yossi, "qwerty123");
+            var regiRes=resReg.Result;
+            var regRes2=_auth.Register(token, shiran, "130452abc");
+            var regiRes2 = regRes2.Result;
+            var yossiLogInTask = _auth.Login(token, "Mechanism1000", "qwerty123", ServiceUserRole.Member);
+            var yossiLoginRes = yossiLogInTask.Result;
             IItem product = new SItem("Tara milk", storeName, 10, "dairy",
                 new List<string>{"dairy", "milk", "Tara"}, (double)5.4);
-            _inStore.OpenStore(yossiLogInResult.Value, storeName);
-            _inStore.AddNewItemToStore(yossiLogInResult.Value, product);
-            _inStore.AddNewItemToStore(yossiLogInResult.Value, new SItem("iPhone X", storeName, 35, "smartphones", 
+            _inStore.OpenStore(yossiLoginRes.Value, storeName);
+            _inStore.AddNewItemToStore(yossiLoginRes.Value, product);
+            _inStore.AddNewItemToStore(yossiLoginRes.Value, new SItem("iPhone X", storeName, 35, "smartphones", 
                 new List<string>{"smartphone", "iPhone", "Apple", "Iphone X"}, (double) 5000.99));
-            token = _auth.Logout(yossiLogInResult.Value).Value;
+            token = _auth.Logout(yossiLoginRes.Value).Value;
             _auth.Disconnect(token);
         }
         
@@ -70,7 +78,7 @@ namespace Tests.AcceptanceTests
         public async Task TestRemoveItemFromStoreSuccess(string productName)
         {
             string token = _auth.Connect();
-            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Result<string> yossiLogin = await _auth.Login(token, "Mechanism1000", "qwerty123", ServiceUserRole.Member);
             Result removeItemResult = _inStore.RemoveItemFromStore(yossiLogin.Value, storeName, productName);
             Assert.True(removeItemResult.IsSuccess, "failed to remove item " + productName + ": " + removeItemResult.Error);
             token = _auth.Logout(yossiLogin.Value).Value;

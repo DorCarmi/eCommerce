@@ -16,7 +16,7 @@ namespace eCommerce.Service
             this.CartHolderID = CartHolder;
         }
         
-        internal SCart(IList<IBasket> baskets, string CartHolder)
+        internal SCart(IList<Basket> baskets, string CartHolder)
         {
             Baskets = new List<SBasket>();
             CartHolderID = CartHolder;

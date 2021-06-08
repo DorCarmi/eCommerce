@@ -1,16 +1,63 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using eCommerce.Common;
+using eCommerce.DataLayer;
 
 namespace eCommerce.Business
 {
     public class Basket: IBasket
     {
-        private IList<ItemInfo> _itemsInBasket;
+
+        private Guid BasketGuid;
+        
+        [Key]
+        public string BasketID {
+            get
+            {
+                return BasketGuid.ToString();
+            }
+            set
+            {
+                Guid currGuid;
+                var guidRes=Guid.TryParse(value, out currGuid);
+                if (guidRes)
+                {
+                    BasketGuid = currGuid;
+                }
+            }
+        }
+        public virtual List<ItemInfo> _itemsInBasket { get; set; }
         private IDictionary<string, ItemInfo> _nameToItem;
-        private Store _store;
-        private ICart _cart;
+
+        private List<Pair<string, ItemInfo>> _nameToItemPairs
+        {
+            get
+            {
+                List<Pair<string, ItemInfo>> items = new List<Pair<string, ItemInfo>>();
+                foreach (var itemKey in _nameToItem.Keys)  
+                {
+                    
+                    items.Add(new Pair<string, ItemInfo>(){HolderId = BasketID,Key = itemKey,KeyId = itemKey,Value = _nameToItem[itemKey]});
+                }
+
+                return items;
+            }
+            set
+            {
+                foreach (var pair in value)
+                {
+                    if (!_nameToItem.ContainsKey(pair.Key))
+                    {
+                        this._nameToItem.Add(pair.Key,pair.Value);
+                    }
+                }
+
+            }
+        }
+        public Store _store { get; set; }
+        public Cart _cart { get; set; }
         
 
         private double currentPrice;
@@ -49,8 +96,14 @@ namespace eCommerce.Business
             this._store.FreeBasket(this);
         }
         
-        public Basket(ICart cart, Store store)
+        //Constructor
+        public Basket()
         {
+            this._nameToItem = new Dictionary<string, ItemInfo>();
+        }
+        public Basket(Cart cart, Store store)
+        {
+            BasketGuid = new Guid();
             if (!store.CheckConnectionToCart(cart))
             {
                 this._cart = cart;
@@ -153,7 +206,7 @@ namespace eCommerce.Business
             return Result.Ok(this.currentPrice);
         }
 
-        public Result<IList<ItemInfo>> GetAllItems()
+        public Result<List<ItemInfo>> GetAllItems()
         {
             return Result.Ok(_itemsInBasket);
         }

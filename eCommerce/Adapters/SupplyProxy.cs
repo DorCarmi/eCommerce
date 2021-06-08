@@ -6,12 +6,12 @@ namespace eCommerce.Adapters
 {
     public class SupplyProxy : ISupplyAdapter
     {
-        private static ISupplyAdapter _adapter;
+        public static ISupplyAdapter _adapter;
         
         public static int REAL_HITS = 0;
         public static int PROXY_HITS = 0;
         
-        private int _transactionId;
+        private static int _transactionId;
 
         public static void AssignSupplyService(ISupplyAdapter supplyAdapter)
         {
@@ -21,7 +21,7 @@ namespace eCommerce.Adapters
         public SupplyProxy()
         {
             _transactionId = 10000;
-            _adapter = new WSEPSupplyAdapter();
+            
         }
 
         public async Task<Result<int>> SupplyProducts(string storeName, string[] itemsNames, string userAddress)

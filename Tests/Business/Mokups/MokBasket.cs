@@ -5,7 +5,7 @@ namespace Tests.Business.Mokups
 {
     public class MokBasket : Basket
     {
-        public MokBasket(ICart cart, Store store) : base(cart, store)
+        public MokBasket(Cart cart, Store store) : base(cart, store)
         {
         }
     }

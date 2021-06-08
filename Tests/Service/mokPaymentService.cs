@@ -20,8 +20,16 @@ namespace Tests.Service
             string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)
         {
             await Task.Delay(2000);
-            //TODO may generate id
-            return Result.Ok(100000);        }
+            if (chargeAns)
+            {
+                //TODO may generate id
+                return Result.Ok(100000);
+            }
+            else
+            {
+                return Result.Fail<int>("Charge problem");
+            }
+        }
 
         public Task<bool> CheckPaymentInfo(string paymentInfoUserName, string paymentInfoIdNumber, string paymentInfoCreditCardNumber,
             string paymentInfoCreditCardExpirationDate, string paymentInfoThreeDigitsOnBackOfCard)

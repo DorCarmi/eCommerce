@@ -740,7 +740,7 @@ namespace Tests.Business.StoreTests
             foreach (var basket in hookCart.GetBaskets())
             {
                 var resPolicy=MyStore.CheckWithStorePolicy(basket, Hook);
-                Assert.True(resPolicy.IsSuccess);
+                Assert.True(resPolicy.IsSuccess,resPolicy.Error);
             }
             
             mokUser Jake = new mokUser("Jake");

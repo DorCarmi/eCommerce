@@ -25,11 +25,14 @@ namespace eCommerce.DataLayer
 
         public DbSet<Store> Stores { get; set; }
         public DbSet<Item> Items { get; set; }
+        public DbSet<ItemInfo> ItemInfos { get; set; }
         public DbSet<ItemsInventory> ItemsInventories { get; set; }
-        
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<Basket> Baskets { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            //@TODO::sharon - enable test mode for db - use different db + add teardown function to context 
             optionsBuilder.EnableSensitiveDataLogging().UseSqlServer(AppConfig.GetInstance().GetData("DBConnectionString"));
         }
         
@@ -45,6 +48,9 @@ namespace eCommerce.DataLayer
             
             //set composite Primary-Key for every entity of type Pair<Store,OwnerAppointment>
             builder.Entity<Pair<Store,OwnerAppointment>>()
+                .HasKey(p => new {p.HolderId, p.KeyId});
+            
+            builder.Entity<Pair<Store,Basket>>()
                 .HasKey(p => new {p.HolderId, p.KeyId});
             
             //set composite Primary-Key for every entity of type Pair<Store,ManagerAppointment>
@@ -84,5 +90,6 @@ namespace eCommerce.DataLayer
         public K Key { get; set; }
         public V Value { get; set; }
         public string HolderId { get; set; }
+        
     }
 }
