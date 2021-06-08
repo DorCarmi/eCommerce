@@ -67,13 +67,7 @@ namespace eCommerce
 
             app.UseRouting();
 
-            //Websockets
-            app.UseCors(builder => builder
-                .WithOrigins("null")
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials());
-
+            app.UseSystemStateValidator();
             app.UseAuth();
 
             app.UseEndpoints(endpoints =>
