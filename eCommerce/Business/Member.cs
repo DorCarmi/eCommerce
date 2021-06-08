@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using eCommerce.Common;
+using eCommerce.Statistics;
 
 namespace eCommerce.Business
 {
@@ -140,6 +141,11 @@ namespace eCommerce.Business
         public Result AnnexStakeholders(User user, Store store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
             return user.AnnexStakeholders(this, store, owners, managers);
+        }
+
+        public virtual Result<LoginDateStat> GetLoginStats(DateTime date)
+        {
+            return Result.Fail<LoginDateStat>("Guest can not get stats");
         }
     }
 }

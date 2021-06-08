@@ -9,6 +9,7 @@ using eCommerce.Business.Repositories;
 
 using eCommerce.Common;
 using eCommerce.Service;
+using eCommerce.Statistics;
 using NLog;
 
 namespace eCommerce.Business
@@ -765,6 +766,18 @@ namespace eCommerce.Business
             }
 
             return res;
+        }
+
+        public Result<LoginDateStat> AdminGetLoginStats(string token, DateTime date)
+        {
+            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+            if (userRes.IsFailure)
+            {
+                return Result.Fail<LoginDateStat>(userRes.Error);
+            }
+            User user = userRes.Value;
+
+            return user.GetLoginStats(date);
         }
 
         #endregion

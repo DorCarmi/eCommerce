@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using eCommerce.Common;
+using eCommerce.Statistics;
 
 namespace eCommerce.Business
 {
@@ -28,5 +29,6 @@ namespace eCommerce.Business
         Result<OwnerAppointment> RemoveOwner(User user, Store store);
         Result<ManagerAppointment> RemoveManager(User user, Store store);
         Result AnnexStakeholders(User user, Store store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers);
+        Result<LoginDateStat> GetLoginStats(DateTime date);
     }
 }

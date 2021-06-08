@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Repositories;
 using eCommerce.Common;
+using eCommerce.Statistics;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 namespace eCommerce.Service
@@ -90,6 +92,11 @@ namespace eCommerce.Service
         public Result<IList<string>> GetAllManagedStoreIds(string token)
         {
             return _marketFacade.GetAllManagedStores(token);
+        }
+
+        public Result<LoginDateStat> AdminGetLoginStats(string token, DateTime date)
+        {
+            return _marketFacade.AdminGetLoginStats(token, date);
         }
     }
 }

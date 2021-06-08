@@ -7,7 +7,7 @@ namespace eCommerce.Statistics
 {
     public class Statistics : IStatisticsService
     {
-        private static Statistics _instance = new Statistics(new PersistenceStatsRepo());
+        private static Statistics _instance = new Statistics(new InMemoryStatsRepo());
         private StatsRepo _statsRepo;
 
         private Statistics(StatsRepo statsRepo)
@@ -15,7 +15,7 @@ namespace eCommerce.Statistics
             _statsRepo = statsRepo;
         }
 
-        public static Statistics GetInstance(StatsRepo statsRepo)
+        public static Statistics GetInstance()
         {
             return _instance;
         }

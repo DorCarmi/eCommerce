@@ -8,6 +8,7 @@ using System.Linq;
 using eCommerce.Common;
 using eCommerce.Publisher;
 using eCommerce.DataLayer;
+using eCommerce.Statistics;
 
 namespace eCommerce.Business
 {
@@ -352,7 +353,11 @@ namespace eCommerce.Business
 
     #region Admin Functions
     
-
+    public virtual Result<LoginDateStat> GetLoginStats(DateTime date)
+    {
+        return _systemState.GetLoginStats(date);
+    }
+    
     #endregion Admin Functions
     
     
