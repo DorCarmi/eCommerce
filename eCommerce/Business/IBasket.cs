@@ -7,8 +7,8 @@ namespace eCommerce.Business
     {
         public Result CalculateBasketPrices();
 
-        public Result AddItemToBasket(IUser user,ItemInfo item);
-        public Result EditItemInBasket(IUser user,ItemInfo item);
+        public Result AddItemToBasket(User user,ItemInfo item);
+        public Result EditItemInBasket(User user,ItemInfo item);
         public Result BuyWholeBasket();
         public Result<double>GetTotalPrice();
         public Result<IList<ItemInfo>> GetAllItems();
@@ -16,11 +16,13 @@ namespace eCommerce.Business
         Result SetTotalPrice();
         public void SetTotalPrice(double newTotalPrice);
         public string GetStoreName();
-        public Result<ItemInfo> GetItem(IUser user, string itemName);
+        public Result<ItemInfo> GetItem(User user, string itemName);
         public BasketInfo GetBasketInfo();
 
         public Result AddBasketRecords();
         public double GetRegularTotalPrice();
         Result CheckWithStorePolicy();
+        Result ReturnAllItemsToStore();
+        void Free();
     }
 }

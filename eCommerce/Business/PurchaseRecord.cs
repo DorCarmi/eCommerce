@@ -1,5 +1,5 @@
 ﻿using System;
-using eCommerce.Business.Service;
+
 using eCommerce.Service;
 
 namespace eCommerce.Business
@@ -11,10 +11,11 @@ namespace eCommerce.Business
         private DateTime _dateTime;
         // TODO add username
         private string _username;
-        public PurchaseRecord(IStore store, IBasket basket, DateTime now)
+        public PurchaseRecord(Store store, IBasket basket, DateTime now)
         {
             this._storeInfo = new StoreInfo(store);
             this._basketInfo = new BasketInfo(basket);
+            this._username = basket.GetCart().GetUser().Username;
             this._dateTime = now;
         }
 

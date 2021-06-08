@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Common;
 using NUnit.Framework;
@@ -19,7 +20,7 @@ namespace Tests.AuthTests
         [SetUp]
         public void Setup()
         {
-            _userAuth = UserAuth.CreateInstanceForTests(new TRegisteredUserRepo());
+            _userAuth = UserAuth.CreateInstanceForTests(new InMemoryRegisteredUserRepo());
             _registeredUsers = new List<TUserData>();
             _userData = new List<TUserData>
             {
@@ -51,16 +52,16 @@ namespace Tests.AuthTests
         }
 
         [Test, Order(1)]
-        public void RegisterValidUsersTest()
+        public async Task RegisterValidUsersTest()
         {
             foreach (var user in _userData)
             {
-                Result registerRes = _userAuth.Register(user.Username, user.Password);
+                Result registerRes = await _userAuth.Register(user.Username, user.Password);
                 Assert.True(registerRes.IsSuccess,
                     $"User {user.Username} wasn't registered, Result Message: {registerRes.Error}");
                 _registeredUsers.Add(user);
 
-                Result authRes = _userAuth.Authenticate(user.Username, user.Password);
+                Result authRes = await _userAuth.Authenticate(user.Username, user.Password);
                 Assert.True(authRes.IsSuccess,
                     $"The user have been successfully register but the Auth class say it doesnt:\n" +
                     $"Error: {authRes.Error}");
@@ -68,20 +69,20 @@ namespace Tests.AuthTests
         }
 
         [Test, Order(2)]
-        public void TryRegistersRegisteredUsersTest()
+        public async Task TryRegistersRegisteredUsersTest()
         {
             TUserData user = _userData[0];
-            Result registerRes = _userAuth.Register(user.Username, user.Password);
+            Result registerRes = await _userAuth.Register(user.Username, user.Password);
             Assert.True(registerRes.IsSuccess,
                 $"User {user.Username} wasn't registered, Result Message: {registerRes.Error}");
 
-            Result reRegisterRes = _userAuth.Register(user.Username, user.Password);
+            Result reRegisterRes = await _userAuth.Register(user.Username, user.Password);
             Assert.True(reRegisterRes.IsFailure,
                 $"User {user.Username} already registered but he registered again\nResult Message: {registerRes.Error}");
         }
         
         [Test]
-        public void RegisterInvalidUsersTest()
+        public async Task RegisterInvalidUsersTest()
         {
             IList<TUserData> userData = new List<TUserData>
             {
@@ -92,7 +93,7 @@ namespace Tests.AuthTests
 
             foreach (var user in userData)
             {
-                Result registerRes = _userAuth.Register(user.Username, user.Password);
+                Result registerRes = await _userAuth.Register(user.Username, user.Password);
                 Assert.True(registerRes.IsFailure,
                     $"User {user.Username} with password {user.Password} was able to be registered\nResult Message: {registerRes.Error}");
             }

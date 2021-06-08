@@ -48,13 +48,21 @@ namespace eCommerce.Adapters
         {
             int transactionId = -1;
             HttpResponseMessage responseMessage;
-            DateTime creditCardExpirationDate = DateTime.Parse(paymentInfoCreditCardExpirationDate);
+            //DateTime creditCardExpirationDate = DateTime.Parse(paymentInfoCreditCardExpirationDate);
+            var creditCardExpirationDate = paymentInfoCreditCardExpirationDate.Split('/');
+            if (creditCardExpirationDate.Length < 2)
+            {
+                return Result.Fail<int>("Not valid expiration date");
+            }
+            var creditExpirationMonth = creditCardExpirationDate[0];
+            var creditExpirationYear = creditCardExpirationDate[1];
+            
             Dictionary<string, string> dictionary = new Dictionary<string, string>()
             {
                 {"action_type", "pay"},
                 {"card_number", paymentInfoCreditCardNumber},
-                {"month", creditCardExpirationDate.Month.ToString()},
-                {"year", creditCardExpirationDate.Year.ToString()},
+                {"month", creditExpirationMonth},
+                {"year", creditExpirationYear},
                 {"holder", paymentInfoUserName},
                 {"ccv", paymentInfoThreeDigitsOnBackOfCard},
                 {"id", paymentInfoIdNumber},

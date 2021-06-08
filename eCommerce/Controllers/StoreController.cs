@@ -26,13 +26,13 @@ namespace eCommerce.Controllers
     public class StoreController : ControllerBase
     {
         private readonly ILogger<StoreController> _logger;
-        private readonly IStoreService _storeService;
-        private readonly IUserService _userService;
+        private readonly INStoreService _inStoreService;
+        private readonly UserService _userService;
 
         public StoreController(ILogger<StoreController> logger)
         {
             _logger = logger;
-            _storeService = new StoreService();
+            _inStoreService = new InStoreService();
             _userService = new UserService();
         }
 
@@ -43,63 +43,63 @@ namespace eCommerce.Controllers
         [HttpPost("[action]")]
         public Result OpenStore(string storeId)
         {
-            return _storeService.OpenStore((string) HttpContext.Items["authToken"],
+            return _inStoreService.OpenStore((string) HttpContext.Items["authToken"],
                 storeId);
         }
 
         [HttpPost("[action]")]
         public Result AddItem([FromBody] SItem item)
         {
-            return _storeService.AddNewItemToStore((string) HttpContext.Items["authToken"],
+            return _inStoreService.AddNewItemToStore((string) HttpContext.Items["authToken"],
                 item);
         }
         
         [HttpPost("[action]")]
         public Result RemoveItem([FromBody] StoreAndItemId data)
         {
-            return _storeService.RemoveItemFromStore((string) HttpContext.Items["authToken"],
+            return _inStoreService.RemoveItemFromStore((string) HttpContext.Items["authToken"],
                 data.StoreId, data.ItemId);
         }
 
         [HttpPost("[action]")]
         public Result EditItem([FromBody] SItem item)
         {
-            return _storeService.EditItemInStore((string) HttpContext.Items["authToken"],
+            return _inStoreService.EditItemInStore((string) HttpContext.Items["authToken"],
                 item);
         }
         
         [HttpGet("{storeId}/{itemId}")]
         public Result<IItem> GetItem(string storeId, string itemId)
         {
-            return _storeService.GetItem((string) HttpContext.Items["authToken"],
+            return _inStoreService.GetItem((string) HttpContext.Items["authToken"],
                 storeId, itemId);
         }
         
         [HttpGet("[action]/{storeId}")]
         public Result<IEnumerable<IItem>> GetAllItems(string storeId)
         {
-            return _storeService.GetAllStoreItems((string) HttpContext.Items["authToken"],
+            return _inStoreService.GetAllStoreItems((string) HttpContext.Items["authToken"],
                     storeId);
         }
         
         [HttpGet("[action]")]
         public Result<IEnumerable<IItem>> Search(string query)
         {
-            return _storeService.SearchForItem((string) HttpContext.Items["authToken"],
+            return _inStoreService.SearchForItem((string) HttpContext.Items["authToken"],
                 query);
         }
         
         [HttpGet("[action]")]
         public Result<IEnumerable<string>> SearchStore(string query)
         {
-            return _storeService.SearchForStore((string) HttpContext.Items["authToken"],
+            return _inStoreService.SearchForStore((string) HttpContext.Items["authToken"],
                 query);
         }
         
         [HttpGet("{storeId}/history")]
         public Result<SPurchaseHistory> GetStoreHistory(string storeId)
         {
-            return _storeService.GetPurchaseHistoryOfStore((string) HttpContext.Items["authToken"],
+            return _inStoreService.GetPurchaseHistoryOfStore((string) HttpContext.Items["authToken"],
                 storeId);
         }
         
@@ -115,14 +115,14 @@ namespace eCommerce.Controllers
         [HttpGet("[action]/{storeId}")]
         public Result<IList<StorePermission>> StorePermissionForUser(string storeId)
         {
-            return _storeService.GetStorePermission((string) HttpContext.Items["authToken"],
+            return _inStoreService.GetStorePermission((string) HttpContext.Items["authToken"],
                 storeId);
         }
         
         [HttpGet("{storeId}/staff")]
         public Result<IList<StaffPermission>> GetStoreStaffPermissions(string storeId)
         {
-            return _storeService.GetStoreStaffAndTheirPermissions((string) HttpContext.Items["authToken"],
+            return _inStoreService.GetStoreStaffAndTheirPermissions((string) HttpContext.Items["authToken"],
                 storeId);
         }
         
@@ -173,14 +173,14 @@ namespace eCommerce.Controllers
         [HttpPost("{storeId}/policy")]
         public Result AddPolicy(string storeId, [FromBody] SRuleNode ruleNode)
         {
-            return _storeService.AddRuleToStorePolicy((string) HttpContext.Items["authToken"],
+            return _inStoreService.AddRuleToStorePolicy((string) HttpContext.Items["authToken"],
                 storeId, ruleNode);
         }
         
         [HttpPost("{storeId}/discount")]
         public Result AddDiscount(string storeId, [FromBody] SDiscountNode discountNode)
         {
-            return _storeService.AddDiscountToStore((string) HttpContext.Items["authToken"],
+            return _inStoreService.AddDiscountToStore((string) HttpContext.Items["authToken"],
                 storeId, discountNode);
         }
     }

@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using eCommerce.Business.CombineRules;
 using eCommerce.Business.Discounts;
 using eCommerce.Business.DiscountsAndPurchases.Purchases.RulesInfo;
 using eCommerce.Business.Purchases;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using Microsoft.Extensions.Logging;
 
 namespace eCommerce.Business
 {
-    public class Store : IStore
+    public class Store
     {
         //Individual
-        private String _storeName;
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public String _storeName { get; private set; }
         
-        //General
-        private MarketFacade _marketFacade;
-
         //Store's issues
         //Discounts and purchases
         private List<Composite> _myDiscountStrategies;
@@ -28,21 +30,23 @@ namespace eCommerce.Business
         
         //History and inventory
         private StoreTransactionHistory _transactionHistory;
-        private ItemsInventory _inventory;
+        public ItemsInventory _inventory { get; private set; }
 
         //User issues
-        private IUser _founder;
-        private List<OwnerAppointment> _ownersAppointments;
-        private List<IUser> _owners;
-        private List<ManagerAppointment> _managersAppointments;
-        private List<IUser> _managers;
+        public User _founder { get; private set; }
+        public List<OwnerAppointment> _ownersAppointments { get; private set; }
+        public List<ManagerAppointment> _managersAppointments { get; private set; }
         
         private List<IBasket> _basketsOfThisStore;
 
-        public Store(String name, IUser founder)
+        // for ef
+        public Store()
+        {
+        }
+
+        public Store(String name, User founder)
         {
             this._storeName = name;
-
             this._myDiscountStrategies = new List<Composite>();
             this._myPurchaseStrategies = new List<PurchaseStrategy>();
             this._myPurchaseStrategies.Add(new DefaultPurchaseStrategy(this));
@@ -54,27 +58,19 @@ namespace eCommerce.Business
             _inventory = new ItemsInventory(this);
 
             this._founder = founder;
-
-            _owners = new List<IUser>();
-            _owners.Add(founder);
             _ownersAppointments = new List<OwnerAppointment>();
             
-            _managers = new List<IUser>();
             _managersAppointments = new List<ManagerAppointment>();
             
             _basketsOfThisStore = new List<IBasket>();
         }
-        
-        
-        
-        
 
-        public IList<Item> GetAllItems()
+        public virtual IList<Item> GetAllItems()
         {
             return this._inventory.GetAllItemsInStore();
         }
         
-        public Result<Item> GetItem(ItemInfo item)
+        public virtual Result<Item> GetItem(ItemInfo item)
         {
             return _inventory.GetItem(item);
         }
@@ -84,7 +80,7 @@ namespace eCommerce.Business
             return _inventory.GetItem(itemId);
         }
 
-        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(IUser user)
+        public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(User user)
         {
             IList<Tuple<string, IList<StorePermission>>> netasCrazyList = new List<Tuple<string, IList<StorePermission>>>();
             foreach (var manager in _managersAppointments)
@@ -102,6 +98,11 @@ namespace eCommerce.Business
             
             foreach (var owner in _ownersAppointments)
             {
+                if (owner.User == _founder)
+                {
+                    continue;
+                    //Founder permissions alone, next in this code
+                }
                 List<StorePermission> ownerPerm = new List<StorePermission>();
                 foreach (var perm in Enum.GetValues(typeof(StorePermission)).Cast<StorePermission>())
                 {
@@ -127,15 +128,15 @@ namespace eCommerce.Business
             return Result.Ok<IList<Tuple<string, IList<StorePermission>>>>(netasCrazyList);
         }
 
-        public Result<IList<StorePermission>> GetPermissions(IUser user)
+        public virtual Result<IList<StorePermission>> GetPermissions(User user)
         {
             IList<StorePermission> permissions = null;
-            if (user.Equals(_founder) | _owners.Contains(user))
+            if (user.Equals(_founder) | _ownersAppointments.Find(u => u.User.Equals(user)) != null)
             {
                 return Result.Ok<IList<StorePermission>>(Enum.GetValues<StorePermission>());
             }
 
-            if (!_managers.Contains(user))
+            if (_managersAppointments.Find(u => u.User.Equals(user)) != null)
             {
                 return Result.Fail<IList<StorePermission>>("User is not a owner or manager of this store");
             }
@@ -157,23 +158,23 @@ namespace eCommerce.Business
             return Result.Ok(permissions);
         }
 
-        public List<Item> SearchItem(string stringSearch)
+        public virtual List<Item> SearchItem(string stringSearch)
         {
             return this._inventory.SearchItem(stringSearch);
         }
 
-        public List<Item> SearchItemWithPriceFilter(string stringSearch, int startPrice, int endPrice)
+        public virtual List<Item> SearchItemWithPriceFilter(string stringSearch, int startPrice, int endPrice)
         {
             return _inventory.SearchItemWithPriceFilter(stringSearch, startPrice, endPrice);
         }
 
-        public List<Item> SearchItemWithCategoryFilter(string stringSearch, string category)
+        public virtual List<Item> SearchItemWithCategoryFilter(string stringSearch, string category)
         {
             return _inventory.SearchItemWithCategoryFilter(stringSearch, category);
         }
 
 
-        public Result AddBasketToStore(IBasket basket)
+        public virtual Result AddBasketToStore(IBasket basket)
         {
             if (this._basketsOfThisStore.FirstOrDefault(x => x.GetCart() == basket.GetCart()) != null)
             {
@@ -185,7 +186,7 @@ namespace eCommerce.Business
                 return Result.Ok(basket);
             }
         }
-        public Result CalculateBasketPrices(IBasket basket)
+        public virtual Result CalculateBasketPrices(IBasket basket)
         {           
             foreach (var strategy in _myDiscountStrategies)
             {
@@ -199,7 +200,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
-        public Result CatchAllBasketProducts(IBasket basket)
+        public virtual Result CatchAllBasketProducts(IBasket basket)
         {
             foreach (var itemInfo in basket.GetAllItems().GetValue())
             {
@@ -218,12 +219,12 @@ namespace eCommerce.Business
             
         }
 
-        public Result TryGetItems(ItemInfo item)
+        public virtual Result TryGetItems(ItemInfo item)
         {
             return this._inventory.TryGetItems(item);
         }
 
-        public Result FinishPurchaseOfBasket(IBasket basket)
+        public virtual Result FinishPurchaseOfBasket(IBasket basket)
         {
             foreach (var item in basket.GetAllItems().GetValue())
             {
@@ -247,7 +248,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
-        public Result FinishPurchaseOfItems(ItemInfo item)
+        public virtual Result FinishPurchaseOfItems(ItemInfo item)
         {
             var res = this._inventory.GetItem(item);
             if (res.IsFailure)
@@ -261,7 +262,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
-        public Result AddItemToStore(ItemInfo newItem, IUser user)
+        public virtual Result AddItemToStore(ItemInfo newItem, User user)
         {
             if (user.HasPermission(this, StorePermission.AddItemToStore).IsFailure)
             {
@@ -281,7 +282,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result EditItemToStore(ItemInfo newItem, IUser user)
+        public virtual Result EditItemToStore(ItemInfo newItem, User user)
         {
             if (user.HasPermission(this, StorePermission.AddItemToStore).IsFailure)
             {
@@ -302,7 +303,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result UpdateStock_AddItems(ItemInfo newItem, IUser user)
+        public virtual Result UpdateStock_AddItems(ItemInfo newItem, User user)
         {
             if (user.HasPermission(this, StorePermission.AddItemToStore).IsFailure)
             {
@@ -310,18 +311,23 @@ namespace eCommerce.Business
             }
             else
             {
-                if (this._inventory.GetItem(newItem).IsFailure)
-                {
-                    return Result.Fail("Item doesn't exist in store");
-                }
-                else
-                {
-                    return this._inventory.AddExistingItem(user, newItem.name, newItem.amount);
-                }
+                return TheStockUpdate_Add(newItem);
             }
         }
 
-        public Result UpdateStock_SubtractItems(ItemInfo newItem, IUser user)
+        private Result TheStockUpdate_Add(ItemInfo newItem)
+        {
+            if (this._inventory.GetItem(newItem).IsFailure)
+            {
+                return Result.Fail("Item doesn't exist in store");
+            }
+            else
+            {
+                return this._inventory.AddExistingItem(newItem.name, newItem.amount);
+            }
+        }
+
+        public virtual Result UpdateStock_SubtractItems(ItemInfo newItem, User user)
         {
             if (user.HasPermission(this, StorePermission.AddItemToStore).IsFailure)
             {
@@ -341,7 +347,7 @@ namespace eCommerce.Business
         }
 
         // TODO implement this method
-        public Result RemoveItemToStore(string productName, IUser user)
+        public virtual Result RemoveItemToStore(string productName, User user)
         {
             var res=this._inventory.GetItem(productName);
             if (res.IsFailure)
@@ -354,7 +360,7 @@ namespace eCommerce.Business
             }
         }
         
-        public Result RemoveItemToStore(ItemInfo newItem, IUser user)
+        public virtual Result RemoveItemToStore(ItemInfo newItem, User user)
         {
             if (user.HasPermission(this, StorePermission.AddItemToStore).IsFailure)
             {
@@ -374,7 +380,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result AppointNewOwner(IUser user, OwnerAppointment ownerAppointment)
+        public virtual Result AppointNewOwner(User user, OwnerAppointment ownerAppointment)
         {
             if (user.HasPermission(this, StorePermission.ControlStaffPermission).IsFailure)
             {
@@ -387,7 +393,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result AppointNewManager(IUser user, ManagerAppointment managerAppointment)
+        public virtual Result AppointNewManager(User user, ManagerAppointment managerAppointment)
         {
             if (user.HasPermission(this, StorePermission.ControlStaffPermission).IsFailure)
             {
@@ -400,7 +406,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result RemoveOwnerFromStore(IUser theOneWhoFires, IUser theFired, OwnerAppointment ownerAppointment)
+        public virtual Result RemoveOwnerFromStore(User theOneWhoFires, User theFired, OwnerAppointment ownerAppointment)
         {
             if (theOneWhoFires.HasPermission(this, StorePermission.RemoveStoreStaff).IsSuccess)
             {
@@ -421,7 +427,7 @@ namespace eCommerce.Business
         }
         
         
-        public Result RemoveManagerFromStore(IUser theOneWhoFires, IUser theFired, ManagerAppointment managerAppointment)
+        public virtual Result RemoveManagerFromStore(User theOneWhoFires, User theFired, ManagerAppointment managerAppointment)
         {
             if (theOneWhoFires.HasPermission(this, StorePermission.RemoveStoreStaff).IsSuccess)
             {
@@ -441,22 +447,22 @@ namespace eCommerce.Business
             }
         }
         
-        public Result<IList<PurchaseRecord>> GetPurchaseHistory(IUser user)
+        public virtual Result<IList<PurchaseRecord>> GetPurchaseHistory(User user)
         {
             return this._transactionHistory.GetHistory(user);
         }
 
-        public Result EnterBasketToHistory(IBasket basket)
+        public virtual Result EnterBasketToHistory(IBasket basket)
         {
             return this._transactionHistory.AddRecordToHistory(basket);
         }
 
-        public string GetStoreName()
+        public virtual string GetStoreName()
         {
             return this._storeName;
         }
         
-        public bool TryAddNewCartToStore(ICart cart)
+        public virtual bool TryAddNewCartToStore(ICart cart)
         {
             bool ans=true;
             foreach (var basket in this._basketsOfThisStore)
@@ -471,7 +477,7 @@ namespace eCommerce.Business
 
         }
 
-        public Result ConnectNewBasketToStore(IBasket newBasket)
+        public virtual Result ConnectNewBasketToStore(IBasket newBasket)
         {
             if (_basketsOfThisStore.Count == 0)
             {
@@ -492,7 +498,7 @@ namespace eCommerce.Business
             }
         }
 
-        public bool CheckConnectionToCart(ICart cart)
+        public virtual bool CheckConnectionToCart(ICart cart)
         {
             foreach (var basket in _basketsOfThisStore)
             {
@@ -505,7 +511,7 @@ namespace eCommerce.Business
             return false;
         }
 
-        public Result<double> CheckDiscount(Basket basket)
+        public virtual Result<double> CheckDiscount(Basket basket)
         {
             //No double discounts
             
@@ -538,13 +544,13 @@ namespace eCommerce.Business
             return Result.Ok(minValue);
         }
 
-        public Result CheckWithStorePolicy(IBasket basket, IUser user)
+        public virtual Result CheckWithStorePolicy(IBasket basket, User user)
         {
             return this._myPurchasePolicy.CheckWithStorePolicy(basket, user);
         }
 
 
-        public Result AddDiscountToStore(IUser user,DiscountInfoNode infoNode)
+        public virtual Result AddDiscountToStore(User user,DiscountInfoNode infoNode)
         {
             if (!user.HasPermission(this, StorePermission.EditStorePolicy).IsSuccess)
             {
@@ -559,7 +565,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
-        public Result AddRuleToStorePolicy(IUser user,RuleInfoNode ruleInfoNode)
+        public virtual Result AddRuleToStorePolicy(User user,RuleInfoNode ruleInfoNode)
         {
             var rule = RuleHandler.HandleRule(ruleInfoNode);
             if (rule.IsFailure)
@@ -569,12 +575,12 @@ namespace eCommerce.Business
             return this._myPurchasePolicy.AddRuleToStorePolicy(user, rule.Value);
         }
 
-        public Result<IList<RuleInfoNode>> GetStorePolicy(IUser user)
+        public virtual Result<IList<RuleInfoNode>> GetStorePolicy(User user)
         {
             return this._myPurchasePolicy.GetPolicy(user);
         }
 
-        public Result<IList<DiscountInfoNode>> GetStoreDiscounts(IUser user)
+        public virtual Result<IList<DiscountInfoNode>> GetStoreDiscounts(User user)
         {
             if (!user.HasPermission(this, StorePermission.EditStorePolicy).IsSuccess)
             {
@@ -599,7 +605,7 @@ namespace eCommerce.Business
             return Result.Ok(discountInfoNodes);
         }
 
-        public Result ResetStorePolicy(IUser user)
+        public virtual Result ResetStorePolicy(User user)
         {
             if (!user.HasPermission(this, StorePermission.EditStorePolicy).IsSuccess)
             {
@@ -609,7 +615,7 @@ namespace eCommerce.Business
             return this._myPurchasePolicy.Reset(user);
         }
 
-        public Result ResetStoreDiscount(IUser user)
+        public virtual Result ResetStoreDiscount(User user)
         {
             if (!user.HasPermission(this, StorePermission.EditStorePolicy).IsSuccess)
             {
@@ -619,12 +625,23 @@ namespace eCommerce.Business
             this._myDiscountStrategies = new List<Composite>();
             return Result.Ok();
         }
+        
+        public Result ReturnItemsToStore(ItemInfo itemInfo)
+        {
+            return this.TheStockUpdate_Add(itemInfo);
+        }
 
-        public Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
+        public void FreeBasket(Basket basket)
+        {
+            this._basketsOfThisStore.Remove(basket);
+        }
+
+        public virtual Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
         {
             var purchaseRecord=this._transactionHistory.AddRecordToHistory(basket);
-            foreach (var owner in _owners)
+            foreach (var ownerAppointment in _ownersAppointments)
             {
+                User owner = ownerAppointment.User;
                 foreach (var item in purchaseRecord.Value.BasketInfo._itemsInBasket)
                 {
                     owner.PublishMessage(String.Format("User: {0} , bought {1} items of {2} at {3}",
@@ -635,9 +652,14 @@ namespace eCommerce.Business
 
         }
 
-        public Result<IUser> GetFounder()
+        public virtual Result<User> GetFounder()
         {
             return Result.Ok(this._founder);
         }
+
+        public string StoreName
+        {
+            get => _storeName;
+        } 
     }
 }

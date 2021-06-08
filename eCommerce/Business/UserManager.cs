@@ -5,8 +5,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using eCommerce.Auth;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 using NLog;
 
@@ -18,23 +19,23 @@ namespace eCommerce.Business
         private IUserAuth _auth;
         
         // token to user
-        private ConcurrentDictionary<string, IUser> _connectedUsers;
+        private ConcurrentDictionary<string, User> _connectedUsers;
         private ConcurrentDictionary<string, bool> _connectedUsersName;
-        private IRepository<IUser> _registeredUsersRepo;
-        private ConcurrentDictionary<string, IUser> _admins;
+        private IRepository<User> _registeredUsersRepo;
+        private ConcurrentDictionary<string, User> _admins;
 
         private ConcurrentIdGenerator _concurrentIdGenerator;
 
 
-        public UserManager(IUserAuth auth, IRepository<IUser> registeredUsersRepo)
+        public UserManager(IUserAuth auth, IRepository<User> registeredUsersRepo)
         {
             _auth = auth;
-            _connectedUsers = new ConcurrentDictionary<string, IUser>();
+            _connectedUsers = new ConcurrentDictionary<string, User>();
             _connectedUsersName = new ConcurrentDictionary<string, bool>();
             // TODO get the initialze id value from DB
             _concurrentIdGenerator = new ConcurrentIdGenerator(0);
             _registeredUsersRepo = registeredUsersRepo;
-            _admins = new ConcurrentDictionary<string, IUser>();
+            _admins = new ConcurrentDictionary<string, User>();
         }
 
         public string Connect()
@@ -42,7 +43,7 @@ namespace eCommerce.Business
             string guestUsername = GenerateGuestUsername();
             string token = _auth.GenerateToken(guestUsername);
 
-            IUser newUser = CreateGuestUser(guestUsername);
+            User newUser = CreateGuestUser(guestUsername);
             _connectedUsers.TryAdd(token, newUser);
             
             _logger.Info($"New guest: {guestUsername}");
@@ -71,7 +72,7 @@ namespace eCommerce.Business
             }
         }
 
-        public Result Register(string token, MemberInfo memberInfo, string password)
+        public async Task<Result> Register(string token, MemberInfo memberInfo, string password)
         {
             if (!_auth.IsValidToken(token))
             {
@@ -95,13 +96,13 @@ namespace eCommerce.Business
                 return validMemberInfoRes;
             }
 
-            Result authRegistrationRes = RegisterAtAuthorization(memberInfo.Username, password);
+            Result authRegistrationRes = await RegisterAtAuthorization(memberInfo.Username, password);
             if (authRegistrationRes.IsFailure)
             {
                 return authRegistrationRes;
             }
             
-            IUser newUser = new User(Member.State, memberInfo.Clone());
+            User newUser = new User(Member.State, memberInfo.Clone());
             if (!_registeredUsersRepo.Add(newUser))
             {
                 // TODO maybe remove the user form userAuth
@@ -116,19 +117,19 @@ namespace eCommerce.Business
 
         public void AddAdmin(MemberInfo adminInfo, string password)
         {
-            IUser user = new User(Admin.State, adminInfo);
-            RegisterAtAuthorization(adminInfo.Username, password);
+            User user = new User(Admin.State, adminInfo);
+            RegisterAtAuthorization(adminInfo.Username, password).Wait();
             _registeredUsersRepo.Add(user);
             _admins.TryAdd(adminInfo.Username, user);
         }
         
-        private Result RegisterAtAuthorization(string username, string password)
+        private Task<Result> RegisterAtAuthorization(string username, string password)
         {
             return _auth.Register(username, password);
         }
         
         // TODO: use the role here, how user that is admin can log in as member
-        public Result<string> Login(string guestToken, string username, string password, UserToSystemState role)
+        public async Task<Result<string>> Login(string guestToken, string username, string password, UserToSystemState role)
         {
             if (!_auth.IsValidToken(guestToken))
             {
@@ -146,7 +147,7 @@ namespace eCommerce.Business
                 return Result.Fail<string>("Not connected or not guest");
             }
             
-            Result authLoginRes = _auth.Authenticate(username, password);
+            Result authLoginRes = await _auth.Authenticate(username, password);
             if (authLoginRes.IsFailure)
             {
                 return Result.Fail<string>(authLoginRes.Error);
@@ -159,7 +160,7 @@ namespace eCommerce.Business
             
             string loginToken = _auth.GenerateToken(username);
             
-            IUser user = _registeredUsersRepo.GetOrNull(username);
+            User user = _registeredUsersRepo.GetOrNull(username);
             if (user == null)
             {
                 _logger.Error($"User {username} is registered in auth, but not in usermanger");
@@ -229,7 +230,7 @@ namespace eCommerce.Business
             return _connectedUsers.TryGetValue(token, out var user);
         }
 
-        public Result<IUser> GetUserIfConnectedOrLoggedIn(string token)
+        public Result<User> GetUserIfConnectedOrLoggedIn(string token)
         {
             if (!_auth.IsValidToken(token))
             {
@@ -239,19 +240,19 @@ namespace eCommerce.Business
                     _connectedUsers.TryRemove(token, out var tUser);
                 }
 
-                return Result.Fail<IUser>("Invalid token");
+                return Result.Fail<User>("Invalid token");
             }
 
             if (!_connectedUsers.TryGetValue(token, out var user))
             {
                 _logger.Info($"Usage of old token {token}");
-                return Result.Fail<IUser>("User not connected or logged in");
+                return Result.Fail<User>("User not connected or logged in");
             }
 
             return Result.Ok(user);
         }
         
-        public Result<IUser> GetUserLoggedIn(string token)
+        public Result<User> GetUserLoggedIn(string token)
         {
             if (!_auth.IsValidToken(token))
             {
@@ -261,18 +262,18 @@ namespace eCommerce.Business
                     _connectedUsers.TryRemove(token, out var tUser);
                 }
 
-                return Result.Fail<IUser>("Invalid token");
+                return Result.Fail<User>("Invalid token");
             }
 
             if (!_connectedUsers.TryGetValue(token, out var user))
             {
                 _logger.Info($"Usage of old token {token}");
-                return Result.Fail<IUser>("User not logged in");
+                return Result.Fail<User>("User not logged in");
             }
 
             if (user.GetState() == Guest.State)
             {
-                return Result.Fail<IUser>("This is a guest user");
+                return Result.Fail<User>("This is a guest user");
             }
             
             return Result.Ok(user);
@@ -283,18 +284,18 @@ namespace eCommerce.Business
         /// </summary>
         /// <param name="username">The username</param>
         /// <returns>The user</returns>
-        public Result<IUser> GetUser(string username)
+        public Result<User> GetUser(string username)
         {
-            IUser user = _registeredUsersRepo.GetOrNull(username);
+            User user = _registeredUsersRepo.GetOrNull(username);
             if (user == null)
             {
-                return Result.Fail<IUser>("User doesn't exists");
+                return Result.Fail<User>("User doesn't exists");
             }
 
             return Result.Ok(user);
         }
 
-        private IUser CreateGuestUser(string guestName)
+        private User CreateGuestUser(string guestName)
         {
             return new User(guestName);
         }
@@ -343,14 +344,19 @@ namespace eCommerce.Business
         public void CreateMainAdmin()
         {
             AppConfig config = AppConfig.GetInstance();
-            
-            MemberInfo adminInfo = new MemberInfo(
-                config.GetData("AdminCreationInfo:Username"),
-                config.GetData("AdminCreationInfo:Email"),
-                "TheAdmin",
-                DateTime.Now, 
-                null);
-            AddAdmin(adminInfo, config.GetData("AdminCreationInfo:Password"));
+            string adminUsername = config.GetData("AdminCreationInfo:Username");
+            string adminPassword = config.GetData("AdminCreationInfo:Password");
+
+            if (_auth.Authenticate(adminUsername, adminPassword).Result.IsFailure)
+            {
+                MemberInfo adminInfo = new MemberInfo(
+                    config.GetData("AdminCreationInfo:Username"),
+                    config.GetData("AdminCreationInfo:Email"),
+                    "TheAdmin",
+                    DateTime.Now,
+                    null);
+                AddAdmin(adminInfo, config.GetData("AdminCreationInfo:Password"));
+            }
         }
     }
 }

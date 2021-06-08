@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+
 using NUnit.Framework;
 using Tests.Business.Mokups;
 
@@ -25,7 +25,7 @@ namespace Tests.Business.StoreTests
         private mokUser alice;
         
 
-        private IStore alenbyStore;
+        private Store alenbyStore;
         
         
         [SetUp]
@@ -88,7 +88,7 @@ namespace Tests.Business.StoreTests
             
             
             int amount = item1.GetAmount();
-            item1.AddItems(alice, 80);
+            item1.AddItems(80);
             Assert.AreEqual(amount+80,item1.GetAmount());
             Assert.AreEqual(amount + 80, item1.ShowItem().amount);
             
@@ -164,8 +164,8 @@ namespace Tests.Business.StoreTests
             //item1.SetPrice()\
             //item1.GetTotalPrice()
             
-            Assert.AreEqual(false,item1.CheckPricesInBetween((int)(pricePer*0.5),pricePer*2).IsFailure);
-            Assert.AreEqual(true,item1.CheckPricesInBetween((int)(pricePer*0.5),pricePer*2).GetValue());
+            Assert.AreEqual(false,item1.CheckPricesInBetween((pricePer*0.5),pricePer*2).IsFailure);
+            Assert.AreEqual(true,item1.CheckPricesInBetween((pricePer*0.5),pricePer*2).GetValue());
             //item1.CheckPricesInBetween()  
         }
 

@@ -16,7 +16,7 @@ namespace Tests.AuthTests
         [SetUp]
         public void Setup()
         {
-            _auth = UserAuth.CreateInstanceForTests(new TRegisteredUserRepo());
+            _auth = UserAuth.CreateInstanceForTests(new InMemoryRegisteredUserRepo());
         }
 
         [Test]
@@ -48,9 +48,13 @@ namespace Tests.AuthTests
         public async Task ConcurrentRegisterSameUserTest()
         {
             const int numberOfTasks = 5;
-            Result[] registerRes = await TaskTestUtils.CreateAndRunTasks(
-                () => _auth.Register("user1", "password1"), 
-                numberOfTasks);
+            Task<Result>[] registerTasks = new Task<Result>[numberOfTasks];
+            for (int i = 0; i < numberOfTasks; i++)
+            {
+                registerTasks[i] = _auth.Register("user1", "password1");
+            }
+
+            Result[] registerRes = await Task.WhenAll<Result>(registerTasks);
 
             int registeredSuccessfully = 0;
             foreach (var res in registerRes)

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using eCommerce.Business.Discounts;
-using eCommerce.Business.Service;
+
 using eCommerce.Common;
 
 namespace eCommerce.Business.CombineRules
@@ -10,16 +10,16 @@ namespace eCommerce.Business.CombineRules
     {
  
 
-        public abstract Dictionary<string,ItemInfo> Check(IBasket checkItem1, IUser checkItem2);
+        public abstract Dictionary<string,ItemInfo> Check(IBasket checkItem1, User checkItem2);
         
-        public abstract bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2);
+        public abstract bool CheckOneItem(ItemInfo itemInfo, User checkItem2);
         
         
 
         public abstract bool CheckIfDiscount();
 
-        public abstract Result<double> Get(IBasket basket, IUser user);
-        public abstract Result<double> GetOneItem(ItemInfo itemInfo, IUser user);
+        public abstract Result<double> Get(IBasket basket, User user);
+        public abstract Result<double> GetOneItem(ItemInfo itemInfo, User user);
 
 
         public Dictionary<string, ItemInfo> CombineDictionaries(Dictionary<string, ItemInfo> dictionary1,

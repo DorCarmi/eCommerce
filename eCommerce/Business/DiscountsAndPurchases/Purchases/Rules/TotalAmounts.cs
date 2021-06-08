@@ -17,7 +17,7 @@ namespace eCommerce.Business
         }
         
 
-        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, IUser checkItem2)
+        public override Dictionary<string, ItemInfo> Check(IBasket checkItem1, User checkItem2)
         {
             Dictionary<string, ItemInfo> itemsList = new Dictionary<string, ItemInfo>();
             int totalAmountChecked = 0;
@@ -40,7 +40,7 @@ namespace eCommerce.Business
             return itemsList;
         }
 
-        public override bool CheckOneItem(ItemInfo itemInfo, IUser checkItem2)
+        public override bool CheckOneItem(ItemInfo itemInfo, User checkItem2)
         {
             var compareAns = _compare.GetResult(_totalAmount, itemInfo.amount);
             return compareAns > 0;

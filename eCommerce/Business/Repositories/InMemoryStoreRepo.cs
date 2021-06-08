@@ -1,32 +1,29 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Net.Sockets;
-using eCommerce.Business.Service;
 using eCommerce.Common;
 
-namespace eCommerce.Business
+namespace eCommerce.Business.Repositories
 {
-    public class StoreRepository : IRepository<IStore>
+    public class InMemoryStoreRepo : IRepository<Store>
     {
-        private ConcurrentDictionary<string, IStore> _stores;
+        private ConcurrentDictionary<string, Store> _stores;
 
-        public StoreRepository()
+        public InMemoryStoreRepo()
         {
-            _stores = new ConcurrentDictionary<string, IStore>();
+            _stores = new ConcurrentDictionary<string, Store>();
         }
 
-        public bool Add([NotNull] IStore store)
+        public bool Add([NotNull] Store store)
         {
             return _stores.TryAdd(store.GetStoreName().ToUpper(), store);
         }
 
-        public IStore GetOrNull([NotNull] string storeName)
+        public Store GetOrNull([NotNull] string storeName)
         {
-            IStore store = null;
+            Store store = null;
             _stores.TryGetValue(storeName.ToUpper(), out store);
             return store;
         }

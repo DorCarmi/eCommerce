@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+
 using NUnit.Framework;
 using Tests.Business.Mokups;
 
@@ -12,8 +12,8 @@ namespace Tests.Business.StoreTests
     public class CartTest
     {
         private ICart MyCart;
-        private IStore MyStore;
-        private IUser Alice;
+        private Store MyStore;
+        private User Alice;
         private ItemInfo item1;
         private ItemInfo item2;
         private ItemInfo item3;
@@ -74,7 +74,7 @@ namespace Tests.Business.StoreTests
         {
             var ans=this.MyCart.CheckForCartHolder(Alice);
             Assert.AreEqual(true, ans);
-            IUser bob = new mokUser("Bob");
+            User bob = new mokUser("Bob");
             Assert.AreEqual(false,MyCart.CheckForCartHolder(bob));
 
         }

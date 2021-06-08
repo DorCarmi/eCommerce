@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using eCommerce.Auth;
 using eCommerce.Business;
-using eCommerce.Business.Service;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
@@ -22,10 +22,10 @@ namespace eCommerce.Service
         }
 
         public static UserService CreateUserServiceForTests(IUserAuth userAuth,
-            IRepository<IUser> registeredUsersRepo,
-            StoreRepository storeRepo)
+            IRepository<User> registeredUsersRepo,
+            InMemoryStoreRepo inMemoryStoreRepo)
         {
-            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(userAuth, registeredUsersRepo, storeRepo);
+            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(userAuth, registeredUsersRepo, inMemoryStoreRepo);
             return new UserService(marketFacade);
         }
 

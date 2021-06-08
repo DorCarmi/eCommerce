@@ -1,31 +1,44 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using eCommerce.Common;
 
 namespace eCommerce.Business
 {
     public class OwnerAppointment
     {
-        public IUser User { get; set; }
+        public string Ownername { get; set; }
+        public string OwnedStorename { get; set; }
+        public User User { get; set; }
         private ConcurrentDictionary<StorePermission,bool> _permissions;
 
-        public OwnerAppointment(IUser user)
+
+        //for ef
+        public OwnerAppointment()
         {
-            this.User = user;
+            // we are able to simply re-assign all permissions to every owner loaded from DB,
+            // because, until further notice, by definition all owners have every permission.
             this._permissions = new ConcurrentDictionary<StorePermission, bool>();
 
             foreach (var permission in Enum.GetValues(typeof(StorePermission)))
             {
                 _permissions.TryAdd((StorePermission)permission,true);
             }
-            // _permissions.TryAdd(StorePermission.GetStoreHistory,true);
-            // _permissions.TryAdd(StorePermission.AddItemToStore,true);
-            // _permissions.TryAdd(StorePermission.ChangeItemPrice,true);
-            // _permissions.TryAdd(StorePermission.EditItemDetails,true);
-            // _permissions.TryAdd(StorePermission.EditStorePolicy,true);
-            // _permissions.TryAdd(StorePermission.ChangeItemStrategy,true);
-            // _permissions.TryAdd(StorePermission.ControlStaffPermission,true);
+        }
+
+        public OwnerAppointment(User user, string storename)
+        {
+            this.User = user;
+            this.Ownername = user.Username;
+            this.OwnedStorename = storename;
+            this._permissions = new ConcurrentDictionary<StorePermission, bool>();
+
+            foreach (var permission in Enum.GetValues(typeof(StorePermission)))
+            {
+                _permissions.TryAdd((StorePermission)permission,true);
+            }
         }
 
         public Result HasPermission(StorePermission permission)
