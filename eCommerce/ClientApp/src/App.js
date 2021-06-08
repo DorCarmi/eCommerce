@@ -32,6 +32,8 @@ import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "./Data/StorePolic
 import AddPolicy from "./components/AddPolicy";
 import AddRule from "./components/AddRule";
 import {AppointOwner} from "./components/AppointOwner";
+import {ShowStatsInput} from "./components/ShowStatsInput";
+import ShowStatsOutput from "./components/ShowStatsOutput";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -256,6 +258,12 @@ export default class App extends Component {
                     <Route exact path="/managePermissions/:id/appointOwner" render={({match}) => <AppointOwner storeId ={match.params.id}/>} />
 
                     <Route exact path="/managePermissions/:storeId/" render={({match}) => <ManagePermissions storeId ={match.params.storeId}/>}/>
+
+                    <Route exact path="/showStats" render={({match}) => <ShowStatsInput storeId ={match.params.storeId}/>}/>
+
+                    <Route exact path="/showStats/:date" render={({match}) => <ShowStatsOutput date ={match.params.date}/>}/>
+
+
 
                 </Layout>
             </BrowserRouter>

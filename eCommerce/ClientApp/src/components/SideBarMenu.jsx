@@ -102,6 +102,9 @@ export class SideBarMenu extends Component {
                                 <MenuItem>
                                     <NavLink tag={Link} exact to={`/AdminPurchaseHistory/User`}>User Purchase History</NavLink>
                                 </MenuItem>
+                                <MenuItem>
+                                    <NavLink tag={Link} exact to={`/showStats`}>Show System Stats</NavLink>
+                                </MenuItem>
                             </SubMenu>
                         </Menu> :
                         null}
