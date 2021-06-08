@@ -1,5 +1,4 @@
 ﻿import React, {Component} from "react";
-import {Form,Button} from 'react-bootstrap'
 import "./Register.css"
 import {StoreApi} from '../Api/StoreApi'
 import {Redirect, withRouter} from "react-router-dom";
@@ -40,11 +39,11 @@ export class ShowStatsInput extends Component {
                 <main className="RegisterMain">
                     <div className="RegisterWindow">
                         <div className="CenterItemContainer">
-                            <h3>Show Stats - Enter Date In Format dd-mm-yyyy</h3>
+                            <h3>Show Stats - Enter Date In Format mm-dd-yyyy</h3>
                         </div>
                         <form className="RegisterForm" onSubmit={this.handleSubmit}>
                             <input type="text" name="date" value={this.state.date}
-                                   placeholder={'Enter Date In Format dd-mm-yyyy'} onChange={this.handleInputChange} required/>
+                                   placeholder={'Enter Date In Format mm-dd-yyyy'} onChange={this.handleInputChange} required/>
                             <div className="CenterItemContainer">
                                 <input className="action" type="submit" value="submit"/>
                             </div>
