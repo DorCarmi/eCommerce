@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eCommerce.Common;
+using eCommerce.Statistics;
 
 namespace eCommerce.Business
 {
@@ -39,6 +41,12 @@ namespace eCommerce.Business
         public override Result<IList<PurchaseRecord>> GetUserPurchaseHistory(User user, User otherUser)
         {
             return otherUser.GetUserPurchaseHistory();
+        }
+        
+        public override Result<LoginDateStat> GetLoginStats(DateTime date)
+        {
+            IStatisticsService statisticsService = Statistics.Statistics.GetInstance();
+            return statisticsService.GetLoginStatsOn(date);
         }
 
         public string GetRole()

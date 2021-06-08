@@ -29,6 +29,7 @@ import {makeRuleInfo, makeRuleNodeComposite, makeRuleNodeLeaf, RuleType} from ".
 import {Comperators} from "./Data/StorePolicies/Comperators";
 import {Combinations} from "./Data/StorePolicies/Combinations";
 import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "./Data/StorePolicies/DiscountInfoTree";
+import {StatsApi} from "./Api/StatsApi";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -192,6 +193,12 @@ export default class App extends Component {
             //console.log("componentDidUpdate")
             await this.connectToWebSocket();
         }
+        
+        // Example for stats
+        /*if(this.state.role === UserRole.Admin){
+            const statsApi = new StatsApi();
+            console.log(await statsApi.loginStats("08-06-2021"))
+        }*/
 
         if(prevState.userName !== this.state.userName){
             if(this.state.isLoggedIn){
@@ -240,10 +247,7 @@ export default class App extends Component {
                     <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
                     <Route exact path="/purchaseHistory/:storeId?/:userId?/:isAdmin?" render={({match}) => <PurchaseHistory storeId ={match.params.storeId} userId={match.params.userId} isAdmin={match.params.isAdmin}/>} />
                     <Route exact path="/AdminPurchaseHistory/:term" render={({match}) => <AdminPurchaseHistory term={match.params.term}/>}/>
-
-
-
-
+                    
                     <Route exact path="/searchItems/Item/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query}  />} />
                     <Route exact path="/searchItems/Store/:query" render={({match}) => <Store  storeId={match.params.query}/>} />
 

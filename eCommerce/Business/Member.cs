@@ -141,6 +141,11 @@ namespace eCommerce.Business
         {
             return user.AnnexStakeholders(this, store, owners, managers);
         }
+
+        public virtual Result<LoginDateStat> GetLoginStats(DateTime date)
+        {
+            return Result.Fail<LoginDateStat>("Guest can not get stats");
+        }
         
         public string GetRole()
         {

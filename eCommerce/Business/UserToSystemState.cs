@@ -29,5 +29,6 @@ namespace eCommerce.Business
         Result<ManagerAppointment> RemoveManager(User user, Store store);
         Result AnnexStakeholders(User user, Store store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers);
         public  string GetRole();
+        Result<LoginDateStat> GetLoginStats(DateTime date);
     }
 }

@@ -135,5 +135,10 @@ namespace eCommerce.Business
         {
             return "Guest";
         }
+
+        public Result<LoginDateStat> GetLoginStats(DateTime date)
+        {
+            return Result.Fail<LoginDateStat>("Guest can not get stats");
+        }
     }  
 }
