@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using eCommerce.Adapters;
 using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Repositories;
@@ -61,6 +62,9 @@ namespace eCommerce.Service
                     break;
                 }
             }
+
+            InitPaymentAdapter(config);
+            InitSupplyAdapter(config);
             
             marketFacade = MarketFacade.GetInstance();
             marketFacade.Init(authService, userRepo, storeRepo);
@@ -71,6 +75,52 @@ namespace eCommerce.Service
             IUserAuth authService = UserAuth.GetInstance();
             authService.Init(config);
             return authService;
+        }
+
+        private void InitPaymentAdapter(AppConfig config)
+        {
+            string paymentAdapter = config.GetData("PaymentAdapter");
+            switch (paymentAdapter)
+            {
+                case "WSEP":
+                {
+                    PaymentProxy.AssignPaymentService(new WSEPPaymentAdapter());
+                    break;
+                }
+                case null:
+                {
+                    break;
+                }
+                default:
+                {
+                    config.ThrowErrorOfData("PaymentAdapter", "invalid");
+                    break;
+                }
+                    
+            }
+        }
+        
+        private void InitSupplyAdapter(AppConfig config)
+        {
+            string paymentAdapter = config.GetData("SupplyAdapter");
+            switch (paymentAdapter)
+            {
+                case "WSEP":
+                {
+                    SupplyProxy.AssignSupplyService(new WSEPSupplyAdapter());
+                    break;
+                }
+                case null:
+                {
+                    break;
+                }
+                default:
+                {
+                    config.ThrowErrorOfData("SupplyAdapter", "invalid");
+                    break;
+                }
+                    
+            }
         }
     }
 }

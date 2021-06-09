@@ -98,7 +98,7 @@ namespace Tests.AcceptanceTests
             //To check later
             
             _cart.AddItemToCart(token, ITEM_NAME, store_name, 5);
-            Result purchaseResult = _cart.PurchaseCart(token, new PaymentInfo("Ivan11","123456789","1234567890123456","12/34","123","address"));
+            Result purchaseResult = _cart.PurchaseCart(token, new PaymentInfo("Ivan11","123456789","1234567890123456","12-34","123","address"));
             Assert.True(purchaseResult.IsSuccess, purchaseResult.Error);
             _auth.Disconnect(token);
         }
@@ -161,7 +161,7 @@ namespace Tests.AcceptanceTests
             Assert.True(resAddItemToCart.IsSuccess, resAddItemToCart.Error);
             
             Result purchaseResult = _cart.PurchaseCart(JakeLogInResult.Value,
-                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12/34", "123", "address"));
+                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12-34", "123", "address"));
             
             Assert.False(purchaseResult.IsSuccess);
             Assert.True(purchaseResult.Error.Contains("<Policy>"),purchaseResult.Error);
@@ -251,7 +251,7 @@ namespace Tests.AcceptanceTests
             var resAddCart=_cart.AddItemToCart(IvanLogInResult.Value, ITEM_NAME, store_name, amount);
             Assert.True(resAddCart.IsSuccess,resAddCart.Error);
             Result purchaseResult = _cart.PurchaseCart(IvanLogInResult.Value,
-                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12/34", "123", "address"));
+                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12-34", "123", "address"));
             
             Assert.False(purchaseResult.IsSuccess);
             
@@ -300,7 +300,7 @@ namespace Tests.AcceptanceTests
             var resAddCart=_cart.AddItemToCart(IvanLogInResult.Value, "Chocolate milk", store_name, amount);
             Assert.True(resAddCart.IsSuccess,resAddCart.Error);
             Result purchaseResult = _cart.PurchaseCart(IvanLogInResult.Value,
-                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12/34", "123", "address"));
+                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12-34", "123", "address"));
 
             Assert.False(purchaseResult.IsSuccess);
             Assert.AreEqual(itemsInStock,_inStore.GetItem(IvanLogInResult.Value,store_name,ITEM_NAME).Value.Amount);

@@ -21,7 +21,6 @@ namespace eCommerce.Adapters
         public SupplyProxy()
         {
             _transactionId = 10000;
-            
         }
 
         public async Task<Result<int>> SupplyProducts(string storeName, string[] itemsNames, string userAddress)

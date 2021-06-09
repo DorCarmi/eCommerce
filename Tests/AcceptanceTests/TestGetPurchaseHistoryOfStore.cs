@@ -83,7 +83,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             _cart.AddItemToCart(token, "Tara milk", storeName, 5);
-            _cart.PurchaseCart(token, new PaymentInfo("Yossi11","123456789","1234567890123456","12/34","123","address"));
+            _cart.PurchaseCart(token, new PaymentInfo("Yossi11","123456789","1234567890123456","12-34","123","address"));
             _auth.Disconnect(token);
             token = _auth.Connect();
             Result<string> yossiLogInResult = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);

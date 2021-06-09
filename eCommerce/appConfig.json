@@ -13,9 +13,8 @@
   "AuthDBConnectionString": "Server=localhost;DataBase=auth;Trusted_Connection=True;",
   "StatsDBConnectionString": "Server=localhost;DataBase=stats;Trusted_Connection=True;",
   
-  "PaymentUrl": "www.",
-  "SupplyUrl": "Server=localhost;DataBase=stats;Trusted_Connection=True;",
-
+  "PaymentAdapter": "WSEP",
+  "SupplyAdapter": "WSEP",
 
   "JWTKey": "keykeykeykeykeyekeykey"
 }
