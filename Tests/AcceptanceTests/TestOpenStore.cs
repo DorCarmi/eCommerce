@@ -88,14 +88,17 @@ namespace Tests.AcceptanceTests
         }
         
         
-        [TestCase("Mechanism100", "qwerty123","Yossi's store","Yossi's store")]
+        [TestCase("Mechanism100", "qwerty123","Yossi's store1995","Yossi's store")]
         [Test]
         public async Task TestOpenStoreFailureInput(string member, string password, string storeName, string itemStore)
         { 
             string token = _auth.Connect();
             Result<string> login = await _auth.Login(token, member, password, ServiceUserRole.Member);
             Result result = _inStore.OpenStore(login.Value, storeName);
-            Assert.True(result.IsFailure, "store opening was suppose to fail");
+            Assert.True(result.IsSuccess, result.Error);
+            
+            Result resultShouldFail = _inStore.OpenStore(login.Value, storeName);
+            Assert.False(resultShouldFail.IsSuccess, "Should fail because of same duplicate store name");
             _auth.Logout(login.Value);
             _auth.Disconnect(token);
         }

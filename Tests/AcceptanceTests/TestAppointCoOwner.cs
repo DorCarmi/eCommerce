@@ -124,5 +124,70 @@ namespace Tests.AcceptanceTests
             Assert.True(result.IsFailure, "Appointing " + username + " was expected to fail since the user wasn't logged in!");
             _auth.Disconnect(token);
         }
+
+        [Test]
+        public void Test_ABC_Test()
+        {
+            string tokenAb = _auth.Connect();
+            string tokenBond = _auth.Connect();
+            string tokenChum = _auth.Connect();
+
+            string THE_PASSWORD = "qwerty123";
+            string STORE_NAME = "AbiAndHisSons";
+            
+            
+            MemberInfo Abraham = new MemberInfo("Abraham", "yossi@gmail.com", "Yossi Park",
+                DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
+            MemberInfo Bond = new MemberInfo("Bond", "shiran@gmail.com", "Shiran Moris",
+                DateTime.ParseExact("25/06/2008", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Rabin 14");
+            MemberInfo Chumacher = new MemberInfo("Chumacher","lior@gmail.com", "Lior Lee", 
+                DateTime.ParseExact("05/07/1996", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Carl Neter 14");
+            
+            var abTask=_auth.Register(tokenAb, Abraham, THE_PASSWORD);
+            var bondTask=_auth.Register(tokenBond, Bond, THE_PASSWORD);
+            var chumTask=_auth.Register(tokenChum, Chumacher, THE_PASSWORD);
+            
+            Assert.True(abTask.Result.IsSuccess,abTask.Result.Error);
+            Assert.True(bondTask.Result.IsSuccess,bondTask.Result.Error);
+            Assert.True(chumTask.Result.IsSuccess,chumTask.Result.Error);
+            
+            //A->B
+            var abrahamLogInTask = _auth.Login(tokenAb, Abraham.Username, THE_PASSWORD, ServiceUserRole.Member);
+            var abrahamLogInResult = abrahamLogInTask.Result;
+            Assert.True(abrahamLogInResult.IsSuccess,abrahamLogInResult.Error);
+            var abiToken = abrahamLogInResult.Value;
+            _inStore.OpenStore(abiToken, STORE_NAME);
+            var appointBondRes=_user.AppointCoOwner(abiToken, STORE_NAME, Bond.Username);
+            Assert.True(appointBondRes.IsSuccess,appointBondRes.Error);
+            
+            //B->C
+            var bondLogInTask = _auth.Login(tokenBond, Bond.Username, THE_PASSWORD, ServiceUserRole.Member);
+            var bondLogInResult = bondLogInTask.Result;
+            Assert.True(bondLogInResult.IsSuccess,bondLogInResult.Error);
+            var bondToken = bondLogInResult.Value;
+            var appointChumRes=_user.AppointCoOwner(bondToken, STORE_NAME, Chumacher.Username);
+            Assert.True(appointChumRes.IsSuccess,appointChumRes.Error);
+            
+            
+            //C->
+            var chumLogInTask = _auth.Login(tokenChum, Chumacher.Username, THE_PASSWORD, ServiceUserRole.Member);
+            var chumLogInResult = chumLogInTask.Result;
+            Assert.True(chumLogInResult.IsSuccess,chumLogInResult.Error);
+            var chumToken = chumLogInResult.Value;
+
+
+            //A-x->B->x->C
+            var resRemoveOwner=_user.RemoveOwnerFromStore(abiToken, STORE_NAME, Bond.Username);
+
+            var permissionResAb = _inStore.GetStorePermission(abiToken, STORE_NAME);
+            var permissionResBond = _inStore.GetStorePermission(bondToken, STORE_NAME);
+            var permissionResChum = _inStore.GetStorePermission(chumToken, STORE_NAME);
+            
+            Assert.True(permissionResAb.IsSuccess,permissionResAb.Error);
+            Assert.False(permissionResBond.IsSuccess);
+            Assert.False(permissionResChum.IsSuccess);
+
+
+        }
     }
 }
