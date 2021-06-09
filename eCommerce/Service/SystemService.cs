@@ -5,6 +5,7 @@ using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Repositories;
 using eCommerce.Common;
+using eCommerce.Statistics;
 
 namespace eCommerce.Service
 {
@@ -63,6 +64,7 @@ namespace eCommerce.Service
                 }
             }
 
+            InitStatistics(config);
             InitPaymentAdapter(config);
             InitSupplyAdapter(config);
             
@@ -75,6 +77,13 @@ namespace eCommerce.Service
             IUserAuth authService = UserAuth.GetInstance();
             authService.Init(config);
             return authService;
+        }
+        
+        private IStatisticsService InitStatistics(AppConfig config)
+        {
+            IStatisticsService statisticsService = Statistics.Statistics.GetInstance();
+            statisticsService.Init(config);
+            return statisticsService;
         }
 
         private void InitPaymentAdapter(AppConfig config)
