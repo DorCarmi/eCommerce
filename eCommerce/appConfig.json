@@ -1,6 +1,8 @@
 ﻿{
   "InitWithData": true,
 
+  "Memory": "InMemory",
+
   "AdminCreationInfo" : {
     "Username": "_Admin",
     "Email": "Admin@eCommerce.com",

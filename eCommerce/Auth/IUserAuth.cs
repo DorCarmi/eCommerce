@@ -5,6 +5,13 @@ namespace eCommerce.Auth
 {
     public interface IUserAuth
     {
+
+        /// <summary>
+        /// Init the Auth, must be called before use.
+        /// </summary>
+        /// <param name="config"></param>
+        public void Init(AppConfig config);
+        
         /// <summary>
         /// Register a new user to the system as a member.
         /// </summary>

@@ -44,19 +44,16 @@ namespace Tests.AcceptanceTests
         {
             PaymentProxy.AssignPaymentService(new mokPaymentService(true,true,true));
             SupplyProxy.AssignSupplyService(new mokSupplyService(true,true));
-            // _auth = new AuthService();
-            // _inStore = new InStoreService();
-            // _cart = new CartService();
-            // _user = new UserService();
-            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
-            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP, "ThisKeyIsForTests");
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             IRepository<User> UR = new InMemoryRegisteredUsersRepository();
+            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(UA,UR, SR);
 
-            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
-            _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
-            _user = UserService.CreateUserServiceForTests(UA, UR, SR);
+            _auth = AuthService.CreateUserServiceForTests(marketFacade);
+            _inStore = InStoreService.CreateUserServiceForTests(marketFacade);
+            _user = UserService.CreateUserServiceForTests(marketFacade);
+            _cart = CartService.CreateUserServiceForTests(marketFacade);
             MemberInfo Ivan = new MemberInfo("Ivan11", "Ivan@gmail.com", "Ivan Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();

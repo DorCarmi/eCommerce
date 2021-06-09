@@ -9,12 +9,8 @@ namespace eCommerce
     {
         public static void Main(string[] args)
         {
-            AppConfig config = AppConfig.GetInstance();
-            if (config.GetData("InitWithData").Equals("True"))
-            {
-                InitSystem initSystem = new InitSystem();
-                initSystem.Init("Init.json");
-            }
+            InitSystem initSystem = new InitSystem();
+            initSystem.Init("Init.json");
 
             CreateHostBuilder(args).Build().Run();
         }

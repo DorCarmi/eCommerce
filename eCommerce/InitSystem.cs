@@ -29,17 +29,22 @@ namespace eCommerce
 
     public class InitSystem
     {
+        private ISystemService _systemService;
         private IAuthService _authService;
         private IUserService _userService;
         private INStoreService _inStoreService;
+
+        private AppConfig _appConfig;
 
         private string _guestToken;
         private string _workingToken;
         public InitSystem()
         {
+            _systemService = new SystemService();
             _authService = new AuthService();
             _userService = new UserService();
             _inStoreService = new InStoreService();
+            _appConfig = AppConfig.GetInstance();
 
             _guestToken = _authService.Connect();
         }
@@ -56,6 +61,14 @@ namespace eCommerce
         }
 
         public void Init(string initFile)
+        {
+            if (_appConfig.GetData("InitWithData").Equals("True"))
+            {
+                InitData("Init.json");
+            }
+        }
+
+        private void InitData(string initFile)
         {
             Setup();
             

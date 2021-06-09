@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using eCommerce;
 using eCommerce.Auth;
 using eCommerce.Common;
 
@@ -31,6 +32,10 @@ namespace Tests.Business.UserManagerTests
             _registeredUsers = new ConcurrentDictionary<string, AuthData>();
             _passwords = new ConcurrentDictionary<string, string>();
             _idGenerator = new ConcurrentIdGenerator(0);
+        }
+
+        public void Init(AppConfig config)
+        {
         }
 
         public async Task<Result> Register(string username, string password)

@@ -13,7 +13,7 @@ namespace eCommerce.Service
         
         internal AuthService(IMarketFacade marketFacade)
         {
-            _marketFacade = MarketFacade.GetInstance();
+            _marketFacade = marketFacade;
         }
         
         public AuthService()
@@ -21,11 +21,8 @@ namespace eCommerce.Service
             _marketFacade = MarketFacade.GetInstance();
         }
 
-        public static AuthService CreateUserServiceForTests(IUserAuth userAuth,
-            IRepository<User> registeredUsersRepo,
-            InMemoryStoreRepo inMemoryStoreRepo)
+        public static AuthService CreateUserServiceForTests(IMarketFacade marketFacade)
         {
-            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(userAuth, registeredUsersRepo, inMemoryStoreRepo);
             return new AuthService(marketFacade);
         }
         
