@@ -8,7 +8,14 @@ namespace eCommerce.Auth.DAL
     {
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseSqlServer(AppConfig.GetInstance().GetData("AuthDBConnectionString"));
+            AppConfig config = AppConfig.GetInstance();
+            string connectionString = config.GetData("AuthDBConnectionString");
+            if (connectionString == null)
+            {
+                config.ThrowErrorOfData("AuthDBConnectionString", "missing");
+            }
+            
+            options.UseSqlServer(connectionString);
         }
 
         // DB sets

@@ -7,7 +7,14 @@ namespace eCommerce.Statistics.DAL
     {
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseSqlServer(AppConfig.GetInstance().GetData("StatsDBConnectionString"));
+            AppConfig config = AppConfig.GetInstance();
+            string connectionString = config.GetData("StatsDBConnectionString");
+            if (connectionString == null)
+            {
+                config.ThrowErrorOfData("StatsDBConnectionString", "missing");
+            }
+            
+            options.UseSqlServer(connectionString);
         }
 
         // DB sets

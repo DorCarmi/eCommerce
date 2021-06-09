@@ -38,6 +38,10 @@ namespace eCommerce.Service
             IRepository<User> userRepo = null;
             AbstractStoreRepo storeRepo = null;
 
+            InitStatistics(config);
+            InitPaymentAdapter(config);
+            InitSupplyAdapter(config);
+            
             string memoryAs = config.GetData("Memory");
             switch (memoryAs)
             {
@@ -64,10 +68,6 @@ namespace eCommerce.Service
                 }
             }
 
-            InitStatistics(config);
-            InitPaymentAdapter(config);
-            InitSupplyAdapter(config);
-            
             marketFacade = MarketFacade.GetInstance();
             marketFacade.Init(authService, userRepo, storeRepo);
         }

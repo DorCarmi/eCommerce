@@ -33,7 +33,14 @@ namespace eCommerce.DataLayer
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //@TODO::sharon - enable test mode for db - use different db + add teardown function to context 
-            optionsBuilder.EnableSensitiveDataLogging().UseSqlServer(AppConfig.GetInstance().GetData("DBConnectionString"));
+            AppConfig config = AppConfig.GetInstance();
+            string connectionString = config.GetData("DBConnectionString");
+            if (connectionString == null)
+            {
+                config.ThrowErrorOfData("DBConnectionString", "missing");
+            }
+            
+            optionsBuilder.EnableSensitiveDataLogging().UseSqlServer(connectionString);
         }
         
         protected override void OnModelCreating(ModelBuilder builder)

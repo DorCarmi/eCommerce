@@ -12,6 +12,7 @@ namespace eCommerce.Statistics
 
         private Statistics()
         {
+            _statsRepo = new InMemoryStatsRepo();
         }
         
         private Statistics(StatsRepo statsRepo)
