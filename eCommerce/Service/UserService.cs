@@ -95,5 +95,10 @@ namespace eCommerce.Service
         {
             return _marketFacade.AdminGetLoginStats(token, date);
         }
+
+        public Result RemoveOwnerFromStore(string token, string storeId, string appointedUserId)
+        {
+            return _marketFacade.RemoveOwnerFromStore(token, storeId, appointedUserId);
+        }
     }
 }

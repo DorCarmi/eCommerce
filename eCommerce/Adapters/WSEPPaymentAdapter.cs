@@ -52,7 +52,11 @@ namespace eCommerce.Adapters
             var creditCardExpirationDate = paymentInfoCreditCardExpirationDate.Split('-');
             if (creditCardExpirationDate.Length < 2)
             {
-                return Result.Fail<int>("Not valid expiration date");
+                creditCardExpirationDate=paymentInfoCreditCardExpirationDate.Split('/');
+                if (creditCardExpirationDate.Length < 2)
+                {
+                    return Result.Fail<int>("Not valid expiration date");
+                }
             }
             var creditExpirationMonth = creditCardExpirationDate[0];
             var creditExpirationYear = creditCardExpirationDate[1];

@@ -796,6 +796,28 @@ namespace eCommerce.Business
             return user.GetLoginStats(date);
         }
 
+        public Result RemoveOwnerFromStore(string token, string storeId, string appointedUserId)
+        {
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
+            
+            _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
+            
+            Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
+            if (appointedUserRes.IsFailure)
+            {
+                return appointedUserRes;
+            }
+            User appointedUser = appointedUserRes.Value;
+
+            return user.RemoveOwnerFromStore(store, appointedUser);
+        }
+
         #endregion
 
         private Result<Tuple<User, Store>> GetUserAndStore(string token, string storeId)

@@ -409,5 +409,7 @@ namespace eCommerce.Business
         /// <param name="date">Date of the stats</param>
         /// <returns>The stats</returns>
         Result<LoginDateStat> AdminGetLoginStats(string token, DateTime date);
+
+        Result RemoveOwnerFromStore(string token, string storeId, string appointedUserId);
     }
 }
