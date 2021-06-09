@@ -525,27 +525,35 @@ namespace eCommerce.Business
             return Result.Fail<ManagerAppointment>("unable to add user \'"+Username+"\' as store Manager");
         }
         
-        public virtual Result RemoveOwnerFromStore(Member member, Store store,User otherUser)
+        public  virtual Result RemoveOwnerFromStore(Member member, Store store,User otherUser)
         {
-            if (!_storesOwned.ContainsKey(store)){
-                return Result.Fail("user \'"+Username+"\' is not an owner of the given store.");
-            }
-            if ((!_appointedOwners.ContainsKey(store)) || FindCoOwner(store,otherUser).IsFailure){
-                return Result.Fail("user \'"+Username+"\' did not appoint the owner of the given store \'"+otherUser.Username+"\'.");
-            }
-            var res = otherUser.RemoveOwner(store);
-            if (res.IsFailure)
+            lock (this)
             {
-                return res;
+                if (!_storesOwned.ContainsKey(store))
+                {
+                    return Result.Fail("user \'" + Username + "\' is not an owner of the given store.");
+                }
+
+                if ((!_appointedOwners.ContainsKey(store)) || FindCoOwner(store, otherUser).IsFailure)
+                {
+                    return Result.Fail("user \'" + Username + "\' did not appoint the owner of the given store \'" +
+                                       otherUser.Username + "\'.");
+                }
+
+                var res = otherUser.RemoveOwner(store);
+                while (res.IsFailure)
+                {
+                    return res;
+                }
+                while (_appointedOwners.ContainsKey(store))
+                {
+                    _appointedOwners[store].Remove(res.Value);
+                    var resFromStore=store.RemoveOwnerFromStore(this, res.Value.User, res.Value);
+                    return resFromStore;
+                }
             }
 
-            if (_appointedOwners.ContainsKey(store))
-            {
-                _appointedOwners[store].Remove(res.Value);
-            }
-            
-    
-            return Result.Ok();
+            return Result.Fail("Something went wrong");
         }
         
         
