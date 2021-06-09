@@ -41,10 +41,15 @@ namespace eCommerce
         public InitSystem()
         {
             _systemService = new SystemService();
+            _appConfig = AppConfig.GetInstance();
+
+        }
+
+        private void InitServices()
+        {
             _authService = new AuthService();
             _userService = new UserService();
             _inStoreService = new InStoreService();
-            _appConfig = AppConfig.GetInstance();
 
             _guestToken = _authService.Connect();
         }
@@ -62,6 +67,10 @@ namespace eCommerce
 
         public void Init(string initFile)
         {
+            
+            _systemService.InitSystem();
+            InitServices();
+            
             if (_appConfig.GetData("InitWithData").Equals("True"))
             {
                 InitData("Init.json");
