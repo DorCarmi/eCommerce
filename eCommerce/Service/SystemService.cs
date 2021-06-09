@@ -1,4 +1,11 @@
-﻿using eCommerce.Business;
+﻿using System;
+using System.IO;
+using eCommerce.Adapters;
+using eCommerce.Auth;
+using eCommerce.Business;
+using eCommerce.Business.Repositories;
+using eCommerce.Common;
+using eCommerce.Statistics;
 
 namespace eCommerce.Service
 {
@@ -20,6 +27,109 @@ namespace eCommerce.Service
         public bool GetErrMessageIfValidSystem(out string message)
         {
             return _marketState.TryGetErrMessage(out message);
+        }
+
+        public void InitSystem()
+        {
+            AppConfig config = AppConfig.GetInstance();
+
+            MarketFacade marketFacade;
+            IUserAuth authService = InitAuth(config);
+            IRepository<User> userRepo = null;
+            AbstractStoreRepo storeRepo = null;
+
+            InitStatistics(config);
+            InitPaymentAdapter(config);
+            InitSupplyAdapter(config);
+            
+            string memoryAs = config.GetData("Memory");
+            switch (memoryAs)
+            {
+                case "InMemory":
+                {
+                    userRepo = new InMemoryRegisteredUsersRepository();
+                    storeRepo = new InMemoryStoreRepo();
+                    break;
+                }
+                case "Persistence":
+                {
+                    throw new NotImplementedException();
+                    break;   
+                }
+                case null:
+                {
+                    config.ThrowErrorOfData("Memory", "missing");
+                    break;
+                }
+                default:
+                {
+                    config.ThrowErrorOfData("Memory", "invalid");
+                    break;
+                }
+            }
+
+            marketFacade = MarketFacade.GetInstance();
+            marketFacade.Init(authService, userRepo, storeRepo);
+        }
+
+        private IUserAuth InitAuth(AppConfig config)
+        {
+            IUserAuth authService = UserAuth.GetInstance();
+            authService.Init(config);
+            return authService;
+        }
+        
+        private IStatisticsService InitStatistics(AppConfig config)
+        {
+            IStatisticsService statisticsService = Statistics.Statistics.GetInstance();
+            statisticsService.Init(config);
+            return statisticsService;
+        }
+
+        private void InitPaymentAdapter(AppConfig config)
+        {
+            string paymentAdapter = config.GetData("PaymentAdapter");
+            switch (paymentAdapter)
+            {
+                case "WSEP":
+                {
+                    PaymentProxy.AssignPaymentService(new WSEPPaymentAdapter());
+                    break;
+                }
+                case null:
+                {
+                    break;
+                }
+                default:
+                {
+                    config.ThrowErrorOfData("PaymentAdapter", "invalid");
+                    break;
+                }
+                    
+            }
+        }
+        
+        private void InitSupplyAdapter(AppConfig config)
+        {
+            string paymentAdapter = config.GetData("SupplyAdapter");
+            switch (paymentAdapter)
+            {
+                case "WSEP":
+                {
+                    SupplyProxy.AssignSupplyService(new WSEPSupplyAdapter());
+                    break;
+                }
+                case null:
+                {
+                    break;
+                }
+                default:
+                {
+                    config.ThrowErrorOfData("SupplyAdapter", "invalid");
+                    break;
+                }
+                    
+            }
         }
     }
 }

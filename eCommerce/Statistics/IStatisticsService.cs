@@ -5,6 +5,13 @@ namespace eCommerce.Statistics
 {
     public interface IStatisticsService
     {
+        
+        /// <summary>
+        /// Init the Auth, must be called before use.
+        /// </summary>
+        /// <param name="config"></param>
+        public void Init(AppConfig config);
+        
         /// <summary>
         /// Add a logged of a user to the records
         /// </summary>

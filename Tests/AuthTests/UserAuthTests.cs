@@ -20,7 +20,7 @@ namespace Tests.AuthTests
         [SetUp]
         public void Setup()
         {
-            _userAuth = UserAuth.CreateInstanceForTests(new InMemoryRegisteredUserRepo());
+            _userAuth = UserAuth.CreateInstanceForTests(new InMemoryRegisteredUserRepo(), "ThisIsAKeyForTests");
             _registeredUsers = new List<TUserData>();
             _userData = new List<TUserData>
             {

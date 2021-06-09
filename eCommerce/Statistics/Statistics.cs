@@ -7,9 +7,14 @@ namespace eCommerce.Statistics
 {
     public class Statistics : IStatisticsService
     {
-        private static Statistics _instance = new Statistics(new InMemoryStatsRepo());
+        private static Statistics _instance = new Statistics();
         private StatsRepo _statsRepo;
 
+        private Statistics()
+        {
+            _statsRepo = new InMemoryStatsRepo();
+        }
+        
         private Statistics(StatsRepo statsRepo)
         {
             _statsRepo = statsRepo;
@@ -23,6 +28,38 @@ namespace eCommerce.Statistics
         public static Statistics GetInstanceForTests(StatsRepo statsRepo)
         {
             return new Statistics(statsRepo);
+        }
+
+        public void Init(AppConfig config)
+        {
+            StatsRepo statsRepo = null;
+            
+            string memoryAs = config.GetData("Memory");
+            switch (memoryAs)
+            {
+                case "InMemory":
+                {
+                    statsRepo = new InMemoryStatsRepo();
+                    break;
+                }
+                case "Persistence":
+                {
+                    statsRepo = new PersistenceStatsRepo();
+                    break;
+                }
+                case null:
+                {
+                    config.ThrowErrorOfData("Memory", "missing");
+                    break;
+                }
+                default:
+                {
+                    config.ThrowErrorOfData("Memory", "invalid");
+                    break;
+                }
+            }
+
+            _statsRepo = statsRepo;
         }
 
         public Result AddLoggedIn(DateTime dateTime, string username, string userType)

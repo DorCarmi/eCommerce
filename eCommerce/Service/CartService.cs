@@ -13,7 +13,7 @@ namespace eCommerce.Service
 
         internal CartService(IMarketFacade marketFacade)
         {
-            _marketFacade = MarketFacade.GetInstance();
+            _marketFacade = marketFacade;
         }
         
         public CartService()
@@ -21,11 +21,8 @@ namespace eCommerce.Service
             _marketFacade = MarketFacade.GetInstance();
         }
         
-        public static CartService CreateUserServiceForTests(IUserAuth userAuth,
-            IRepository<User> registeredUsersRepo,
-            InMemoryStoreRepo inMemoryStoreRepo)
+        public static CartService CreateUserServiceForTests(IMarketFacade marketFacade)
         {
-            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(userAuth, registeredUsersRepo, inMemoryStoreRepo);
             return new CartService(marketFacade);
         }
 

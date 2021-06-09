@@ -19,8 +19,6 @@ namespace eCommerce.Adapters
             
         }
         
-        
-
         public static void AssignPaymentService(IPaymentAdapter paymentAdapter)
         {
             _adapter = paymentAdapter;

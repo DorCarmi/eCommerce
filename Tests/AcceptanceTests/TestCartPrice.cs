@@ -34,14 +34,15 @@ namespace Tests.AcceptanceTests
         [SetUpAttribute]
         public async Task SetUp()
         {
-            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
-            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP, "ThisKeyIsForTests");
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             IRepository<User> UR = new InMemoryRegisteredUsersRepository();
+            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(UA,UR, SR);
 
-            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
-            _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
+            _auth = AuthService.CreateUserServiceForTests(marketFacade);
+            _inStore = InStoreService.CreateUserServiceForTests(marketFacade);
+            _cart = CartService.CreateUserServiceForTests(marketFacade);
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims; 
 using System.Security.Cryptography;
@@ -13,23 +14,28 @@ namespace eCommerce.Auth
 {
     public class UserAuth  : IUserAuth
     {
-        private static readonly UserAuth Instance = new UserAuth(new InMemoryRegisteredUserRepo());
+        private static readonly UserAuth Instance = new UserAuth();
 
-        private readonly JWTAuth _jwtAuth;
+        private JWTAuth _jwtAuth;
 
         private Mutex _hashMutex;
         private readonly SHA256 _sha256;
         
         private IRegisteredUserRepo _userRepo;
 
-        private UserAuth(IRegisteredUserRepo repo)
+        private UserAuth()
         {
-            AppConfig config = AppConfig.GetInstance();
-            _jwtAuth = new JWTAuth(config.GetData("JWTKey"));
-
+            _hashMutex = new Mutex();
+            _sha256 = SHA256.Create();
+        }
+        
+        private UserAuth(IRegisteredUserRepo repo, string key)
+        {
+            
             _hashMutex = new Mutex();
             _sha256 = SHA256.Create();
             
+            _jwtAuth = new JWTAuth(key);
             _userRepo = repo;
         }
 
@@ -38,9 +44,49 @@ namespace eCommerce.Auth
             return Instance;
         }
         
-        public static UserAuth CreateInstanceForTests(IRegisteredUserRepo userRepo)
+        public static UserAuth CreateInstanceForTests(IRegisteredUserRepo userRepo, string key)
         {
-            return new UserAuth(userRepo);
+            return new UserAuth(userRepo, key);
+        }
+
+        public void Init(AppConfig config)
+        {
+            IRegisteredUserRepo userRepo = null;
+            string key = null;
+            
+            string memoryAs = config.GetData("Memory");
+            switch (memoryAs)
+            {
+                case "InMemory":
+                {
+                    userRepo = new InMemoryRegisteredUserRepo();
+                    break;
+                }
+                case "Persistence":
+                {
+                    userRepo = new PersistentRegisteredUserRepo();
+                    break;
+                }
+                case null:
+                {
+                    config.ThrowErrorOfData("Memory", "missing");
+                    break;
+                }
+                default:
+                {
+                    config.ThrowErrorOfData("Memory", "invalid");
+                    break;
+                }
+            }
+            
+            key = config.GetData("JWTKey");
+            if (key == null)
+            {
+                config.ThrowErrorOfData("JWTKey", "missing");
+            }
+            
+            _jwtAuth = new JWTAuth(key);
+            _userRepo = userRepo;
         }
 
         public async Task<Result> Register(string username, string password)

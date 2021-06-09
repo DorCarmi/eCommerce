@@ -14,5 +14,10 @@
         /// <param name="message">string to set message in</param>
         /// <returns>True if the err message was set</returns>
         public bool GetErrMessageIfValidSystem(out string message);
+
+        /// <summary>
+        /// Initialize the system, must be called before system use.
+        /// </summary>
+        public void InitSystem();
     }
 }

@@ -16,7 +16,7 @@ namespace Tests.AuthTests
         [SetUp]
         public void Setup()
         {
-            _auth = UserAuth.CreateInstanceForTests(new InMemoryRegisteredUserRepo());
+            _auth = UserAuth.CreateInstanceForTests(new InMemoryRegisteredUserRepo(), "ThisIsAKeyForTests");
         }
 
         [Test]

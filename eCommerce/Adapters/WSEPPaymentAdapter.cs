@@ -49,7 +49,7 @@ namespace eCommerce.Adapters
             int transactionId = -1;
             HttpResponseMessage responseMessage;
             //DateTime creditCardExpirationDate = DateTime.Parse(paymentInfoCreditCardExpirationDate);
-            var creditCardExpirationDate = paymentInfoCreditCardExpirationDate.Split('/');
+            var creditCardExpirationDate = paymentInfoCreditCardExpirationDate.Split('-');
             if (creditCardExpirationDate.Length < 2)
             {
                 return Result.Fail<int>("Not valid expiration date");

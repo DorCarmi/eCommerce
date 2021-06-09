@@ -39,5 +39,10 @@ namespace Tests.Business.UserManagerTests
         {
             throw new System.NotImplementedException();
         }
+
+        public void Update(User data)
+        {
+            
+        }
     }
 }

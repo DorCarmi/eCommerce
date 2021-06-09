@@ -44,19 +44,16 @@ namespace Tests.AcceptanceTests
         {
             PaymentProxy.AssignPaymentService(new mokPaymentService(true,true,true));
             SupplyProxy.AssignSupplyService(new mokSupplyService(true,true));
-            // _auth = new AuthService();
-            // _inStore = new InStoreService();
-            // _cart = new CartService();
-            // _user = new UserService();
-            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
-            UserAuth UA = UserAuth.CreateInstanceForTests(RP);
+            UserAuth UA = UserAuth.CreateInstanceForTests(RP, "ThisKeyIsForTests");
+            InMemoryStoreRepo SR = new InMemoryStoreRepo();
             IRepository<User> UR = new InMemoryRegisteredUsersRepository();
+            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(UA,UR, SR);
 
-            _auth = AuthService.CreateUserServiceForTests(UA, UR, SR);
-            _inStore = InStoreService.CreateUserServiceForTests(UA, UR, SR);
-            _cart = CartService.CreateUserServiceForTests(UA, UR, SR);
-            _user = UserService.CreateUserServiceForTests(UA, UR, SR);
+            _auth = AuthService.CreateUserServiceForTests(marketFacade);
+            _inStore = InStoreService.CreateUserServiceForTests(marketFacade);
+            _user = UserService.CreateUserServiceForTests(marketFacade);
+            _cart = CartService.CreateUserServiceForTests(marketFacade);
             MemberInfo Ivan = new MemberInfo("Ivan11", "Ivan@gmail.com", "Ivan Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();
@@ -101,7 +98,7 @@ namespace Tests.AcceptanceTests
             //To check later
             
             _cart.AddItemToCart(token, ITEM_NAME, store_name, 5);
-            Result purchaseResult = _cart.PurchaseCart(token, new PaymentInfo("Ivan11","123456789","1234567890123456","12/34","123","address"));
+            Result purchaseResult = _cart.PurchaseCart(token, new PaymentInfo("Ivan11","123456789","1234567890123456","12-34","123","address"));
             Assert.True(purchaseResult.IsSuccess, purchaseResult.Error);
             _auth.Disconnect(token);
         }
@@ -164,7 +161,7 @@ namespace Tests.AcceptanceTests
             Assert.True(resAddItemToCart.IsSuccess, resAddItemToCart.Error);
             
             Result purchaseResult = _cart.PurchaseCart(JakeLogInResult.Value,
-                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12/34", "123", "address"));
+                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12-34", "123", "address"));
             
             Assert.False(purchaseResult.IsSuccess);
             Assert.True(purchaseResult.Error.Contains("<Policy>"),purchaseResult.Error);
@@ -254,7 +251,7 @@ namespace Tests.AcceptanceTests
             var resAddCart=_cart.AddItemToCart(IvanLogInResult.Value, ITEM_NAME, store_name, amount);
             Assert.True(resAddCart.IsSuccess,resAddCart.Error);
             Result purchaseResult = _cart.PurchaseCart(IvanLogInResult.Value,
-                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12/34", "123", "address"));
+                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12-34", "123", "address"));
             
             Assert.False(purchaseResult.IsSuccess);
             
@@ -303,7 +300,7 @@ namespace Tests.AcceptanceTests
             var resAddCart=_cart.AddItemToCart(IvanLogInResult.Value, "Chocolate milk", store_name, amount);
             Assert.True(resAddCart.IsSuccess,resAddCart.Error);
             Result purchaseResult = _cart.PurchaseCart(IvanLogInResult.Value,
-                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12/34", "123", "address"));
+                new PaymentInfo("Ivan11", "123456789", "1234567890123456", "12-34", "123", "address"));
 
             Assert.False(purchaseResult.IsSuccess);
             Assert.AreEqual(itemsInStock,_inStore.GetItem(IvanLogInResult.Value,store_name,ITEM_NAME).Value.Amount);

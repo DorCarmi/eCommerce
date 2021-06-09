@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace eCommerce
 {
@@ -22,6 +23,11 @@ namespace eCommerce
         public string GetData(string dataPath)
         {
             return _config[dataPath];
+        }
+
+        public void ThrowErrorOfData(string data, string state)
+        {
+            throw new InvalidDataException($"{data} data in the config file is {state}");
         }
     }
 }

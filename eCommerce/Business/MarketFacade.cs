@@ -18,25 +18,23 @@ namespace eCommerce.Business
     // TODO check authException if we should throw them
     public class MarketFacade : IMarketFacade
     {
-        private static MarketFacade _instance =
-            new MarketFacade(
-                UserAuth.GetInstance(),
-                //new InMemoryRegisteredUsersRepository(),
-                new PersistenceRegisteredUsersRepo(),
-                new InMemoryStoreRepo());
+        private static MarketFacade _instance = new MarketFacade();
 
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private InMemoryStoreRepo _inMemoryStoreRepo;
+        private AbstractStoreRepo _storeRepo;
         private UserManager _userManager;
+
+        private MarketFacade()
+        {
+            
+        }
         
         private MarketFacade(IUserAuth userAuth,
             IRepository<User> registeredUsersRepo,
-            InMemoryStoreRepo inMemoryStoreRepo)
+            AbstractStoreRepo storeRepo)
         {
-            _inMemoryStoreRepo = inMemoryStoreRepo;
-            _userManager = new UserManager(userAuth, registeredUsersRepo);
-            CreateMainAdmin();
+            Init(userAuth, registeredUsersRepo, storeRepo);
         }
 
         public static MarketFacade GetInstance()
@@ -46,9 +44,21 @@ namespace eCommerce.Business
 
         public static MarketFacade CreateInstanceForTests(IUserAuth userAuth,
             IRepository<User> registeredUsersRepo,
-            InMemoryStoreRepo inMemoryStoreRepo)
+            AbstractStoreRepo storeRepo)
         {
-            return new MarketFacade(userAuth, registeredUsersRepo, inMemoryStoreRepo);
+            return new MarketFacade(userAuth, registeredUsersRepo, storeRepo);
+        }
+
+        /// <summary>
+        /// Initialize the market, must be called before using this class
+        /// </summary>
+        public void Init(IUserAuth userAuth,
+            IRepository<User> registeredUsersRepo,
+            AbstractStoreRepo storeRepo)
+        {
+            _storeRepo = storeRepo;
+            _userManager = new UserManager(userAuth, registeredUsersRepo);
+            CreateMainAdmin();
         }
 
         public void CreateMainAdmin()
@@ -312,7 +322,7 @@ namespace eCommerce.Business
 
             _logger.Info($"SearchForItem({userRes.Value.Username}, {query})");
 
-            return Result.Ok<IEnumerable<IItem>>(_inMemoryStoreRepo.SearchForItem(query));
+            return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItem(query));
         }
 
         public Result<IEnumerable<IItem>> SearchForItemByPriceRange(string token, string query, double @from = 0, double to = Double.MaxValue)
@@ -330,7 +340,7 @@ namespace eCommerce.Business
             
             _logger.Info($"SearchForItemByPriceRange({userRes.Value.Username}, {query}, {from}, {to})");
 
-            return Result.Ok<IEnumerable<IItem>>(_inMemoryStoreRepo.SearchForItemByPrice(query, from, to));
+            return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItemByPrice(query, from, to));
         }
 
         public Result<IEnumerable<IItem>> SearchForItemByCategory(string token, string query, string category)
@@ -343,7 +353,7 @@ namespace eCommerce.Business
 
             _logger.Info($"SearchForItemByCategory({userRes.Value.Username}, {query}, {category})");
 
-            return Result.Ok<IEnumerable<IItem>>(_inMemoryStoreRepo.SearchForItemByCategory(query, category));
+            return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItemByCategory(query, category));
         }
 
         public Result<IEnumerable<string>> SearchForStore(string token, string query)
@@ -356,7 +366,7 @@ namespace eCommerce.Business
             
             _logger.Info($"SearchForStore({userRes.Value.Username}, {query})");
 
-            return Result.Ok(_inMemoryStoreRepo.SearchForStore(query));
+            return Result.Ok(_storeRepo.SearchForStore(query));
         }
         
         public Result<Store> GetStore(string token, string storeId)
@@ -576,7 +586,7 @@ namespace eCommerce.Business
             _logger.Info($"OpenStore({user.Username})");
             
             Store newStore = new Store(storeName, user);
-            if (!_inMemoryStoreRepo.Add(newStore))
+            if (!_storeRepo.Add(newStore))
             {
                 return Result.Fail("Store name taken");
             }
@@ -799,7 +809,7 @@ namespace eCommerce.Business
             
             _logger.Info($"GetUserAndStore({user.Username} , {storeId})");
 
-            Store store = _inMemoryStoreRepo.GetOrNull(storeId);
+            Store store = _storeRepo.GetOrNull(storeId);
             if (store == null)
             {
                 return Result.Fail<Tuple<User, Store>>("Store doesn't exist");
