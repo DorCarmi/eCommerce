@@ -161,6 +161,19 @@ export class StoreApi {
             }).catch(err => undefined)
     }
 
+    removeOwner(storeId: string, removedUserId: string){
+        return instance.delete<Result<any>>(STAFF_OF_STORE_PATH(storeId), 
+            {
+                params: {
+                    role: "owner",
+                    userId: removedUserId
+                }
+            })
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+
     appointManager(storeId: string, appointedUserId: string){
         return instance.post<Result<any>>(STAFF_OF_STORE_PATH(storeId),
             {},
@@ -168,6 +181,19 @@ export class StoreApi {
                 params: {
                     role: "manager",
                     userId: appointedUserId
+                }
+            })
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+
+    removeManager(storeId: string, removedUserId: string){
+        return instance.delete<Result<any>>(STAFF_OF_STORE_PATH(storeId),
+            {
+                params: {
+                    role: "manager",
+                    userId: removedUserId
                 }
             })
             .then(res => {

@@ -49,9 +49,19 @@ namespace eCommerce.Service
             return _marketFacade.AppointCoOwner(token, storeId, appointedUserId);
         }
 
+        public Result RemoveCoOwner(string token, string storeId, string removedUserId)
+        {
+            return _marketFacade.RemoveCoOwner(token, storeId, removedUserId);
+        }
+
         public Result AppointManager(string token, string storeId, string appointedManagerUserId)
         {
             return _marketFacade.AppointManager(token, storeId, appointedManagerUserId);
+        }
+
+        public Result RemoveManager(string token, string storeId, string removedUserId)
+        {
+            return _marketFacade.RemoveManager(token, storeId, removedUserId);
         }
 
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)

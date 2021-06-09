@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using eCommerce.Auth;
 using eCommerce.Business;
+using Microsoft.Extensions.Logging;
+using NLog;
 
 
 namespace eCommerce.Service
 {
     public class DtoUtils
     {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
         public static UserToSystemState ServiceUserRoleToSystemState(ServiceUserRole role)
         {
             switch (role)
@@ -22,7 +25,7 @@ namespace eCommerce.Service
                 }
             }
 
-            // TODO log if it gets here
+            _logger.Error($"DtoUtils ServiceUserRoleToSystemState got invalid rule {role.ToString()}");
             throw new NotImplementedException();
         }
         

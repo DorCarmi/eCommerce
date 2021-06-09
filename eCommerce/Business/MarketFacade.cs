@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business.Discounts;
@@ -14,8 +15,6 @@ using NLog;
 
 namespace eCommerce.Business
 {
-    // TODO should be singleton
-    // TODO check authException if we should throw them
     public class MarketFacade : IMarketFacade
     {
         private static MarketFacade _instance = new MarketFacade();
@@ -155,8 +154,6 @@ namespace eCommerce.Business
             User user = userAndStoreRes.Value.Item1;
             Store store = userAndStoreRes.Value.Item2;
             
-            _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
-            
             Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
             if (appointedUserRes.IsFailure)
             {
@@ -164,7 +161,31 @@ namespace eCommerce.Business
             }
             User appointedUser = appointedUserRes.Value;
 
+            _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
             return user.AppointUserToOwner(store, appointedUser);
+        }
+        
+        public Result RemoveCoOwner(string token, string storeId, string appointedUserId)
+        {
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
+            
+            
+            Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
+            if (appointedUserRes.IsFailure)
+            {
+                return appointedUserRes;
+            }
+            User removedMangerUser = appointedUserRes.Value;
+
+            _logger.Info($"RemoveCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
+            // TODO update
+            return Result.Ok(); //user.RemoveManager()
         }
                 
         //<CNAME>AppointManager</CNAME>
@@ -188,6 +209,29 @@ namespace eCommerce.Business
             User appointedUser = appointedUserRes.Value;
 
             return user.AppointUserToManager(store, appointedUser);
+        }
+        
+        public Result RemoveManager(string token, string storeId, string appointedUserId)
+        {
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
+            
+            
+            Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
+            if (appointedUserRes.IsFailure)
+            {
+                return appointedUserRes;
+            }
+            User removedMangerUser = appointedUserRes.Value;
+
+            _logger.Info($"RemoveCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
+            // TODO update
+            return Result.Ok(); //user.RemoveManager()
         }
 
         public Result<IList<StorePermission>> GetStorePermission(string token, string storeId)
@@ -575,17 +619,14 @@ namespace eCommerce.Business
         //<CNAME>OpenStore</CNAME>
         public Result OpenStore(string token, string storeName)
         {
-            // TODO check with user and store
             Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail(userRes.Error);
             }
             User user = userRes.Value;
-            
-            _logger.Info($"OpenStore({user.Username})");
-            
             Store newStore = new Store(storeName, user);
+            
             if (!_storeRepo.Add(newStore))
             {
                 return Result.Fail("Store name taken");
@@ -596,6 +637,7 @@ namespace eCommerce.Business
                 return Result.Fail("Error opening store");
             }
 
+            _logger.Info($"OpenStore({user.Username})");
             _userManager.UpdateUser(user);
             return Result.Ok();
         }

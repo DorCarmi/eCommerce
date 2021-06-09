@@ -148,6 +148,28 @@ namespace eCommerce.Controllers
             return appointRes;
         }
         
+        [HttpDelete("{storeId}/staff")]
+        public Result RemoveStaff(string storeId, string role, string userId)
+        {
+            string token = (string) HttpContext.Items["authToken"];
+            Result removedRes;
+
+            switch (role)
+            {
+                case "owner":
+                    removedRes = _userService.RemoveCoOwner(token, storeId, userId); 
+                    break;
+                case "manager":
+                    removedRes = _userService.RemoveManager(token, storeId, userId);
+                    break;
+                default:
+                    removedRes = Result.Fail("Invalid staff role");
+                    break;
+            }
+
+            return removedRes;
+        }
+        
         [HttpPut("{storeId}/staff")]
         public Result UpdateManagerPermissions(string storeId, string role, 
             string userId, [FromBody] JSONStorePermissions storePermissions)

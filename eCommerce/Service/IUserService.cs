@@ -39,6 +39,15 @@ using eCommerce.Common;
         public Result AppointCoOwner(string token, string storeId, string appointedUserId);
         
         /// <summary>
+        /// Remove owner from store
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The store id</param>
+        /// <param name="removedUserId">The removed owner user</param>
+        /// <returns>Result of the removal</returns>
+        public Result RemoveCoOwner(string token, string storeId, string removedUserId);
+        
+        /// <summary>
         /// Appoint a user as a new manager to the sore 
         /// </summary>
         /// <Test>
@@ -52,7 +61,15 @@ using eCommerce.Common;
         /// <returns>Result of the appointment</returns>
         public Result AppointManager(string token, string storeId, string appointedManagerUserId);
         
-        // TODO how to define and send the permission
+        /// <summary>
+        /// Remove manager from store
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The store id</param>
+        /// <param name="removedUserId">The removed owner user</param>
+        /// <returns>Result of the removal</returns>
+        public Result RemoveManager(string token, string storeId, string removedUserId);
+        
         /// <summary>
         /// Update the manager permission
         /// </summary>

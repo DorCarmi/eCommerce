@@ -89,6 +89,16 @@ namespace eCommerce.Business
         /// <param name="appointedUserId">The appointment user</param>
         /// <returns>Result of the appointment</returns>
         public Result AppointCoOwner(string token, string storeId, string appointedUserId);
+
+        /// <summary>
+        /// Remove owner from store
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The store id</param>
+        /// <param name="removedUserId">The removed owner user</param>
+        /// <returns>Result of the removal</returns>
+        public Result RemoveCoOwner(string token, string storeId, string removedUserId);
+
         
         /// <summary>
         /// Appoint a user as a new manager to the sore 
@@ -105,6 +115,15 @@ namespace eCommerce.Business
         public Result AppointManager(string token, string storeId, string appointedManagerUserId);
 
         /// <summary>
+        /// Remove manager from store
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The store id</param>
+        /// <param name="removedUserId">The removed owner user</param>
+        /// <returns>Result of the removal</returns>
+        public Result RemoveManager(string token, string storeId, string removedUserId);
+        
+        /// <summary>
         /// Return all the store permission that the user have
         /// </summary>
         /// <param name="token">Authorization token</param>
@@ -112,7 +131,6 @@ namespace eCommerce.Business
         /// <returns>All the store permission that the user have</returns>
         public Result<IList<StorePermission>> GetStorePermission(string token, string storeId);
 
-        // TODO how to define and send the permission
         /// <summary>
         /// Update the manager permission
         /// </summary>
@@ -123,8 +141,7 @@ namespace eCommerce.Business
         /// <returns>Result of the update</returns>
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions);
         
-        /*// TODO how to define and send the permission
-        /// <summary>
+        /*/// <summary>
         /// Remove the manager permission
         /// </summary>
         /// <param name="token">Authorization token</param>
