@@ -106,6 +106,7 @@ namespace Tests.AcceptanceTests
         [Test]
         [TestCase(5)]
         [Order(2)]
+        // Policy -> X
         public void TestBuyCartFailurePolicy(int amount)
         {
             string token = _auth.Connect();

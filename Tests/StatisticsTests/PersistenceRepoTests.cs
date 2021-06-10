@@ -10,7 +10,6 @@ namespace Tests.StatisticsTests
     [TestFixture]
     public class PersistenceRepoTests
     {
-
         private PersistenceStatsRepo _repo;
         public PersistenceRepoTests()
         {
