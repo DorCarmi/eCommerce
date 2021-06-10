@@ -13,7 +13,7 @@ class AddRule extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            kind:'', 
+            kind:'',
             ruleType:0,
             whatIsTheRuleOf:'',
             selectedComperator:0,
@@ -22,7 +22,7 @@ class AddRule extends Component {
         }
         this.storeApi = new StoreApi();
 
-        this.handleSubmit = this.handleSubmit.bind(this);
+        // this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
@@ -56,29 +56,29 @@ class AddRule extends Component {
         }
     }
 
-    async handleSubmit(event){
-        const {storeId} = this.props
-        const {ruleType,whatIsTheRuleOf,selectedItem,selectedComperator} = this.state
-        // const ruleTypeIdx=ruleType
-        // const comperatorIdx = selectedComperator
-        // console.log(ruleTypeIdx)
-        // console.log(comperatorIdx)
-        // console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
-        event.preventDefault();
-        const res = await this.storeApi.addRuleToStorePolicy(storeId,makeRuleNodeLeaf(makeRuleInfo(parseInt(ruleType),whatIsTheRuleOf,
-            selectedItem,parseInt(selectedComperator))))
-
-        if(res && res.isSuccess) {
-            alert('add rule succeed')
-            this.redirectToHome(`/store/${storeId}`)
-        }
-        else{
-            if(res) {
-                alert(`add rule failed because- ${res.error}`)
-            }
-        }
-        // alert("Rule Has Been Added")
-    }
+    // async handleSubmit(event){
+    //     const {storeId} = this.props
+    //     const {ruleType,whatIsTheRuleOf,selectedItem,selectedComperator} = this.state
+    //     // const ruleTypeIdx=ruleType
+    //     // const comperatorIdx = selectedComperator
+    //     // console.log(ruleTypeIdx)
+    //     // console.log(comperatorIdx)
+    //     // console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+    //     event.preventDefault();
+    //     const res = await this.storeApi.addRuleToStorePolicy(storeId,makeRuleNodeLeaf(makeRuleInfo(parseInt(ruleType),whatIsTheRuleOf,
+    //         selectedItem,parseInt(selectedComperator))))
+    //
+    //     if(res && res.isSuccess) {
+    //         alert('add rule succeed')
+    //         this.redirectToHome(`/store/${storeId}`)
+    //     }
+    //     else{
+    //         if(res) {
+    //             alert(`add rule failed because- ${res.error}`)
+    //         }
+    //     }
+    //     // alert("Rule Has Been Added")
+    // }
 
 
     
@@ -105,7 +105,7 @@ class AddRule extends Component {
                     <div className="CenterItemContainer">
                         <h3>{`Add Rule`}</h3>
                     </div>
-                    <form  onSubmit={this.handleSubmit}>
+                    {/*<form  onSubmit={this.handleSubmit}>*/}
                         <div><label>
                             Choose An Item:
                             <select  onChange={this.handleInputChange} name="selectedItem" className="searchContainer">
@@ -128,14 +128,14 @@ class AddRule extends Component {
                                 {ComperatorsNames.map((comperator,index) => <option  value={index}>{comperator}</option>)}
                             </select>
                         </label></div>
-                    {
-                        !this.props.addRule?
-                            <div className="CenterItemContainer">
-                                <input className="action" type="submit" value="Add Rule"/>
-                            </div>
-                         : null
-                    }
-                    </form>
+                    {/*{*/}
+                    {/*//     !this.props.addRule?*/}
+                    {/*//         <div className="CenterItemContainer">*/}
+                    {/*//             <input className="action" type="submit" value="Add Rule"/>*/}
+                    {/*//         </div>*/}
+                    {/*//      : null*/}
+                    {/*// }*/}
+                    {/*// </form>*/}
             </div>
             // </main>
         );
