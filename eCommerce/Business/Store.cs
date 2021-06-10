@@ -518,7 +518,6 @@ namespace eCommerce.Business
             double minValue = basket.GetRegularTotalPrice();
             foreach (var discount in this._myDiscountStrategies)
             {
-                Dictionary<string, ItemInfo> itemsInDiscount = new Dictionary<string, ItemInfo>();
                 var checkIfDiscount = discount.CheckIfDiscount();
                 if (checkIfDiscount)
                 {

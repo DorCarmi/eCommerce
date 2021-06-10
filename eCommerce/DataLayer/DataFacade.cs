@@ -43,7 +43,7 @@ namespace eCommerce.DataLayer
         public Result SaveUser(User user)
         {
             // synchronize all fields which arent compatible with EF (all dictionary properties)
-            user.SyncFromBusiness();
+
             
             Console.WriteLine("Inserting a new User");
             //using (var db = new ECommerceContext())
@@ -94,7 +94,7 @@ namespace eCommerce.DataLayer
                 try
                 {
                     // db.Update(user);
-                    user.SyncFromBusiness();
+
                     db.SaveChanges();
                 }
                 catch (Exception e)
@@ -159,7 +159,6 @@ namespace eCommerce.DataLayer
                 }
             }
             // synchronize all fields which arent compatible with EF (all dictionary properties) 
-            user.SyncToBusiness();
             return Result.Ok<User>(user);
         }
         
