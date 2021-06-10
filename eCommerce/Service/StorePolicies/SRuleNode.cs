@@ -18,6 +18,10 @@ namespace eCommerce.Service.StorePolicies
         public SRuleNode RuleB { get; set; }
         public Combinations Combination { get; set; }
         
+        public SRuleNode()
+        {
+        }
+        
         public SRuleNode(SRuleNodeType type, SRuleInfo ruleInfo)
         {
             Type = type;
