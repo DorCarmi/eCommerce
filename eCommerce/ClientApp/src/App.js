@@ -34,6 +34,8 @@ import {AppointOwner} from "./components/AppointOwner";
 import {ShowStatsInput} from "./components/ShowStatsInput";
 import ShowStatsOutput from "./components/ShowStatsOutput";
 import AddDiscount from "./components/AddDiscount";
+import {RemoveManager} from "./components/RemoveManager";
+import {RemoveOwner} from "./components/RemoveOwner";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -262,7 +264,10 @@ export default class App extends Component {
                     <Route exact path="/showStats" render={({match}) => <ShowStatsInput storeId ={match.params.storeId}/>}/>
 
                     <Route exact path="/showStats/:date" render={({match}) => <ShowStatsOutput date ={match.params.date}/>}/>
+                    
+                    <Route exact path="/removeManager/:storeId" render={({match}) => <RemoveManager storeId ={match.params.storeId}/>}/>
 
+                    <Route exact path="/removeOwner/:storeId" render={({match}) => <RemoveOwner storeId ={match.params.storeId}/>}/>
 
 
                 </Layout>

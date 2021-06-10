@@ -77,7 +77,7 @@ export default class ManagePermissions extends Component {
             editedStaff[parseInt(detail[0])].permissions.push(parseInt(detail[1]))
         }
         console.log(editedStaff)
-        alert(detail)
+        // alert(detail)
         this.setState({
             staff : editedStaff,
             changedManagers : [... this.state.changedManagers,detail[2]]
@@ -105,7 +105,7 @@ export default class ManagePermissions extends Component {
                 if (!updatePermissions(storeId, member.userId, member.permissions)) {
                     alert('Edit Permission Failed Has Not Fully Completed')
                 }
-                alert(member.userId)
+                alert(`permissions for user:${member.userId} updated`)
             }
         })
         this.setState({
@@ -116,16 +116,19 @@ export default class ManagePermissions extends Component {
         // return <div>Permissions</div>
         // const {items,storeId,permissions} = this.state
         // if (items.length > 0) {
-        const {staff, submitted} = this.state
+        const {staff, submitted,storeId} = this.state
         console.log(staff)
         if (submitted) {
-            return <Redirect exact to='/'/>
+            return <Redirect exact to={`/store/${storeId}`}/>
         } else {
             return (
                 <div>
                     <h3>{`Permissions For The Store : ${this.state.storeId}`}</h3>
                     <div><Link to={`${this.state.storeId}/appointManager`}>Appoint Manager</Link></div>
+                    <div><Link to={`/removeManager/${this.state.storeId}`}>Remove Manager</Link></div>
                     <div><Link to={`${this.state.storeId}/appointOwner`}>Appoint Owner</Link></div>
+                    <div><Link to={`/removeOwner/${this.state.storeId}`}>Remove Owner</Link></div>
+
 
                     <Table striped bordered hover>
                         <thead>
