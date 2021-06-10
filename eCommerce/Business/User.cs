@@ -36,6 +36,8 @@ namespace eCommerce.Business
 
         [NotMapped]
         public Cart _myCart { get; private set; }
+        
+        
         private Object dataLock;
         //MemberData:
         private ConcurrentDictionary<Store, bool> _storesFounded;

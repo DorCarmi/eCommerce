@@ -51,8 +51,10 @@ namespace eCommerce.DataLayer
                 try
                 {
                     db.Add(user);
+                    
                     Console.WriteLine("Inserting a new User!!!");
                     db.SaveChanges();
+                    
                 }
                 catch (Exception e)
                 {
@@ -64,7 +66,27 @@ namespace eCommerce.DataLayer
             }
             return Result.Ok();
         }
-        
+
+        public Result RemoveOwnerAppointment(OwnerAppointment ownerAppointment)
+        {
+            try
+            {
+                db.Remove(ownerAppointment);
+                    
+                Console.WriteLine("Inserting a new User!!!");
+                db.SaveChanges();
+                    
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);   
+                return Result.Fail("Unable to Save User");
+                // add logging here
+            }
+
+            return Result.Ok();
+        }
+
         public Result UpdateUser(User user)
         {
             //using (var db = new ECommerceContext())
