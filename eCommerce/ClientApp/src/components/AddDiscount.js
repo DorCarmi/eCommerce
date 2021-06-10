@@ -6,8 +6,9 @@ import {
     makeRuleNodeComposite, makeRuleNodeLeaf
 } from '../Data/StorePolicies/RuleInfo'
 import AddRule from "./AddRule";
-import {CombinationsNames} from "../Data/StorePolicies/Combinations";
-import {makeDiscountNodeLeaf} from "../Data/StorePolicies/DiscountInfoTree";
+import {Combinations, CombinationsNames} from "../Data/StorePolicies/Combinations";
+import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "../Data/StorePolicies/DiscountInfoTree";
+import Discount from "./Discount";
 
 class AddDiscount extends Component {
     static displayName = AddDiscount.name;
@@ -19,13 +20,13 @@ class AddDiscount extends Component {
             discount:0,
             selectedCombination:0,
             toggler:false,
-            firstRule:undefined,
-            secondRule:undefined,
+            firstDiscount:undefined,
+            secondDiscount:undefined,
             submitted:false
         }
         this.storeApi = new StoreApi();
 
-        // this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
         this.toggle = this.toggle.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
 
@@ -36,56 +37,55 @@ class AddDiscount extends Component {
     //     const { history } = this.props;
     //     if(history) history.push(path);
     // }
-    
 
 
-     createDiscountLeaf(){
-        const {firstRule,secondRule,selectedCombination,discount} = this.state
+
+    async handleSubmit(event){
+        const {firstDiscount,secondDiscount,selectedCombination,discount,toggler} = this.state
         const {storeId} = this.props
-        // event.preventDefault();
-        if(firstRule) {
+        event.preventDefault();
+        if(firstDiscount) {
             let res = undefined
-            let rule = makeRuleNodeLeaf(firstRule)
-            if(secondRule){
-                rule = makeRuleNodeComposite(makeRuleNodeLeaf(firstRule), makeRuleNodeLeaf(secondRule), parseInt(selectedCombination));
+            let discount = firstDiscount
+            if(toggler && secondDiscount){
+                discount = makeDiscountCompositeNode(firstDiscount, secondDiscount, parseInt(selectedCombination));
             }
-            return makeDiscountNodeLeaf(rule,parseInt(discount));
-            // res = await this.storeApi.addDiscountToStore(storeId, discountNodeLeaf)
-            //
-            // if(res && res.isSuccess) {
-            //     alert('add discount succeed')
-            //     this.setState({
-            //         submitted:true
-            //     })
-            // }
-            // else{
-            //     if(res) {
-            //         alert(`add discount failed because- ${res.error}`)
-            //     }
-            // }
+            res = await this.storeApi.addDiscountToStore(storeId, discount)
+
+            if(res && res.isSuccess) {
+                alert('add policy succeed')
+                this.setState({
+                    submitted:true
+                })
+            }
+            else{
+                if(res) {
+                    alert(`add policy failed because- ${res.error}`)
+                }
+            }
         }
 
 
     }
 
 
-    
+
 
     toggle(event){
         this.setState({
             toggler:!this.state.toggler
         })
     }
-    
-    addFirstRule(rule){
+
+    addFirstDiscount(discount){
         this.setState({
-            firstRule:rule
+            firstDiscount:discount
         })
     }
 
-    addSecondRule(rule){
+    addSecondDiscount(discount){
         this.setState({
-            secondRule:rule
+            secondDiscount:discount
         })
     }
 
@@ -96,49 +96,45 @@ class AddDiscount extends Component {
         this.setState({
             [target.name]: target.value
         });
-        this.props.addDiscount(this.createDiscountLeaf())
     }
     render () {
         const {toggler,items,submitted} = this.state
         const {storeId} = this.props
         const combinatorValue = CombinationsNames[this.state.selectedCombination]
         if(submitted){
-            return <Redirect exact to="/"/>
+            return <Redirect exact to={`/store/${storeId}`}/>
         }
         else{
-        return (
-            // <main className="RegisterMain">
+            return (
+                // <main className="RegisterMain">
                 <div className="RegisterWindow">
-                        <h3>{`Add Discount`}</h3>
-                    {/*<form  onSubmit={this.handleSubmit}>*/}
-                        <AddRule addRule={(rule) =>this.addFirstRule(rule)} storeId={storeId}/>
-                         <button onClick={this.toggle}>{`${toggler? "Don't " : ''}Combine Another Rule`}</button>
+                    <h3>{`Add Discounts To The Policy Of The Store: ${storeId}`}</h3>
+                    <form  onSubmit={this.handleSubmit}>
+                        <Discount addDiscount={(discount) =>this.addFirstDiscount(discount)} storeId={storeId}/>
+                        <button onClick={this.toggle}>{`${toggler? "Don't " : ''}Combine Another Discount`}</button>
                         {
                             toggler ?
                                 <>
-                                <div>
-                                    <label>
-                                        Choose Combination:
-                                        
-                                        <select  onChange={this.handleInputChange} name="selectedCombination" className="searchContainer">
-                                            {CombinationsNames.map((combination,index) => <option  value={index}>{combination}</option>)}
-                                        </select>
-                                    </label>
-                                </div>
-                                <AddRule addRule={(rule) =>this.addSecondRule(rule)} storeId={storeId}/></>:
-                                    null
+                                    <div>
+                                        <label>
+                                            Choose Combination:
+
+                                            <select  onChange={this.handleInputChange} name="selectedCombination" className="searchContainer">
+                                                {CombinationsNames.map((combination,index) => <option  value={index}>{combination}</option>)}
+                                            </select>
+                                        </label>
+                                    </div>
+                                    <Discount addDiscount={(discount) =>this.addSecondDiscount(discount)} storeId={storeId}/></>:
+                                null
                         }
-                        <div><label>Enter Discount</label>
-                            <input type="number" name="discount" value={this.state.discount} onChange={this.handleInputChange}
-                                    placeholder={'Enter Discount'} required/></div>
-                    {/*    <div className="CenterItemContainer">*/}
-                    {/*        <input className="action" type="submit" value="Add Discount"/>*/}
-                    {/*    </div>*/}
-                    {/*</form>*/}
+                        <div className="CenterItemContainer">
+                            <input className="action" type="submit" value="Add Policy"/>
+                        </div>
+                    </form>
                 </div>
-            // </main>
-        );
-    }
-}}
+                // </main>
+            );
+        }
+    }}
 
 export default withRouter(AddDiscount);
