@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using eCommerce.Business;
 using eCommerce.Common;
@@ -26,9 +27,16 @@ namespace eCommerce
         public string Password { get; set; }
         public BasicActionJsonFormat[] Actions { get; set; }
     }
+    
+    public class AppointManager {
+        public string Manager { get; set; }
+        public string Store { get; set; }
+        public string[] Permissions { get; set; }
+    }
 
     public class InitSystem
     {
+        private static Logger _logger = LogManager.GetCurrentClassLogger();
         private ISystemService _systemService;
         private IAuthService _authService;
         private IUserService _userService;
@@ -94,7 +102,7 @@ namespace eCommerce
                         Result registerRes = _authService.Register(_guestToken, userData.MemberInfo, userData.Password).Result;
                         if (registerRes.IsFailure)
                         {
-                            ThrowInvalidException($"Error when register user {userData.MemberInfo.Username}",
+                            LogError($"Error when register user {userData.MemberInfo.Username}",
                                 registerRes.Error, at, initFile);
                         }
                         break;
@@ -106,8 +114,9 @@ namespace eCommerce
                         break;
                     }
                     default:
-                        throw new InvalidDataException($"Invalid init action {initData.Action}");
-                        
+                        ThrowInvalidException($"Invalid init action {initData.Action}",
+                            "Invalid action", at, initFile);
+                        break;
                 }
 
                 at++;
@@ -123,8 +132,9 @@ namespace eCommerce
                 memberAction.Password, ServiceUserRole.Member).Result;
             if (loginRes.IsFailure)
             {
-                ThrowInvalidException($"User {memberAction.Username} wasn't able to login",
+                LogError($"User {memberAction.Username} wasn't able to login",
                     loginRes.Error, at, initFile);
+                return;
             }
 
             _workingToken = loginRes.Value;
@@ -139,7 +149,7 @@ namespace eCommerce
                         Result openStoreRes = _inStoreService.OpenStore(_workingToken, storeName);
                         if (openStoreRes.IsFailure)
                         {
-                            ThrowInvalidException($"Error when opening store {storeName} for {memberAction.Username}",
+                            LogError($"Error when opening store {storeName} for {memberAction.Username}",
                                 openStoreRes.Error, at, initFile);
                         }
                         break;
@@ -150,26 +160,76 @@ namespace eCommerce
                         Result addItemRes = _inStoreService.AddNewItemToStore(_workingToken, item);
                         if (addItemRes.IsFailure)
                         {
-                            ThrowInvalidException($"Error when adding item {item.ItemName} to store {item.StoreName}",
+                            LogError($"Error when adding item {item.ItemName} to store {item.StoreName}",
                                 addItemRes.Error, at, initFile);
                         }
                         break;
                     }
+                    case "AppointManager":
+                    {
+                        AppointManager appointManager = basicAction.Data.ToObject<AppointManager>();
+                        Result appointManagerRes = _userService.AppointManager(_workingToken, appointManager.Store, appointManager.Manager);
+                        if (appointManagerRes.IsFailure)
+                        {
+                            LogError($"Error when appointing {appointManager.Manager} to store {appointManager.Store}",
+                                appointManagerRes.Error, at, initFile);
+                            break;
+                        }
+
+                        if (appointManager.Permissions != null && appointManager.Permissions.Length > 0)
+                        {
+                            List<StorePermission> managerPermissions = new List<StorePermission>();
+                            foreach (var permission in appointManager.Permissions)
+                            {
+                                try
+                                {
+                                    StorePermission storePermission = Enum.Parse<StorePermission>(permission, true);
+                                    managerPermissions.Add(storePermission);
+                                }
+                                catch (Exception e)
+                                {
+                                    LogError($"Invalid permission {permission} when appointing {appointManager.Permissions} to store {appointManager.Store}",
+                                        appointManagerRes.Error, at, initFile);
+                                }
+                            }
+
+                            Result updateManagerPermission = _userService.UpdateManagerPermission(_workingToken, appointManager.Store,
+                                appointManager.Manager, managerPermissions);
+                            if (updateManagerPermission.IsFailure)
+                            {
+                                LogError($"Error when updating {appointManager.Manager} manager permission on store {appointManager.Store}",
+                                    appointManagerRes.Error, at, initFile);
+                            }
+                        }
+                        break;
+                    }
                     default:
-                        throw new InvalidDataException($"Invalid init action at index {at} of MemberAction");
+                        ThrowInvalidException($"Invalid init action at index {at} of MemberAction",
+                            "Invalid action", at, initFile);
+                        break;
                 }
             }
             
             _authService.Disconnect(_authService.Logout(_workingToken).Value);
         }
 
+        private void LogError(string errorMessage, string resMessage, int at, string initFile)
+        {
+            CleanUp();
+            string message = $"\nSystem Init:\n{errorMessage}\n" +
+                             $"Error message: {resMessage}\n" +
+                             $"In index {at}, file {initFile}";
+            _logger.Error(message);
+        }
+        
         private void ThrowInvalidException(string errorMessage, string resMessage, int at, string initFile)
         {
             CleanUp();
-            throw new InvalidDataException(
-                $"\nSystem Init:\n{errorMessage}\n" +
-                $"Error message: {resMessage}\n" +
-                $"In index {at}, file {initFile}");
+            string message = $"\nSystem Init:\n{errorMessage}\n" +
+                             $"Error message: {resMessage}\n" +
+                             $"In index {at}, file {initFile}";
+            _logger.Error(message);
+            throw new InvalidDataException(message);
         }
     }
 }

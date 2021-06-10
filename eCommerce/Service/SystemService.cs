@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using eCommerce.Adapters;
+﻿using eCommerce.Adapters;
 using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Repositories;
@@ -53,7 +51,9 @@ namespace eCommerce.Service
                 }
                 case "Persistence":
                 {
-                    throw new NotImplementedException();
+                    userRepo = new PersistenceRegisteredUsersRepo();
+                    //TODO update to persistennce store repo
+                    storeRepo = new InMemoryStoreRepo();
                     break;   
                 }
                 case null:
