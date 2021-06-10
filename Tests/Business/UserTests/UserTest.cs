@@ -286,10 +286,44 @@ namespace Tests.Business.UserTests
             task2.Start();
             task3.Start();
             task4.Start();
-            Assert.True(task1.Result.IsSuccess != task2.Result.IsSuccess);
-            Assert.True(task3.Result.IsSuccess != task4.Result.IsSuccess);
+            var res1 = task1.Result;
+            var res2 = task2.Result;
+            var res3 = task3.Result;
+            var res4 = task4.Result;
+            Assert.True(res1.IsSuccess != res2.IsSuccess);
+            Assert.True(res3.IsSuccess != res4.IsSuccess);
             int ownersCount = ja.AppointedOwners[store1].Count;
-            Assert.True(ownersCount == 0);
+            Assert.True(ownersCount == 0,ownersCount.ToString());
+        }
+
+        [Test]
+        public void TheABC_OwnersTest()
+        {
+            //ja = new User(new MemberInfo("Ja Morant", "ja@mail.com", "Ja", DateTime.Now, "Memphis"));
+            var Abraham = new User(new MemberInfo("Abraham", "a@a.com", "Ab", DateTime.Now, "TLV"));
+            var Bond = new User(new MemberInfo("Bon", "b@a.com", "Bon", DateTime.Now, "TLV"));
+            var Chumacher = new User(new MemberInfo("Chumacher", "c@a.com", "Chu", DateTime.Now, "TLV"));
+            
+            //A->B
+            var AbiAndHisSons= new mokStore("AbiAndHisSons");
+            var openStoreRes=Abraham.OpenStore(AbiAndHisSons);
+            Assert.True(openStoreRes.IsSuccess,openStoreRes.Error);
+            var resNominateBond=Abraham.AppointUserToOwner(AbiAndHisSons, Bond);
+            Assert.True(resNominateBond.IsSuccess,resNominateBond.Error);
+            
+            //B->C
+            var resNominateChu=Bond.AppointUserToOwner(AbiAndHisSons, Chumacher);
+            Assert.True(resNominateChu.IsSuccess,resNominateChu.Error);
+            
+            Assert.True(Bond.StoresOwned.ContainsKey(AbiAndHisSons));
+            Assert.True(Chumacher.StoresOwned.ContainsKey(AbiAndHisSons));
+
+            var resRemoveBond=Abraham.RemoveOwnerFromStore(AbiAndHisSons, Bond);
+            Assert.True(resRemoveBond.IsSuccess,resRemoveBond.Error);
+
+            Assert.False(Bond.StoresOwned.ContainsKey(AbiAndHisSons));
+            Assert.False(Chumacher.StoresOwned.ContainsKey(AbiAndHisSons));
+
         }
     }
 }

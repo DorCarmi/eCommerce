@@ -83,8 +83,11 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<string> yossiLogInResult = await _auth.Login(token, "AzalinRex", "qwerty123", ServiceUserRole.Member);
-            _cart.AddItemToCart(yossiLogInResult.Value, "Tara milk", storeName, 5);
-            _cart.PurchaseCart(yossiLogInResult.Value, new PaymentInfo("AzalinRex","123456789","1234567890123456","12/34","123","address"));
+            var resAddItem=_cart.AddItemToCart(yossiLogInResult.Value, "Tara milk", storeName, 5);
+            Assert.True(resAddItem.IsSuccess,resAddItem.Error);
+            
+            var resBuyCart=_cart.PurchaseCart(yossiLogInResult.Value, new PaymentInfo("AzalinRex","123456789","1234567890123456","12/34","123","address"));
+            Assert.True(resBuyCart.IsSuccess,resBuyCart.Error);
             Result<SPurchaseHistory> result = _user.GetPurchaseHistory(yossiLogInResult.Value);
             Assert.True(result.IsSuccess && result.Value.Records.Count != 0);
             token = _auth.Logout(yossiLogInResult.Value).Value;
