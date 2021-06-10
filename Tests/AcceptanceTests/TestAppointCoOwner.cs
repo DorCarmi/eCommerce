@@ -177,7 +177,7 @@ namespace Tests.AcceptanceTests
 
 
             //A-x->B->x->C
-            var resRemoveOwner=_user.RemoveOwnerFromStore(abiToken, STORE_NAME, Bond.Username);
+            var resRemoveOwner=_user.RemoveCoOwner(abiToken, STORE_NAME, Bond.Username);
 
             var permissionResAb = _inStore.GetStorePermission(abiToken, STORE_NAME);
             var permissionResBond = _inStore.GetStorePermission(bondToken, STORE_NAME);

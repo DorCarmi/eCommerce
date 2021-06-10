@@ -184,8 +184,8 @@ namespace eCommerce.Business
             User removedMangerUser = appointedUserRes.Value;
 
             _logger.Info($"RemoveCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
-            // TODO update
-            return Result.Ok(); //user.RemoveManager()
+
+            return user.RemoveOwnerFromStore(store, removedMangerUser);
         }
                 
         //<CNAME>AppointManager</CNAME>
@@ -230,7 +230,7 @@ namespace eCommerce.Business
             User removedMangerUser = appointedUserRes.Value;
 
             _logger.Info($"RemoveCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
-            // TODO update
+
             return Result.Ok(); //user.RemoveManager()
         }
 
@@ -836,28 +836,6 @@ namespace eCommerce.Business
             User user = userRes.Value;
 
             return user.GetLoginStats(date);
-        }
-
-        public Result RemoveOwnerFromStore(string token, string storeId, string appointedUserId)
-        {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-            
-            _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
-            
-            Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
-            if (appointedUserRes.IsFailure)
-            {
-                return appointedUserRes;
-            }
-            User appointedUser = appointedUserRes.Value;
-
-            return user.RemoveOwnerFromStore(store, appointedUser);
         }
 
         #endregion

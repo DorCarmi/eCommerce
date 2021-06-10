@@ -118,7 +118,5 @@ using eCommerce.Common;
         /// <param name="date">Date of the stats</param>
         /// <returns>The stats</returns>
         public Result<LoginDateStat> AdminGetLoginStats(string token, DateTime date);
-
-        public Result RemoveOwnerFromStore(string abiToken, string storeName, string bondUsername);
     }
 }
