@@ -13,7 +13,7 @@ class AddRule extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            kind:'',
+            kind:'', 
             ruleType:0,
             whatIsTheRuleOf:'',
             selectedComperator:0,

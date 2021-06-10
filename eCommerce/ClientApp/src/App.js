@@ -34,6 +34,7 @@ import AddRule from "./components/AddRule";
 import {AppointOwner} from "./components/AppointOwner";
 import {ShowStatsInput} from "./components/ShowStatsInput";
 import ShowStatsOutput from "./components/ShowStatsOutput";
+import CombineRule from "./components/CombineRules";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -248,7 +249,7 @@ export default class App extends Component {
                     <Route exact path="/addPolicy/:storeId" render={({match}) => <AddPolicy storeId={match.params.storeId}/>}/>
 
 
-                    <Route exact path="/addRule/:storeId" render={({match}) => <AddRule storeId={match.params.storeId}/>}/>
+                    <Route exact path="/addRule/:storeId" render={({match}) => <CombineRule storeId={match.params.storeId}/>}/>
 
                     <Route exact path="/searchItems/Item/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query}  />} />
                     <Route exact path="/searchItems/Store/:query" render={({match}) => <Store  storeId={match.params.query}/>} />

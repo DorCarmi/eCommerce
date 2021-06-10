@@ -88,8 +88,8 @@ export default class Store extends Component {
                 {permissions.includes(StorePermission.ControlStaffPermission) ? <div><Link tag={Link} exact to={`/managePermissions/${storeId}`}>Manage Permissions</Link></div> : null}
                 {permissions.includes(StorePermission.AddItemToStore) ? <div><Link to={`${storeId}/addItem`}>Add an Item</Link></div> : null}
                 {permissions.includes(StorePermission.GetStoreHistory) ?<div> <Link to={`/purchaseHistory/${storeId}`}>Show Store's Purchase History</Link></div> : null}
-                {permissions.includes(StorePermission.EditStorePolicy) ? <div><Link to={`/addRule/${storeId}`}>Add Rule</Link></div> : null}
-                {permissions.includes(StorePermission.EditStorePolicy) ? <div><Link to={`/addPolicy/${storeId}`}>Add Policy</Link></div> : null}
+                {permissions.includes(StorePermission.EditStorePolicy) ? <div><Link to={`/addRule/${storeId}`}>Add Rule To Policy</Link></div> : null}
+                {permissions.includes(StorePermission.EditStorePolicy) ? <div><Link to={`/addPolicy/${storeId}`}>Add Discount To Policy</Link></div> : null}
 
                     </div>
 

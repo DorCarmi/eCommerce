@@ -102,13 +102,13 @@ class AddPolicy extends Component {
         const {storeId} = this.props
         const combinatorValue = CombinationsNames[this.state.selectedCombination]
         if(submitted){
-            return <Redirect exact to="/"/>
+            return <Redirect exact to={`/store/${storeId}`}/>
         }
         else{
             return (
                 // <main className="RegisterMain">
                 <div className="RegisterWindow">
-                    <h3>{`Add Policy For The Store: ${storeId}`}</h3>
+                    <h3>{`Add Discounts To The Policy Of The Store: ${storeId}`}</h3>
                     <form  onSubmit={this.handleSubmit}>
                         <AddDiscount addDiscount={(discount) =>this.addFirstDiscount(discount)} storeId={storeId}/>
                         <button onClick={this.toggle}>{`${toggler? "Don't " : ''}Combine Another Discount`}</button>
