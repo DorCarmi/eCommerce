@@ -918,7 +918,8 @@ namespace eCommerce.Business
         lock (dataLock)
         {
             storesFoundedBackup = new List<Store>(_storesFounded.Keys);
-            
+
+            storesOwnedBackup = new List<Pair<Store, OwnerAppointment>>();
             foreach (Store key in StoresOwned.Keys)
             {
                 /*if (storesOwnedBackup.Find(p => p.Key == key) == null)
@@ -938,6 +939,7 @@ namespace eCommerce.Business
                 storesManagedBackup.Add(new Pair<Store, ManagerAppointment>(){Key = key,KeyId = key.StoreName, Value = val, HolderId = this.Username});
             }
 
+            appointedOwnersBackup = new List<ListPair<Store, OwnerAppointment>>();
             foreach (Store key in AppointedOwners.Keys)
             {
                 /*if (appointedOwnersBackup.Find(p => p.Key == key) == null)

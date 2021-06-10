@@ -1,9 +1,12 @@
-﻿using eCommerce.Adapters;
+﻿using System;
+using eCommerce.Adapters;
 using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Statistics;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace eCommerce.Service
 {
@@ -27,15 +30,36 @@ namespace eCommerce.Service
             return _marketState.TryGetErrMessage(out message);
         }
 
-        public void InitSystem()
+        public void Start(string[] args)
         {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+
+        public bool InitSystem(string[] args)
+        {
+            if (args.Length < 1)
+            {
+                Console.WriteLine("Usage: <Config file>");
+                return false;
+            }
+            
             AppConfig config = AppConfig.GetInstance();
+            if (!config.Init(args[0]))
+            {
+                Console.WriteLine($"Usage: Invalid config file {args[0]}");
+                return false;
+            }
 
             MarketFacade marketFacade;
-            IUserAuth authService = InitAuth(config);
+            IUserAuth authService;
             IRepository<User> userRepo = null;
             AbstractStoreRepo storeRepo = null;
 
+            authService = InitAuth(config);
             InitStatistics(config);
             InitPaymentAdapter(config);
             InitSupplyAdapter(config);
@@ -70,6 +94,22 @@ namespace eCommerce.Service
 
             marketFacade = MarketFacade.GetInstance();
             marketFacade.Init(authService, userRepo, storeRepo);
+
+            string initFilePath;
+            if (config.GetData("InitWithData").Equals("True"))
+            {
+                initFilePath = config.GetData("InitDataFile");
+                if (initFilePath != null)
+                {
+                    InitSystemWithData initSystemWithData = new InitSystemWithData(
+                        new AuthService(),
+                        new UserService(),
+                        new InStoreService());
+                    initSystemWithData.Init(initFilePath);
+                }
+            }
+
+            return true;
         }
 
         private IUserAuth InitAuth(AppConfig config)

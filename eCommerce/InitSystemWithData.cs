@@ -34,31 +34,25 @@ namespace eCommerce
         public string[] Permissions { get; set; }
     }
 
-    public class InitSystem
+    public class InitSystemWithData
     {
         private static Logger _logger = LogManager.GetCurrentClassLogger();
-        private ISystemService _systemService;
         private IAuthService _authService;
         private IUserService _userService;
         private INStoreService _inStoreService;
-
-        private AppConfig _appConfig;
-
+        
         private string _guestToken;
         private string _workingToken;
-        public InitSystem()
-        {
-            _systemService = new SystemService();
-            _appConfig = AppConfig.GetInstance();
 
+        public InitSystemWithData(IAuthService authService, IUserService userService, INStoreService inStoreService)
+        {
+            _authService = authService;
+            _userService = userService;
+            _inStoreService = inStoreService;
         }
 
         private void InitServices()
         {
-            _authService = new AuthService();
-            _userService = new UserService();
-            _inStoreService = new InStoreService();
-
             _guestToken = _authService.Connect();
         }
 
@@ -73,25 +67,27 @@ namespace eCommerce
             _authService.Disconnect(_authService.Logout(_workingToken).Value);
         }
 
-        public void Init(string initFile)
+        public bool Init(string initFile)
         {
-            
-            _systemService.InitSystem();
             InitServices();
-            
-            if (_appConfig.GetData("InitWithData").Equals("True"))
-            {
-                InitData("Init.json");
-            }
+            return InitData(initFile);
         }
 
-        private void InitData(string initFile)
+        private bool InitData(string initFile)
         {
-            Setup();
+            if (!File.Exists(initFile))
+            {
+                return false;
+            }
             
             int at = 0;
             BasicActionJsonFormat[] initDataJsons = JsonConvert.DeserializeObject<BasicActionJsonFormat[]>(File.ReadAllText(initFile));
-
+            if (initDataJsons == null)
+            {
+                return false;
+            }
+                
+            Setup();
             foreach (var initData in initDataJsons)
             {
                 switch (initData.Action)
@@ -123,6 +119,7 @@ namespace eCommerce
             }
 
             CleanUp();
+            return true;
         }
 
         private void HandleMemberActions(MemberAction memberAction, int at, string initFile)

@@ -1,6 +1,7 @@
 ﻿{
   "InitWithData": true,
-
+  "InitDataFile": "Init.json",
+  
   "Memory": "InMemory",
 
   "AdminCreationInfo" : {
