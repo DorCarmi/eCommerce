@@ -37,11 +37,12 @@ namespace eCommerce.Business
 
         public Result<List<string>> GetStoreIds(User user)
         {
-            List<string> storeIds = new List<string>();
-            foreach (var store in ListHelper<Store, OwnerAppointment>.Keys(user.StoresOwned))
-            {
-                storeIds.Add(store.GetStoreName());
-            }
+            List<string> storeIds = ListHelper<string, OwnerAppointment>.Keys(user.StoresOwned);
+            // List<string> storeIds = new List<string>();
+            // foreach (var store in ListHelper<string, OwnerAppointment>.Keys(user.StoresOwned))
+            // {
+            //     storeIds.Add(store.GetStoreName());
+            // }
 
             return Result.Ok(storeIds);
         }

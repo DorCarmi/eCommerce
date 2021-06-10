@@ -18,11 +18,13 @@ namespace eCommerce.DataLayer
         public DbSet<User> Users { get; set; }
         public DbSet<OwnerAppointment> OwnerAppointments { get; set; }
         public DbSet<ManagerAppointment> ManagerAppointments { get; set; }
-        public DbSet<Pair<Store,OwnerAppointment>> OwnedStores { get; set; }
-        public DbSet<Pair<Store,ManagerAppointment>> ManagedStores { get; set; }
-        public DbSet<ListPair<Store,OwnerAppointment>> AppointedOwners { get; set; }
-        public DbSet<ListPair<Store,ManagerAppointment>> AppointedManagers { get; set; }
+        public DbSet<Pair<string,bool>> FoundedStores { get; set; }
+        public DbSet<Pair<string,OwnerAppointment>> OwnedStores { get; set; }
+        public DbSet<Pair<string,ManagerAppointment>> ManagedStores { get; set; }
+        public DbSet<ListPair<string,OwnerAppointment>> AppointedOwners { get; set; }
+        public DbSet<ListPair<string,ManagerAppointment>> AppointedManagers { get; set; }
 
+        
         public DbSet<Store> Stores { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemInfo> ItemInfos { get; set; }
@@ -45,14 +47,23 @@ namespace eCommerce.DataLayer
         
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            //set composite Primary-Key for entities of type OwnerAppointment
-            builder.Entity<OwnerAppointment>()
-                .HasKey(o => new {o.Ownername, o.OwnedStorename});
+            // //set composite Primary-Key for entities of type OwnerAppointment
+            // builder.Entity<OwnerAppointment>()
+            //     .HasKey(o => new {o.Ownername, o.OwnedStorename});
             
             //set composite Primary-Key for entities of type ManagerAppointment
             builder.Entity<ManagerAppointment>()
                 .HasKey(o => new {o.Managername, o.ManagedStorename});
             
+            
+            //configure One-to-One relation for User & Cart
+            builder.Entity<Cart>()
+                .HasOne(c => c._cartHolder)
+                .WithOne(u => u._myCart)
+                .HasForeignKey<User>(u => u._cartId);
+            
+            
+            /*
             //set composite Primary-Key for every entity of type Pair<Store,OwnerAppointment>
             builder.Entity<Pair<Store,OwnerAppointment>>()
                 .HasKey(p => new {p.HolderId, p.KeyId});
@@ -71,6 +82,8 @@ namespace eCommerce.DataLayer
             //set composite Primary-Key for every entity of type Pair<Store,ManagerAppointment>
             builder.Entity<ListPair<Store,ManagerAppointment>>()
                 .HasKey(p => new {p.HolderId, p.KeyId});
+                */
+            
             
             var stringListConverter = new ValueConverter<List<string>, string>(
                 v => string.Join(",", v),
@@ -85,15 +98,19 @@ namespace eCommerce.DataLayer
     
     public class ListPair<K,V>
     {
-        public string KeyId { get; set; }
+        // public string KeyId { get; set; }
+        [Key]
+        public Guid id { get; set; }
         public K Key { get; set; }
         public virtual List<V> ValList { get; set; }
-        public string HolderId { get; set; }
+        // public string HolderId { get; set; }
     }
     
     public class Pair<K,V>
     {
         public string KeyId { get; set; }
+        [Key]
+        public Guid id { get; set; }
         public K Key { get; set; }
         public V Value { get; set; }
         public string HolderId { get; set; }

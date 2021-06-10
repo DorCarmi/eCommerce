@@ -34,9 +34,8 @@ namespace eCommerce.Business
         
         public Transaction _performTransaction;
         
-        [NotMapped]
-        //public Dictionary<Store, Basket> _baskets;
-        public List<Pair<Store, Basket>> _baskets;
+        
+        public List<Pair<Store, Basket>> _baskets { get; set; }
         
         
         private double _totalPrice;

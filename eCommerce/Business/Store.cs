@@ -33,11 +33,22 @@ namespace eCommerce.Business
         public ItemsInventory _inventory { get; private set; }
 
         //User issues
-        public User _founder { get; private set; }
-        public List<OwnerAppointment> _ownersAppointments { get; private set; }
-        public List<ManagerAppointment> _managersAppointments { get; private set; }
+        [NotMapped] 
+        public User _founder { get; set; }
+        public string _founderName { get; set; }
+
         
-        public List<Basket> _basketsOfThisStore { get; private set; }
+        
+        public string OwnersIds { get; set; }
+        [NotMapped]
+        public List<OwnerAppointment> _ownersAppointments { get;  set; }
+        [NotMapped]
+        public List<ManagerAppointment> _managersAppointments { get; private set; }
+
+        public string basketsIds { get; set; }
+
+        [NotMapped]
+        public List<Basket> _basketsOfThisStore { get; set; }
 
         // for ef
         public Store()
@@ -58,6 +69,8 @@ namespace eCommerce.Business
             _inventory = new ItemsInventory(this);
 
             this._founder = founder;
+            this._founderName = founder.Username;
+
             _ownersAppointments = new List<OwnerAppointment>();
             
             _managersAppointments = new List<ManagerAppointment>();

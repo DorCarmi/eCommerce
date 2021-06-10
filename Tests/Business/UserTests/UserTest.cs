@@ -42,8 +42,8 @@ namespace Tests.Business.UserTests
         public void TestOpenStore_Pass()
         {
             Assert.True(ja.HasPermission(store1,StorePermission.ControlStaffPermission).IsSuccess);
-            Assert.True(ListHelper<Store,OwnerAppointment>.ContainsKey(ja.StoresOwned,store1));
-            Assert.True(ListHelper<Store,OwnerAppointment>.KeyToValue(ja.StoresOwned,store1).User.Equals(ja));
+            Assert.True(ListHelper<string,OwnerAppointment>.ContainsKey(ja.StoresOwned,store1.StoreName));
+            Assert.True(ListHelper<string,OwnerAppointment>.KeyToValue(ja.StoresOwned,store1.StoreName).User.Equals(ja));
         } 
         [Test]
         public void TestOpenStore_Fail()
@@ -317,14 +317,14 @@ namespace Tests.Business.UserTests
             var resNominateChu=Bond.AppointUserToOwner(AbiAndHisSons, Chumacher);
             Assert.True(resNominateChu.IsSuccess,resNominateChu.Error);
             
-            Assert.True(ListHelper<Store,OwnerAppointment>.ContainsKey(Bond.StoresOwned,AbiAndHisSons));
-            Assert.True(ListHelper<Store,OwnerAppointment>.ContainsKey(Chumacher.StoresOwned,AbiAndHisSons));
+            Assert.True(ListHelper<string,OwnerAppointment>.ContainsKey(Bond.StoresOwned,AbiAndHisSons.storeName));
+            Assert.True(ListHelper<string,OwnerAppointment>.ContainsKey(Chumacher.StoresOwned,AbiAndHisSons.storeName));
 
             var resRemoveBond=Abraham.RemoveOwnerFromStore(AbiAndHisSons, Bond);
             Assert.True(resRemoveBond.IsSuccess,resRemoveBond.Error);
 
-            Assert.False(ListHelper<Store,OwnerAppointment>.ContainsKey(Bond.StoresOwned,AbiAndHisSons));
-            Assert.False(ListHelper<Store,OwnerAppointment>.ContainsKey(Chumacher.StoresOwned,AbiAndHisSons));
+            Assert.False(ListHelper<string,OwnerAppointment>.ContainsKey(Bond.StoresOwned,AbiAndHisSons.storeName));
+            Assert.False(ListHelper<string,OwnerAppointment>.ContainsKey(Chumacher.StoresOwned,AbiAndHisSons.storeName));
 
         }
     }
