@@ -10,8 +10,7 @@ namespace eCommerce.Business
     {
         [NotMapped] //TODO is this field needed
         public List<Item> _aquiredItems { get; private set; }
-        private Dictionary<string, Item> _nameToAquiredItem { get; set; }
-        
+
         [Key] [ForeignKey("Store")]
         public string StoreId { get; private set; }
         public Store _belongsToStore { get; private set; }
@@ -21,7 +20,6 @@ namespace eCommerce.Business
         public ItemsInventory()
         {
             this._aquiredItems = new List<Item>();
-            this._nameToAquiredItem = new Dictionary<string, Item>();
         }
 
         public ItemsInventory(Store store)
@@ -29,20 +27,13 @@ namespace eCommerce.Business
             this._belongsToStore = store;
             this._itemsInStore = new List<Item>();
             this._aquiredItems = new List<Item>();
-            this._nameToAquiredItem = new Dictionary<string, Item>();
         }
 
-        public ItemsInventory(List<Item> itemsInStore, List<Item> aquiredItems, Store belongsToStore)
+        public ItemsInventory(List<Item> itemsInStore, Store belongsToStore)
         {
             _itemsInStore = itemsInStore;
-            _aquiredItems = aquiredItems;
-            _nameToAquiredItem = new Dictionary<string, Item>();
             _belongsToStore = belongsToStore;
-
-            foreach (var aquiredItem in aquiredItems)
-            {
-                _nameToAquiredItem.Add(aquiredItem._name, aquiredItem);
-            }
+            
         }
 
         //Searches
@@ -101,7 +92,7 @@ namespace eCommerce.Business
             var ans = user.HasPermission(this._belongsToStore, StorePermission.AddItemToStore);
             if(!ans.IsFailure)
             {
-                if (HasItem(itemInfo.name) || this._nameToAquiredItem.ContainsKey(itemInfo.name))
+                if (HasItem(itemInfo.name))
                 {
                     return Result.Fail("Item already exist in store");
                 } else if(itemInfo.pricePerUnit <= 0)

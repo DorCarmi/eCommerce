@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.DataLayer;
 
@@ -34,45 +35,22 @@ namespace eCommerce.Business
         public Transaction _performTransaction;
         
         [NotMapped]
-        public Dictionary<Store, Basket> _baskets;
-
-
-        public List<Pair<Store, Basket>> _basketsPairs
-        {
-            get
-            {
-                List<Pair<Store, Basket>> pairs = new List<Pair<Store, Basket>>();
-                foreach (var basketPair in _baskets)
-                {
-                    pairs.Add(new Pair<Store, Basket>(){HolderId = CardID,Key = basketPair.Key,KeyId = basketPair.Key.StoreName,Value = basketPair.Value});
-                }
-
-                return pairs;
-            }
-            set
-            {
-                foreach (var pair in value)
-                {
-                    if(!_baskets.ContainsKey(pair.Key))
-                    {
-                        _baskets.Add(pair.Key,pair.Value);
-                    }
-                }
-            }
-        }
+        //public Dictionary<Store, Basket> _baskets;
+        public List<Pair<Store, Basket>> _baskets;
+        
         
         private double _totalPrice;
 
         public Cart()
         {
-            _baskets = new Dictionary<Store, Basket>();
+            _baskets = new List<Pair<Store, Basket>>();
             _totalPrice = 0;
         }
 
         public Cart(User user)
         {
             this._cartHolder = user;
-            _baskets = new Dictionary<Store, Basket>();
+            _baskets = new List<Pair<Store, Basket>>();
             _totalPrice = 0;
             CartGuid = Guid.NewGuid();
         }
@@ -93,7 +71,7 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    if (!this._baskets.ContainsKey(storeRes.Value))
+                    if (!ListHelper<Store,Basket>.ContainsKey(_baskets,storeRes.Value))
                     {
                         if (storeRes.Value.TryAddNewCartToStore(this))
                         {
@@ -106,7 +84,7 @@ namespace eCommerce.Business
                             }
                             else
                             {
-                                this._baskets.Add(storeRes.Value,newBasket);
+                                ListHelper<Store,Basket>.Add(_baskets,this.CardID,storeRes.Value,storeRes.Value._storeName,newBasket);
                             }
                         }
                         else
@@ -116,7 +94,7 @@ namespace eCommerce.Business
 
                     }
 
-                    return this._baskets[storeRes.Value].AddItemToBasket(user, item);
+                    return  ListHelper<Store,Basket>.KeyToValue(_baskets,storeRes.Value).AddItemToBasket(user, item);
                 }
 
             }
@@ -137,9 +115,9 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    if (this._baskets.ContainsKey(storeRes.Value))
+                    if (ListHelper<Store,Basket>.ContainsKey(_baskets,storeRes.Value))
                     {
-                        return _baskets[storeRes.Value].EditItemInBasket(user, item);
+                        return  ListHelper<Store,Basket>.KeyToValue(_baskets,storeRes.Value).EditItemInBasket(user, item);
                     }
                     else
                     {
@@ -185,7 +163,7 @@ namespace eCommerce.Business
         }
         public List<Basket> GetBaskets()
         {
-            return this._baskets.Values.ToList();
+            return ListHelper<Store,Basket>.Values(_baskets);
         }
 
         public CartInfo GetCartInfo()

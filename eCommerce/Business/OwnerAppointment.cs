@@ -12,7 +12,7 @@ namespace eCommerce.Business
         public string Ownername { get; set; }
         public string OwnedStorename { get; set; }
         public User User { get; set; }
-        private ConcurrentDictionary<StorePermission,bool> _permissions;
+        private List<StorePermission> _permissions;
 
 
         //for ef
@@ -20,11 +20,11 @@ namespace eCommerce.Business
         {
             // we are able to simply re-assign all permissions to every owner loaded from DB,
             // because, until further notice, by definition all owners have every permission.
-            this._permissions = new ConcurrentDictionary<StorePermission, bool>();
+            this._permissions = new List<StorePermission>();
 
             foreach (var permission in Enum.GetValues(typeof(StorePermission)))
             {
-                _permissions.TryAdd((StorePermission)permission,true);
+                _permissions.Add((StorePermission)permission);
             }
         }
 
@@ -33,17 +33,17 @@ namespace eCommerce.Business
             this.User = user;
             this.Ownername = user.Username;
             this.OwnedStorename = storename;
-            this._permissions = new ConcurrentDictionary<StorePermission, bool>();
+            this._permissions = new List<StorePermission>();
 
             foreach (var permission in Enum.GetValues(typeof(StorePermission)))
             {
-                _permissions.TryAdd((StorePermission)permission,true);
+                _permissions.Add((StorePermission)permission);
             }
         }
 
         public Result HasPermission(StorePermission permission)
         {
-            if(_permissions.ContainsKey(permission))
+            if(_permissions.Contains(permission))
                 return Result.Ok();
             return Result.Fail("Owner does not have the required permission");
         }
