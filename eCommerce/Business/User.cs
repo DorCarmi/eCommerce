@@ -22,25 +22,13 @@ namespace eCommerce.Business
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Username { get; set; }
         
-        public MemberInfo MemberInfo
-        {
-            get
-            {
-                return _memberInfo;
-            }
-            set
-            {
-                _memberInfo = value;
-            }
-        }
-
+        public MemberInfo MemberInfo {get => _memberInfo; set =>_memberInfo = value; }
         [NotMapped]
         public Cart _myCart { get; private set; }
         
         
         private Object dataLock;
         //MemberData:
-        //private ConcurrentDictionary<Store, bool> _storesFounded;
         private List<Pair<Store, bool>> _storesFounded;
         private List<Pair<Store, OwnerAppointment>> _storesOwned;
         private List<Pair<Store, ManagerAppointment>> _storesManaged;
