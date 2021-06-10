@@ -32,7 +32,7 @@ namespace eCommerce
 
         public string GetData(string dataPath)
         {
-            return _config[dataPath];
+            return _config?[dataPath];
         }
 
         public void ThrowErrorOfData(string data, string state)

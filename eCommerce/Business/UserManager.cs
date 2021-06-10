@@ -375,11 +375,11 @@ namespace eCommerce.Business
             {
                 MemberInfo adminInfo = new MemberInfo(
                     adminUsername,
-                    adminPassword,
+                    adminEmail,
                     "TheAdmin",
                     DateTime.Now,
                     null);
-                AddAdmin(adminInfo, adminEmail);
+                AddAdmin(adminInfo, adminPassword);
             }
         }
 
