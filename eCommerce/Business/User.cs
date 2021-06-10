@@ -919,10 +919,15 @@ namespace eCommerce.Business
         {
             storesFoundedBackup = new List<Store>(_storesFounded.Keys);
             
-            storesOwnedBackup = new List<Pair<Store, OwnerAppointment>>();
             foreach (Store key in StoresOwned.Keys)
             {
-                storesOwnedBackup.Add(new Pair<Store, OwnerAppointment>(){Key = key,KeyId = key.StoreName, Value = StoresOwned[key], HolderId = this.Username});
+                /*if (storesOwnedBackup.Find(p => p.Key == key) == null)
+                {
+                    storesOwnedBackup.Add(new Pair<Store, OwnerAppointment>()
+                        {Key = key, KeyId = key.StoreName, Value = StoresOwned[key], HolderId = this.Username});
+                }*/
+                storesOwnedBackup.Add(new Pair<Store, OwnerAppointment>()
+                    {Key = key, KeyId = key.StoreName, Value = StoresOwned[key], HolderId = this.Username});
             }
 
             storesManagedBackup = new List<Pair<Store, ManagerAppointment>>();
@@ -933,10 +938,21 @@ namespace eCommerce.Business
                 storesManagedBackup.Add(new Pair<Store, ManagerAppointment>(){Key = key,KeyId = key.StoreName, Value = val, HolderId = this.Username});
             }
 
-            appointedOwnersBackup = new List<ListPair<Store,OwnerAppointment>>();
             foreach (Store key in AppointedOwners.Keys)
             {
-                appointedOwnersBackup.Add(new ListPair<Store, OwnerAppointment>(){Key = key,KeyId = key.StoreName, ValList = new List<OwnerAppointment>(AppointedOwners[key]), HolderId = this.Username});
+                /*if (appointedOwnersBackup.Find(p => p.Key == key) == null)
+                {
+                    appointedOwnersBackup.Add(new ListPair<Store, OwnerAppointment>()
+                    {
+                        Key = key, KeyId = key.StoreName, ValList = new List<OwnerAppointment>(AppointedOwners[key]),
+                        HolderId = this.Username
+                    });
+                }*/
+                appointedOwnersBackup.Add(new ListPair<Store, OwnerAppointment>()
+                {
+                    Key = key, KeyId = key.StoreName, ValList = new List<OwnerAppointment>(AppointedOwners[key]),
+                    HolderId = this.Username
+                });
             }
 
             appointedManagersBackup = new List<ListPair<Store,ManagerAppointment>>();
@@ -950,8 +966,6 @@ namespace eCommerce.Business
                 }
                 appointedManagersBackup.Add(new ListPair<Store, ManagerAppointment>(){Key = key,KeyId = key.StoreName, ValList = managers, HolderId = this.Username});
             }
-
-            
         }
     }
 

@@ -296,7 +296,7 @@ namespace eCommerce.Business
         }
         
         /// <summary>
-        /// GetDiscount the user
+        /// Get user
         /// </summary>
         /// <param name="username">The username</param>
         /// <returns>The user</returns>
