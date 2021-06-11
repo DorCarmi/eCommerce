@@ -282,9 +282,10 @@ namespace Tests.DataLayer
             Assert.True(res.Value.GetHashCode() == ja.GetHashCode());
         }
 
+        [Test]
         public void SaveStoreWithoutGuestCartTest()
         {
-            
+            Assert.Fail("Not Implemented");
         }
     }
 }

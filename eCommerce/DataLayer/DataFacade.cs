@@ -247,7 +247,7 @@ namespace eCommerce.DataLayer
                 store._ownersAppointments.Add(res.Value);
             }
 
-            var BasketsIds = store.basketsIds.Split(";");
+            var BasketsIds = store.basketsIds.Split(";",StringSplitOptions.RemoveEmptyEntries);
             store._basketsOfThisStore = new List<Basket>();
             foreach (var basketId in BasketsIds)
             {
