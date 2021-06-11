@@ -52,7 +52,7 @@ class Rule extends Component {
         if(this.state !== prevState && this.props.addRule) {
             // alert(ruleType)
             this.props.addRule((makeRuleInfo(parseInt(ruleType), whatIsTheRuleOf
-                , selectedItem, parseInt(selectedComperator))))
+                , selectedItem, parseInt(selectedComperator))),this.props.index)
         }
     }
 
