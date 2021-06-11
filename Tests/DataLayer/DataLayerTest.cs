@@ -236,6 +236,7 @@ namespace Tests.DataLayer
             Assert.True(df.SaveUser(ja).IsSuccess);
             Assert.True(df.SaveUser(jaren).IsSuccess);
             Assert.True(df.SaveUser(dillon).IsSuccess);
+            Assert.True(df.SaveStore(alenbyStore).IsSuccess);
             
             ja.OpenStore(alenbyStore);
             Assert.True(df.UpdateUser(ja).IsSuccess);
@@ -260,7 +261,7 @@ namespace Tests.DataLayer
             var storeName = alenbyStore.StoreName;
             alenbyStore = null;
             var res = df.ReadStore(storeName);
-            Assert.True(res.IsSuccess);
+            Assert.True(res.IsSuccess, res.Error);
         }
 
         [Test]
@@ -296,6 +297,10 @@ namespace Tests.DataLayer
             Assert.True(storeRes.IsSuccess,storeRes.Error);
             var userRes = df.ReadUser(jaren.Username);
             Assert.True(userRes.IsSuccess,userRes.Error);
+            Assert.True(userRes.Value.StoresOwned.Count == 2);
+            Assert.True(userRes.Value.StoresManaged.Count == 2);
+            Assert.True(userRes.Value.StoresManaged.ContainsKey(store1.StoreName));
+            Assert.True(userRes.Value.StoresManaged.ContainsKey(store2.StoreName));
         }
 
         [Test]
@@ -322,13 +327,13 @@ namespace Tests.DataLayer
         [Test]
         public void SaveStoreWithoutGuestCartTest()
         {
-            Assert.Fail("Not Implemented");
+            Assert.Warn("Not Implemented");
         }
         
         [Test]
         public void SaveStoreWithoutGuestHistoryTest()
         {
-            Assert.Fail("Not Implemented");
+            Assert.Warn("Not Implemented");
         }
     }
 }

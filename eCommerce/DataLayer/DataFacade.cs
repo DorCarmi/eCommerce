@@ -49,14 +49,13 @@ namespace eCommerce.DataLayer
             // synchronize all fields which arent compatible with EF (all dictionary properties)
 
 
-            Console.WriteLine("Inserting a new User");
             //using (var db = new ECommerceContext())
             {
                 try
                 {
                     db.Add(user);
 
-                    Console.WriteLine("Inserting a new User!!!");
+                    Console.WriteLine($"Inserting a new User - [{user.Username}]");
                     db.SaveChanges();
 
                 }
@@ -109,11 +108,9 @@ namespace eCommerce.DataLayer
                         .ThenInclude(p => p.Value)
                         .ThenInclude(o => o.User)
                         // // include inner Managed-Stores entities
-                        // .Include(u=> u.storesManagedBackup)
-                        // .ThenInclude(p => p.Key)
-                        // .Include(u=> u.storesManagedBackup)
-                        // .ThenInclude(p => p.Value)
-                        // .ThenInclude(m => m.User)
+                        .Include(u=> u.StoresManaged)
+                        .ThenInclude(p => p.Value)
+                        .ThenInclude(m => m.User)
                         // // include inner Appointed-Owners entities
                         // .Include(u=> u.appointedOwnersBackup)
                         // .ThenInclude(p => p.Key)

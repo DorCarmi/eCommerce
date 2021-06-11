@@ -50,9 +50,9 @@ namespace eCommerce.Business
         public Result<IList<string>> GetManagedStoreIds(User user)
         {
             List<string> storeIds = new List<string>();
-            foreach (var store in ListHelper<Store, ManagerAppointment>.Keys(user.StoresManaged))
+            foreach (var storename in user.StoresManaged.Keys())
             {
-                storeIds.Add(store.GetStoreName());
+                storeIds.Add(storename);
             }
 
             return Result.Ok<IList<string>>(storeIds);

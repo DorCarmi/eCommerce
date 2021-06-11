@@ -103,9 +103,9 @@ namespace eCommerce.DataLayer
     
     public class ListPair<K,V>
     {
-        // public string KeyId { get; set; }
         [Key]
         public Guid id { get; set; }
+        // public string KeyId { get; set; }
         public K Key { get; set; }
         public virtual List<V> ValList { get; set; }
         // public string HolderId { get; set; }
@@ -115,7 +115,7 @@ namespace eCommerce.DataLayer
     {
         public string KeyId { get; set; }
         [Key]
-        public Guid id { get; set; }
+        public Guid Id { get; set; }
         public K Key { get; set; }
         public V Value { get; set; }
         public string HolderId { get; set; }
