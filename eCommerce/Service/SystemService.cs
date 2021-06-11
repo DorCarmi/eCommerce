@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using eCommerce.Adapters;
 using eCommerce.Auth;
 using eCommerce.Business;
@@ -6,6 +7,7 @@ using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Statistics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace eCommerce.Service
@@ -126,6 +128,66 @@ namespace eCommerce.Service
             return statisticsService;
         }
 
+        public Result<Services> GetInstanceForTests(string configFile)
+        {
+            if (!File.Exists(configFile))
+            {
+                return Result.Fail<Services>("No config file");
+            }
+
+            IAuthService authService;
+            IUserService userService;
+            INStoreService inStoreService;
+            ICartService cartService;
+            IMarketFacade marketFacade;
+            
+            IConfigurationRoot config = new ConfigurationBuilder()
+                .AddJsonFile(configFile)
+                .Build();
+
+            string authKey = config["JWTKey"];
+            if (authKey == null)
+            {
+                return Result.Fail<Services>("Missing JWTKey in config");
+            }
+            
+            string memoryAs = config["Memory"];
+            switch (memoryAs)
+            {
+                case "InMemory":
+                {
+                    InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
+                    UserAuth UA = UserAuth.CreateInstanceForTests(RP, authKey);
+                    InMemoryStoreRepo SR = new InMemoryStoreRepo();
+                    IRepository<User> UR = new InMemoryRegisteredUsersRepository();
+                    marketFacade = MarketFacade.CreateInstanceForTests(UA,UR, SR);
+                    break;
+                }
+                case "Persistence":
+                {
+                    IRegisteredUserRepo RP = new PersistentRegisteredUserRepo();
+                    UserAuth UA = UserAuth.CreateInstanceForTests(RP, authKey);
+                    AbstractStoreRepo SR = new PersistenceStoreRepo();
+                    IRepository<User> UR = new PersistenceRegisteredUsersRepo();
+                    marketFacade = MarketFacade.CreateInstanceForTests(UA,UR, SR);
+                    break;   
+                }
+                default:
+                {
+                    return Result.Fail<Services>("Invalid value in config");
+                    break;
+                }
+            }
+
+            authService = AuthService.CreateUserServiceForTests(marketFacade);
+            userService = UserService.CreateUserServiceForTests(marketFacade);
+            inStoreService = InStoreService.CreateUserServiceForTests(marketFacade);
+            cartService = CartService.CreateUserServiceForTests(marketFacade);
+
+            return Result.Ok(new Services(authService, userService, inStoreService, cartService));
+
+        }
+        
         private void InitPaymentAdapter(AppConfig config)
         {
             string paymentAdapter = config.GetData("PaymentAdapter");

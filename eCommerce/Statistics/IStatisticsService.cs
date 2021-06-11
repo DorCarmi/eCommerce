@@ -3,7 +3,7 @@ using eCommerce.Common;
 
 namespace eCommerce.Statistics
 {
-    public interface IStatisticsService
+    public interface IStatisticsService : Brodcaster
     {
         
         /// <summary>
@@ -26,5 +26,7 @@ namespace eCommerce.Statistics
         /// <param name="date">The required date</param>
         /// <returns>The states for that date</returns>
         public Result<LoginDateStat> GetLoginStatsOn(DateTime date);
+        
+        
     }
 }

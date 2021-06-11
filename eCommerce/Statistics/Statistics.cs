@@ -8,16 +8,20 @@ namespace eCommerce.Statistics
     public class Statistics : IStatisticsService
     {
         private static Statistics _instance = new Statistics();
+        
         private StatsRepo _statsRepo;
+        private List<Reciver> _recivers;
 
         private Statistics()
         {
             _statsRepo = new InMemoryStatsRepo();
+            _recivers = new List<Reciver>();
         }
         
         private Statistics(StatsRepo statsRepo)
         {
             _statsRepo = statsRepo;
+            _recivers = new List<Reciver>();
         }
 
         public static Statistics GetInstance()
@@ -65,7 +69,17 @@ namespace eCommerce.Statistics
         public Result AddLoggedIn(DateTime dateTime, string username, string userType)
         {
             dateTime = dateTime.Date;
-            return _statsRepo.AddLoginStat(new LoginStat(dateTime, username, userType));
+            Result res = _statsRepo.AddLoginStat(new LoginStat(dateTime, username, userType));
+            if (res.IsSuccess && dateTime.Date.Equals(DateTime.Now.Date))
+            {
+                Result<int> resNumber = _statsRepo.GetNumberOfLoginStatsFrom(dateTime.Date, userType);
+                if (resNumber.IsSuccess)
+                {
+                    NotifyAll(userType, resNumber.Value);
+                }
+            }
+
+            return res;
         }
 
         public Result<LoginDateStat> GetLoginStatsOn(DateTime date)
@@ -94,6 +108,24 @@ namespace eCommerce.Statistics
             }
 
             return Result.Ok(new LoginDateStat(loginStats));
+        }
+
+        public void Register(Reciver reciver)
+        {
+            _recivers.Add(reciver);
+        }
+
+        public void UnRegister(Reciver reciver)
+        {
+            _recivers.Remove(reciver);
+        }
+
+        public void NotifyAll(string userType, int number)
+        {
+            foreach (var reciver in _recivers)
+            {
+                reciver.ReciveBrodcast(userType, number);
+            }
         }
     }
 }

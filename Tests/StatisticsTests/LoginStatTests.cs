@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using eCommerce.Common;
 using eCommerce.Statistics;
 using eCommerce.Statistics.Repositories;
@@ -13,6 +15,11 @@ namespace Tests.StatisticsTests
         private IStatisticsService _statisticsService;
         
         public LoginStatTests()
+        {
+        }
+
+        [SetUp]
+        public void SetUp()
         {
             _statisticsService = Statistics.GetInstanceForTests(new InMemoryStatsRepo());
         }
@@ -49,7 +56,23 @@ namespace Tests.StatisticsTests
                         break;
                 }
             }
+        }
+        
+        [Test]
+        [Order(3)]
+        public void ReciverTest() 
+        {
+            Assert.True(_statisticsService.AddLoggedIn(DateTime.Now, "_Guest1", "guest").IsSuccess);
+            Assert.True(_statisticsService.AddLoggedIn(DateTime.Now, "User1", "owner").IsSuccess);
 
+            MockReciver mockReciver = new MockReciver();
+            _statisticsService.Register(mockReciver);
+            
+            Assert.True(_statisticsService.AddLoggedIn(DateTime.Now, "User2", "owner").IsSuccess);
+            
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+            Assert.AreEqual(mockReciver.Loggins["owner"], 2);
+            Assert.True(mockReciver.NumberOfMessages["owner"] == 1);
         }
     }
 }
