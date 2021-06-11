@@ -18,6 +18,8 @@
         /// <summary>
         /// Initialize the system, must be called before system use.
         /// </summary>
-        public void InitSystem();
+        public bool InitSystem(string[] args);
+        
+        public void Start(string[] args);
     }
 }

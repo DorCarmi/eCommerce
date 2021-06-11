@@ -22,7 +22,7 @@ namespace Tests.Business.StoreTests
             Alice = new mokUser("Alice");
             item1 = new ItemInfo(50, "IPhone", "Alenby", "Tech", new List<string>(), 5000);
             item2 = new ItemInfo(50, "Dell6598", "Alenby", "Tech", new List<string>(), 10000);
-            MyStore = new mokStore("Alenby");
+            MyStore = new mokStore("Alenby", Alice);
             MyCart = new Cart(Alice);
             item1.AssignStoreToItem(MyStore);
             item2.AssignStoreToItem(MyStore);

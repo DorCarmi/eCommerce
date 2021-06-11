@@ -1,12 +1,13 @@
 ﻿{
   "InitWithData": true,
-
-  "Memory": "InMemory",
+  "InitDataFile": "Init.json",
+  
+  "Memory": "Persistence",
 
   "AdminCreationInfo" : {
-    "Username": "_Admin",
-    "Email": "Admin@eCommerce.com",
-    "Password": "_Admin"
+    "Username": "User1",
+    "Email": "User1@eCommerce.com",
+    "Password": "User1"
   },
 
   "DBConnectionString": "Server=localhost;DataBase=market;Trusted_Connection=True;",

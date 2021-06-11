@@ -27,9 +27,9 @@ namespace Tests.Business.UserTests
         public void Setup()
         {
             ja = new User(new MemberInfo("Ja Morant", "ja@mail.com", "Ja", DateTime.Now, "Memphis"));
-            store1= new mokStore("BasketBall stuff.. buy here");
+            store1= new mokStore("BasketBall stuff.. buy here", ja);
             tempguy = new User("10-Day-Contract guy");
-            store2 = new mokStore("More(!) BasketBall stuff.. buy here");
+            store2 = new mokStore("More(!) BasketBall stuff.. buy here", ja);
             jaren = new User(new MemberInfo("Jaren Jackson Jr.", "jjj@mail.com", "Jaren", DateTime.Now, "Memphis"));
             GM = new User(Admin.State,new MemberInfo("GM", "gm@mail.com", "GM", DateTime.Now, "Memphis"));
             dillon = new User(new MemberInfo("Dillon Brooks","db@mail.com","Dillon",DateTime.Now, "Memphis"));
@@ -54,8 +54,8 @@ namespace Tests.Business.UserTests
         [Test]
         public void TestOpenStore_Concurrent()
         {
-            var store3 = new mokStore("New Location(!) BasketBall stuff.. buy here");
-            var store4 = new mokStore("Old Location Again(!) BasketBall stuff.. buy here");
+            var store3 = new mokStore("New Location(!) BasketBall stuff.. buy here", ja);
+            var store4 = new mokStore("Old Location Again(!) BasketBall stuff.. buy here", ja);
             Task<Result> task1 = new Task<Result>(() => { return jaren.OpenStore(store2); });
             Task<Result> task2 = new Task<Result>(() => { return jaren.OpenStore(store2); });
             task1.Start();
@@ -307,7 +307,7 @@ namespace Tests.Business.UserTests
             var Chumacher = new User(new MemberInfo("Chumacher", "c@a.com", "Chu", DateTime.Now, "TLV"));
             
             //A->B
-            var AbiAndHisSons= new mokStore("AbiAndHisSons");
+            var AbiAndHisSons= new mokStore("AbiAndHisSons", Abraham);
             var openStoreRes=Abraham.OpenStore(AbiAndHisSons);
             Assert.True(openStoreRes.IsSuccess,openStoreRes.Error);
             var resNominateBond=Abraham.AppointUserToOwner(AbiAndHisSons, Bond);

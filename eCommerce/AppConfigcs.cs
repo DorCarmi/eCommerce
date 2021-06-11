@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 
 namespace eCommerce
@@ -19,10 +20,22 @@ namespace eCommerce
         {
             return _instance;
         }
+        
+        public bool Init(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return false;
+            }
+            _config = new ConfigurationBuilder()
+                .AddJsonFile(filePath)
+                .Build();
+            return true;
+        }
 
         public string GetData(string dataPath)
         {
-            return _config[dataPath];
+            return _config?[dataPath];
         }
 
         public void ThrowErrorOfData(string data, string state)
