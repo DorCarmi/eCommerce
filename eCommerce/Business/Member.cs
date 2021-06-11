@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.Statistics;
 
@@ -38,7 +38,7 @@ namespace eCommerce.Business
         public Result<List<string>> GetStoreIds(User user)
         {
             List<string> storeIds = new List<string>();
-            foreach (var store in user.StoresOwned.Keys)
+            foreach (var store in ListHelper<Store, OwnerAppointment>.Keys(user.StoresOwned))
             {
                 storeIds.Add(store.GetStoreName());
             }
@@ -49,7 +49,7 @@ namespace eCommerce.Business
         public Result<IList<string>> GetManagedStoreIds(User user)
         {
             List<string> storeIds = new List<string>();
-            foreach (var store in user.StoresManaged.Keys)
+            foreach (var store in ListHelper<Store, ManagerAppointment>.Keys(user.StoresManaged))
             {
                 storeIds.Add(store.GetStoreName());
             }

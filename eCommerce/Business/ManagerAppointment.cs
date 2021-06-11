@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
+using eCommerce.DataLayer;
 
 namespace eCommerce.Business
 {
@@ -11,7 +13,8 @@ namespace eCommerce.Business
         public string Managername { get; set; }
         public string ManagedStorename { get; set; }
         public User User { get; set; }
-        private ConcurrentDictionary<StorePermission, bool> _permissions;
+        //private ConcurrentDictionary<StorePermission, bool> _permissions;
+        private List<StorePermission> _permissions;
         private static readonly  IList<StorePermission> BaseManagerPermissions = ImmutableList.Create(new StorePermission[] 
             {StorePermission.ViewStaffPermission});
 
@@ -20,31 +23,36 @@ namespace eCommerce.Business
             this.User = user;
             this.Managername = user.Username;
             this.ManagedStorename = storename;
-            this._permissions = new ConcurrentDictionary<StorePermission, bool>();
+            this._permissions = new List<StorePermission>();
             foreach (StorePermission permission in BaseManagerPermissions)
             {
-                _permissions.TryAdd(permission, true);
+                _permissions.Add(permission);
             }
         }
         
         public Result AddPermissions(StorePermission permission)
         {
-            if(_permissions.TryAdd(permission, true))
-                return Result.Ok();
-            return Result.Fail("Manager already has permission");
+            _permissions.Add(permission);
+            return Result.Ok();
         }
         
         public Result RemovePermission(StorePermission permission)
         {
             bool btrue;
-            if (_permissions.TryRemove(permission, out btrue))
+            btrue=_permissions.Remove(permission);
+            if (btrue)
+            {
                 return Result.Ok();
-            return Result.Fail("Manager does not have the given permission");
+            }
+            else
+            {
+                return Result.Fail("Manager does not have the given permission");
+            }
         }
 
         public Result HasPermission(StorePermission permission)
         {
-            if(_permissions.ContainsKey(permission))
+            if(_permissions.Contains(permission))
                 return Result.Ok();
             return Result.Fail("Manager does not have the required permission");
         }
@@ -52,15 +60,15 @@ namespace eCommerce.Business
         public Result UpdatePermissions(IList<StorePermission> permissions)
         {
             bool res = false;
-            var newPermissions = new ConcurrentDictionary<StorePermission, bool>();
+            var newPermissions = new List<StorePermission>();
             foreach (var permission in permissions)
             {
-                newPermissions.TryAdd(permission,true);
+                newPermissions.Add(permission);
             }
             //@TODO::sharon check if should add BaseManagerPermissions as well?  
             foreach (var permission in BaseManagerPermissions)
             {
-                newPermissions.TryAdd(permission,true);
+                newPermissions.Add(permission);
             }
             this._permissions = newPermissions;
             return Result.Ok();
@@ -68,7 +76,7 @@ namespace eCommerce.Business
 
         public List<StorePermission> GetAllPermissions()
         {
-            return _permissions.Keys.ToList();
+            return _permissions.ToList();
         }
 
 
@@ -76,13 +84,13 @@ namespace eCommerce.Business
         public virtual string permissionsString { get; set;}
         public ManagerAppointment()
         {
-            this._permissions = new ConcurrentDictionary<StorePermission, bool>();
+            this._permissions = new List<StorePermission>();
             this.permissionsString = "";
         }
 
          public void syncFromDict()
         {
-            permissionsString = string.Join(";", _permissions.Keys.Select(p => (int)p));
+            permissionsString = string.Join(";", _permissions.Select(p => (int)p));
         }
          
          
@@ -91,7 +99,7 @@ namespace eCommerce.Business
             string[] list = permissionsString.Split(";");
             foreach (string p in list)
             {
-                _permissions.TryAdd((StorePermission)int.Parse(p), true);
+                _permissions.Add((StorePermission)int.Parse(p));
             }
         }
 
