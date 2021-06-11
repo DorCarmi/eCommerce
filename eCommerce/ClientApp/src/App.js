@@ -29,12 +29,13 @@ import {makeRuleInfo, makeRuleNodeComposite, makeRuleNodeLeaf, RuleType} from ".
 import {Comperators} from "./Data/StorePolicies/Comperators";
 import {Combinations} from "./Data/StorePolicies/Combinations";
 import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "./Data/StorePolicies/DiscountInfoTree";
-import AddPolicy from "./components/AddPolicy";
 import AddRule from "./components/AddRule";
 import {AppointOwner} from "./components/AppointOwner";
 import {ShowStatsInput} from "./components/ShowStatsInput";
 import ShowStatsOutput from "./components/ShowStatsOutput";
-import CombineRule from "./components/CombineRules";
+import AddDiscount from "./components/AddDiscount";
+import {RemoveManager} from "./components/RemoveManager";
+import {RemoveOwner} from "./components/RemoveOwner";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -246,10 +247,10 @@ export default class App extends Component {
                     <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
                     <Route exact path="/purchaseHistory/:storeId?/:userId?/:isAdmin?" render={({match}) => <PurchaseHistory storeId ={match.params.storeId} userId={match.params.userId} isAdmin={match.params.isAdmin}/>} />
                     <Route exact path="/AdminPurchaseHistory/:term" render={({match}) => <AdminPurchaseHistory term={match.params.term}/>}/>
-                    <Route exact path="/addPolicy/:storeId" render={({match}) => <AddPolicy storeId={match.params.storeId}/>}/>
+                    <Route exact path="/addPolicy/:storeId" render={({match}) => <AddDiscount storeId={match.params.storeId}/>}/>
 
 
-                    <Route exact path="/addRule/:storeId" render={({match}) => <CombineRule storeId={match.params.storeId}/>}/>
+                    <Route exact path="/addRule/:storeId" render={({match}) => <AddRule storeId={match.params.storeId}/>}/>
 
                     <Route exact path="/searchItems/Item/:query" render={({match}) => <ItemSearchDisplay itemQuery={match.params.query}  />} />
                     <Route exact path="/searchItems/Store/:query" render={({match}) => <Store  storeId={match.params.query}/>} />
@@ -263,7 +264,10 @@ export default class App extends Component {
                     <Route exact path="/showStats" render={({match}) => <ShowStatsInput storeId ={match.params.storeId}/>}/>
 
                     <Route exact path="/showStats/:date" render={({match}) => <ShowStatsOutput date ={match.params.date}/>}/>
+                    
+                    <Route exact path="/removeManager/:storeId" render={({match}) => <RemoveManager storeId ={match.params.storeId}/>}/>
 
+                    <Route exact path="/removeOwner/:storeId" render={({match}) => <RemoveOwner storeId ={match.params.storeId}/>}/>
 
 
                 </Layout>
