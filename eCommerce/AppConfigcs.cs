@@ -11,6 +11,9 @@ namespace eCommerce
         private IConfigurationRoot _config;
         private AppConfig()
         {
+            _config = new ConfigurationBuilder()
+                .AddJsonFile("appConfig.json")
+                .Build();
         }
 
         public static AppConfig GetInstance()
