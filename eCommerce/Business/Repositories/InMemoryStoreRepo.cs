@@ -43,16 +43,17 @@ namespace eCommerce.Business.Repositories
 
         public override IEnumerable<ItemInfo> SearchForItem(string query)
         {
-            IList<ItemInfo> queryMatches = new List<ItemInfo>();
+
+            SortedList<int, ItemInfo> list = new SortedList<int, ItemInfo>();
             foreach (var store in _stores.Values)
             {
-                foreach (var item in store.SearchItem(query))
+                foreach (var item in store.GetAllItems())
                 {
-                    queryMatches.Add(item.ShowItem());
+                    list.Add(EditDistance(query, item._name), item.ShowItem());
                 }
             }
-
-            return queryMatches;
+            
+            return list.Values;
         }
         
         public override IEnumerable<ItemInfo> SearchForItemByPrice(string query, double from, double to)
