@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business.Discounts;
@@ -140,6 +138,7 @@ namespace eCommerce.Business
             }
 
             _logger.Info($"User {user.Username} request purchase history");
+            //TODO save
             return result;
         }
         
@@ -154,6 +153,8 @@ namespace eCommerce.Business
             User user = userAndStoreRes.Value.Item1;
             Store store = userAndStoreRes.Value.Item2;
             
+            _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
+            
             Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
             if (appointedUserRes.IsFailure)
             {
@@ -161,8 +162,14 @@ namespace eCommerce.Business
             }
             User appointedUser = appointedUserRes.Value;
 
-            _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
-            return user.AppointUserToOwner(store, appointedUser);
+            Result appointmentRes = user.AppointUserToOwner(store, appointedUser);
+            if (appointmentRes.IsSuccess)
+            {
+                _userManager.UpdateUser(user);
+                _userManager.UpdateUser(appointedUser);
+            }
+
+            return appointmentRes;
         }
         
         public Result RemoveCoOwner(string token, string storeId, string appointedUserId)
@@ -207,8 +214,15 @@ namespace eCommerce.Business
                 return appointedUserRes;
             }
             User appointedUser = appointedUserRes.Value;
+            
+            Result appointmentRes = user.AppointUserToManager(store, appointedUser);
+            if (appointmentRes.IsSuccess)
+            {
+                _userManager.UpdateUser(user);
+                _userManager.UpdateUser(appointedUser);
+            }
 
-            return user.AppointUserToManager(store, appointedUser);
+            return appointmentRes;
         }
         
         public Result RemoveManager(string token, string storeId, string appointedUserId)
@@ -265,7 +279,14 @@ namespace eCommerce.Business
                 return mangerUserRes;
             }
             User managerUser = mangerUserRes.Value;
-            return user.UpdatePermissionsToManager(store, managerUser, permissions);
+            Result updateRes = user.UpdatePermissionsToManager(store, managerUser, permissions);
+            if (updateRes.IsSuccess)
+            {
+                //TODO maybe update the user
+                _userManager.UpdateUser(managerUser);
+            }
+
+            return updateRes;
         }
         
         //<CNAME>RemoveManagerPermissions</CNAME>
@@ -518,7 +539,7 @@ namespace eCommerce.Business
             }
             var newItemInfo = itemRes.Value.ShowItem();
             newItemInfo.amount = amount;
-            //newItemInfo.AssignStoreToItem(store);
+            //TODO save
             return user.AddItemToCart(newItemInfo);
         }
 
@@ -542,6 +563,7 @@ namespace eCommerce.Business
             }
             var editedItemInfo = itemRes.Value.ShowItem();
             editedItemInfo.amount = amount;
+            //TODO save
             return user.EditCart(editedItemInfo);
         }
         
@@ -610,6 +632,7 @@ namespace eCommerce.Business
                 return purchaseRes;
             }
 
+            //TODO save
             return Result.Ok();
         }
         
@@ -655,7 +678,13 @@ namespace eCommerce.Business
 
             _logger.Info($"AddNewItemToStore({user.Username} ,{item})");
 
-            return store.AddItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
+            Result addItemRes = store.AddItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
+            if (addItemRes.IsSuccess)
+            {
+                _storeRepo.Update(store);
+            }
+
+            return addItemRes;
         }
         
         //<CNAME>ItemsInStore</CNAME>

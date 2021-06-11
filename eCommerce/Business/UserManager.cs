@@ -296,7 +296,7 @@ namespace eCommerce.Business
         }
         
         /// <summary>
-        /// GetDiscount the user
+        /// Get user
         /// </summary>
         /// <param name="username">The username</param>
         /// <returns>The user</returns>
@@ -362,16 +362,24 @@ namespace eCommerce.Business
             AppConfig config = AppConfig.GetInstance();
             string adminUsername = config.GetData("AdminCreationInfo:Username");
             string adminPassword = config.GetData("AdminCreationInfo:Password");
+            string adminEmail = config.GetData("AdminCreationInfo:Email");
+
+            if (adminUsername == null | adminPassword == null | adminEmail == null)
+            {
+                adminUsername = "_Admin";
+                adminPassword = "_Admin";
+                adminEmail = "_Admin@eCommernce.com";
+            }
 
             if (_auth.Authenticate(adminUsername, adminPassword).Result.IsFailure)
             {
                 MemberInfo adminInfo = new MemberInfo(
-                    config.GetData("AdminCreationInfo:Username"),
-                    config.GetData("AdminCreationInfo:Email"),
+                    adminUsername,
+                    adminEmail,
                     "TheAdmin",
                     DateTime.Now,
                     null);
-                AddAdmin(adminInfo, config.GetData("AdminCreationInfo:Password"));
+                AddAdmin(adminInfo, adminPassword);
             }
         }
 

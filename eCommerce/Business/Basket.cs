@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using eCommerce.Business.Repositories;
 using eCommerce.Common;
 using eCommerce.DataLayer;
 
@@ -29,17 +30,19 @@ namespace eCommerce.Business
             }
         }
         public virtual List<ItemInfo> _itemsInBasket { get; set; }
-        private IDictionary<string, ItemInfo> _nameToItem;
+        //private IDictionary<string, ItemInfo> _nameToItem;
+        private List<Pair<string, ItemInfo>> _nameToItem;
+        
 
         private List<Pair<string, ItemInfo>> _nameToItemPairs
         {
             get
             {
                 List<Pair<string, ItemInfo>> items = new List<Pair<string, ItemInfo>>();
-                foreach (var itemKey in _nameToItem.Keys)  
+                foreach (var itemKey in ListHelper<string,ItemInfo>.Keys(_nameToItem))  
                 {
                     
-                    items.Add(new Pair<string, ItemInfo>(){HolderId = BasketID,Key = itemKey,KeyId = itemKey,Value = _nameToItem[itemKey]});
+                    items.Add(new Pair<string, ItemInfo>(){HolderId = BasketID,Key = itemKey,KeyId = itemKey,Value = ListHelper<string,ItemInfo>.KeyToValue(_nameToItem,itemKey)});
                 }
 
                 return items;
@@ -48,9 +51,9 @@ namespace eCommerce.Business
             {
                 foreach (var pair in value)
                 {
-                    if (!_nameToItem.ContainsKey(pair.Key))
+                    if (!ListHelper<string,ItemInfo>.ContainsKey(_nameToItem,pair.Key))
                     {
-                        this._nameToItem.Add(pair.Key,pair.Value);
+                        ListHelper<string,ItemInfo>.Add(_nameToItem,this.BasketID,pair.Key,pair.Key ,pair.Value);
                     }
                 }
 
@@ -99,7 +102,7 @@ namespace eCommerce.Business
         //Constructor
         public Basket()
         {
-            this._nameToItem = new Dictionary<string, ItemInfo>();
+            this._nameToItem = new List<Pair<string, ItemInfo>>();
         }
         public Basket(Cart cart, Store store)
         {
@@ -110,7 +113,7 @@ namespace eCommerce.Business
                 this._cart = cart;
                 this._store = store;
                 this._itemsInBasket = new List<ItemInfo>();
-                this._nameToItem = new Dictionary<string, ItemInfo>();
+                this._nameToItem = new List<Pair<string, ItemInfo>>();
                 this.currentPrice = 0;
             }
             else
@@ -147,15 +150,15 @@ namespace eCommerce.Business
                 return itemRes;
             }
             
-            else if (this._nameToItem.ContainsKey(item.name))
+            else if (ListHelper<string,ItemInfo>.ContainsKey(_nameToItem,item.name))
             {
-                this._nameToItem[item.name].amount += item.amount;
+                ListHelper<string,ItemInfo>.KeyToValue(_nameToItem,item.name).amount += item.amount;
                 this.currentPrice = this.GetRegularTotalPrice();
                 return Result.Ok();
             }
             else
             {
-                this._nameToItem.Add(item.name,new ItemInfo(item));
+                ListHelper<string,ItemInfo>.Add(_nameToItem,this.BasketID,item.name,item.name,new ItemInfo(item));
                 this._itemsInBasket.Add(item);
                 this.currentPrice = this.GetRegularTotalPrice();
                 return Result.Ok();
@@ -168,11 +171,11 @@ namespace eCommerce.Business
             {
                 return Result.Fail("User is not cart holder, can't perform changes to cart");
             }
-            if (this._nameToItem.ContainsKey(item.name))
+            if (ListHelper<string,ItemInfo>.ContainsKey(_nameToItem,item.name))
             {
                 if (item.amount == -1 || item.amount == 0)
                 {
-                    this._nameToItem.Remove(item.name);
+                    ListHelper<string,ItemInfo>.Remove(_nameToItem,item.name);
                     this.currentPrice = this.GetRegularTotalPrice();
                     return Result.Ok();
                 }
@@ -186,7 +189,7 @@ namespace eCommerce.Business
                 }
                 else
                 {
-                    this._nameToItem[item.name].amount = item.amount;
+                    ListHelper<string,ItemInfo>.KeyToValue(_nameToItem,item.name).amount = item.amount;
                     this.currentPrice = this.GetRegularTotalPrice();
                     return Result.Ok();
                 }
@@ -249,9 +252,9 @@ namespace eCommerce.Business
             {
                 return Result.Fail<ItemInfo>("User is not cart holder, can't perform changes to cart");
             }
-            if (this._nameToItem.ContainsKey(itemName))
+            if (ListHelper<string,ItemInfo>.ContainsKey(_nameToItem,itemName))
             {
-                return Result.Ok(_nameToItem[itemName]);
+                return Result.Ok(ListHelper<string,ItemInfo>.KeyToValue(_nameToItem,itemName));
             }
             else
             {
