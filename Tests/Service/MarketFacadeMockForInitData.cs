@@ -142,6 +142,11 @@ namespace Tests.Service
             throw new NotImplementedException();
         }
 
+        public Result AskToBidOnItem(string token, string productId, string storeId, int amount, double newPrice)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount)
         {
             throw new NotImplementedException();
@@ -213,6 +218,16 @@ namespace Tests.Service
         }
 
         public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<List<BidInfo>> GetAllBidsWaitingToApprove(string token, string storeId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result ApproveOrDisapproveBid(string token, string storeId, string BidID, bool shouldApprove)
         {
             throw new NotImplementedException();
         }

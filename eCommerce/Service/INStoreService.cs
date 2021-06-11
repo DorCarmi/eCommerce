@@ -165,5 +165,33 @@ namespace eCommerce.Service
         /// <param name="discountNode">The discount: Leaf (simple) or Composite (Combined)</param>
         public Result AddDiscountToStore(string token, string storeId, SDiscountNode discountNode);
         
+        /// <summary>
+        /// Ask To Bid On Item
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="productId">The item id</param>
+        /// <param name="storeId">The store id</param>
+        /// <param name="amount">The amount of the item</param>
+        /// <param name="newPrice">New price to offer</param>
+        /// <returns>Result of the request</returns>
+        public Result AskToBidOnItem(string token, string productId, string storeId, int amount, double newPrice);
+
+        /// <summary>
+        /// Return all the bids waiting for owner to approve
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <returns>List of all bids infos of bids waiting for the user (owner) to approve or not</returns>
+        Result<List<BidInfo>> GetAllBidsWaitingToApprove(string value, string store);
+        
+        /// <summary>
+        /// Approves or disapproves the bid
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <param name="BidID">The bid id to approve or not</param>
+        /// <param name="shouldApprove">true to approve the bid and false to disapprove</param>
+        /// <returns>Result for if the process succeeded or not</returns>
+        Result ApproveOrDisapproveBid(string value, string store, string bidId, bool b);
     }
 }
