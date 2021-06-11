@@ -202,15 +202,15 @@ namespace eCommerce.DataLayer
             {
                 store = db.Stores
                     .Where(s => s._storeName == storename)
-                    //Include Transaction-history and every sub property
-                    // .Include(s => s._transactionHistory)
-                    //     .ThenInclude(th => th.History)
-                    //         .ThenInclude(pr => pr.BasketInfo)
-                    //             .ThenInclude(bi => bi._itemsInBasket)
-                    //                 .ThenInclude(i => i._store)
-                    // .Include(u => u._transactionHistory)
-                    //     .ThenInclude(h => h.History)
-                    //         .ThenInclude(pr => pr.StoreInfo)
+                    // Include Transaction-history and every sub property
+                     .Include(s => s._transactionHistory)
+                         .ThenInclude(th => th._history)
+                             .ThenInclude(pr => pr.BasketInfo)
+                                 .ThenInclude(bi => bi.ItemsInBasket)
+                                     .ThenInclude(i => i._store)
+                     .Include(u => u._transactionHistory)
+                         .ThenInclude(h => h._history)
+                             .ThenInclude(pr => pr.StoreInfo)
                     // //Include Item-Inventory and every sub property
                     // .Include(s => s._inventory)
                     // //Include Founder and every sub property

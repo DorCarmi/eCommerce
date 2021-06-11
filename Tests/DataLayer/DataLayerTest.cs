@@ -227,7 +227,7 @@ namespace Tests.DataLayer
             var storename = alenbyStore.StoreName;
             var storeRes = df.ReadStore(storename);
             Assert.True(storeRes.IsSuccess);
-            // Assert.True(storeRes.Value._transactionHistory.History.Count == 1);
+            Assert.True(storeRes.Value._transactionHistory._history.Count == 1);
         }
 
         [Test]
@@ -318,8 +318,15 @@ namespace Tests.DataLayer
             Assert.True(res.Value.GetHashCode() == ja.GetHashCode());
         }
 
+        
         [Test]
         public void SaveStoreWithoutGuestCartTest()
+        {
+            Assert.Fail("Not Implemented");
+        }
+        
+        [Test]
+        public void SaveStoreWithoutGuestHistoryTest()
         {
             Assert.Fail("Not Implemented");
         }

@@ -29,7 +29,7 @@ namespace eCommerce.Business
         private PurchasePolicy _myPurchasePolicy;
         
         //History and inventory
-        private StoreTransactionHistory _transactionHistory;
+        public StoreTransactionHistory _transactionHistory { get; set; }
         public ItemsInventory _inventory { get; private set; }
 
         //User issues
@@ -467,7 +467,7 @@ namespace eCommerce.Business
 
         public virtual Result EnterBasketToHistory(IBasket basket)
         {
-            return this._transactionHistory.AddRecordToHistory(basket);
+            return this._transactionHistory.AddRecordToHistory(this, basket);
         }
 
         public virtual string GetStoreName()
@@ -650,7 +650,7 @@ namespace eCommerce.Business
 
         public virtual Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
         {
-            var purchaseRecord=this._transactionHistory.AddRecordToHistory(basket);
+            var purchaseRecord=this._transactionHistory.AddRecordToHistory(this, basket);
 
             foreach (var ownerAppointment in _ownersAppointments)
             {
