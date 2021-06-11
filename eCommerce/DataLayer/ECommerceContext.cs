@@ -107,7 +107,7 @@ namespace eCommerce.DataLayer
         public Guid id { get; set; }
         // public string KeyId { get; set; }
         public K Key { get; set; }
-        public virtual List<V> ValList { get; set; }
+        public virtual IList<V> ValList { get; set; }
         // public string HolderId { get; set; }
     }
     

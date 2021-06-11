@@ -34,11 +34,11 @@ namespace eCommerce.Business
             }
         }
         
-        public List<List<V>> Values()
+        public List<IList<V>> Values()
         {
             lock (_list)
             {
-                List<List<V>> vals = new List<List<V>>();
+                List<IList<V>> vals = new List<IList<V>>();
                 foreach (var pair in _list)
                 {
                     vals.Add(pair.ValList);
@@ -64,7 +64,7 @@ namespace eCommerce.Business
             }
         }
 
-        public List<V> KeyToValue(K key)
+        public IList<V> KeyToValue(K key)
         {
             lock (_list)
             {
@@ -80,7 +80,7 @@ namespace eCommerce.Business
             }
         }
 
-        public void Add(string HolderID,K pairKey,string KeyID, List<V> pairValue)
+        public void Add(K pairKey,List<V> pairValue)
         {
             lock (_list)
             {
@@ -106,7 +106,7 @@ namespace eCommerce.Business
         }
         
         
-        public bool TryAdd(string HolderID,K pairKey,string KeyID, List<V> pairValue)
+        public bool TryAdd(K pairKey,IList<V> pairValue)
         {
             lock (_list)
             {

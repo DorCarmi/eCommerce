@@ -19,6 +19,8 @@ namespace Tests.DataLayer
         private User dillon;
         private Store store1;
         private Store store2;
+        private Store store3;
+        private Store store4;
         private Store alenbyStore;
        
         public DataLayerTest()
@@ -45,6 +47,8 @@ namespace Tests.DataLayer
             dillon = new User(info3);
             store1= new Store("BasketBall stuff.. buy here",ja);
             store2= new Store("More(!) BasketBall stuff.. buy here",ja);
+            store3= new Store("EVEN MORE!! BasketBall stuff.. buy here",ja);
+            store4= new Store("ok we had too much BasketBall stuff.. buy here",ja);
             alenbyStore= new Store("this is the store in alenby.. buy here",ja);
 
             //clear DB
@@ -69,24 +73,30 @@ namespace Tests.DataLayer
         
         
         [Test]
-        public void SaveUserWithStoreTest_Success()
+        public void SaveUserWithStoreTest()
         {
             Assert.True(df.SaveUser(ja).IsSuccess);
-            var store3= new Store("EVEN MORE!! BasketBall stuff.. buy here",ja);
-            var store4= new Store("ok we had too much BasketBall stuff.. buy here",ja);
+            Assert.True(df.SaveUser(jaren).IsSuccess);
+            Assert.True(df.SaveStore(store1).IsSuccess);
+            Assert.True(df.SaveStore(store2).IsSuccess);
+            Assert.True(df.SaveStore(store3).IsSuccess);
+            Assert.True(df.SaveStore(store4).IsSuccess);
+
             ja.OpenStore(store1);
             ja.OpenStore(store2);
             ja.OpenStore(store3);
             ja.OpenStore(store4);
-            Assert.True(df.SaveUser(jaren).IsSuccess);
             ja.AppointUserToManager(store1,jaren);
             ja.AppointUserToManager(store2,jaren);
             ja.AppointUserToOwner(store3, jaren);
             ja.AppointUserToOwner(store4, jaren);
             var prems = new List<StorePermission>() {StorePermission.ChangeItemPrice, StorePermission.ControlStaffPermission, StorePermission.EditStorePolicy, StorePermission.AddItemToStore};
             ja.UpdatePermissionsToManager(store2,jaren, prems);
+           
             Assert.True(df.UpdateUser(ja).IsSuccess);
             Assert.True(df.UpdateUser(jaren).IsSuccess);
+            Assert.True(df.UpdateStore(store1).IsSuccess);
+            Assert.True(df.UpdateStore(store3).IsSuccess);
         }
 
         [Test]
@@ -119,7 +129,7 @@ namespace Tests.DataLayer
         [Test]
         public void ReadUserWithStoreTest()
         {
-            SaveUserWithStoreTest_Success();
+            SaveUserWithStoreTest();
             Assert.True(df.ResetConnection().IsSuccess);
             var username = jaren.Username;
             var res = df.ReadUser(username);
@@ -265,42 +275,27 @@ namespace Tests.DataLayer
         }
 
         [Test]
-        public void ReadStoreTest()
+        public void TheReadStoreTest()
         {
-            Assert.True(df.SaveUser(ja).IsSuccess);
-            Assert.True(df.SaveUser(jaren).IsSuccess);
-            var store3= new Store("EVEN MORE!! BasketBall stuff.. buy here",ja);
-            var store4= new Store("ok we had too much BasketBall stuff.. buy here",ja);
-            
-            Assert.True(df.SaveStore(store1).IsSuccess);
-            Assert.True(df.SaveStore(store2).IsSuccess);
-            Assert.True(df.SaveStore(store3).IsSuccess);
-            Assert.True(df.SaveStore(store4).IsSuccess);
-
-            ja.OpenStore(store1);
-            ja.OpenStore(store2);
-            ja.OpenStore(store3);
-            ja.OpenStore(store4);
-            ja.AppointUserToManager(store1,jaren);
-            ja.AppointUserToManager(store2,jaren);
-            ja.AppointUserToOwner(store3, jaren);
-            ja.AppointUserToOwner(store4, jaren);
-            var prems = new List<StorePermission>() {StorePermission.ChangeItemPrice, StorePermission.ControlStaffPermission, StorePermission.EditStorePolicy, StorePermission.AddItemToStore};
-            ja.UpdatePermissionsToManager(store2,jaren, prems);
-           
-            Assert.True(df.UpdateUser(ja).IsSuccess);
-            Assert.True(df.UpdateUser(jaren).IsSuccess);
-            Assert.True(df.UpdateStore(store3).IsSuccess);
-
+            SaveUserWithStoreTest();
             Assert.True(df.ResetConnection().IsSuccess);
             var storeRes = df.ReadStore(store3.StoreName);
             Assert.True(storeRes.IsSuccess,storeRes.Error);
             var userRes = df.ReadUser(jaren.Username);
             Assert.True(userRes.IsSuccess,userRes.Error);
             Assert.True(userRes.Value.StoresOwned.Count == 2);
+            Assert.True(userRes.Value.StoresOwned.ContainsKey(store3.StoreName));
+            Assert.True(userRes.Value.StoresOwned.ContainsKey(store4.StoreName));
             Assert.True(userRes.Value.StoresManaged.Count == 2);
             Assert.True(userRes.Value.StoresManaged.ContainsKey(store1.StoreName));
             Assert.True(userRes.Value.StoresManaged.ContainsKey(store2.StoreName));
+            userRes = df.ReadUser(ja.Username);
+            Assert.True(userRes.IsSuccess,userRes.Error);
+            Assert.True(userRes.Value.AppointedOwners.Count == 2);
+            Assert.True(userRes.Value.AppointedOwners.ContainsKey(store3.StoreName));
+            Assert.True(userRes.Value.AppointedOwners.KeyToValue(store3.StoreName).Count == 1);
+            Assert.True(userRes.Value.AppointedOwners.ContainsKey(store4.StoreName));
+            Assert.True(userRes.Value.AppointedOwners.KeyToValue(store4.StoreName).Count == 1);
         }
 
         [Test]
@@ -324,6 +319,13 @@ namespace Tests.DataLayer
         }
 
         
+        
+        
+        [Test]
+        public void ReadStoreManagersTest()
+        {
+            Assert.Warn("Not Implemented");
+        }
         [Test]
         public void SaveStoreWithoutGuestCartTest()
         {

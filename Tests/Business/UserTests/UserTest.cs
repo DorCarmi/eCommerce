@@ -136,8 +136,8 @@ namespace Tests.Business.UserTests
         {
             Assert.True(ja.AppointUserToOwner(store1, jaren).IsSuccess);
             Assert.True(ja.AppointedOwners != null);
-            Assert.True(ListHelper<Store, IList<OwnerAppointment>>.ContainsKey(ja.AppointedOwners,store1));
-            Assert.True(ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(ja.AppointedOwners,store1).FirstOrDefault(m => m.User == jaren)!= null);
+            Assert.True(ja.AppointedOwners.ContainsKey(store1.StoreName));
+            Assert.True(ja.AppointedOwners.KeyToValue(store1.StoreName).FirstOrDefault(m => m.User == jaren)!= null);
         }
         [Test]
         public void TestAppointUserToOwner_Fail()
@@ -157,10 +157,10 @@ namespace Tests.Business.UserTests
             task2.Start();
             Assert.True(task1.Result.IsSuccess != task2.Result.IsSuccess);
             int OwnersCount = 0;
-            OwnersCount += ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(ja.AppointedOwners,store1).Count;
-            if (ListHelper<Store, IList<OwnerAppointment>>.ContainsKey(jaren.AppointedOwners,store1))
+            OwnersCount += ja.AppointedOwners.KeyToValue(store1.StoreName).Count;
+            if (jaren.AppointedOwners.ContainsKey(store1.StoreName))
             {
-                OwnersCount += ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(jaren.AppointedOwners,store1).Count;
+                OwnersCount += jaren.AppointedOwners.KeyToValue(store1.StoreName).Count;
             }
             Assert.True(OwnersCount == 2);
         }
@@ -294,7 +294,7 @@ namespace Tests.Business.UserTests
             var res4 = task4.Result;
             Assert.True(res1.IsSuccess != res2.IsSuccess);
             Assert.True(res3.IsSuccess != res4.IsSuccess);
-            int ownersCount = ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(ja.AppointedOwners,store1).Count;
+            int ownersCount = ja.AppointedOwners.KeyToValue(store1.storeName).Count;
             Assert.True(ownersCount == 0,ownersCount.ToString());
         }
 
