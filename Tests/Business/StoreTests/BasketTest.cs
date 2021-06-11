@@ -32,11 +32,11 @@ namespace Tests.Business.StoreTests
         [SetUp]
         public void Setup()
         {
-            alenbyStore = new mokStore(storeName);
+            alice = new mokUser("Alice");
+            alenbyStore = new mokStore(storeName, alice);
             item1 = new Item(itemName, itemCategory, alenbyStore, itemPrice);
             mokStore mokStore = (mokStore) alenbyStore;
             mokStore.item = item1;
-            alice = new mokUser("Alice");
             info1 = new ItemInfo(0, itemName, storeName, itemCategory.getName(), new List<string>(), itemPrice);
             alice = new mokUser("Alice");
             cart = new Cart(alice);

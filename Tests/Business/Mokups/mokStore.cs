@@ -13,7 +13,7 @@ namespace Tests.Business.Mokups
         public Item item;
         public ICart cart;
 
-        public mokStore(string storeName): base(storeName, null)
+        public mokStore(string storeName, User founder): base(storeName, founder)
         {
             this.storeName = storeName;
         }

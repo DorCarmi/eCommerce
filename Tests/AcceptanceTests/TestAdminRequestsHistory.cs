@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using eCommerce.Auth;
 using System.Threading.Tasks;
+using eCommerce;
 using eCommerce.Business;
 using eCommerce.Business.Repositories;
 using eCommerce.Common;
@@ -73,7 +74,11 @@ namespace Tests.AcceptanceTests
         public async Task TestAdminUserSuccess(string member)
         { 
             string token = _auth.Connect();
-            Result<string> login = await _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
+            AppConfig config = AppConfig.GetInstance();
+            string username = config.GetData("AdminCreationInfo:Username");
+            string password = config.GetData("AdminCreationInfo:Password");
+            
+            Result<string> login = await _auth.Login(token, username, password, ServiceUserRole.Admin);
             Result result = _user.AdminGetPurchaseHistoryUser(login.Value,member);
             Assert.True(result.IsSuccess, result.Error);
             _auth.Logout(login.Value);
@@ -86,7 +91,11 @@ namespace Tests.AcceptanceTests
         public async Task TestAdminUserFailure(string member)
         { 
             string token = _auth.Connect();
-            Result<string> login = await _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
+            AppConfig config = AppConfig.GetInstance();
+            string username = config.GetData("AdminCreationInfo:Username");
+            string password = config.GetData("AdminCreationInfo:Password");
+            
+            Result<string> login = await _auth.Login(token, username, password, ServiceUserRole.Admin);
             Result result = _user.AdminGetPurchaseHistoryUser(login.Value,member);
             Assert.True(result.IsFailure);
             _auth.Logout(login.Value);
@@ -111,7 +120,11 @@ namespace Tests.AcceptanceTests
         public async Task TestAdminStoreSuccess(string storeID)
         { 
             string token = _auth.Connect();
-            Result<string> login = await _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
+            AppConfig config = AppConfig.GetInstance();
+            string username = config.GetData("AdminCreationInfo:Username");
+            string password = config.GetData("AdminCreationInfo:Password");
+
+            Result<string> login = await _auth.Login(token, username, password, ServiceUserRole.Admin);
             Result result = _user.AdminGetPurchaseHistoryStore(login.Value,storeID);
             Assert.True(result.IsSuccess, result.Error);
             _auth.Logout(login.Value);
@@ -122,7 +135,11 @@ namespace Tests.AcceptanceTests
         public async Task TestAdminStoreFailure(string storeID)
         { 
             string token = _auth.Connect();
-            Result<string> login = await _auth.Login(token, "_Admin", "_Admin", ServiceUserRole.Admin);
+            AppConfig config = AppConfig.GetInstance();
+            string username = config.GetData("AdminCreationInfo:Username");
+            string password = config.GetData("AdminCreationInfo:Password");
+            
+            Result<string> login = await _auth.Login(token, username, password, ServiceUserRole.Admin);
             Result result = _user.AdminGetPurchaseHistoryStore(login.Value,storeID);
             Assert.True(result.IsFailure);
             _auth.Logout(login.Value);
