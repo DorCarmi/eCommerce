@@ -158,8 +158,9 @@ namespace eCommerce.Business
             }
             else
             {
-                ListHelper<string,ItemInfo>.Add(_nameToItem,this.BasketID,item.name,item.name,new ItemInfo(item));
-                this._itemsInBasket.Add(item);
+                ItemInfo newItemToAdd = new ItemInfo(item);
+                ListHelper<string,ItemInfo>.Add(_nameToItem,this.BasketID,item.name,item.name,newItemToAdd);
+                this._itemsInBasket.Add(newItemToAdd);
                 this.currentPrice = this.GetRegularTotalPrice();
                 return Result.Ok();
             }
@@ -279,6 +280,32 @@ namespace eCommerce.Business
 
             var userRes=this.GetCart().GetUser().EnterRecordToHistory(resStore.Value);
             return userRes;
+        }
+
+        public Result AddItemAfterBid(ItemInfo item)
+        {
+            var itemRes = this._store.TryGetItems(item);
+            if (itemRes.IsFailure )
+            {
+                return itemRes;
+            }
+            else if (ListHelper<string, ItemInfo>.ContainsKey(_nameToItem, item.name))
+            {
+                var theItem=ListHelper<string, ItemInfo>.KeyToValue(_nameToItem, item.name);
+                theItem.amount += item.amount;
+                theItem.PricePerUnit = item.pricePerUnit;
+                this.currentPrice = this.GetRegularTotalPrice();
+                
+                return Result.Ok();
+            }
+            else
+            {
+                ItemInfo newItemToAdd = new ItemInfo(item);
+                ListHelper<string,ItemInfo>.Add(_nameToItem,this.BasketID,item.name,item.name,newItemToAdd);
+                this._itemsInBasket.Add(newItemToAdd);
+                this.currentPrice = this.GetRegularTotalPrice();
+                return Result.Ok();
+            }
         }
     }
     
