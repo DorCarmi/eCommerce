@@ -176,6 +176,42 @@ namespace Tests.DataLayer
             ));
             Assert.True(df.UpdateUser(ja).IsSuccess);
             Assert.True(df.UpdateUser(jaren).IsSuccess);
+            Assert.True(df.UpdateStore(alenbyStore).IsSuccess);
+        }
+        
+        [Test]
+        public void SaveUserPurchaseTest2()
+        {
+            Assert.True(df.SaveUser(ja).IsSuccess);
+            Assert.True(df.SaveUser(jaren).IsSuccess);
+            ja.OpenStore(alenbyStore);
+            Assert.True(df.SaveStore(alenbyStore).IsSuccess);
+
+            
+            var pstation = new ItemInfo(100, "Playstation4", alenbyStore.GetStoreName(), "Tech",
+                new List<string>(), 3500);
+            var addItemRes= alenbyStore.AddItemToStore(pstation,ja);
+           
+            
+            var resGetItem=alenbyStore.GetItem(pstation);
+            var showItem = resGetItem.Value.ShowItem();
+            showItem.amount = 5;
+            jaren.AddItemToCart(showItem);
+            
+            Assert.True(df.UpdateUser(ja).IsSuccess);
+            Assert.True(df.UpdateUser(jaren).IsSuccess);
+            Assert.True(df.UpdateStore(alenbyStore).IsSuccess);
+
+            var purchaseRes=jaren.BuyWholeCart(new PaymentInfo(
+                userName:jaren.Username,
+                idNumber:jaren.MemberInfo.Id,
+                creditCardNumber:"1234567789",
+                creditCardExpirationDate:"03-01-22",
+                threeDigitsOnBackOfCard:"123",
+                fullAddress:"TLV"
+            ));
+            // Assert.True(df.UpdateUser(ja).IsSuccess);
+            Assert.True(df.UpdateUser(jaren).IsSuccess);
 
         }
         
@@ -187,7 +223,7 @@ namespace Tests.DataLayer
             var username = jaren.Username;
             var userRes = df.ReadUser(username);
             Assert.True(userRes.IsSuccess);
-            // Assert.True(userRes.Value._transHistory._purchases.Count == 1);
+            Assert.True(userRes.Value._transHistory._purchases.Count == 1);
             var storename = alenbyStore.StoreName;
             var storeRes = df.ReadStore(storename);
             Assert.True(storeRes.IsSuccess);

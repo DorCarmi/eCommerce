@@ -655,7 +655,7 @@ namespace eCommerce.Business
             foreach (var ownerAppointment in _ownersAppointments)
             {
                 User owner = ownerAppointment.User;
-                foreach (var item in purchaseRecord.Value.BasketInfo._itemsInBasket)
+                foreach (var item in purchaseRecord.Value.BasketInfo.ItemsInBasket)
                 {
                     owner.PublishMessage(String.Format("User: {0} , bought {1} items of {2} at {3}",
                         purchaseRecord.Value.Username, item.name, item.name, purchaseRecord.Value.GetDate()));

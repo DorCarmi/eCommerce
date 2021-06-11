@@ -16,20 +16,6 @@ namespace eCommerce.Business
         [Key] 
         public string BasketID { get; set; }
 
-        // {get
-            // {
-            //     return BasketGuid.ToString();
-            // }
-            // set
-            // {
-            //     Guid currGuid;
-            //     var guidRes=Guid.TryParse(value, out currGuid);
-            //     if (guidRes)
-            //     {
-            //         BasketGuid = currGuid;
-            //     }
-            // }
-        // }
         public virtual List<ItemInfo> _itemsInBasket { get; set; }
         //private IDictionary<string, ItemInfo> _nameToItem;
         private List<Pair<string, ItemInfo>> _nameToItem;

@@ -14,17 +14,8 @@ namespace eCommerce.Business
     {
         private string id;
         [Key]
-        public string ItemID
-        {
-            get
-            {
-                return storeName + "-" + name;
-            }
-            set
-            {
-                id = value;
-            }
-        }
+        public Guid ItemID
+        { get; set; }
         [NotMapped]
         public int amount { get; set; }
         [NotMapped]

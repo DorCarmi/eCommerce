@@ -35,7 +35,6 @@ namespace eCommerce.Business
         private List<Pair<Store, IList<ManagerAppointment>>> _appointedManagers;
         
         public MemberInfo MemberInfo {get => _memberInfo; set =>_memberInfo = value; }
-        [NotMapped]
         public UserTransactionHistory _transHistory { get; set; }
         public Cart _myCart { get; private set; }
         public string _cartId { get; set; }
@@ -70,7 +69,7 @@ namespace eCommerce.Business
             _storesManaged = new List<Pair<Store, ManagerAppointment>>();
             _appointedOwners = new List<Pair<Store, IList<OwnerAppointment>>>();
             _appointedManagers = new List<Pair<Store, IList<ManagerAppointment>>>();
-            _transHistory = new UserTransactionHistory();
+            _transHistory = new UserTransactionHistory(Username);
         } 
         public User(UserToSystemState state, MemberInfo MemberInfo)
         {
@@ -87,7 +86,7 @@ namespace eCommerce.Business
             _storesManaged = new List<Pair<Store, ManagerAppointment>>();
             _appointedOwners = new List<Pair<Store, IList<OwnerAppointment>>>();
             _appointedManagers = new List<Pair<Store, IList<ManagerAppointment>>>();
-            _transHistory = new UserTransactionHistory();
+            _transHistory = new UserTransactionHistory(Username);
         }
 
         
@@ -857,7 +856,6 @@ namespace eCommerce.Business
         _storesManaged = new List<Pair<Store, ManagerAppointment>>();
         _appointedOwners = new List<Pair<Store, IList<OwnerAppointment>>>();
         _appointedManagers = new List<Pair<Store, IList<ManagerAppointment>>>();
-        _transHistory = new UserTransactionHistory();
     }
     
     #endregion

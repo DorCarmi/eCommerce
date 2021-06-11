@@ -126,6 +126,15 @@ namespace eCommerce.DataLayer
                         // .Include(u=> u.appointedManagersBackup)
                         // .ThenInclude(p => p.ValList)
                         // .ThenInclude(m => m.User)
+                        //include inner Transaction history
+                        .Include(u => u._transHistory)
+                        .ThenInclude(h => h._purchases)
+                        .ThenInclude(pr => pr.BasketInfo)
+                        .ThenInclude(bi => bi.ItemsInBasket)
+                        .ThenInclude(i => i._store)
+                        .Include(u => u._transHistory)
+                        .ThenInclude(h => h._purchases)
+                        .ThenInclude(pr => pr.StoreInfo)
                         .SingleOrDefault(u => u.Username == username);
 
                     if (user == null)

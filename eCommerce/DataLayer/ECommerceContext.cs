@@ -25,13 +25,14 @@ namespace eCommerce.DataLayer
         public DbSet<ListPair<string,ManagerAppointment>> AppointedManagers { get; set; }
 
         
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<Basket> Baskets { get; set; }
         public DbSet<Store> Stores { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<ItemInfo> ItemInfos { get; set; }
         public DbSet<ItemsInventory> ItemsInventories { get; set; }
-        public DbSet<Cart> Carts { get; set; }
-        public DbSet<Basket> Baskets { get; set; }
-
+        public DbSet<PurchaseRecord> PurchaseRecords { get; set; }
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //@TODO::sharon - enable test mode for db - use different db + add teardown function to context 
@@ -62,6 +63,10 @@ namespace eCommerce.DataLayer
                 .WithOne(u => u._myCart)
                 .HasForeignKey<User>(u => u._cartId);
             
+            //set composite Primary-Key for every entity of type Pair<Store,ManagerAppointment>
+            builder.Entity<PurchaseRecord>()
+                .HasKey(p => new {p.StoreId, p.Username, p.PurchaseTime});
+
             
             /*
             //set composite Primary-Key for every entity of type Pair<Store,OwnerAppointment>
