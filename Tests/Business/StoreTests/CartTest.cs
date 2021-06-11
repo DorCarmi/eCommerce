@@ -85,7 +85,8 @@ namespace Tests.Business.StoreTests
                 var allItems = baskets[i].GetAllItems();
                 if (!allItems.IsFailure)
                 {
-                    if (allItems.Value.Contains(item1))
+                    if (allItems.Value.FirstOrDefault(x=>x.name.Equals(item1.name))!=null)
+                        
                     {
                         foundItem = true;
                     }
@@ -120,7 +121,7 @@ namespace Tests.Business.StoreTests
         }
         
         [Test]
-        [Order(2)]
+        [Order(3)]
         public void TestBidItemToCartManyApproves()
         {
             int newPrice = 9;
@@ -161,20 +162,33 @@ namespace Tests.Business.StoreTests
             Assert.True(resApprove.IsSuccess);
             var theBakset =
                 gedalia._myCart._baskets.FirstOrDefault(x => x.Value._store._storeName.Equals(MyNewStore.StoreName));
-            Assert.AreEqual(null,theBakset);
+            if(theBakset!=null)
+            {
+                var theItemInBasketInside = theBakset.Value._itemsInBasket.FirstOrDefault(x => x.name.Equals(pumpkin.name));
+                Assert.Null(theItemInBasketInside);
+            }
+            
 
             resApprove=MyNewStore.ApproveOrDissaproveBid(Guy, firstBid.BidID, true);
             Assert.True(resApprove.IsSuccess);
             theBakset =
                 gedalia._myCart._baskets.FirstOrDefault(x => x.Value._store._storeName.Equals(MyNewStore.StoreName));
-            Assert.AreEqual(null,theBakset);
+            if(theBakset!=null)
+            {
+                var theItemInBasketInside = theBakset.Value._itemsInBasket.FirstOrDefault(x => x.name.Equals(pumpkin.name));
+                Assert.Null(theItemInBasketInside);
+            }
 
 
             resApprove=MyNewStore.ApproveOrDissaproveBid(Raviv, firstBid.BidID, true);
             Assert.True(resApprove.IsSuccess);
             theBakset =
                 gedalia._myCart._baskets.FirstOrDefault(x => x.Value._store._storeName.Equals(MyNewStore.StoreName));
-            Assert.AreEqual(null,theBakset);
+            if(theBakset!=null)
+            {
+                var theItemInBasketInside = theBakset.Value._itemsInBasket.FirstOrDefault(x => x.name.Equals(pumpkin.name));
+                Assert.Null(theItemInBasketInside);
+            }
 
 
             resApprove=MyNewStore.ApproveOrDissaproveBid(Rinat, firstBid.BidID, true);

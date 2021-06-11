@@ -15,5 +15,7 @@ namespace eCommerce.Statistics.Repositories
         public Result AddLoginStat(LoginStat stat);
         
         public Result<List<LoginStat>> GetAllLoginStatsFrom(DateTime date);
+        
+        public Result<int> GetNumberOfLoginStatsFrom(DateTime date, string userTyp);
     }
 }

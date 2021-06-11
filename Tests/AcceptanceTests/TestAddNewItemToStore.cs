@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 using eCommerce.Auth;
@@ -34,14 +35,16 @@ namespace Tests.AcceptanceTests
         [SetUpAttribute]
         public async Task SetUp()
         {
-            InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
-            UserAuth UA = UserAuth.CreateInstanceForTests(RP, "ThisKeyIsForTests");
-            InMemoryStoreRepo SR = new InMemoryStoreRepo();
-            IRepository<User> UR = new InMemoryRegisteredUsersRepository();
-            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(UA,UR, SR);
 
-            _auth = AuthService.CreateUserServiceForTests(marketFacade);
-            _inStore = InStoreService.CreateUserServiceForTests(marketFacade);
+            ISystemService systemService = new SystemService();
+            Result<Services> initRes = systemService.GetInstanceForTests(Path.GetFullPath("..\\..\\..\\testsConfig.json"));
+            Assert.True(initRes.IsSuccess, "Error at test config file");
+            Services services = initRes.Value;
+
+            _auth = services.AuthService;
+            _inStore = services.InStoreService;
+            
+            
             MemberInfo yossi = new MemberInfo("Yossi11", "yossi@gmail.com", "Yossi Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             MemberInfo shiran = new MemberInfo("singerMermaid", "shiran@gmail.com", "Shiran Moris",

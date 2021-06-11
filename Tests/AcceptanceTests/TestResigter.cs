@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using eCommerce.Auth;
 using eCommerce.Business;
@@ -28,13 +29,12 @@ namespace Tests.AcceptanceTests
         [SetUpAttribute]
         public void SetUp()
         {
-            InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
-            UserAuth UA = UserAuth.CreateInstanceForTests(RP, "ThisKeyIsForTests");
-            InMemoryStoreRepo SR = new InMemoryStoreRepo();
-            IRepository<User> UR = new InMemoryRegisteredUsersRepository();
-            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(UA,UR, SR);
+            ISystemService systemService = new SystemService();
+            Result<Services> initRes = systemService.GetInstanceForTests(Path.GetFullPath("..\\..\\..\\testsConfig.json"));
+            Assert.True(initRes.IsSuccess, "Error at test config file");
+            Services services = initRes.Value;
 
-            _auth = AuthService.CreateUserServiceForTests(marketFacade);
+            _auth = services.AuthService;
         }
         
         [TearDownAttribute]

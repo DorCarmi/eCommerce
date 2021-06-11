@@ -1,4 +1,6 @@
-﻿namespace eCommerce.Service
+﻿using eCommerce.Common;
+
+namespace eCommerce.Service
 {
     public interface ISystemService
     {
@@ -18,6 +20,19 @@
         /// <summary>
         /// Initialize the system, must be called before system use.
         /// </summary>
-        public void InitSystem();
+        public bool InitSystem(string[] args);
+        
+        /// <summary>
+        /// Start the server
+        /// </summary>
+        /// <param name="args">Args</param>
+        public void Start(string[] args);
+
+        /// <summary>
+        /// Return service instances
+        /// </summary>
+        /// <param name="configFile">The config file</param>
+        /// <returns>Services</returns>
+        public Result<Services> GetInstanceForTests(string configFile);
     }
 }

@@ -73,7 +73,11 @@ namespace eCommerce
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                    endpoints.MapHub<MessageHub>("/messageHub", options =>
+                endpoints.MapHub<MessageHub>("/messageHub", options =>
+                {
+                    options.Transports = HttpTransportType.WebSockets;
+                });
+                endpoints.MapHub<MessageHub>("/statsBroadcaster", options =>
                 {
                     options.Transports = HttpTransportType.WebSockets;
                 });
