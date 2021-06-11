@@ -36,5 +36,20 @@ namespace eCommerce.Statistics.Repositories
 
             return Result.Ok(loginStats);
         }
+
+        public Result<int> GetNumberOfLoginStatsFrom(DateTime date, string userType)
+        {
+            int number = 0;
+            DateTime cateComponent = date.Date;
+            foreach (var stat in _statLogins)
+            {
+                if (stat.DateTime.Date.Equals(cateComponent) && stat.UserType.Equals(userType))
+                {
+                    number++;
+                }
+            }
+
+            return Result.Ok(number);
+        }
     }
 }

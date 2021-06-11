@@ -47,5 +47,20 @@ namespace eCommerce.Statistics.Repositories
                 }
             }
         }
+
+        public Result<int> GetNumberOfLoginStatsFrom(DateTime date, string userTyp)
+        {
+            using (var context = _contextFactory.Create())
+            {
+                try
+                {
+                    return Result.Ok(context.Login.Count(ls => ls.DateTime.Equals(date.Date) &&
+                                                               ls.UserType.Equals(userTyp)));
+                }
+                catch (Exception e)
+                {
+                    return Result.Fail<int>("Error saving data");
+                }
+            }        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using eCommerce.Auth;
 using eCommerce.Adapters;
 using System.Threading.Tasks;
@@ -42,18 +43,16 @@ namespace Tests.AcceptanceTests
         
         public TestBuyCart()
         {
-            PaymentProxy.AssignPaymentService(new mokPaymentService(true,true,true));
-            SupplyProxy.AssignSupplyService(new mokSupplyService(true,true));
-            InMemoryRegisteredUserRepo RP = new InMemoryRegisteredUserRepo();
-            UserAuth UA = UserAuth.CreateInstanceForTests(RP, "ThisKeyIsForTests");
-            InMemoryStoreRepo SR = new InMemoryStoreRepo();
-            IRepository<User> UR = new InMemoryRegisteredUsersRepository();
-            IMarketFacade marketFacade = MarketFacade.CreateInstanceForTests(UA,UR, SR);
+            ISystemService systemService = new SystemService();
+            Result<Services> initRes = systemService.GetInstanceForTests(Path.GetFullPath("..\\..\\..\\testsConfig.json"));
+            Assert.True(initRes.IsSuccess, "Error at test config file");
+            Services services = initRes.Value;
 
-            _auth = AuthService.CreateUserServiceForTests(marketFacade);
-            _inStore = InStoreService.CreateUserServiceForTests(marketFacade);
-            _user = UserService.CreateUserServiceForTests(marketFacade);
-            _cart = CartService.CreateUserServiceForTests(marketFacade);
+            _auth = services.AuthService;
+            _inStore = services.InStoreService;
+            _user = services.UserService;
+            _cart = services.CartService;
+            
             MemberInfo Ivan = new MemberInfo("Ivan11", "Ivan@gmail.com", "Ivan Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();
