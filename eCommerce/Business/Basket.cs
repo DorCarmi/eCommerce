@@ -11,15 +11,14 @@ namespace eCommerce.Business
     public class Basket: IBasket
     {
 
-        // private Guid BasketGuid;
 
         [Key] 
         public string BasketID { get; set; }
 
         public virtual List<ItemInfo> _itemsInBasket { get; set; }
         //private IDictionary<string, ItemInfo> _nameToItem;
-        private List<Pair<string, ItemInfo>> _nameToItem;
-        
+        public List<Pair<string, ItemInfo>> _nameToItem;
+        //@TODO: fix nameToItem in DB
 
         private List<Pair<string, ItemInfo>> _nameToItemPairs
         {

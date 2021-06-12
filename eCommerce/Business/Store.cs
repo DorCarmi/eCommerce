@@ -42,8 +42,10 @@ namespace eCommerce.Business
         public string OwnersIds { get; set; }
         [NotMapped]
         public List<OwnerAppointment> _ownersAppointments { get;  set; }
+        
+        public string ManagersIds { get; set; }
         [NotMapped]
-        public List<ManagerAppointment> _managersAppointments { get; private set; }
+        public List<ManagerAppointment> _managersAppointments { get; set; }
 
         public string basketsIds { get; set; }
 

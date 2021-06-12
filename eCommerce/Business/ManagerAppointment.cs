@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using eCommerce.Business.Repositories;
 using eCommerce.Common;
@@ -10,8 +11,10 @@ namespace eCommerce.Business
 {
     public class ManagerAppointment
     {
-        public string Managername { get; set; }
-        public string ManagedStorename { get; set; }
+        [Key]
+        public string ManagerId { get; set; }
+        // public string Managername { get; set; }
+        // public string ManagedStorename { get; set; }
         public User User { get; set; }
         //private ConcurrentDictionary<StorePermission, bool> _permissions;
         private List<StorePermission> _permissions;
@@ -20,9 +23,10 @@ namespace eCommerce.Business
 
         public ManagerAppointment(User user, string storename)
         {
+            this.ManagerId = user.Username+"_"+storename;
             this.User = user;
-            this.Managername = user.Username;
-            this.ManagedStorename = storename;
+            // this.Managername = user.Username;
+            // this.ManagedStorename = storename;
             this._permissions = new List<StorePermission>();
             foreach (StorePermission permission in BaseManagerPermissions)
             {

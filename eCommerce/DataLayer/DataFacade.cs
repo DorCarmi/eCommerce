@@ -46,26 +46,19 @@ namespace eCommerce.DataLayer
 
         public Result SaveUser(User user)
         {
-            // synchronize all fields which arent compatible with EF (all dictionary properties)
-
-
-            //using (var db = new ECommerceContext())
+            try
             {
-                try
-                {
-                    db.Add(user);
+                db.Add(user);
 
-                    Console.WriteLine($"Inserting a new User - [{user.Username}]");
-                    db.SaveChanges();
+                Console.WriteLine($"Inserting a new User - [{user.Username}]");
+                db.SaveChanges();
 
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    return Result.Fail("Unable to Save User");
-                    // add logging here
-                }
-
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Result.Fail("Unable to Save User");
+                // add logging here
             }
             return Result.Ok();
         }
@@ -73,21 +66,16 @@ namespace eCommerce.DataLayer
 
         public Result UpdateUser(User user)
         {
-            //using (var db = new ECommerceContext())
+            try
             {
-                try
-                {
-                    // db.Update(user);
-
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    return Result.Fail("Unable to Update User");
-                    // add logging here
-                }
-
+                // db.Update(user);
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Result.Fail("Unable to Update User");
+                // add logging here
             }
             return Result.Ok();
         }
@@ -95,57 +83,58 @@ namespace eCommerce.DataLayer
         public Result<User> ReadUser(string username)
         {
             User user = null;
-            //using (var db = new ECommerceContext())
+            
+        try
+        {
+            Console.WriteLine("fetching saved User");
+            user = db.Users
+                .Include(u => u.MemberInfo)
+                .Include(u => u.StoresFounded)
+                // include inner Owned-Stores entities
+                .Include(u => u.StoresOwned)
+                .ThenInclude(p => p.Value)
+                .ThenInclude(o => o.User)
+                // // include inner Managed-Stores entities
+                .Include(u=> u.StoresManaged)
+                .ThenInclude(p => p.Value)
+                .ThenInclude(m => m.User)
+                // // include inner Appointed-Owners entities
+                .Include(u=> u.AppointedOwners)
+                .ThenInclude(p => p.ValList)
+                .ThenInclude(o => o.User)
+                // // include inner Appointed-Managers entities
+                // .Include(u=> u.appointedManagersBackup)
+                // .ThenInclude(p => p.Key)
+                // .Include(u=> u.appointedManagersBackup)
+                // .ThenInclude(p => p.ValList)
+                // .ThenInclude(m => m.User)
+                // // keep going
+                
+                //include inner Transaction history
+                .Include(u => u._transHistory)
+                .ThenInclude(h => h._purchases)
+                .ThenInclude(pr => pr.BasketInfo)
+                .ThenInclude(bi => bi.ItemsInBasket)
+                .ThenInclude(i => i._store)
+                .Include(u => u._transHistory)
+                .ThenInclude(h => h._purchases)
+                .ThenInclude(pr => pr.StoreInfo)
+                .SingleOrDefault(u => u.Username == username);
+
+            if (user == null)
             {
-                try
-                {
-                    Console.WriteLine("fetching saved User");
-                    user = db.Users
-                        .Include(u => u.MemberInfo)
-                        .Include(u => u.StoresFounded)
-                        // include inner Owned-Stores entities
-                        .Include(u => u.StoresOwned)
-                        .ThenInclude(p => p.Value)
-                        .ThenInclude(o => o.User)
-                        // // include inner Managed-Stores entities
-                        .Include(u=> u.StoresManaged)
-                        .ThenInclude(p => p.Value)
-                        .ThenInclude(m => m.User)
-                        // // include inner Appointed-Owners entities
-                        .Include(u=> u.AppointedOwners)
-                        .ThenInclude(p => p.ValList)
-                        .ThenInclude(o => o.User)
-                        // // include inner Appointed-Managers entities
-                        // .Include(u=> u.appointedManagersBackup)
-                        // .ThenInclude(p => p.Key)
-                        // .Include(u=> u.appointedManagersBackup)
-                        // .ThenInclude(p => p.ValList)
-                        // .ThenInclude(m => m.User)
-                        //include inner Transaction history
-                        .Include(u => u._transHistory)
-                        .ThenInclude(h => h._purchases)
-                        .ThenInclude(pr => pr.BasketInfo)
-                        .ThenInclude(bi => bi.ItemsInBasket)
-                        .ThenInclude(i => i._store)
-                        .Include(u => u._transHistory)
-                        .ThenInclude(h => h._purchases)
-                        .ThenInclude(pr => pr.StoreInfo)
-                        .SingleOrDefault(u => u.Username == username);
+                return Result.Fail<User>($"No user called {username}");
+            }
 
-                    if (user == null)
-                    {
-                        return Result.Fail<User>($"No user called {username}");
-                    }
-
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    return Result.Fail<User>("Unable to read User");
-                    // add logging here
-                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Result.Fail<User>("Unable to read User");
+                // add logging here
             }
             // synchronize all fields which arent compatible with EF (all dictionary properties) 
+            var cartRes = ReadCart(username);
             return Result.Ok<User>(user);
         }
 
@@ -177,6 +166,9 @@ namespace eCommerce.DataLayer
             try
             {
                 store.OwnersIds = string.Join(";", store._ownersAppointments.Select(o => o.OwnerId));
+                store.ManagersIds = string.Join(";", store._managersAppointments.Select(m =>{
+                    m.syncFromDict();
+                    return m.ManagerId; }));
                 store.basketsIds = string.Join(";", store._basketsOfThisStore.Select(b => b.BasketID));
 
                 db.SaveChanges();
@@ -241,7 +233,7 @@ namespace eCommerce.DataLayer
                 return Result.Fail<Store>("In ReadStore -  Get Founder: " + userRes.Error);
             store._founder = userRes.Value;
 
-            var ownersIds = store.OwnersIds.Split(";");
+            var ownersIds = store.OwnersIds.Split(";",StringSplitOptions.RemoveEmptyEntries);
             store._ownersAppointments = new List<OwnerAppointment>();
             foreach (var ownerId in ownersIds)
             {
@@ -249,6 +241,17 @@ namespace eCommerce.DataLayer
                 if (res.IsFailure)
                     return Result.Fail<Store>("In ReadStore -  Get Owner: " + res.Error);
                 store._ownersAppointments.Add(res.Value);
+            }
+            
+            var managersIds = store.ManagersIds.Split(";",StringSplitOptions.RemoveEmptyEntries);
+            store._managersAppointments = new List<ManagerAppointment>();
+            foreach (var managerId in managersIds)
+            {
+                var res = ReadManager(managerId);
+                if (res.IsFailure)
+                    return Result.Fail<Store>("In ReadStore -  Get Manager: " + res.Error);
+                res.Value.syncToDict();
+                store._managersAppointments.Add(res.Value);
             }
 
             var BasketsIds = store.basketsIds.Split(";",StringSplitOptions.RemoveEmptyEntries);
@@ -294,7 +297,36 @@ namespace eCommerce.DataLayer
         }
         return Result.Ok<OwnerAppointment>(owner);
     }
+    
+    private Result<ManagerAppointment> ReadManager(string managerId)
+    {
+        ManagerAppointment manager = null;
+        try
+        {
+            manager = db.ManagerAppointments
+                .Where(m => m.ManagerId == managerId)
+                .Include(m => m.User)
+                .SingleOrDefault();
+            Console.WriteLine("fetching saved Manager");
 
+            if (manager == null)
+            {
+                return Result.Fail<ManagerAppointment>($"No Manager called {managerId}");
+            }
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return Result.Fail<ManagerAppointment>("Unable to read Manager");
+            // add logging here
+        }
+        
+        //sync permissions!!!
+        return Result.Ok<ManagerAppointment>(manager);
+    }
+
+    //TODO:: add delete basketS method
     
     public Result<Basket> ReadBasket(string basketId)
     {
@@ -305,6 +337,7 @@ namespace eCommerce.DataLayer
             basket = db.Baskets
                 .Where(b => b.BasketID == basketId)
                 .Include(b => b._store)
+                .Include(b => b._cart)
                 .Include(b => b._itemsInBasket)
                 .ThenInclude(i => i.theItem)
                 .Include(b => b._itemsInBasket)
@@ -359,16 +392,28 @@ namespace eCommerce.DataLayer
                 Console.WriteLine("fetching saved Cart");
 
                 cart = db.Carts
-                    // .Where(c => c._holderId == holderId)
-                    // .Include(c => c._basketsPairs)
-                    // .ThenInclude(bp => bp.Key)
-                    // .Include(c => c._basketsPairs)
+                    .Where(c => c.CardID == holderId)
+                    .Include(c => c._baskets)
+                    .ThenInclude(bp => bp.Key)
+                    .Include(c => c._baskets)
+                    .ThenInclude(bp => bp.Value)
+                    .ThenInclude(b => b._cart)
+                    .Include(c => c._baskets)
+                    .ThenInclude(bp => bp.Value)
+                    .ThenInclude(b => b._store)
+                    .Include(c => c._baskets)
+                    .ThenInclude(bp => bp.Value)
+                    .ThenInclude(b => b._itemsInBasket)
+                    .ThenInclude(i => i.theItem)
+                    .Include(c => c._baskets)
+                    .ThenInclude(bp => bp.Value)
+                    .ThenInclude(b => b._itemsInBasket)
+                    .ThenInclude(i => i._store)
+                    // .Include(c => c._baskets)
                     // .ThenInclude(bp => bp.Value)
-                    // .ThenInclude(b => b._cart)
-                    // .Include(c => c._basketsPairs)
-                    // .ThenInclude(bp => bp.Value)
-                    // .ThenInclude(b => b._store)
-                    // .Include(c => c._cartHolder)
+                    // .ThenInclude(b => b._nameToItem)
+                    // .ThenInclude(n2i => n2i.Value)
+                    .Include(c => c._cartHolder)
 
                     .SingleOrDefault();
                 

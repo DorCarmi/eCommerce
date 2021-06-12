@@ -300,7 +300,6 @@ namespace eCommerce.Business
         public void FreeCart()
         {
             this._myCart.Free();
-            this._myCart = new Cart(this);
         }
 
         public virtual Result AnnexStakeholders(Store store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)

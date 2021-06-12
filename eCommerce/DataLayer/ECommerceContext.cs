@@ -52,9 +52,9 @@ namespace eCommerce.DataLayer
             // builder.Entity<OwnerAppointment>()
             //     .HasKey(o => new {o.Ownername, o.OwnedStorename});
             
-            //set composite Primary-Key for entities of type ManagerAppointment
-            builder.Entity<ManagerAppointment>()
-                .HasKey(o => new {o.Managername, o.ManagedStorename});
+            // //set composite Primary-Key for entities of type ManagerAppointment
+            // builder.Entity<ManagerAppointment>()
+            //     .HasKey(o => new {o.Managername, o.ManagedStorename});
             
             
             //configure One-to-One relation for User & Cart

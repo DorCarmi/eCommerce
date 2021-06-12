@@ -31,8 +31,6 @@ namespace eCommerce.Business
         public OwnerAppointment(User user, string storename)
         {
             this.User = user;
-            // this.Ownername = user.Username;
-            // this.OwnedStorename = storename;
             this.OwnerId = user.Username + "_" + storename;
             this._permissions = new List<StorePermission>();
 
