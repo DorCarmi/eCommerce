@@ -257,6 +257,17 @@ namespace eCommerce.Business
         /// <returns>Result of the request</returns>
         public Result AddItemToCart(string token, string itemId, string storeId, int amount);
         /// <summary>
+        /// Ask To Bid On Item
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="productId">The item id</param>
+        /// <param name="storeId">The store id</param>
+        /// <param name="amount">The amount of the item</param>
+        /// <param name="newPrice">New price to offer</param>
+        /// <returns>Result of the request</returns>
+        public Result AskToBidOnItem(string token, string productId, string storeId, int amount, double newPrice);
+        
+        /// <summary>
         /// Change the amount of the item in the cart
         /// </summary>
         /// <param name="token">Authorization token</param>
@@ -399,6 +410,24 @@ namespace eCommerce.Business
         /// <param name="storeId">The storeId</param>
         /// <returns>List of all discounts in store</returns>
         public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId);
+
+        /// <summary>
+        /// Return all the bids waiting for owner to approve
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <returns>List of all bids infos of bids waiting for the user (owner) to approve or not</returns>
+        public Result<List<BidInfo>> GetAllBidsWaitingToApprove(string token, string storeId);
+        
+        /// <summary>
+        /// Approves or disapproves the bid
+        /// </summary>
+        /// <param name="token">Authorization token</param>
+        /// <param name="storeId">The storeId</param>
+        /// <param name="BidID">The bid id to approve or not</param>
+        /// <param name="shouldApprove">true to approve the bid and false to disapprove</param>
+        /// <returns>Result for if the process succeeded or not</returns>
+        public Result ApproveOrDisapproveBid(string token, string storeId, string BidID, bool shouldApprove);
         
         #endregion
 

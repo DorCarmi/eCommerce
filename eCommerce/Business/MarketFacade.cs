@@ -443,7 +443,7 @@ namespace eCommerce.Business
                 return Result.Fail<IItem>(itemRes.Error);
             }
             
-            _logger.Info($"GetItem({user.Username}, {storeId}, {itemId})");
+            _logger.Info($"GetItemInfoAfterBidApprove({user.Username}, {storeId}, {itemId})");
 
             return Result.Ok<IItem>(itemRes.Value.ShowItem());
         }
@@ -498,6 +498,28 @@ namespace eCommerce.Business
             newItemInfo.amount = amount;
             //TODO save
             return user.AddItemToCart(newItemInfo);
+        }
+
+        public Result AskToBidOnItem(string token, string productId, string storeId, int amount, double newPrice)
+        {
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
+
+            _logger.Info($"AddItemToCart({user.Username}, {productId}, {storeId}, {amount})");
+
+            Result<Item> itemRes = store.GetItem(productId);
+            if (itemRes.IsFailure)
+            {
+                return itemRes;
+            }
+            var newItemInfo = itemRes.Value.ShowItem();
+            //newItemInfo.AssignStoreToItem(store);
+            return store.AskToBidOnItem(user, newItemInfo, newPrice, amount);
         }
 
         //<CNAME>EditCart</CNAME>  
@@ -846,6 +868,34 @@ namespace eCommerce.Business
             User appointedUser = appointedUserRes.Value;
 
             return user.RemoveOwnerFromStore(store, appointedUser);
+        }
+
+        public Result<List<BidInfo>> GetAllBidsWaitingToApprove(string token, string storeId)
+        {
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<List<BidInfo>>(userAndStoreRes.Error);
+            }
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
+            
+            _logger.Info($"Get all bids waiting to approve ({user.Username}, {store.GetStoreName()})");
+            return store.GetAllMyWaitingBids(user);
+        }
+        
+        public Result ApproveOrDisapproveBid(string token, string storeId, string BidID,bool shouldApprove)
+        {
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<List<BidInfo>>(userAndStoreRes.Error);
+            }
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
+            
+            _logger.Info($"Approve={shouldApprove} for bid {BidID} of owner and store({user.Username}, {store.GetStoreName()})");
+            return store.ApproveOrDissaproveBid(user, BidID, shouldApprove);
         }
 
         #endregion

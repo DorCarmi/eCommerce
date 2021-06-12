@@ -242,13 +242,21 @@ namespace Tests.Business.StoreTests
             Assert.AreEqual(false,MyStore.TryAddNewCartToStore(cart));
         }
 
-        public void TestHistory()
+        [Test]
+        [Order(4)]
+        public void TestBids()
         {
-            //MyStore.GetPurchaseHistory()
-            //MyStore.EnterBasketToHistory()
+            mokUser gedalia = new mokUser("Gedalia"); 
+            ItemInfo sano = new ItemInfo(50, "Sano Maxima", MyStore.StoreName, "Clean", new List<string>(), 25);
+            var resAddIeItemToStore = MyStore.AddItemToStore(sano, gedalia);
+            var resBidOnItem = MyStore.AskToBidOnItem(gedalia, sano, 20, 30);
+            var resBidsInfos = MyStore.GetAllMyWaitingBids(Alice);
+            Assert.True(resBidOnItem.IsSuccess);
+            var resBidsInfosNotOwner = MyStore.GetAllMyWaitingBids(gedalia);
+            Assert.False(resBidsInfosNotOwner.IsSuccess);
+
+
         }
-        
-        
 
         [TearDown]
         public void TearDown()
