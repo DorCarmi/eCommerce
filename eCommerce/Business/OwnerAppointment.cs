@@ -11,6 +11,7 @@ namespace eCommerce.Business
     {
         [Key]
         public string OwnerId { get; set; }
+        public string Ownername { get; set; }
         public User User { get; set; }
         private List<StorePermission> _permissions;
 
@@ -32,6 +33,7 @@ namespace eCommerce.Business
         {
             this.User = user;
             this.OwnerId = user.Username + "_" + storename;
+            this.Ownername = user.Username;
             this._permissions = new List<StorePermission>();
 
             foreach (var permission in Enum.GetValues(typeof(StorePermission)))
