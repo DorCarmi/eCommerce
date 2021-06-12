@@ -620,8 +620,9 @@ namespace eCommerce.Business
             }
 
             // TODO check save order
-            _storeRepo.Add(newStore);
+            
             _userManager.UpdateUser(user);
+            _storeRepo.Update(newStore);
             return Result.Ok();
         }
         

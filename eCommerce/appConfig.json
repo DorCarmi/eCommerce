@@ -1,5 +1,5 @@
 ﻿{
-  "InitWithData": true,
+  "InitWithData": false,
   "InitDataFile": "Init.json",
   
   "Memory": "Persistence",

@@ -13,9 +13,9 @@ namespace eCommerce.Business.Repositories
     {
         private DataFacade _dataFacade;
 
-        public PersistenceStoreRepo()
+        public PersistenceStoreRepo(DataFacade dataFacade)
         {
-            _dataFacade = new DataFacade();
+            _dataFacade = dataFacade;
         }
 
         public override IEnumerable<ItemInfo> SearchForItem(string query)

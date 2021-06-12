@@ -5,6 +5,7 @@ using eCommerce.Auth;
 using eCommerce.Business;
 using eCommerce.Business.Repositories;
 using eCommerce.Common;
+using eCommerce.DataLayer;
 using eCommerce.Statistics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -77,8 +78,11 @@ namespace eCommerce.Service
                 }
                 case "Persistence":
                 {
-                    userRepo = new PersistenceRegisteredUsersRepo();
-                    storeRepo = new PersistenceStoreRepo();
+                    DataFacade df = new DataFacade();
+                    df.init();
+                    userRepo = new PersistenceRegisteredUsersRepo(df);
+                    storeRepo = new PersistenceStoreRepo(df);
+                    
                     break;   
                 }
                 case null:
@@ -166,8 +170,10 @@ namespace eCommerce.Service
                 {
                     IRegisteredUserRepo RP = new PersistentRegisteredUserRepo();
                     UserAuth UA = UserAuth.CreateInstanceForTests(RP, authKey);
-                    AbstractStoreRepo SR = new PersistenceStoreRepo();
-                    IRepository<User> UR = new PersistenceRegisteredUsersRepo();
+                    DataFacade df = new DataFacade();
+                    df.init();
+                    AbstractStoreRepo SR = new PersistenceStoreRepo(df);
+                    IRepository<User> UR = new PersistenceRegisteredUsersRepo(df);
                     marketFacade = MarketFacade.CreateInstanceForTests(UA,UR, SR);
                     break;   
                 }
