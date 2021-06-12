@@ -83,7 +83,7 @@ namespace Tests.Business.Mokups
 
         public override Result AddItemToCart(ItemInfo item)
         {
-            throw new System.NotImplementedException();
+            return this._myCart.AddItemToCart(this, item);
         }
 
         Result<ICart> GetCartInfo()

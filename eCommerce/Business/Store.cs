@@ -11,7 +11,10 @@ using eCommerce.Business.DiscountsAndPurchases.Purchases.RulesInfo;
 using eCommerce.Business.Purchases;
 
 using eCommerce.Common;
+using eCommerce.DataLayer;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using Microsoft.Extensions.Logging;
+using NLog.Time;
 
 namespace eCommerce.Business
 {
@@ -21,6 +24,8 @@ namespace eCommerce.Business
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public String _storeName { get; private set; }
+
+        private List<Pair<User, Bid>> _UsersBids;
         
         //Store's issues
         //Discounts and purchases
@@ -63,6 +68,8 @@ namespace eCommerce.Business
             _managersAppointments = new List<ManagerAppointment>();
             
             _basketsOfThisStore = new List<Basket>();
+            _UsersBids = new List<Pair<User, Bid>>();
+
         }
 
         public virtual IList<Item> GetAllItems()
@@ -660,6 +667,179 @@ namespace eCommerce.Business
         public string StoreName
         {
             get => _storeName;
-        } 
+        }
+
+
+        public Result AskToBidOnItem(User buyer,ItemInfo itemInfo, double newPricePerUnit, int amount)
+        {
+            if (_UsersBids == null)
+            {
+                _UsersBids = new List<Pair<User, Bid>>();
+            }
+
+            itemInfo.amount = amount;
+            var resGetItems = TryGetItems(itemInfo);
+            if (resGetItems.IsFailure)
+            {
+                return resGetItems;
+            }
+
+            if (this._UsersBids.Count > 0)
+            {
+                Pair<User, Bid> pairToRemove = _UsersBids[0];
+                bool found = false;
+                foreach (var usersBid in _UsersBids)
+                {
+                    if (buyer == usersBid.Key || buyer.Username == usersBid.Key.Username)
+                    {
+                        pairToRemove = usersBid;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found)
+                {
+                    _UsersBids.Remove(pairToRemove);
+                }
+            }
+
+            var newPair = new Pair<User, Bid>()
+            {
+                HolderId = StoreName,
+                Key = buyer,
+                KeyId = buyer.Username,
+                Value = new Bid(buyer,itemInfo, newPricePerUnit, amount, this._ownersAppointments,_founder)
+            };
+            this._UsersBids.Add(newPair);
+            return Result.Ok();
+        }
+
+        public Result ApproveOrDissaproveBid(User owner, string BidID, bool shouldApprove)
+        {
+            bool found = false;
+            if (_UsersBids.Count <= 0)
+            {
+                return Result.Fail("No bids to approve");
+            }
+
+            Pair<User, Bid> theBid = _UsersBids[0];
+            foreach (var usersBid in _UsersBids)
+            {
+                if (usersBid.Value.GetID().Equals(BidID))
+                {
+                    found = true;
+                    theBid = usersBid; 
+                    break;
+                }
+            }
+
+            if (found)
+            {
+                var approveRes = theBid.Value.ApproveOrDissapproveBid(owner.Username, shouldApprove);
+                if (approveRes.IsFailure)
+                {
+                    return approveRes;
+                }
+                else
+                {
+                    if (approveRes.Value.Equals(Bid.BidState.Approved)|| approveRes.Value.Equals(Bid.BidState.NotApproved))
+                    {
+                        return finishBid(theBid,approveRes.Value);
+                    }
+                    else
+                    {
+                        return Result.Ok();
+                    }
+                }
+            }
+            else
+            {
+                return Result.Fail("Bid not found");
+            }
+        }
+
+        private Result finishBid(Pair<User, Bid> theBid, Bid.BidState approveResValue)
+        {
+            var removed=this._UsersBids.Remove(theBid);
+
+            Basket theBasket;
+            if (removed == false)
+            {
+                return Result.Fail("Problem removing bid");
+            }
+
+            if (approveResValue.Equals(Bid.BidState.Approved))
+            {
+                bool foundBasket = false;
+                foreach (var basket in this._basketsOfThisStore)
+                {
+                    if(basket._cart.GetUser().Username.Equals(theBid.Key.Username))
+                    {
+                        var resAddToBasket=basket.AddItemAfterBid(theBid.Value.GetItemInfoAfterBidApprove());
+                        if (resAddToBasket.IsFailure)
+                        {
+                            return resAddToBasket;
+                        }
+                        foundBasket = true;
+                        break;
+                    }
+                }
+
+                ItemInfo theItemAfterApproval = theBid.Value.GetItemInfoAfterBidApprove();
+                if (!foundBasket)
+                {
+                    theItemAfterApproval.AssignStoreToItem(this);
+                    var resAddToCart = theBid.Key.AddItemToCart(theItemAfterApproval);
+                    if (resAddToCart.IsFailure)
+                    {
+                        return resAddToCart;
+                    }
+                }
+
+                theBid.Key.PublishMessage(
+                    $"Your bid for the item {theItemAfterApproval.name} with price={theItemAfterApproval.pricePerUnit} was approved and appears now in your basket");
+                return Result.Ok();
+            }
+            else
+            {
+                ItemInfo theItemAfterApproval = theBid.Value.GetItemInfoAfterBidApprove();
+                theBid.Key.PublishMessage(
+                    $"Your bid for the item {theItemAfterApproval.name} with price={theItemAfterApproval.pricePerUnit} was approved and appears now in your basket");
+                return Result.Ok();
+            }
+        }
+
+        public Result<List<BidInfo>> GetAllMyWaitingBids(User user)
+        {
+            bool found = false;
+            foreach (var ownersAppointment in this._ownersAppointments)
+            {
+                if (ownersAppointment.Ownername.Equals(user.Username))
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            found = found ? found : _founder.Username.Equals(user.Username);
+            if (!found)
+            {
+                return Result.Fail<List<BidInfo>>("Not an owner or founder of this store");
+            }
+            
+            List<BidInfo> bids = new List<BidInfo>();
+            foreach (var bid in this._UsersBids)  
+            {
+                if (bid.Value.CheckIfShouldApprove(user))
+                {
+                    bids.Add(bid.Value.GetBidInfo());
+                }
+            }
+
+            return Result.Ok(bids);
+        }
     }
+
+    
 }

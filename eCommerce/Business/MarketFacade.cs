@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ using NLog;
 
 namespace eCommerce.Business
 {
+    // TODO should be singleton
+    // TODO check authException if we should throw them
     public class MarketFacade : IMarketFacade
     {
         private static MarketFacade _instance = new MarketFacade();
@@ -171,29 +174,6 @@ namespace eCommerce.Business
 
             return appointmentRes;
         }
-        
-        public Result RemoveCoOwner(string token, string storeId, string appointedUserId)
-        {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-            
-            
-            Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
-            if (appointedUserRes.IsFailure)
-            {
-                return appointedUserRes;
-            }
-            User removedMangerUser = appointedUserRes.Value;
-
-            _logger.Info($"RemoveCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
-
-            return user.RemoveOwnerFromStore(store, removedMangerUser);
-        }
                 
         //<CNAME>AppointManager</CNAME>
         public Result AppointManager(string token, string storeId, string appointedManagerUserId)
@@ -223,29 +203,6 @@ namespace eCommerce.Business
             }
 
             return appointmentRes;
-        }
-        
-        public Result RemoveManager(string token, string storeId, string appointedUserId)
-        {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-            
-            
-            Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
-            if (appointedUserRes.IsFailure)
-            {
-                return appointedUserRes;
-            }
-            User removedMangerUser = appointedUserRes.Value;
-
-            _logger.Info($"RemoveCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
-
-            return Result.Ok(); //user.RemoveManager()
         }
 
         public Result<IList<StorePermission>> GetStorePermission(string token, string storeId)
@@ -486,7 +443,7 @@ namespace eCommerce.Business
                 return Result.Fail<IItem>(itemRes.Error);
             }
             
-            _logger.Info($"GetItem({user.Username}, {storeId}, {itemId})");
+            _logger.Info($"GetItemInfoAfterBidApprove({user.Username}, {storeId}, {itemId})");
 
             return Result.Ok<IItem>(itemRes.Value.ShowItem());
         }
@@ -541,6 +498,28 @@ namespace eCommerce.Business
             newItemInfo.amount = amount;
             //TODO save
             return user.AddItemToCart(newItemInfo);
+        }
+
+        public Result AskToBidOnItem(string token, string productId, string storeId, int amount, double newPrice)
+        {
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
+
+            _logger.Info($"AddItemToCart({user.Username}, {productId}, {storeId}, {amount})");
+
+            Result<Item> itemRes = store.GetItem(productId);
+            if (itemRes.IsFailure)
+            {
+                return itemRes;
+            }
+            var newItemInfo = itemRes.Value.ShowItem();
+            //newItemInfo.AssignStoreToItem(store);
+            return store.AskToBidOnItem(user, newItemInfo, newPrice, amount);
         }
 
         //<CNAME>EditCart</CNAME>  
@@ -642,14 +621,17 @@ namespace eCommerce.Business
         //<CNAME>OpenStore</CNAME>
         public Result OpenStore(string token, string storeName)
         {
+            // TODO check with user and store
             Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
                 return Result.Fail(userRes.Error);
             }
             User user = userRes.Value;
-            Store newStore = new Store(storeName, user);
             
+            _logger.Info($"OpenStore({user.Username})");
+            
+            Store newStore = new Store(storeName, user);
             if (!_storeRepo.Add(newStore))
             {
                 return Result.Fail("Store name taken");
@@ -660,7 +642,6 @@ namespace eCommerce.Business
                 return Result.Fail("Error opening store");
             }
 
-            _logger.Info($"OpenStore({user.Username})");
             _userManager.UpdateUser(user);
             return Result.Ok();
         }
@@ -865,6 +846,56 @@ namespace eCommerce.Business
             User user = userRes.Value;
 
             return user.GetLoginStats(date);
+        }
+
+        public Result RemoveOwnerFromStore(string token, string storeId, string appointedUserId)
+        {
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return userAndStoreRes;
+            }
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
+            
+            _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
+            
+            Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
+            if (appointedUserRes.IsFailure)
+            {
+                return appointedUserRes;
+            }
+            User appointedUser = appointedUserRes.Value;
+
+            return user.RemoveOwnerFromStore(store, appointedUser);
+        }
+
+        public Result<List<BidInfo>> GetAllBidsWaitingToApprove(string token, string storeId)
+        {
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<List<BidInfo>>(userAndStoreRes.Error);
+            }
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
+            
+            _logger.Info($"Get all bids waiting to approve ({user.Username}, {store.GetStoreName()})");
+            return store.GetAllMyWaitingBids(user);
+        }
+        
+        public Result ApproveOrDisapproveBid(string token, string storeId, string BidID,bool shouldApprove)
+        {
+            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+            if (userAndStoreRes.IsFailure)
+            {
+                return Result.Fail<List<BidInfo>>(userAndStoreRes.Error);
+            }
+            User user = userAndStoreRes.Value.Item1;
+            Store store = userAndStoreRes.Value.Item2;
+            
+            _logger.Info($"Approve={shouldApprove} for bid {BidID} of owner and store({user.Username}, {store.GetStoreName()})");
+            return store.ApproveOrDissaproveBid(user, BidID, shouldApprove);
         }
 
         #endregion

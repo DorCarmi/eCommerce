@@ -154,5 +154,20 @@ namespace eCommerce.Service
             DiscountInfoNode discountInfoNode = discountNode.ParseToDiscountInfoNode();
             return _marketFacade.AddDiscountToStore(token, storeId, discountInfoNode);
         }
+
+        public Result AskToBidOnItem(string token, string productId, string storeId, int amount, double newPrice)
+        {
+            return _marketFacade.AskToBidOnItem(token, productId, storeId, amount, newPrice);
+        }
+
+        public Result<List<BidInfo>> GetAllBidsWaitingToApprove(string value, string store)
+        {
+            return _marketFacade.GetAllBidsWaitingToApprove(value, store);
+        }
+
+        public Result ApproveOrDisapproveBid(string value, string store, string bidId, bool b)
+        {
+            return _marketFacade.ApproveOrDisapproveBid(value, store, bidId, b);
+        }
     }
 }
