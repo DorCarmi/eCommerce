@@ -2,17 +2,24 @@
 import {Result} from "../Common";
 import {
     ADD_DISCOUNT_TO_STORE_PATH,
-    ADD_ITEM_TO_STORE_PATH, ADD_POLICY_TO_STORE_PATH, ADMIN_GET_STORE_PURCHASE_HISTORY, ADMIN_GET_USER_PURCHASE_HISTORY,
+    ADD_ITEM_TO_STORE_PATH,
+    ADD_POLICY_TO_STORE_PATH,
+    ADMIN_GET_STORE_PURCHASE_HISTORY,
+    ADMIN_GET_USER_PURCHASE_HISTORY,
+    ASK_TO_BID_ITEM,
     EDIT_ITEM_IN_STORE_PATH,
-    GET_ALL_ITEMS_IN_STORE_PATH, GET_HISTORY_OF_STORE_PATH,
+    GET_ALL_ITEMS_IN_STORE_PATH,
+    GET_HISTORY_OF_STORE_PATH,
     GET_ITEM_IN_STORE_PATH,
-    GET_STORE_PERMISSION_FOR_USER_PATH, GET_USER_PURCHASE_HISTORY_PATH,
+    GET_STORE_PERMISSION_FOR_USER_PATH,
+    GET_USER_PURCHASE_HISTORY_PATH,
     OPEN_STORE_PATH,
     REMOVE_ITEM_FROM_STORE_PATH,
     SEARCH_ITEMS_PATH,
     SEARCH_STORE_PATH,
     STAFF_OF_STORE_PATH,
-    STAFF_PERMISSIONS_OF_STORE_PATH, UPDATE_MANAGER_PERMISSIONS_IN_STORE_PATH
+    STAFF_PERMISSIONS_OF_STORE_PATH,
+    UPDATE_MANAGER_PERMISSIONS_IN_STORE_PATH
 } from "./ApiPaths";
 import {Item} from "../Data/Item";
 import {StorePermission} from "../Data/StorePermission";
@@ -161,6 +168,19 @@ export class StoreApi {
             }).catch(err => undefined)
     }
 
+    removeOwner(storeId: string, removedUserId: string){
+        return instance.delete<Result<any>>(STAFF_OF_STORE_PATH(storeId), 
+            {
+                params: {
+                    role: "owner",
+                    userId: removedUserId
+                }
+            })
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+
     appointManager(storeId: string, appointedUserId: string){
         return instance.post<Result<any>>(STAFF_OF_STORE_PATH(storeId),
             {},
@@ -168,6 +188,19 @@ export class StoreApi {
                 params: {
                     role: "manager",
                     userId: appointedUserId
+                }
+            })
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+
+    removeManager(storeId: string, removedUserId: string){
+        return instance.delete<Result<any>>(STAFF_OF_STORE_PATH(storeId),
+            {
+                params: {
+                    role: "manager",
+                    userId: removedUserId
                 }
             })
             .then(res => {
@@ -214,4 +247,19 @@ export class StoreApi {
                 return res.data
             }).catch(err => undefined)
     }
+
+    // ========== Store bid ========== //
+    askToBidOnItem(storeId:string, itemId:string , amount:number ,newPrice:number ){
+        return instance.post<Result<any>>(ASK_TO_BID_ITEM(storeId),{},{
+            params: {
+                itemId: itemId,
+                amount: amount,
+                newPrice: newPrice
+            }
+        })
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+    
 }

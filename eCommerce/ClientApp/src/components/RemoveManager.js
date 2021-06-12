@@ -4,8 +4,8 @@ import "./Register.css"
 import {StoreApi} from '../Api/StoreApi'
 import {Redirect, withRouter} from "react-router-dom";
 
-export class AppointManager extends Component {
-    static displayName = AppointManager.name;
+export class RemoveManager extends Component {
+    static displayName = RemoveManager.name;
 
     constructor(props) {
         super(props)
@@ -21,15 +21,17 @@ export class AppointManager extends Component {
 
     async handleSubmit(event){
         const {managerId} = this.state
+        const {storeId} = this.props
         event.preventDefault();
-        const res = await this.storeApi.appointManager(this.props.storeId,managerId)
+        const res = await this.storeApi.removeManager(storeId,managerId)
         if(res && res.isSuccess) {
             this.setState({
                 submitted: true
             })
+            alert(`${managerId} is no longer manager of the store: ${storeId}`)
         }
         else{
-            alert(`appoint manager failed because- ${res.error}`)
+            alert(`remove manager failed because- ${res.error}`)
         }
 
     }
@@ -42,17 +44,17 @@ export class AppointManager extends Component {
 
     render () {
         if (this.state.submitted) {
-            return <Redirect exact to="/"/>
+            return <Redirect exact to={`/managePermissions/${this.props.storeId}`}/>
         } else {
             return (
                 <main className="RegisterMain">
                     <div className="RegisterWindow">
                         <div className="CenterItemContainer">
-                            <h3>{`Appoint a manager for store - ${this.props.storeId}`}:</h3>
+                            <h3>Remove Manager</h3>
                         </div>
                         <form className="RegisterForm" onSubmit={this.handleSubmit}>
                             <input type="text" name="managerId" value={this.state.managerId}
-                                   placeholder={'Enter Manager Id'} onChange={this.handleInputChange} required/>
+                                   placeholder={'Enter Manager Id To Remove'} onChange={this.handleInputChange} required/>
                             <div className="CenterItemContainer">
                                 <input className="action" type="submit" value="submit"/>
                             </div>

@@ -62,7 +62,17 @@ namespace Tests.Service
             throw new NotImplementedException();
         }
 
+        public Result RemoveCoOwner(string token, string storeId, string removedUserId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Result AppointManager(string token, string storeId, string appointedManagerUserId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result RemoveManager(string token, string storeId, string removedUserId)
         {
             throw new NotImplementedException();
         }

@@ -26,7 +26,7 @@ namespace eCommerce.Communication
         }
     }
     
-    public class StatsHub : Hub, Reciver
+    public class StatsHub : Hub
     {
         private IHubContext<MessageHub> _hubContext = null;
         
@@ -55,21 +55,13 @@ namespace eCommerce.Communication
             }
 
             Console.WriteLine("--> Stats Connection Opened: " + Context.ConnectionId);
-            _statistics.Register(this);
             return base.OnConnectedAsync();
         }
         
         public override Task OnDisconnectedAsync(Exception? exception)
         {
             Console.WriteLine("Stats close connection");
-            _statistics.UnRegister(this);
-
             return base.OnDisconnectedAsync(exception);
-        }
-
-        public void ReciveBrodcast(string userType, int number)
-        {
-            _hubContext.Clients.All.SendAsync("LoginUpdate", new StatsMessageModel(userType, number));
         }
     }
 }

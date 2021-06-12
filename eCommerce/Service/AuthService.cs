@@ -40,8 +40,7 @@ namespace eCommerce.Service
             // }
             _marketFacade.Disconnect(token);
         }
-
-        //TODO: maybe user dto for MemberInfo
+        
         public Task<Result> Register(string token, MemberInfo memberInfo, string password)
         {
             return _marketFacade.Register(token, memberInfo, password);

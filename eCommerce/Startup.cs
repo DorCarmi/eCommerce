@@ -41,6 +41,7 @@ namespace eCommerce
             
             // init message connection handler
             services.AddSingleton<MessageConnectionHandler, MessageConnectionHandler>();
+            services.AddSingleton<StatsConnectionHandler, StatsConnectionHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,6 +49,7 @@ namespace eCommerce
         {
             // init services
             app.ApplicationServices.GetService(typeof(MessageConnectionHandler));
+            app.ApplicationServices.GetService(typeof(StatsConnectionHandler));
             
             if (env.IsDevelopment())
             {
@@ -77,7 +79,7 @@ namespace eCommerce
                 {
                     options.Transports = HttpTransportType.WebSockets;
                 });
-                endpoints.MapHub<MessageHub>("/statsBroadcaster", options =>
+                endpoints.MapHub<StatsHub>("/statsBroadcaster", options =>
                 {
                     options.Transports = HttpTransportType.WebSockets;
                 });

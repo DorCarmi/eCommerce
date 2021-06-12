@@ -47,11 +47,17 @@ export class SearchComponent extends Component {
 
                 </select>
                 <input placeholder="Search" value={this.state.searchQuery} onChange={this.handleInputChange}/>
-                <Link className="searchLink" exact to={`/searchItems/${this.state.searchBy}/${this.state.searchQuery}`}>
-                    <div className="imageDiv">
-                        <img src="/Images/search.png" alt="Search" className="imageFitSize"/>
-                    </div>
-                </Link>
+                {this.state.searchBy ==='Item' ? <Link className="searchLink" exact to={`/searchItems/${this.state.searchBy}/${this.state.searchQuery}`}>
+                        <div className="imageDiv">
+                            <img src="/Images/search.png" alt="Search" className="imageFitSize"/>
+                        </div>
+                    </Link>
+                    : <Link className="searchLink" exact to={`/store/${this.state.searchQuery}`}>
+                        <div className="imageDiv">
+                            <img src="/Images/search.png" alt="Search" className="imageFitSize"/>
+                        </div>
+                    </Link>}
+
             </div>
         )
     }
