@@ -357,11 +357,6 @@ namespace Tests.DataLayer
         
         
         [Test]
-        public void ReadStoreManagersTest()
-        {
-            Assert.Warn("Not Implemented");
-        }
-        [Test]
         public void SaveStoreWithoutGuestCartTest()
         {
             Assert.Warn("Not Implemented");
