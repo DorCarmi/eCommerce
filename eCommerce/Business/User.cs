@@ -303,11 +303,16 @@ namespace eCommerce.Business
         {
             return _systemState.AnnexStakeholders(this,store,owners,managers);
         }
-
+        
 
         public virtual UserToSystemState GetState()
         {
             return _systemState;
+        }
+
+        public string GetRole()
+        {
+            return _systemState.GetRole();
         }
 
         public virtual Result PublishMessage(string message)

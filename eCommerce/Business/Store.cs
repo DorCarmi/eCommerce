@@ -54,8 +54,16 @@ namespace eCommerce.Business
 
         public string basketsIds { get; set; }
 
-        [NotMapped]
-        public List<Basket> _basketsOfThisStore { get; set; }
+        [NotMapped] public List<Basket> _basketsOfThisStore;
+
+        
+        
+        public List<Basket> GetBasketsOfMembers()
+        {
+
+            return _basketsOfThisStore.Where(x => !x._cart._cartHolder.GetRole().Equals(Guest.State.GetRole()))
+                .ToList();
+        }
 
         // for ef
         public Store()

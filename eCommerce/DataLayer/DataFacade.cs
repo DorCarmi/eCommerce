@@ -165,7 +165,7 @@ namespace eCommerce.DataLayer
                 store.ManagersIds = string.Join(";", store._managersAppointments.Select(m =>{
                     m.syncFromDict();
                     return m.ManagerId; }));
-                store.basketsIds = string.Join(";", store._basketsOfThisStore.Select(b => b.BasketID));
+                store.basketsIds = string.Join(";", store.GetBasketsOfMembers().Select(b => b.BasketID));
 
                 db.SaveChanges();
             }
