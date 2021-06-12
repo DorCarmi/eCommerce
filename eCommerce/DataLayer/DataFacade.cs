@@ -131,6 +131,7 @@ namespace eCommerce.DataLayer
             }
             // synchronize all fields which arent compatible with EF (all dictionary properties) 
             var cartRes = ReadCart(username);
+            user.setState();
             return Result.Ok<User>(user);
         }
 

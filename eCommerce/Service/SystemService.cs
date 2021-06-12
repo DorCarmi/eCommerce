@@ -79,8 +79,8 @@ namespace eCommerce.Service
                 {
                     userRepo = new PersistenceRegisteredUsersRepo();
                     //TODO update to persistennce store repo
-                    //storeRepo = new InMemoryStoreRepo();
-                    storeRepo = new PersistenceStoreRepo();
+                    storeRepo = new InMemoryStoreRepo();
+                    //storeRepo = new PersistenceStoreRepo();
                     break;   
                 }
                 case null:

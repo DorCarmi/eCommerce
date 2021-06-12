@@ -845,17 +845,20 @@ namespace eCommerce.Business
         set
         {
             _role = value;
-            if(value.Equals(Member.State.GetRole()))
-            {
-                _systemState = Member.State;
-            }
-            else
-            {
-                _systemState = Admin.State;    
-            }
         }
     }
 
+    public void setState()
+    {
+        if(_role.Equals(Member.State.GetRole()))
+        {
+            _systemState = Member.State;
+        }
+        else
+        {
+            _systemState = Admin.State;    
+        }
+    }
     public User()
     {
         _isRegistered = true;
