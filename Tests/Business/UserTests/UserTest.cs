@@ -108,8 +108,8 @@ namespace Tests.Business.UserTests
         {
             Assert.True(ja.AppointUserToManager(store1, jaren).IsSuccess);
             Assert.True(ja.AppointedManagers != null);
-            Assert.True(ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(ja.AppointedManagers,store1));
-            Assert.True(ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(ja.AppointedManagers,store1).FirstOrDefault(m => m.User == jaren)!= null);
+            Assert.True(ja.AppointedManagers.ContainsKey(store1.StoreName));
+            Assert.True(ja.AppointedManagers.KeyToValue(store1.StoreName).FirstOrDefault(m => m.User == jaren)!= null);
         }
         [Test]
         public void TestAppointUserToManager_Fail()
@@ -128,8 +128,8 @@ namespace Tests.Business.UserTests
             task1.Start();
             task2.Start();
             Assert.True(task1.Result.IsSuccess != task2.Result.IsSuccess);
-            Assert.True(ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(ja.AppointedManagers,store1) != 
-                        ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(jaren.AppointedManagers,store1));
+            Assert.True(ja.AppointedManagers.ContainsKey(store1.StoreName) != 
+                        jaren.AppointedManagers.ContainsKey(store1.StoreName));
         }
         [Test]
         public void TestAppointUserToOwner_Pass()

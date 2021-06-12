@@ -102,12 +102,10 @@ namespace eCommerce.DataLayer
                 .Include(u=> u.AppointedOwners)
                 .ThenInclude(p => p.ValList)
                 .ThenInclude(o => o.User)
-                // // include inner Appointed-Managers entities
-                // .Include(u=> u.appointedManagersBackup)
-                // .ThenInclude(p => p.Key)
-                // .Include(u=> u.appointedManagersBackup)
-                // .ThenInclude(p => p.ValList)
-                // .ThenInclude(m => m.User)
+                // include inner Appointed-Managers entities
+                .Include(u=> u.AppointedManagers)
+                .ThenInclude(p => p.ValList)
+                .ThenInclude(m => m.User)
                 // // keep going
                 
                 //include inner Transaction history

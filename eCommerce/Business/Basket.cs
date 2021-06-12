@@ -16,7 +16,6 @@ namespace eCommerce.Business
         public string BasketID { get; set; }
 
         public virtual List<ItemInfo> _itemsInBasket { get; set; }
-        //private IDictionary<string, ItemInfo> _nameToItem;
         public List<Pair<string, ItemInfo>> _nameToItem;
         //@TODO: fix nameToItem in DB
 

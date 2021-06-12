@@ -131,9 +131,13 @@ namespace Tests.DataLayer
         {
             SaveUserWithStoreTest();
             Assert.True(df.ResetConnection().IsSuccess);
-            var username = jaren.Username;
+            var username = ja.Username;
             var res = df.ReadUser(username);
-            Assert.True(res.IsSuccess);
+            Assert.True(res.IsSuccess, res.Error);
+            
+            username = jaren.Username;
+            res = df.ReadUser(username);
+            Assert.True(res.IsSuccess, res.Error);
         }
 
         [Test]
@@ -322,6 +326,11 @@ namespace Tests.DataLayer
             Assert.True(userRes.Value.AppointedOwners.KeyToValue(store3.StoreName).Count == 1);
             Assert.True(userRes.Value.AppointedOwners.ContainsKey(store4.StoreName));
             Assert.True(userRes.Value.AppointedOwners.KeyToValue(store4.StoreName).Count == 1);
+            Assert.True(userRes.Value.AppointedManagers.Count == 2);
+            Assert.True(userRes.Value.AppointedManagers.ContainsKey(store1.StoreName));
+            Assert.True(userRes.Value.AppointedManagers.KeyToValue(store1.StoreName).Count == 1);
+            Assert.True(userRes.Value.AppointedManagers.ContainsKey(store2.StoreName));
+            Assert.True(userRes.Value.AppointedManagers.KeyToValue(store2.StoreName).Count == 1);
         }
 
         [Test]
