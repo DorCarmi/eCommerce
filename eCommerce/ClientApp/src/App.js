@@ -36,6 +36,7 @@ import ShowStatsOutput from "./components/ShowStatsOutput";
 import AddDiscount from "./components/AddDiscount";
 import {RemoveManager} from "./components/RemoveManager";
 import {RemoveOwner} from "./components/RemoveOwner";
+import BidItem from "./components/BidItem";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -147,13 +148,17 @@ export default class App extends Component {
         console.log("==========");
     }
 
+    
+    async bidExample() {
+        console.log(await this.storeApi.askToBidOnItem("S1","Bamba",3,4))
+    }
     async componentDidMount() {
         const userBasicInfo = await this.userApi.getUserBasicInfo();
         console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
         if(userBasicInfo.userRole !== UserRole.Guest){
             await this.connectToWebSocket();
 
-            await this.policyExample();
+            await this.bidExample();
         }
 
         const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()
@@ -268,6 +273,9 @@ export default class App extends Component {
                     <Route exact path="/removeManager/:storeId" render={({match}) => <RemoveManager storeId ={match.params.storeId}/>}/>
 
                     <Route exact path="/removeOwner/:storeId" render={({match}) => <RemoveOwner storeId ={match.params.storeId}/>}/>
+
+                    <Route exact path="/bidItem/:storeId/:itemId/" render={({match}) => <BidItem storeId ={match.params.storeId} itemId ={match.params.itemId} />}/>
+
 
 
                 </Layout>

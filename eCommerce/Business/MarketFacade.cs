@@ -174,7 +174,12 @@ namespace eCommerce.Business
 
             return appointmentRes;
         }
-                
+
+        public Result RemoveCoOwner(string token, string storeId, string removedUserId)
+        {
+            throw new NotImplementedException();
+        }
+
         //<CNAME>AppointManager</CNAME>
         public Result AppointManager(string token, string storeId, string appointedManagerUserId)
         {
@@ -203,6 +208,11 @@ namespace eCommerce.Business
             }
 
             return appointmentRes;
+        }
+
+        public Result RemoveManager(string token, string storeId, string removedUserId)
+        {
+            throw new NotImplementedException();
         }
 
         public Result<IList<StorePermission>> GetStorePermission(string token, string storeId)

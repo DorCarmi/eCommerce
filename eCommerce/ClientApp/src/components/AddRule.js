@@ -49,7 +49,7 @@ class AddRule extends Component {
                 currNode = rule
             }
             else{
-                currNode = makeRuleNodeComposite(currNode,rule,selectedCombinations[index-1])
+                currNode = makeRuleNodeComposite(currNode,rule,parseInt(selectedCombinations[index-1]))
             }
         })
         return currNode

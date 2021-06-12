@@ -140,6 +140,7 @@ export default class Store extends Component {
                                         {permissions.includes(StorePermission.RemoveStoreStaff) ? <button onClick={() => this.removeItem(storeId,item.itemName)}>Remove Item</button> : null }
                                         </div>
                                         <button onClick={(e) => this.addToCart(item.itemName) }>Add To Cart</button>
+                                        <div><Link to = {`/bidItem/${item.storeName}/${item.itemName}`}>Bid Item</Link></div>
                                     </td>
                                 </tr>
                             )

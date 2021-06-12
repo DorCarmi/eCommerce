@@ -205,5 +205,19 @@ namespace eCommerce.Controllers
             return _inStoreService.AddDiscountToStore((string) HttpContext.Items["authToken"],
                 storeId, discountNode);
         }
+        
+        // ========== Store bids ========== //
+        
+        [HttpPost("{storeId}/bid")]
+        public Result AskToBidOnItem(string storeId, string itemId, int amount, int newPrice )
+        {
+            return _inStoreService.AskToBidOnItem((string) HttpContext.Items["authToken"],itemId
+                , storeId, amount, newPrice);
+        }
+        
+
     }
+    
+    
+    
 }
