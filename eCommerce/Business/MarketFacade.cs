@@ -141,7 +141,6 @@ namespace eCommerce.Business
             }
 
             _logger.Info($"User {user.Username} request purchase history");
-            //TODO save
             return result;
         }
         
@@ -246,37 +245,6 @@ namespace eCommerce.Business
             return updateRes;
         }
         
-        //<CNAME>RemoveManagerPermissions</CNAME>
-        /*public Result RemoveManagerPermission(string token, string storeId, string managersUserId,
-            IList<StorePermission> permissions)
-        {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-            
-            _logger.Info($"RemoveManagerPermission({user.Username}, {store.GetStoreName()}, {managersUserId}, {permissions})");
-
-            Result<User> mangerUserRes = _userManager.GetUser(managersUserId);
-            if (mangerUserRes.IsFailure)
-            {
-                return mangerUserRes;
-            }
-            User managerUser = mangerUserRes.Value;
-            foreach (var permission in permissions)
-            {
-                var res = user.RemovePermissionsToManager(store, managerUser, permission);
-                if(res.IsFailure)
-                {
-                    return res;
-                }
-            }
-
-            return Result.Ok();
-        }*/
         //<CNAME:GetStoreStaff</CNAME>
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(string token,
             string storeId)
@@ -496,8 +464,16 @@ namespace eCommerce.Business
             }
             var newItemInfo = itemRes.Value.ShowItem();
             newItemInfo.amount = amount;
-            //TODO save
-            return user.AddItemToCart(newItemInfo);
+
+            Result addRes = user.AddItemToCart(newItemInfo);
+            if (addRes.IsSuccess)
+            {
+                //TODO check if need to update store
+                _userManager.UpdateUser(user);
+                _storeRepo.Update(store);
+            }
+
+            return addRes;
         }
 
         public Result AskToBidOnItem(string token, string productId, string storeId, int amount, double newPrice)
@@ -611,7 +587,8 @@ namespace eCommerce.Business
                 return purchaseRes;
             }
 
-            //TODO save
+            // TODO check if need to update each store
+            _userManager.UpdateUser(user);
             return Result.Ok();
         }
         
@@ -642,6 +619,8 @@ namespace eCommerce.Business
                 return Result.Fail("Error opening store");
             }
 
+            // TODO check save order
+            _storeRepo.Add(newStore);
             _userManager.UpdateUser(user);
             return Result.Ok();
         }
@@ -681,7 +660,13 @@ namespace eCommerce.Business
 
             _logger.Info($"RemoveItemFromStore({user.Username} ,{storeId}, {itemId})");
 
-            return store.RemoveItemToStore(itemId, user);
+            Result removeItemRes =  store.RemoveItemToStore(itemId, user);
+            if (removeItemRes.IsSuccess)
+            {
+                _storeRepo.Update(store);
+            }
+
+            return removeItemRes;
         }
 
         public Result EditItemInStore(string token, IItem item)
@@ -701,7 +686,13 @@ namespace eCommerce.Business
                 new ItemInfo(item.Amount, item.ItemName, item.StoreName, item.Category, item.KeyWords.ToList(),
                     (int) item.PricePerUnit), user);
             
-            return store.EditItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
+            Result editItemRes = store.EditItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
+            if (editItemRes.IsSuccess)
+            {
+                _storeRepo.Update(store);
+            }
+
+            return editItemRes;
         }
 
         public Result UpdateStock_AddItems(string token, IItem item)
@@ -867,7 +858,14 @@ namespace eCommerce.Business
             }
             User appointedUser = appointedUserRes.Value;
 
-            return user.RemoveOwnerFromStore(store, appointedUser);
+            Result removalRes = user.RemoveOwnerFromStore(store, appointedUser);
+            if (removalRes.IsSuccess)
+            {
+                _userManager.UpdateUser(user);
+                _userManager.UpdateUser(appointedUser);
+            }
+
+            return removalRes;
         }
 
         public Result<List<BidInfo>> GetAllBidsWaitingToApprove(string token, string storeId)

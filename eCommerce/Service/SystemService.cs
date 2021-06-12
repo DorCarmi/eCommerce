@@ -78,9 +78,7 @@ namespace eCommerce.Service
                 case "Persistence":
                 {
                     userRepo = new PersistenceRegisteredUsersRepo();
-                    //TODO update to persistennce store repo
-                    storeRepo = new InMemoryStoreRepo();
-                    //storeRepo = new PersistenceStoreRepo();
+                    storeRepo = new PersistenceStoreRepo();
                     break;   
                 }
                 case null:
