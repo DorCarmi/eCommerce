@@ -70,9 +70,6 @@ namespace Tests.Business.StoreTests
         [Order(0)]
         public void SuccessMilkProducts()
         {
-            
-            
-
             var resBeforeDiscount=cart.CalculatePricesForCart();
             Assert.True(resBeforeDiscount.IsSuccess,resBeforeDiscount.Error);
 
@@ -121,7 +118,7 @@ namespace Tests.Business.StoreTests
             Assert.True(resBeforeDiscount.IsSuccess,resBeforeDiscount.Error);
 
             double priceBefore = 0;
-            foreach (var itemInfo in items)
+            foreach (var itemInfo in cart.GetAllItems())
             {
                 priceBefore += itemInfo.amount * itemInfo.pricePerUnit;
             }
@@ -138,7 +135,7 @@ namespace Tests.Business.StoreTests
             
             
             double priceAfter = 0;
-            foreach (var itemInfo in items)
+            foreach (var itemInfo in cart.GetAllItems())
             {
                 priceAfter += itemInfo.amount * itemInfo.pricePerUnit*0.8;
             }
@@ -195,8 +192,10 @@ namespace Tests.Business.StoreTests
             
             foreach (var itemInfo in items)
             {
+                int amountBeforeChange = itemInfo.amount;
                 itemInfo.amount = 10;
                 cartCharlie.AddItemToCart(Charlie, itemInfo);
+                itemInfo.amount += amountBeforeChange;
             }
             
             
@@ -353,8 +352,11 @@ namespace Tests.Business.StoreTests
             bans.amount = 2;
             bread.amount = 5;
 
-            elieCart.AddItemToCart(Alice,bans);
-            elieCart.AddItemToCart(Alice,bread);
+            elieCart.AddItemToCart(Elie,bans);
+            elieCart.AddItemToCart(Elie,bread);
+
+            bans.amount += 1; //for what was before, aggregate
+            bread.amount += 1;//for what was before, aggregate
 
 
             double priceAfter = 0;
@@ -431,10 +433,13 @@ namespace Tests.Business.StoreTests
             
             Assert.AreEqual(priceBefore,resBeforeDiscount.Value);
 
+            int amountBeforeChange = yogurt.amount;
             yogurt.amount = 2;
             
 
-            fredieCart.AddItemToCart(Alice,yogurt);
+            fredieCart.AddItemToCart(Fredie,yogurt);
+
+            yogurt.amount += amountBeforeChange;
             
             double priceAfter = 0;
             foreach (var itemInfo in items)
@@ -502,9 +507,13 @@ namespace Tests.Business.StoreTests
             
             Assert.AreEqual(priceBefore,resBeforeDiscount.Value);
 
+            int items0amountbeforeChange = items[0].amount;
             items[0].amount = 12;
+            
 
-            goolCart.AddItemToCart(Alice,items[0]);
+            goolCart.AddItemToCart(Gool,items[0]);
+
+            items[0].amount += items0amountbeforeChange;
             
             double priceBefore2 = 0;
             foreach (var itemInfo in items)
@@ -516,8 +525,10 @@ namespace Tests.Business.StoreTests
             
             Assert.AreEqual(priceBefore2,resBeforeDiscount.Value);
 
+            int amountBeforeChange = pasta.amount;
             pasta.amount = 3;
             goolCart.AddItemToCart(Gool,pasta);
+            pasta.amount += amountBeforeChange;
             
             double priceAfter = 0;
             foreach (var itemInfo in items)
