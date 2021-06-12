@@ -41,6 +41,22 @@ namespace eCommerce.DataLayer
                 //add logging
             }
         }
+        
+        
+        public bool CheckConnection()
+        {
+            return db.Database.CanConnect();
+            // try
+            // {
+            //     db.Database.OpenConnection();
+            //     db.Database.CloseConnection();
+            // }
+            // catch(Exception ex)
+            // {
+            //     return false;
+            // }
+            // return true;
+        }
 
         #region User functions
 
@@ -126,6 +142,7 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
                 return Result.Fail<User>("Unable to read User");
                 // add logging here
             }
@@ -179,6 +196,15 @@ namespace eCommerce.DataLayer
             return Result.Ok();
         }
 
+        public Result<List<Item>> GetAllItems()
+        {
+            var lst = db.Items
+                .Include(i => i._category)
+                .Include(i => i._belongsToStore);
+            return Result.Ok(lst.ToList());
+
+        }
+
         public Result<Store> ReadStore(string storename)
         {
             Store store = null;
@@ -200,6 +226,7 @@ namespace eCommerce.DataLayer
                     // .ThenInclude( ii => ii._aquiredItems)
                     .Include(s => s._inventory)
                     .ThenInclude( ii => ii._itemsInStore)
+                    .ThenInclude(i=>i._category)
                     .SingleOrDefault();
 
                 Console.WriteLine("fetching saved Store");
@@ -260,10 +287,14 @@ namespace eCommerce.DataLayer
 
             return Result.Ok<Store>(store);
         }
+        
+        
+        
+        
 
         #endregion
 
-    private Result<OwnerAppointment> ReadOwner(string ownerId)
+        private Result<OwnerAppointment> ReadOwner(string ownerId)
     {
         OwnerAppointment owner = null;
         try

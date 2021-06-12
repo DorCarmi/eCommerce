@@ -97,7 +97,7 @@ namespace eCommerce.Business
             {
                 this._cart = cart;
                 this._store = store;
-                this.BasketID = cart._cartHolder.Username + "_" + store.StoreName;
+                this.BasketID = cart._cartHolder.Username + "_" + store.StoreName + "_" + DateTime.Now;
                 this._itemsInBasket = new List<ItemInfo>();
                 this._nameToItem = new List<Pair<string, ItemInfo>>();
                 this.currentPrice = 0;

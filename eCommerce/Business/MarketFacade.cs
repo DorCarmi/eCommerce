@@ -599,6 +599,10 @@ namespace eCommerce.Business
 
             // TODO check if need to update each store
             _userManager.UpdateUser(user);
+            foreach (var basket in cart.GetBaskets())
+            {
+                _storeRepo.Update(basket._store);
+            }
             return Result.Ok();
         }
         

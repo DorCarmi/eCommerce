@@ -20,7 +20,8 @@ namespace eCommerce.Business.Repositories
 
         public override IEnumerable<ItemInfo> SearchForItem(string query)
         {
-            throw new NotImplementedException();
+            var lst = _dataFacade.GetAllItems();
+            return lst.Value.Select(x => x.ShowItem());
         }
 
         public override IEnumerable<ItemInfo> SearchForItemByPrice(string query, double @from, double to)

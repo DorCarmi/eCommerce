@@ -68,6 +68,8 @@ namespace eCommerce.Business
         // for ef
         public Store()
         {
+            this._myDiscountStrategies = new List<Composite>();
+            this._myPurchasePolicy = new PurchasePolicy(this);
         }
 
         public Store(String name, User founder)
