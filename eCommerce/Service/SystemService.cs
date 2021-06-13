@@ -78,7 +78,7 @@ namespace eCommerce.Service
                 }
                 case "Persistence":
                 {
-                    DataFacade df = new DataFacade();
+                    DataFacade df = DataFacade.Instance;
                     df.init();
                     userRepo = new PersistenceRegisteredUsersRepo(df);
                     storeRepo = new PersistenceStoreRepo(df);
@@ -171,7 +171,7 @@ namespace eCommerce.Service
                 {
                     IRegisteredUserRepo RP = new PersistentRegisteredUserRepo();
                     UserAuth UA = UserAuth.CreateInstanceForTests(RP, authKey);
-                    DataFacade df = new DataFacade();
+                    DataFacade df = DataFacade.Instance;
                     df.init();
                     AbstractStoreRepo SR = new PersistenceStoreRepo(df);
                     IRepository<User> UR = new PersistenceRegisteredUsersRepo(df);

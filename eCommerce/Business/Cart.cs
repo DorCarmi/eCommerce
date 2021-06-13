@@ -183,15 +183,20 @@ namespace eCommerce.Business
 
         public void Free()
         {
-            foreach (var basket in _baskets)
+            var oldBaskets = new Queue<Pair<Store, Basket>>(_baskets);
+            _baskets = new List<Pair<Store, Basket>>();
+            
+            while(oldBaskets.Count > 0)
             {
-                basket.Value.Free();
+                var pair  = oldBaskets.Dequeue();
+                pair.Value.Free();
+                // DataFacade.Instance.RemoveEntity(pair.Value);
+                DataFacade.Instance.RemoveEntity(pair);
             }
 
-            //TODO: find a way to dispose of this instance
             _totalPrice = 0;
             _performTransaction = null;
-            this._baskets.Clear();
+            // this._baskets.Clear();
         }
     }
 }

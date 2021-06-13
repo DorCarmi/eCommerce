@@ -25,7 +25,7 @@ namespace Tests.DataLayer
        
         public DataLayerTest()
         {
-            df = new DataFacade();
+            df = DataFacade.Instance;
             df.init(true);
         }
 
@@ -147,7 +147,9 @@ namespace Tests.DataLayer
             Assert.True(df.SaveUser(ja).IsSuccess);
             Assert.True(df.SaveUser(jaren).IsSuccess);
             ja.OpenStore(alenbyStore);
+            ja.OpenStore(store1);
             Assert.True(df.SaveStore(alenbyStore).IsSuccess);
+            Assert.True(df.SaveStore(store1).IsSuccess);
 
             
             var pstation4 = new ItemInfo(100, "Playstation4", alenbyStore.GetStoreName(), "Tech",
@@ -156,6 +158,14 @@ namespace Tests.DataLayer
                 new List<string>(), 4500);
             alenbyStore.AddItemToStore(pstation4,ja);
             alenbyStore.AddItemToStore(pstation5,ja);
+
+            
+            var xboxOne = new ItemInfo(100, "xboxOne", store1.GetStoreName(), "Tech",
+                new List<string>(), 2500);
+            var xboxX = new ItemInfo(100, "xboxX", store1.GetStoreName(), "Tech",
+                new List<string>(), 4500);
+            store1.AddItemToStore(xboxOne,ja);
+            store1.AddItemToStore(xboxX,ja);
 
             
             var resGetItem=alenbyStore.GetItem(pstation4);
@@ -167,10 +177,19 @@ namespace Tests.DataLayer
             showItem.amount = 5;
             jaren.AddItemToCart(showItem);
             
+            resGetItem=store1.GetItem(xboxOne);
+            showItem = resGetItem.Value.ShowItem();
+            showItem.amount = 6;
+            jaren.AddItemToCart(showItem);
+            resGetItem=store1.GetItem(xboxX);
+            showItem = resGetItem.Value.ShowItem();
+            showItem.amount = 7;
+            jaren.AddItemToCart(showItem);
+            
             Assert.True(df.UpdateUser(ja).IsSuccess);
             Assert.True(df.UpdateUser(jaren).IsSuccess);
             Assert.True(df.UpdateStore(alenbyStore).IsSuccess);
-
+            Assert.True(df.UpdateStore(store1).IsSuccess);
         }
 
         [Test]
@@ -189,11 +208,13 @@ namespace Tests.DataLayer
             Assert.True(df.ResetConnection().IsSuccess);
             var userRes = df.ReadUser(jaren.Username);
             Assert.True(userRes.IsSuccess, userRes.Error);
-            Assert.True(userRes.Value._myCart._baskets.Count == 1);
+            Assert.True(userRes.Value._myCart._baskets.Count == 2);
         }
+        
         [Test]
         public void SaveUserPurchaseTest()
         {
+            var trans = df.BeginTransaction();
             SaveUserCartTest();
             var purchaseRes=jaren.BuyWholeCart(new PaymentInfo(
                 userName:jaren.Username,
@@ -206,6 +227,8 @@ namespace Tests.DataLayer
             Assert.True(df.UpdateUser(ja).IsSuccess);
             Assert.True(df.UpdateUser(jaren).IsSuccess);
             Assert.True(df.UpdateStore(alenbyStore).IsSuccess);
+            Assert.True(df.UpdateStore(store1).IsSuccess);
+            df.CommitTransaction(trans);
         }
         
         [Test]
@@ -254,9 +277,13 @@ namespace Tests.DataLayer
             var username = jaren.Username;
             var userRes = df.ReadUser(username);
             Assert.True(userRes.IsSuccess);
-            Assert.True(userRes.Value._transHistory._purchases.Count == 1);
-            var storename = alenbyStore.StoreName;
-            var storeRes = df.ReadStore(storename);
+            Assert.True(userRes.Value._transHistory._purchases.Count == 2);
+            
+            var storeRes = df.ReadStore(alenbyStore.StoreName);
+            Assert.True(storeRes.IsSuccess);
+            Assert.True(storeRes.Value._transactionHistory._history.Count == 1);
+            
+            storeRes = df.ReadStore(store1.StoreName);
             Assert.True(storeRes.IsSuccess);
             Assert.True(storeRes.Value._transactionHistory._history.Count == 1);
         }
@@ -353,9 +380,17 @@ namespace Tests.DataLayer
             Assert.True(res.Value.GetHashCode() == ja.GetHashCode());
         }
 
-        
-        
-        
+
+        [Test]
+        public void AddRemoveAddOwnerTest()
+        {
+            Assert.True(df.SaveUser(ja).IsSuccess);
+            Assert.True(df.SaveStore(store1).IsSuccess);
+
+            
+            Assert.Warn("Not Implemented");
+        }
+
         [Test]
         public void SaveStoreWithoutGuestCartTest()
         {

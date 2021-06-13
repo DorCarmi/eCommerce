@@ -478,7 +478,6 @@ namespace eCommerce.Business
             Result addRes = user.AddItemToCart(newItemInfo);
             if (addRes.IsSuccess)
             {
-                //TODO check if need to update store
                 _userManager.UpdateUser(user);
                 _storeRepo.Update(store);
             }

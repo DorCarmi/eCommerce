@@ -5,12 +5,28 @@ using eCommerce.Business;
 using eCommerce.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace eCommerce.DataLayer
 {
     public class DataFacade
     {
-        private ECommerceContext db;
+
+    private static readonly DataFacade instance = new DataFacade();  
+    // Explicit static constructor to tell C# compiler not to mark type as beforefieldinit  
+
+    static DataFacade(){}
+    protected DataFacade(){}  
+    public static DataFacade Instance  
+    {  
+        get  
+        {  
+            return instance;  
+        }  
+    
+    }
+
+    private ECommerceContext db;
 
         public void init()
         {
@@ -46,6 +62,8 @@ namespace eCommerce.DataLayer
         
         public bool CheckConnection()
         {
+            if (db == null)
+                return true;
             return db.Database.CanConnect();
         }
 
@@ -402,6 +420,82 @@ namespace eCommerce.DataLayer
             return Result.Ok();
         }
 
+    public void RemoveEntity(Object entity)
+    {
+        try
+        {
+            db.Remove(entity);
+                    
+            Console.WriteLine("removing "+entity.GetType()+" from DB");
+            db.SaveChanges();
+                    
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+        }
+    }
+
+
+    public void RemovePair<K,V>(Pair<K,V> pair)
+    {
+        try
+        {
+            db.Remove(pair.Value);
+            db.Remove(pair);
+            Console.WriteLine("removing "+pair.Value.GetType()+" from DB");
+            db.SaveChanges();
+                    
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+        }
+    }
+
+    
+    public void RemoveListPair<K,V>(ListPair<K,V> pair)
+    {
+        try
+        {
+            throw new NotImplementedException();
+            db.Remove(pair.ValList);
+            db.Remove(pair);
+            Console.WriteLine("removing "+pair.ValList.GetType()+" from DB");
+            db.SaveChanges();
+                    
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+        }
+    }
+
+    #region SQL Transactions
+
+    public IDbContextTransaction BeginTransaction()
+    {
+        // lock db
+        var transaction = db.Database.BeginTransaction();
+        return transaction;
+    }
+    public void CommitTransaction(IDbContextTransaction transaction)
+    {
+        // lock db
+        transaction.Commit();
+    }
+    public void RollbackTransaction(IDbContextTransaction transaction)
+    {
+        // lock db
+        transaction.Rollback();
+    }
+    
+
+    #endregion
+    
         #region Cart functions
         
         public Result<Cart> ReadCart(string holderId)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using eCommerce.Common;
+using eCommerce.DataLayer;
 
 namespace eCommerce.Business
 {
@@ -231,6 +232,7 @@ namespace eCommerce.Business
                 if (item != null)
                 {
                     this._itemsInStore.Remove(item);
+                    // DataFacade.Instance.RemoveEntity(item);
                     return Result.Ok();
                 }
                 else
