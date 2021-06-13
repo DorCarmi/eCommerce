@@ -20,7 +20,10 @@ namespace eCommerce.DataLayer
             }
             catch (Exception e)
             {
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 Console.WriteLine(e);
             }
         }
@@ -38,7 +41,10 @@ namespace eCommerce.DataLayer
             }
             catch (Exception e)
             {
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 Console.WriteLine(e);
             }
         }
@@ -64,7 +70,10 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail("Unable to Save User");
             }
             return Result.Ok();
@@ -81,7 +90,10 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail("Unable to Update User");
                 // add logging here
             }
@@ -134,7 +146,10 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail<User>("Unable to read User");
             }
             // synchronize all fields which arent compatible with EF (all dictionary properties) 
@@ -151,12 +166,22 @@ namespace eCommerce.DataLayer
         {
             try
             {
+                var storesLst=db.Stores.Where(x => x._storeName.Equals(store._storeName)).ToList();
+                if (storesLst.Count > 0)
+                {
+                    return Result.Fail("Store with the same name already exist");
+                }
                 db.Add(store);
                 db.SaveChanges();
             }
             catch (Exception e)
             {
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
+                
                 Console.WriteLine(e);
                 Console.WriteLine(e.InnerException);
                 return Result.Fail($"Unable to Save Store {store.StoreName}");
@@ -180,7 +205,10 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail($"Unable to Update Store {store.StoreName}");
             }
             return Result.Ok();
@@ -197,7 +225,10 @@ namespace eCommerce.DataLayer
             }
             catch (Exception e)
             {
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail<List<Item>>("Error getting items from db");
             }
 
@@ -240,7 +271,10 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail<Store>("Unable to read Store");
             }
 
@@ -311,7 +345,10 @@ namespace eCommerce.DataLayer
         catch (Exception e)
         {
             Console.WriteLine(e);
-            MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+            if (!CheckConnection())
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+            }
             return Result.Fail<OwnerAppointment>("Unable to read Owner");
         }
         return Result.Ok<OwnerAppointment>(owner);
@@ -337,7 +374,10 @@ namespace eCommerce.DataLayer
         catch (Exception e)
         {
             Console.WriteLine(e);
-            MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+            if (!CheckConnection())
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+            }
             return Result.Fail<ManagerAppointment>("Unable to read Manager");
         }
         
@@ -373,7 +413,10 @@ namespace eCommerce.DataLayer
         catch (Exception e)
         {
             Console.WriteLine(e);
-            MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+            if (!CheckConnection())
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+            }
             return Result.Fail<Basket>("Unable to read Basket");
             // add logging here
         }
@@ -394,7 +437,10 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail("Unable to Save User");
                 // add logging here
             }
@@ -447,7 +493,10 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail<Cart>("Unable to read Cart");
             }
             
@@ -473,7 +522,10 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail("Unable clear Database");
             }
             return Result.Ok();
@@ -490,7 +542,10 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail("Unable to reset Database connection");
             }
             return Result.Ok();
