@@ -14,8 +14,15 @@
   "AuthDBConnectionString": "Server=localhost;DataBase=auth;Trusted_Connection=True;",
   "StatsDBConnectionString": "Server=localhost;DataBase=stats;Trusted_Connection=True;",
   
-  "PaymentAdapter": "WSEP",
-  "SupplyAdapter": "WSEP",
+  "PaymentAdapter": {
+    "Name": "WSEP",
+    "Url": "https://cs-bgu-wsep.herokuapp.com/"
+  },
+  
+  "SupplyAdapter": {
+    "Name": "WSEP",
+    "Url": "https://cs-bgu-wsep.herokuapp.com/"
+  },
 
   "JWTKey": "keykeykeykeykeyekeykey"
 }

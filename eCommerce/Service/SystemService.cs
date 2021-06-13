@@ -196,12 +196,17 @@ namespace eCommerce.Service
         
         private void InitPaymentAdapter(AppConfig config)
         {
-            string paymentAdapter = config.GetData("PaymentAdapter");
-            switch (paymentAdapter)
+            string paymentAdapterName = config.GetData("PaymentAdapter:Name");
+            string paymentAdapterUrl = config.GetData("PaymentAdapter:Url");
+            switch (paymentAdapterName)
             {
                 case "WSEP":
                 {
-                    PaymentProxy.AssignPaymentService(new WSEPPaymentAdapter());
+                    if (paymentAdapterUrl == null)
+                    {
+                        config.ThrowErrorOfData("PaymentAdapter:Url", "missing");
+                    }
+                    PaymentProxy.AssignPaymentService(new WSEPPaymentAdapter(paymentAdapterUrl));
                     break;
                 }
                 case null:
@@ -219,12 +224,18 @@ namespace eCommerce.Service
         
         private void InitSupplyAdapter(AppConfig config)
         {
-            string paymentAdapter = config.GetData("SupplyAdapter");
-            switch (paymentAdapter)
+            string supplyAdapter = config.GetData("SupplyAdapter:Name");
+            string supplyAdapterUrl = config.GetData("SupplyAdapter:Url");
+
+            switch (supplyAdapter)
             {
                 case "WSEP":
                 {
-                    SupplyProxy.AssignSupplyService(new WSEPSupplyAdapter());
+                    if (supplyAdapterUrl == null)
+                    {
+                        config.ThrowErrorOfData("PaymentAdapter:Url", "missing");
+                    }
+                    SupplyProxy.AssignSupplyService(new WSEPSupplyAdapter(supplyAdapterUrl));
                     break;
                 }
                 case null:
