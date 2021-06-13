@@ -46,16 +46,6 @@ namespace eCommerce.DataLayer
         public bool CheckConnection()
         {
             return db.Database.CanConnect();
-            // try
-            // {
-            //     db.Database.OpenConnection();
-            //     db.Database.CloseConnection();
-            // }
-            // catch(Exception ex)
-            // {
-            //     return false;
-            // }
-            // return true;
         }
 
         #region User functions
