@@ -19,10 +19,18 @@ namespace eCommerce.Auth
         public async Task<bool> Add(AuthUser authUser)
         {
             bool added = false;
-            using (var context = _contextFactory.Create())
+            try
             {
-                await context.User.AddAsync(authUser);
-                added = await context.SaveChangesAsync() == 1;
+                using (var context = _contextFactory.Create())
+                {
+                    await context.User.AddAsync(authUser);
+                    added = await context.SaveChangesAsync() == 1;
+
+                }
+            } catch (Exception e)
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                return false;
             }
 
             return added;
