@@ -131,7 +131,7 @@ namespace eCommerce.Business
 
         public BidInfo GetBidInfo()
         {
-            return new BidInfo(this.ID, this.currentState, this.item, this.priceBid, this.amout, this.buyer.Username);
+            return new BidInfo(this.ID, this.currentState, this.item.ItemName, this.priceBid, this.amout, this.buyer.Username);
         }
 
         public bool CheckIfShouldApprove(User user)
@@ -154,16 +154,16 @@ namespace eCommerce.Business
     {
         public string BidID { get; private set; }
         public Bid.BidState State { get; private set; }
-        public ItemInfo ItemInfo { get; private set; }
+        public string itemID { get; private set; }
         public double price { get; private set; }
         public int amount { get; private set; }
         public string BuyerID { get; private set; }
 
-        public BidInfo(string bidId, Bid.BidState state, ItemInfo itemInfo, double price, int amount, string buyerId)
+        public BidInfo(string bidId, Bid.BidState state, string itemID, double price, int amount, string buyerId)
         {
             BidID = bidId;
             State = state;
-            ItemInfo = itemInfo;
+            this.itemID = itemID;
             this.price = price;
             this.amount = amount;
             BuyerID = buyerId;
