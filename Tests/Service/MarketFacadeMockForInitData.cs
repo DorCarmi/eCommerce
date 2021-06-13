@@ -12,10 +12,23 @@ namespace Tests.Service
     public class MarketFacadeMockForInitData : IMarketFacade
     {
         public int RegisteredNumber;
+        public int OpenedStores;
+        
+        public int LoginsNumber;
+        public int LogoutsNumber;
 
         public MarketFacadeMockForInitData()
         {
+            Clear();
+        }
+
+        public void Clear()
+        {
             RegisteredNumber = 0;
+            OpenedStores = 0;
+
+            LoginsNumber = 0;
+            LogoutsNumber = 0;
         }
         public string Connect()
         {
@@ -34,11 +47,13 @@ namespace Tests.Service
 
         public async Task<Result<string>> Login(string guestToken, string username, string password, UserToSystemState role)
         {
+            LoginsNumber++;
             return Result.Ok("1");
         }
 
         public Result<string> Logout(string token)
         {
+            LogoutsNumber++;
             return Result.Ok("1");
         }
 
@@ -179,7 +194,12 @@ namespace Tests.Service
 
         public Result OpenStore(string token, string storeName)
         {
-            throw new NotImplementedException();
+            if (storeName.Equals("TakenStoreName"))
+            {
+                return Result.Fail("Store name is taken");
+            }
+            OpenedStores++;
+            return Result.Ok();
         }
 
         public Result AddNewItemToStore(string token, IItem item)
