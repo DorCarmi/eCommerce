@@ -101,7 +101,8 @@ namespace eCommerce.Service
             marketFacade.Init(authService, userRepo, storeRepo);
 
             string initFilePath;
-            if (config.GetData("InitWithData").Equals("True"))
+            string initWithData = config.GetData("InitWithData");
+            if (initWithData != null && initWithData.Equals("True"))
             {
                 initFilePath = config.GetData("InitDataFile");
                 if (initFilePath != null)

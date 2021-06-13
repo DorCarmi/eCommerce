@@ -591,18 +591,21 @@ namespace eCommerce.Business
             }
 
             ICart cart = cartRes.Value;
+
+            var storesToUpdate = cart.GetBaskets().Select(basket => basket._store );
+            
             Result purchaseRes = cart.BuyWholeCart(user,paymentInfo);
             if (purchaseRes.IsFailure)
             {
                 return purchaseRes;
             }
-
-            // TODO check if need to update each store
             _userManager.UpdateUser(user);
-            foreach (var basket in cart.GetBaskets())
+            
+            foreach (var store in storesToUpdate)
             {
-                _storeRepo.Update(basket._store);
+                _storeRepo.Update(store);
             }
+            
             return Result.Ok();
         }
         

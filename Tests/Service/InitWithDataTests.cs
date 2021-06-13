@@ -29,7 +29,7 @@ namespace Tests.Service
         [SetUp]
         public void Setup()
         {
-            _marketFacade.RegisteredNumber = 0;
+            _marketFacade.Clear();
         }
         
         [Test]
@@ -52,6 +52,18 @@ namespace Tests.Service
         {
             Assert.True(_initSystemWithData.Init("..\\..\\..\\Service\\simpleInit.json"));
             Assert.AreEqual(1, _marketFacade.RegisteredNumber);
+        }
+        
+        [Test]
+        public void OpenStoreTest()
+        {
+            Assert.True(_initSystemWithData.Init("..\\..\\..\\Service\\openStoreInit.json"));
+            
+            Assert.AreEqual(1, _marketFacade.OpenedStores);
+            
+            Assert.True(_marketFacade.LoginsNumber > 0 && _marketFacade.LogoutsNumber > 0, "Need to login and logout in member action");
+            Assert.AreEqual(_marketFacade.LoginsNumber, _marketFacade.LogoutsNumber);
+
         }
     }
 }
