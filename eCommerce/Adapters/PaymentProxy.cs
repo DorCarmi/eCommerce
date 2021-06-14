@@ -30,7 +30,7 @@ namespace eCommerce.Adapters
             {
                 int transactionId = _transactionId;
                 transactionId++;
-                await Task.Delay(5000);
+                await Task.Delay(30);
                 PROXY_HITS++;
                 return Result.Ok(transactionId);
             }
@@ -55,7 +55,7 @@ namespace eCommerce.Adapters
         {
             if (_adapter == null)
             {
-                await Task.Delay(5000);
+                await Task.Delay(30);
                 return true;
             }
             var ans=await _adapter.CheckPaymentInfo(paymentInfoUserName,paymentInfoIDNumber, paymentInfoCreditCardNumber,paymentInfoCreditCardExpirationDate, paymentInfoThreeDigitsOnBackOfCard );
@@ -66,7 +66,7 @@ namespace eCommerce.Adapters
         {
             if (_adapter == null)
             {
-                await Task.Delay(5000);
+                await Task.Delay(30);
                 PROXY_REFUNDS++;
                 return Result.Ok();
             }

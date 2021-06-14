@@ -12,8 +12,11 @@ namespace eCommerce.Business
     {
 
 
-        [Key] 
+        //[Key] 
         public string BasketID { get; set; }
+        
+        [Key]
+        public Guid Guid { get; set; }
 
         public virtual List<ItemInfo> _itemsInBasket { get; set; }
         public List<Pair<string, ItemInfo>> _nameToItem;

@@ -32,7 +32,10 @@ namespace eCommerce.Statistics.Repositories
                 }
             } catch (Exception e)
             {
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail("Error saving data");
             }
 
@@ -50,7 +53,10 @@ namespace eCommerce.Statistics.Repositories
             }
             catch (Exception e)
             {
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail<List<LoginStat>>("Error saving data");
             }
         }
@@ -68,7 +74,10 @@ namespace eCommerce.Statistics.Repositories
             }
             catch (Exception e)
             {
-                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return Result.Fail<int>("Error saving data");
             }
         }

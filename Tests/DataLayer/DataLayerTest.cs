@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using eCommerce.Adapters;
 using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.DataLayer;
@@ -46,6 +47,7 @@ namespace Tests.DataLayer
             jaren = new User(info2);
             dillon = new User(info3);
             store1= new Store("BasketBall stuff.. buy here",ja);
+            ja.OpenStore(store1);
             store2= new Store("More(!) BasketBall stuff.. buy here",ja);
             store3= new Store("EVEN MORE!! BasketBall stuff.. buy here",ja);
             store4= new Store("ok we had too much BasketBall stuff.. buy here",ja);
@@ -97,6 +99,26 @@ namespace Tests.DataLayer
             Assert.True(df.UpdateUser(jaren).IsSuccess);
             Assert.True(df.UpdateStore(store1).IsSuccess);
             Assert.True(df.UpdateStore(store3).IsSuccess);
+        }
+
+        [Test]
+        public void SaveMillionPurchases()
+        {
+            var iphoneItem = new ItemInfo(3000000, "iPhone", store1._storeName, "tech", new List<string>(), 3500);
+            var assignRes=iphoneItem.AssignStoreToItem(store1);
+            Assert.True(assignRes.IsSuccess,assignRes.Error);
+            var addToStoreREs=store1.AddItemToStore(iphoneItem, ja);
+            Assert.True(addToStoreREs.IsSuccess,addToStoreREs.Error);
+            iphoneItem.amount = 2;
+            var addToCartRes=ja.AddItemToCart(iphoneItem);
+            Assert.True(addToCartRes.IsSuccess,addToCartRes.Error);
+            var buyRes=ja.BuyWholeCart(new PaymentInfo(ja.Username, "111", "111", "11/11", "111", "abc"));
+            Assert.True(buyRes.IsSuccess,buyRes.Error);
+            df.UpdateStore(store1);
+            df.UpdateUser(ja);
+
+
+
         }
 
         [Test]
@@ -291,6 +313,8 @@ namespace Tests.DataLayer
         [Test]
         public void SaveStorePurchaseTest()
         {
+            var payInstance = PaymentProxy._adapter;
+            var supplyInstance = SupplyProxy._adapter;
             Assert.True(df.SaveUser(ja).IsSuccess);
             Assert.True(df.SaveUser(jaren).IsSuccess);
             Assert.True(df.SaveUser(dillon).IsSuccess);
@@ -298,7 +322,7 @@ namespace Tests.DataLayer
             
             ja.OpenStore(alenbyStore);
             Assert.True(df.UpdateUser(ja).IsSuccess);
-            var pstation4 = new ItemInfo(100, "Playstation4", alenbyStore.GetStoreName(), "Gaming",
+            var pstation4 = new ItemInfo(3000000, "Playstation4", alenbyStore.GetStoreName(), "Gaming",
                 new List<string>(), 2500);
             var pstation5 = new ItemInfo(100, "Playstation5", alenbyStore.GetStoreName(), "Gaming",
                 new List<string>(), 4000);
@@ -306,8 +330,19 @@ namespace Tests.DataLayer
             alenbyStore.AddItemToStore(pstation5,ja);
             ja.AppointUserToOwner(alenbyStore, jaren);
             jaren.AppointUserToManager(alenbyStore, dillon);
-            
-            Assert.True(df.UpdateStore(alenbyStore).IsSuccess);
+
+            var resAssign=pstation4.AssignStoreToItem(alenbyStore);
+            pstation4.amount = 1;
+            Assert.True(resAssign.IsSuccess,resAssign.Error);
+
+            for (int i = 0; i < 10; i++)
+            {
+                var addToCartRes = ja.AddItemToCart(pstation4);
+                Assert.True(addToCartRes.IsSuccess, addToCartRes.Error);
+                var resBuy = ja.BuyWholeCart(new PaymentInfo(ja.Username, "111", "111", "11/11", "111", "abc"));
+                Assert.True(resBuy.IsSuccess, resBuy.Error);
+                Assert.True(df.UpdateStore(alenbyStore).IsSuccess);
+            }
 
         }
 

@@ -208,11 +208,26 @@ namespace eCommerce.Controllers
         
         // ========== Store bids ========== //
         
-        [HttpPost("{storeId}/bid")]
+        [HttpPost("{storeId}/askToBid")]
         public Result AskToBidOnItem(string storeId, string itemId, int amount, int newPrice )
         {
             return _inStoreService.AskToBidOnItem((string) HttpContext.Items["authToken"],itemId
                 , storeId, amount, newPrice);
+        }
+        
+        [HttpGet("{storeId}/getAllBids")]
+        public Result<List<BidInfo>> GetAllBidsWaitingToApprove(string storeId)
+        {
+            Result<List<BidInfo>> output = _inStoreService.GetAllBidsWaitingToApprove((string) HttpContext.Items["authToken"],
+                storeId);
+            return output;
+        }
+        
+        [HttpPost("{storeId}/approveOrDisapproveBid")]
+        public Result ApproveOrDisapproveBid(string storeId, string bidID, bool shouldApprove )
+        {
+            Console.WriteLine("storeID "+storeId+"\nbidID: "+bidID+"\nshouldApprove: "+shouldApprove);
+            return _inStoreService.ApproveOrDisapproveBid((string) HttpContext.Items["authToken"],storeId,bidID,shouldApprove);
         }
         
 

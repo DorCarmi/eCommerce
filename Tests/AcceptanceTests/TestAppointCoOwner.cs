@@ -151,6 +151,8 @@ namespace Tests.AcceptanceTests
             Assert.True(abTask.Result.IsSuccess,abTask.Result.Error);
             Assert.True(bondTask.Result.IsSuccess,bondTask.Result.Error);
             Assert.True(chumTask.Result.IsSuccess,chumTask.Result.Error);
+            Console.WriteLine("got here");
+            
             
             //A->B
             var abrahamLogInTask = _auth.Login(tokenAb, Abraham.Username, THE_PASSWORD, ServiceUserRole.Member);
@@ -160,6 +162,7 @@ namespace Tests.AcceptanceTests
             _inStore.OpenStore(abiToken, STORE_NAME);
             var appointBondRes=_user.AppointCoOwner(abiToken, STORE_NAME, Bond.Username);
             Assert.True(appointBondRes.IsSuccess,appointBondRes.Error);
+            Console.WriteLine("got here");
             
             //B->C
             var bondLogInTask = _auth.Login(tokenBond, Bond.Username, THE_PASSWORD, ServiceUserRole.Member);
@@ -168,6 +171,7 @@ namespace Tests.AcceptanceTests
             var bondToken = bondLogInResult.Value;
             var appointChumRes=_user.AppointCoOwner(bondToken, STORE_NAME, Chumacher.Username);
             Assert.True(appointChumRes.IsSuccess,appointChumRes.Error);
+            Console.WriteLine("got here");
             
             
             //C->
@@ -175,7 +179,7 @@ namespace Tests.AcceptanceTests
             var chumLogInResult = chumLogInTask.Result;
             Assert.True(chumLogInResult.IsSuccess,chumLogInResult.Error);
             var chumToken = chumLogInResult.Value;
-
+            Console.WriteLine("got here");
 
             //A-x->B->x->C
             var resRemoveOwner=_user.RemoveCoOwner(abiToken, STORE_NAME, Bond.Username);
@@ -187,7 +191,7 @@ namespace Tests.AcceptanceTests
             Assert.True(permissionResAb.IsSuccess,permissionResAb.Error);
             Assert.False(permissionResBond.IsSuccess);
             Assert.False(permissionResChum.IsSuccess);
-
+            Console.WriteLine("got here");
 
         }
     }

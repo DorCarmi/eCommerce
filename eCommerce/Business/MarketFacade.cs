@@ -176,7 +176,7 @@ namespace eCommerce.Business
 
         public Result RemoveCoOwner(string token, string storeId, string removedUserId)
         {
-            throw new NotImplementedException();
+            return this.RemoveOwnerFromStore(token, storeId, removedUserId);
         }
 
         //<CNAME>AppointManager</CNAME>
@@ -478,6 +478,7 @@ namespace eCommerce.Business
             Result addRes = user.AddItemToCart(newItemInfo);
             if (addRes.IsSuccess)
             {
+                //TODO check if need to update store
                 _userManager.UpdateUser(user);
                 _storeRepo.Update(store);
             }

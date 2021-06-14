@@ -95,7 +95,7 @@ namespace Tests.AcceptanceTests
         }
         
         [TestCase("Yossi11", "qwerty123","dancing dragon")]
-        [TestCase("singerMermaid", "130452abc", "Yossi's Store")]
+        [TestCase("singerMermaid", "130452abc", "Borca")]
         [Test] 
         public async Task TestGetPurchaseHistoryOfStoreFailureLogic(string member, string password, string store)
         {
