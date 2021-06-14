@@ -5,7 +5,7 @@ using eCommerce.Common;
 
 namespace eCommerce.Statistics.Repositories
 {
-    // TODO make concurrent
+    
     public class InMemoryStatsRepo : StatsRepo
     {
 
@@ -13,24 +13,32 @@ namespace eCommerce.Statistics.Repositories
         
         public InMemoryStatsRepo()
         {
+            
             _statLogins = new List<LoginStat>();
         }
         
         public Result AddLoginStat(LoginStat stat)
         {
-            _statLogins.Add(stat);
+            lock (_statLogins)
+            {
+                _statLogins.Add(stat);
+            }
+
             return Result.Ok();
         }
 
         public Result<List<LoginStat>> GetAllLoginStatsFrom(DateTime date)
         {
             List<LoginStat> loginStats = new List<LoginStat>();
-            DateTime cateComponent = date.Date;
-            foreach (var stat in _statLogins)
+            DateTime dateComponent = date.Date;
+            lock (_statLogins)
             {
-                if (stat.DateTime.Date.Equals(cateComponent))
+                foreach (var stat in _statLogins)
                 {
-                    loginStats.Add(stat);
+                    if (stat.DateTime.Date.Equals(dateComponent))
+                    {
+                        loginStats.Add(stat);
+                    }
                 }
             }
 
@@ -40,12 +48,15 @@ namespace eCommerce.Statistics.Repositories
         public Result<int> GetNumberOfLoginStatsFrom(DateTime date, string userType)
         {
             int number = 0;
-            DateTime cateComponent = date.Date;
-            foreach (var stat in _statLogins)
+            DateTime dateComponent = date.Date;
+            lock (_statLogins)
             {
-                if (stat.DateTime.Date.Equals(cateComponent) && stat.UserType.Equals(userType))
+                foreach (var stat in _statLogins)
                 {
-                    number++;
+                    if (stat.DateTime.Date.Equals(dateComponent) && stat.UserType.Equals(userType))
+                    {
+                        number++;
+                    }
                 }
             }
 

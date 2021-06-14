@@ -90,8 +90,11 @@ export default class Store extends Component {
                 {permissions.includes(StorePermission.GetStoreHistory) ?<div> <Link to={`/purchaseHistory/${storeId}`}>Show Store's Purchase History</Link></div> : null}
                 {permissions.includes(StorePermission.EditStorePolicy) ? <div><Link to={`/addRule/${storeId}`}>Add Rule To Policy</Link></div> : null}
                 {permissions.includes(StorePermission.EditStorePolicy) ? <div><Link to={`/addPolicy/${storeId}`}>Add Discount To Policy</Link></div> : null}
+                {permissions.includes(StorePermission.EditItemDetails) ? <div><Link to={`/showBids/${storeId}`}>Show Bids
+                </Link></div> : null}
 
-                    </div>
+
+            </div>
 
         )
     }

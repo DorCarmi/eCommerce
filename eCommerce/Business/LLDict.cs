@@ -97,7 +97,7 @@ namespace eCommerce.Business
                     if (pair.Key.Equals(key))
                     {
                         _list.Remove(pair);
-                        // DataFacade.Instance.RemoveListPair(pair);
+                        DataFacade.Instance.RemoveListPair(pair);
                         return;
                     }
                 }
@@ -116,7 +116,7 @@ namespace eCommerce.Business
                         pair.ValList.Remove(value);
                         if (pair.ValList.Count == 0)
                         {
-                            // DataFacade.Instance.RemoveListPair(pair);
+                            DataFacade.Instance.RemoveListPair(pair);
                         }
                         return;
                     }

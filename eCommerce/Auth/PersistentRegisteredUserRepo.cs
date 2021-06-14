@@ -29,7 +29,10 @@ namespace eCommerce.Auth
                 }
             } catch (Exception e)
             {
-                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                if (!CheckConnection())
+                {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                }
                 return false;
             }
 
@@ -49,7 +52,10 @@ namespace eCommerce.Auth
                 }
                 catch (Exception e)
                 {
-                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                    if (!CheckConnection())
+                    {
+                        MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                    }
                     return null;
                 }
             

@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
@@ -69,10 +70,13 @@ namespace eCommerce.Business
             {
                 newPermissions.Add(permission);
             }
-            //@TODO::sharon check if should add BaseManagerPermissions as well?  
+
             foreach (var permission in BaseManagerPermissions)
             {
-                newPermissions.Add(permission);
+                if (!newPermissions.Contains(permission))
+                {
+                    newPermissions.Add(permission);
+                }
             }
             this._permissions = newPermissions;
             return Result.Ok();
@@ -95,12 +99,14 @@ namespace eCommerce.Business
          public void syncFromDict()
         {
             permissionsString = string.Join(";", _permissions.Select(p => (int)p));
+            Console.WriteLine(permissionsString);
         }
          
          
         public void syncToDict()
         {
             string[] list = permissionsString.Split(";");
+            _permissions = new List<StorePermission>();
             foreach (string p in list)
             {
                 _permissions.Add((StorePermission)int.Parse(p));

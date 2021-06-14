@@ -190,8 +190,10 @@ namespace eCommerce.Business
             {
                 var pair  = oldBaskets.Dequeue();
                 pair.Value.Free();
-                // DataFacade.Instance.RemoveEntity(pair.Value);
-                DataFacade.Instance.RemoveEntity(pair);
+                var basket = pair.Value;
+                pair.Value = null;
+                // DataFacade.Instance.RemoveEntity(basket);
+                // DataFacade.Instance.RemoveEntity(pair);
             }
 
             _totalPrice = 0;

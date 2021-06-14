@@ -5,9 +5,9 @@ import {
     ADD_ITEM_TO_STORE_PATH,
     ADD_POLICY_TO_STORE_PATH,
     ADMIN_GET_STORE_PURCHASE_HISTORY,
-    ADMIN_GET_USER_PURCHASE_HISTORY,
+    ADMIN_GET_USER_PURCHASE_HISTORY, APPROVE_OR_DISAPPROVE_BID,
     ASK_TO_BID_ITEM,
-    EDIT_ITEM_IN_STORE_PATH,
+    EDIT_ITEM_IN_STORE_PATH, Get_All_Bid_Waiting,
     GET_ALL_ITEMS_IN_STORE_PATH,
     GET_HISTORY_OF_STORE_PATH,
     GET_ITEM_IN_STORE_PATH,
@@ -27,6 +27,7 @@ import {StaffPermission} from "../Data/StaffPermission";
 import {PurchaseHistory} from "../Data/Purchase";
 import {RuleNode} from "../Data/StorePolicies/RuleInfo";
 import {DiscountNode} from "../Data/StorePolicies/DiscountInfoTree";
+import {BidInfo} from "../Data/BidInfo";
 
 const instance = axios.create(
     {withCredentials : true}
@@ -262,4 +263,24 @@ export class StoreApi {
             }).catch(err => undefined)
     }
     
+    getAllBidWaiting(storeId: string){
+        return instance.get<Result<BidInfo>>(Get_All_Bid_Waiting(storeId))
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+
+    approveOrDisapproveBid(storeId:string, bidID:string ,shouldApprove:boolean ){
+        return instance.post<Result<any>>(APPROVE_OR_DISAPPROVE_BID(storeId),{},{
+            params: {
+                bidID: bidID,
+                shouldApprove: shouldApprove,
+            }
+        })
+            .then(res => {
+                return res.data
+            }).catch(err => undefined)
+    }
+
+
 }

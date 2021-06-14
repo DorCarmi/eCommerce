@@ -39,6 +39,11 @@ namespace eCommerce.Business.Repositories
             
         }
 
+        public override void UpdateManager(ManagerAppointment manager)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IEnumerable<ItemInfo> SearchForItem(string query)
         {
 

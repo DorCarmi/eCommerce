@@ -30,7 +30,11 @@ export function GET_HISTORY_OF_STORE_PATH(storeId){ return STORE_PATH + `/${stor
 export function ADD_POLICY_TO_STORE_PATH(storeId) { return STORE_PATH + `/${storeId}/policy`}
 export function ADD_DISCOUNT_TO_STORE_PATH(storeId) { return STORE_PATH + `/${storeId}/discount`}
 
-export function ASK_TO_BID_ITEM (storeId) { return STORE_PATH + `/${storeId}/bid`}
+export function ASK_TO_BID_ITEM (storeId) { return STORE_PATH + `/${storeId}/askToBid`}
+
+export function Get_All_Bid_Waiting (storeId) { return STORE_PATH + `/${storeId}/getAllBids`}
+
+export function APPROVE_OR_DISAPPROVE_BID (storeId){ return STORE_PATH+`/${storeId}/approveOrDisapproveBid`}
 
 
 // ========= Cart ========== //

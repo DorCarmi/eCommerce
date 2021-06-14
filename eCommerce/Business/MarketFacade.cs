@@ -8,6 +8,7 @@ using eCommerce.Business.Discounts;
 using eCommerce.Business.Repositories;
 
 using eCommerce.Common;
+using eCommerce.DataLayer;
 using eCommerce.Service;
 using eCommerce.Statistics;
 using NLog;
@@ -169,6 +170,7 @@ namespace eCommerce.Business
             {
                 _userManager.UpdateUser(user);
                 _userManager.UpdateUser(appointedUser);
+                _storeRepo.Update(store);
             }
 
             return appointmentRes;
@@ -176,31 +178,7 @@ namespace eCommerce.Business
 
         public Result RemoveCoOwner(string token, string storeId, string removedUserId)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-            
-            _logger.Info($"RemoveOwner({user.Username}, {store.GetStoreName()}, {removedUserId})");
-            
-            Result<User> appointedUserRes = _userManager.GetUser(removedUserId);
-            if (appointedUserRes.IsFailure)
-            {
-                return appointedUserRes;
-            }
-            User userToRemove = appointedUserRes.Value;
-            
-            Result removalRes = user.RemoveOwnerFromStore(store, userToRemove);
-            if (removalRes.IsSuccess)
-            {
-                _userManager.UpdateUser(user);
-                _userManager.UpdateUser(userToRemove);
-            }
-
-            return removalRes;
+            return this.RemoveOwnerFromStore(token, storeId, removedUserId);
         }
 
         //<CNAME>AppointManager</CNAME>
@@ -228,7 +206,9 @@ namespace eCommerce.Business
             {
                 _userManager.UpdateUser(user);
                 _userManager.UpdateUser(appointedUser);
+                _storeRepo.Update(store);
             }
+            
 
             return appointmentRes;
         }
@@ -272,7 +252,8 @@ namespace eCommerce.Business
             Result updateRes = user.UpdatePermissionsToManager(store, managerUser, permissions);
             if (updateRes.IsSuccess)
             {
-                //TODO maybe update the user
+                _storeRepo.UpdateManager(managerUser.StoresManaged.KeyToValue(store.StoreName));
+                _storeRepo.Update(store);
                 _userManager.UpdateUser(managerUser);
             }
 
@@ -502,6 +483,7 @@ namespace eCommerce.Business
             Result addRes = user.AddItemToCart(newItemInfo);
             if (addRes.IsSuccess)
             {
+                //TODO check if need to update store
                 _userManager.UpdateUser(user);
                 _storeRepo.Update(store);
             }
@@ -551,8 +533,14 @@ namespace eCommerce.Business
             }
             var editedItemInfo = itemRes.Value.ShowItem();
             editedItemInfo.amount = amount;
-            //TODO save
-            return user.EditCart(editedItemInfo);
+            Result cartRes = user.EditCart(editedItemInfo);
+
+            if (cartRes.IsSuccess)
+            {
+                _userManager.UpdateUser(user);
+            }
+            
+            return cartRes;
         }
         
         //<CNAME>GetCart</CNAME>

@@ -54,7 +54,7 @@ namespace eCommerce.Business
 
         public string basketsIds { get; set; }
 
-        [NotMapped] public List<Basket> _basketsOfThisStore;
+        [NotMapped] private List<Basket> _basketsOfThisStore;
 
         
         
@@ -64,6 +64,15 @@ namespace eCommerce.Business
             return _basketsOfThisStore.Where(x => !x._cart._cartHolder.GetRole().Equals(Guest.State.GetRole()))
                 .ToList();
         }
+        public void SetBasketsOfMembers(List<Basket> baskets)
+        {
+            _basketsOfThisStore = baskets;
+        }
+        public List<Basket> GetAllBaskets()
+        {
+            return _basketsOfThisStore;
+        }
+        
 
         // for ef
         public Store()
@@ -170,7 +179,7 @@ namespace eCommerce.Business
                 return Result.Ok<IList<StorePermission>>(Enum.GetValues<StorePermission>());
             }
 
-            if (_managersAppointments.Find(u => u.User.Equals(user)) != null)
+            if (_managersAppointments.Find(u => u.User.Equals(user)) == null)
             {
                 return Result.Fail<IList<StorePermission>>("User is not a owner or manager of this store");
             }
@@ -210,14 +219,17 @@ namespace eCommerce.Business
 
         public virtual Result AddBasketToStore(Basket basket)
         {
-            if (this._basketsOfThisStore.FirstOrDefault(x => x.GetCart() == basket.GetCart()) != null)
+            lock (this)
             {
-                return Result.Fail("Store already contains basket for this cart");
-            }
-            else
-            {
-                this._basketsOfThisStore.Add(basket);
-                return Result.Ok(basket);
+                if (this._basketsOfThisStore.FirstOrDefault(x => x.GetCart() == basket.GetCart()) != null)
+                {
+                    return Result.Fail("Store already contains basket for this cart");
+                }
+                else
+                {
+                    this._basketsOfThisStore.Add(basket);
+                    return Result.Ok(basket);
+                }
             }
         }
         public virtual Result CalculateBasketPrices(IBasket basket)

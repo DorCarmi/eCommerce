@@ -12,12 +12,14 @@ namespace eCommerce.Business
     {
 
 
-        [Key] 
+        //[Key] 
         public string BasketID { get; set; }
+        
+        [Key]
+        public Guid Guid { get; set; }
 
         public virtual List<ItemInfo> _itemsInBasket { get; set; }
         public List<Pair<string, ItemInfo>> _nameToItem;
-        //@TODO: fix nameToItem in DB
 
         private List<Pair<string, ItemInfo>> _nameToItemPairs
         {
@@ -162,7 +164,9 @@ namespace eCommerce.Business
             {
                 if (item.amount == -1 || item.amount == 0)
                 {
+                    ItemInfo itinfo = ListHelper<string,ItemInfo>.KeyToValue(_nameToItem,item.name);
                     ListHelper<string,ItemInfo>.Remove(_nameToItem,item.name);
+                    _itemsInBasket.Remove(itinfo);
                     this.currentPrice = this.GetRegularTotalPrice();
                     return Result.Ok();
                 }
