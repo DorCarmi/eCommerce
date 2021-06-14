@@ -337,16 +337,22 @@ namespace Tests.DataLayer
             var updateRes = df.UpdateStore(alenbyStore);
             Assert.True(updateRes.IsSuccess,updateRes.Error);
             
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 100000; i++)
             {
                 var addToCartRes = ja.AddItemToCart(pstation4);
                 Assert.True(addToCartRes.IsSuccess, addToCartRes.Error);
                 var resBuy = ja.BuyWholeCart(new PaymentInfo(ja.Username, "111", "111", "11/11", "111", "abc"));
                 Assert.True(resBuy.IsSuccess, resBuy.Error);
                 
+                if (i % 10000 == 0)
+                {
+                    Assert.True(df.UpdateStore(alenbyStore).IsSuccess);
+                    Console.WriteLine(".");
+                }
+
             }
             Assert.True(df.UpdateStore(alenbyStore).IsSuccess);
-            Assert.True(df.RemoveLingeringEntities());
+            
         }
 
         [Test]
