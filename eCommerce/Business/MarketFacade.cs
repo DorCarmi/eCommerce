@@ -169,6 +169,7 @@ namespace eCommerce.Business
             {
                 _userManager.UpdateUser(user);
                 _userManager.UpdateUser(appointedUser);
+                _storeRepo.Update(store);
             }
 
             return appointmentRes;
@@ -204,7 +205,9 @@ namespace eCommerce.Business
             {
                 _userManager.UpdateUser(user);
                 _userManager.UpdateUser(appointedUser);
+                _storeRepo.Update(store);
             }
+            
 
             return appointmentRes;
         }
