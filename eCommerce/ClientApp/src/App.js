@@ -37,6 +37,7 @@ import AddDiscount from "./components/AddDiscount";
 import {RemoveManager} from "./components/RemoveManager";
 import {RemoveOwner} from "./components/RemoveOwner";
 import BidItem from "./components/BidItem";
+import ShowBids from "./components/ShowBids";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -149,8 +150,8 @@ export default class App extends Component {
     }
 
     
-    async bidExample() {
-        console.log(await this.storeApi.askToBidOnItem("S1","Bamba",3,4))
+    async getAllBidsExample() {
+        console.log(await this.storeApi.getAllBidWaiting("S1"))
     }
     async componentDidMount() {
         const userBasicInfo = await this.userApi.getUserBasicInfo();
@@ -158,7 +159,7 @@ export default class App extends Component {
         if(userBasicInfo.userRole !== UserRole.Guest){
             await this.connectToWebSocket();
 
-            await this.bidExample();
+            console.log(await this.getAllBidsExample());
         }
 
         const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()
@@ -276,6 +277,7 @@ export default class App extends Component {
 
                     <Route exact path="/bidItem/:storeId/:itemId/" render={({match}) => <BidItem storeId ={match.params.storeId} itemId ={match.params.itemId} />}/>
 
+                    <Route exact path="/showBids/:storeId" render={({match}) => <ShowBids storeId ={match.params.storeId}  />}/>
 
 
                 </Layout>
