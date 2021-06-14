@@ -531,8 +531,14 @@ namespace eCommerce.Business
             }
             var editedItemInfo = itemRes.Value.ShowItem();
             editedItemInfo.amount = amount;
-            //TODO save
-            return user.EditCart(editedItemInfo);
+            Result cartRes = user.EditCart(editedItemInfo);
+
+            if (cartRes.IsSuccess)
+            {
+                _userManager.UpdateUser(user);
+            }
+            
+            return cartRes;
         }
         
         //<CNAME>GetCart</CNAME>
