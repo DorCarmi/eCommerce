@@ -232,7 +232,7 @@ namespace eCommerce.Business
                 if (item != null)
                 {
                     this._itemsInStore.Remove(item);
-                    // DataFacade.Instance.RemoveEntity(item);
+                    DataFacade.Instance.RemoveEntity(item);
                     return Result.Ok();
                 }
                 else

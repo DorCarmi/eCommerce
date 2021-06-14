@@ -384,17 +384,65 @@ namespace Tests.DataLayer
         [Test]
         public void AddRemoveAddOwnerTest()
         {
+            var trans = df.BeginTransaction();
             Assert.True(df.SaveUser(ja).IsSuccess);
+            Assert.True(df.SaveUser(jaren).IsSuccess);
             Assert.True(df.SaveStore(store1).IsSuccess);
+            ja.OpenStore(store1);
+            ja.AppointUserToOwner(store1,jaren);
+            Assert.True(df.UpdateUser(ja).IsSuccess);
+            Assert.True(df.UpdateUser(jaren).IsSuccess);
+            Assert.True(df.UpdateStore(store1).IsSuccess);
+            ja.RemoveOwnerFromStore(store1,jaren);
+            Assert.True(df.UpdateUser(ja).IsSuccess);
+            Assert.True(df.UpdateUser(jaren).IsSuccess);
+            Assert.True(df.UpdateStore(store1).IsSuccess);
 
+            df.CommitTransaction(trans);
             
-            Assert.Warn("Not Implemented");
+            Assert.True(df.ResetConnection().IsSuccess);
+
+            var jaRes = df.ReadUser(ja.Username);
+            Assert.True(jaRes.IsSuccess);
+            var ja_2 = jaRes.Value;
+            var jarenRes = df.ReadUser(jaren.Username);
+            Assert.True(jarenRes.IsSuccess);
+            var jaren_2 = jarenRes.Value;
+            var storeRes = df.ReadStore(store1.StoreName);
+            Assert.True(storeRes.IsSuccess);
+            var store_2 = storeRes.Value;
+            
+            ja_2.AppointUserToOwner(store_2,jaren_2);
+            Assert.True(df.UpdateUser(ja_2).IsSuccess);
+            Assert.True(df.UpdateUser(jaren_2).IsSuccess);
+            Assert.True(df.UpdateStore(store_2).IsSuccess);
+
+
+
         }
 
         [Test]
         public void SaveStoreWithoutGuestCartTest()
         {
-            Assert.Warn("Not Implemented");
+            // Assert.Warn("Not Implemented");
+            var guest = new User("guest_1");
+            Assert.True(df.SaveUser(ja).IsSuccess);
+            Assert.True(df.SaveStore(store1).IsSuccess);
+            ja.OpenStore(store1);
+            
+            var pstation = new ItemInfo(100, "Playstation4", store1.GetStoreName(), "Tech",
+                new List<string>(), 3500);
+            var addItemRes= store1.AddItemToStore(pstation,ja);
+           
+            
+            var resGetItem=store1.GetItem(pstation);
+            var showItem = resGetItem.Value.ShowItem();
+            showItem.amount = 5;
+            guest.AddItemToCart(showItem);
+            
+            Assert.True(df.UpdateUser(ja).IsSuccess);
+            Assert.True(df.UpdateStore(store1).IsSuccess);
+
         }
         
         [Test]

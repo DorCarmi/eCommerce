@@ -442,9 +442,9 @@ namespace eCommerce.DataLayer
     {
         try
         {
+            Console.WriteLine("removing "+pair.Value.GetType()+" from DB");
             db.Remove(pair.Value);
             db.Remove(pair);
-            Console.WriteLine("removing "+pair.Value.GetType()+" from DB");
             db.SaveChanges();
                     
         }
@@ -460,8 +460,13 @@ namespace eCommerce.DataLayer
     {
         try
         {
-            throw new NotImplementedException();
-            db.Remove(pair.ValList);
+
+            var valQueue = new Queue<V>(pair.ValList);
+            while (valQueue.Count > 0)
+            {
+                var val = valQueue.Dequeue();
+                db.Remove(val);
+            }
             db.Remove(pair);
             Console.WriteLine("removing "+pair.ValList.GetType()+" from DB");
             db.SaveChanges();
