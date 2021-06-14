@@ -27,7 +27,8 @@ namespace eCommerce.DataLayer
     }
 
     private ECommerceContext db;
-
+    private Queue<Object> EntitiesToRemove = new Queue<object>();
+    
         public void init()
         {
             lock (this)
@@ -119,6 +120,8 @@ namespace eCommerce.DataLayer
                 try
                 {
                     // db.Update(user);
+                    db.SaveChanges();
+                    // RemoveLingeringEntities();
                     db.SaveChanges();
                 }
                 catch (Exception e)
@@ -248,7 +251,9 @@ namespace eCommerce.DataLayer
                         return m.ManagerId;
                     }));
                     store.basketsIds = string.Join(";", store.GetBasketsOfMembers().Select(b => b.BasketID));
-
+                    
+                    db.SaveChanges();
+                    // RemoveLingeringEntities();
                     db.SaveChanges();
                 }
                 catch (Exception e)
@@ -497,54 +502,69 @@ namespace eCommerce.DataLayer
     }
     
 
-    public Result RemoveOwnerAppointment(OwnerAppointment ownerAppointment)
-    {
-        lock (this)
-        {
-            try
-            {
-                db.Remove(ownerAppointment);
-
-                Console.WriteLine("Inserting a new User!!!");
-                db.SaveChanges();
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                if (!CheckConnection())
-                {
-                    MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
-                }
-
-                return Result.Fail("Unable to Save User");
-                // add logging here
-            }
-
-            return Result.Ok();
-        }
-    }
+    // public Result RemoveOwnerAppointment(OwnerAppointment ownerAppointment)
+    // {
+    //     lock (this)
+    //     {
+    //         try
+    //         {
+    //             db.Remove(ownerAppointment);
+    //
+    //             Console.WriteLine("Inserting a new User!!!");
+    //             db.SaveChanges();
+    //
+    //         }
+    //         catch (Exception e)
+    //         {
+    //             Console.WriteLine(e);
+    //             if (!CheckConnection())
+    //             {
+    //                 MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+    //             }
+    //
+    //             return Result.Fail("Unable to Save User");
+    //             // add logging here
+    //         }
+    //
+    //         return Result.Ok();
+    //     }
+    // }
 
     public void RemoveEntity(Object entity)
     {
         lock (this)
         {
-            try
-            {
-                db.Remove(entity);
-
-                Console.WriteLine("removing " + entity.GetType() + " from DB");
-                db.SaveChanges();
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
-            }
+                EntitiesToRemove.Enqueue(entity);
+                Console.WriteLine("Queue removal of " + entity.GetType() + " from DB");
         }
     }
 
+
+    public bool RemoveLingeringEntities()
+    {
+        
+        try
+        {
+            while (EntitiesToRemove.Count > 0)
+            {
+                var entity = EntitiesToRemove.Dequeue();
+                db.Remove(entity);
+            }
+
+            db.SaveChanges();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            if (!CheckConnection())
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+            }
+            return false;
+        }
+
+        return true;
+    }
 
     public void RemovePair<K,V>(Pair<K,V> pair)
     {

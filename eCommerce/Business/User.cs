@@ -541,7 +541,7 @@ namespace eCommerce.Business
                 {
                     _appointedOwners.RemoveFromList(store.StoreName,res.Value);
                     var resFromStore=store.RemoveOwnerFromStore(this, res.Value.User, res.Value);
-                    DataFacade.Instance.RemoveEntity(res.Value);
+                    // DataFacade.Instance.RemoveEntity(res.Value);
                     return resFromStore;
                 }
             }
@@ -571,7 +571,7 @@ namespace eCommerce.Business
                 
                 _appointedManagers.RemoveFromList(store.StoreName,res.Value);
                 var resFromStore=store.RemoveManagerFromStore(this, res.Value.User, res.Value);
-                DataFacade.Instance.RemoveEntity(res.Value);
+                // DataFacade.Instance.RemoveEntity(res.Value);
                 return resFromStore;
             }
             

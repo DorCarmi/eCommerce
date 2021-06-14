@@ -191,7 +191,7 @@ namespace eCommerce.Business
                 var pair  = oldBaskets.Dequeue();
                 pair.Value.Free();
                 // DataFacade.Instance.RemoveEntity(pair.Value);
-                DataFacade.Instance.RemoveEntity(pair);
+                // DataFacade.Instance.RemoveEntity(pair);
             }
 
             _totalPrice = 0;
