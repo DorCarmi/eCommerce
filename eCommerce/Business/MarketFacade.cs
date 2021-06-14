@@ -253,6 +253,7 @@ namespace eCommerce.Business
             {
                 //TODO maybe update the user
                 _userManager.UpdateUser(managerUser);
+                _storeRepo.Update(store);
             }
 
             return updateRes;
