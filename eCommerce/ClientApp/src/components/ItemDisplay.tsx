@@ -62,7 +62,7 @@ export class ItemDisplay extends Component<ItemDisplayProps, ItemDisplayState> {
             }
         } else {
             this.setState({
-                errorMessage: "Connection error",
+                errorMessage: "Connection error",   
                 successMessage: undefined
             })
         }
