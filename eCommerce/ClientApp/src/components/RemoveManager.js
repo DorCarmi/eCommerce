@@ -31,7 +31,9 @@ export class RemoveManager extends Component {
             alert(`${managerId} is no longer manager of the store: ${storeId}`)
         }
         else{
-            alert(`remove manager failed because- ${res.error}`)
+            if(res) {
+                alert(`remove manager failed because- ${res.error}`)
+            }
         }
 
     }
