@@ -337,7 +337,7 @@ namespace Tests.DataLayer
             var updateRes = df.UpdateStore(alenbyStore);
             Assert.True(updateRes.IsSuccess,updateRes.Error);
             
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
                 var addToCartRes = ja.AddItemToCart(pstation4);
                 Assert.True(addToCartRes.IsSuccess, addToCartRes.Error);
@@ -346,6 +346,7 @@ namespace Tests.DataLayer
                 
             }
             Assert.True(df.UpdateStore(alenbyStore).IsSuccess);
+            Assert.True(df.RemoveLingeringEntities());
         }
 
         [Test]
@@ -482,10 +483,5 @@ namespace Tests.DataLayer
 
         }
         
-        [Test]
-        public void SaveStoreWithoutGuestHistoryTest()
-        {
-            Assert.Warn("Not Implemented");
-        }
     }
 }
