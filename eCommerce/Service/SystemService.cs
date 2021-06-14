@@ -78,7 +78,7 @@ namespace eCommerce.Service
                 }
                 case "Persistence":
                 {
-                    DataFacade df = new DataFacade();
+                    DataFacade df = DataFacade.Instance;
                     df.init();
                     userRepo = new PersistenceRegisteredUsersRepo(df);
                     storeRepo = new PersistenceStoreRepo(df);
@@ -171,7 +171,7 @@ namespace eCommerce.Service
                 {
                     IRegisteredUserRepo RP = new PersistentRegisteredUserRepo();
                     UserAuth UA = UserAuth.CreateInstanceForTests(RP, authKey);
-                    DataFacade df = new DataFacade();
+                    DataFacade df = DataFacade.Instance;
                     df.init();
                     AbstractStoreRepo SR = new PersistenceStoreRepo(df);
                     IRepository<User> UR = new PersistenceRegisteredUsersRepo(df);
@@ -196,12 +196,17 @@ namespace eCommerce.Service
         
         private void InitPaymentAdapter(AppConfig config)
         {
-            string paymentAdapter = config.GetData("PaymentAdapter");
-            switch (paymentAdapter)
+            string paymentAdapterName = config.GetData("PaymentAdapter:Name");
+            string paymentAdapterUrl = config.GetData("PaymentAdapter:Url");
+            switch (paymentAdapterName)
             {
                 case "WSEP":
                 {
-                    PaymentProxy.AssignPaymentService(new WSEPPaymentAdapter());
+                    if (paymentAdapterUrl == null)
+                    {
+                        config.ThrowErrorOfData("PaymentAdapter:Url", "missing");
+                    }
+                    PaymentProxy.AssignPaymentService(new WSEPPaymentAdapter(paymentAdapterUrl));
                     break;
                 }
                 case null:
@@ -219,12 +224,18 @@ namespace eCommerce.Service
         
         private void InitSupplyAdapter(AppConfig config)
         {
-            string paymentAdapter = config.GetData("SupplyAdapter");
-            switch (paymentAdapter)
+            string supplyAdapter = config.GetData("SupplyAdapter:Name");
+            string supplyAdapterUrl = config.GetData("SupplyAdapter:Url");
+
+            switch (supplyAdapter)
             {
                 case "WSEP":
                 {
-                    SupplyProxy.AssignSupplyService(new WSEPSupplyAdapter());
+                    if (supplyAdapterUrl == null)
+                    {
+                        config.ThrowErrorOfData("PaymentAdapter:Url", "missing");
+                    }
+                    SupplyProxy.AssignSupplyService(new WSEPSupplyAdapter(supplyAdapterUrl));
                     break;
                 }
                 case null:

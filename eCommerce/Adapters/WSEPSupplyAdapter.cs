@@ -15,10 +15,10 @@ namespace eCommerce.Adapters
         private readonly string _url;
         private readonly Logger _logger;
         
-        public WSEPSupplyAdapter()
+        public WSEPSupplyAdapter(string url)
         {
             _httpClient = new HttpClient();
-            _url = "https://cs-bgu-wsep.herokuapp.com/";
+            _url = url;
             _logger = LogManager.GetCurrentClassLogger();
             LogManager.GetCurrentClassLogger();
         }
@@ -58,9 +58,15 @@ namespace eCommerce.Adapters
             {
                 responseMessage = await _httpClient.PostAsync(_url, content);
             }
+            catch (System.Net.Http.HttpRequestException)
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to supply system",() => this.VerifyConnection().Result);
+                return Result.Fail<int>("Supply system connection error");
+            }
             catch (Exception e)
             {
-                return Result.Fail<int>("Payment system connection error");
+                _logger.Error($"Supply system error {e}");
+                return Result.Fail<int>("Supply system connection error");
             }
 
             if (!responseMessage.IsSuccessStatusCode)
@@ -94,9 +100,15 @@ namespace eCommerce.Adapters
             {
                 responseMessage = await _httpClient.PostAsync(_url, content);
             }
+            catch (System.Net.Http.HttpRequestException)
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to supply system",() => this.VerifyConnection().Result);
+                return Result.Fail<int>("Supply system connection error");
+            }
             catch (Exception e)
             {
-                return Result.Fail("Payment system connection error");
+                _logger.Error($"Supply system error {e}");
+                return Result.Fail<int>("Supply system connection error");
             }
 
             if (!responseMessage.IsSuccessStatusCode)

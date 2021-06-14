@@ -15,8 +15,6 @@ namespace eCommerce.Business.Repositories
         public InMemoryStoreRepo()
         {
             _stores = new ConcurrentDictionary<string, Store>();
-            PaymentProxy._adapter = new WSEPPaymentAdapter();
-            SupplyProxy._adapter = new WSEPSupplyAdapter();
         }
 
         public override bool Add([NotNull] Store store)

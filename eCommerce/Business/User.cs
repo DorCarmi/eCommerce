@@ -533,14 +533,15 @@ namespace eCommerce.Business
                 }
 
                 var res = otherUser.RemoveOwner(store);
-                while (res.IsFailure)
+                if (res.IsFailure)
                 {
                     return res;
                 }
-                while (_appointedOwners.ContainsKey(store.StoreName))
+                if (_appointedOwners.ContainsKey(store.StoreName))
                 {
-                    _appointedOwners.KeyToValue(store.StoreName).Remove(res.Value);
+                    _appointedOwners.RemoveFromList(store.StoreName,res.Value);
                     var resFromStore=store.RemoveOwnerFromStore(this, res.Value.User, res.Value);
+                    DataFacade.Instance.RemoveEntity(res.Value);
                     return resFromStore;
                 }
             }
@@ -568,7 +569,10 @@ namespace eCommerce.Business
             if (_appointedManagers.ContainsKey(store.StoreName))
             {
                 
-                _appointedManagers.KeyToValue(store.StoreName).Remove(res.Value);
+                _appointedManagers.RemoveFromList(store.StoreName,res.Value);
+                var resFromStore=store.RemoveManagerFromStore(this, res.Value.User, res.Value);
+                DataFacade.Instance.RemoveEntity(res.Value);
+                return resFromStore;
             }
             
     
