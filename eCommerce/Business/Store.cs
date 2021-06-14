@@ -179,7 +179,7 @@ namespace eCommerce.Business
                 return Result.Ok<IList<StorePermission>>(Enum.GetValues<StorePermission>());
             }
 
-            if (_managersAppointments.Find(u => u.User.Equals(user)) != null)
+            if (_managersAppointments.Find(u => u.User.Equals(user)) == null)
             {
                 return Result.Fail<IList<StorePermission>>("User is not a owner or manager of this store");
             }

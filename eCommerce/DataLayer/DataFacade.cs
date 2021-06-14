@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using eCommerce.Business;
 using eCommerce.Common;
 using Microsoft.EntityFrameworkCore;
@@ -381,10 +382,28 @@ namespace eCommerce.DataLayer
                 return Result.Ok<Store>(store);
             }
         }
-        
-        
-        
-        
+
+        public void UpdateManager(ManagerAppointment managerAppointment)
+        {
+            lock (this)
+            {
+                try
+                {
+                    managerAppointment.syncFromDict();
+                    db.Entry(managerAppointment).Property(x => x.permissionsString).IsModified = true;
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    if (!CheckConnection())
+                    {
+                        MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+                    }
+                }
+            }
+        }
+
+
 
         #endregion
 

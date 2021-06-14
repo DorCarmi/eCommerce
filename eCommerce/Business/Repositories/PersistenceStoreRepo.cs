@@ -65,5 +65,10 @@ namespace eCommerce.Business.Repositories
         {
             _dataFacade.UpdateStore(data);
         }
+
+        public override void UpdateManager(ManagerAppointment manager)
+        {
+            _dataFacade.UpdateManager(manager);
+        }
     }
 }
