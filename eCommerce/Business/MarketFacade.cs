@@ -321,7 +321,7 @@ namespace eCommerce.Business
             }
 
             _logger.Info($"SearchForItem({userRes.Value.Username}, {query})");
-
+            
             return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItem(query));
         }
 

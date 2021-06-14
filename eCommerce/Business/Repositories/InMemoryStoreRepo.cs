@@ -43,9 +43,10 @@ namespace eCommerce.Business.Repositories
         {
 
             SortedList<int, ItemInfo> list = new SortedList<int, ItemInfo>();
+            
             foreach (var store in _stores.Values)
             {
-                foreach (var item in store.GetAllItems())
+                foreach (var item in store.GetAllItems().Where(x=>x._name.ToUpper().Contains(query.ToUpper())))
                 {
                     list.Add(EditDistance(query, item._name), item.ShowItem());
                 }
