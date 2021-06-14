@@ -775,5 +775,19 @@ namespace eCommerce.DataLayer
             }
         }
         #endregion
+
+        public List<Store> GetAllStores()
+        {
+            try
+            {
+                return this.db.Stores.ToList();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return new List<Store>();
+            }
+            
+        }
     }
 }

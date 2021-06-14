@@ -21,7 +21,7 @@ namespace eCommerce.Business.Repositories
         public override IEnumerable<ItemInfo> SearchForItem(string query)
         {
             var lst = _dataFacade.GetAllItems();
-            return lst.Value.Select(x => x.ShowItem());
+            return lst.Value.Where(x => x._name.ToUpper().Contains(query.ToUpper())).Select(x=>x.ShowItem()).ToList();
         }
 
         public override IEnumerable<ItemInfo> SearchForItemByPrice(string query, double @from, double to)
@@ -36,7 +36,8 @@ namespace eCommerce.Business.Repositories
 
         public override IEnumerable<string> SearchForStore(string query)
         {
-            throw new NotImplementedException();
+            var lst = _dataFacade.GetAllStores();
+            return lst.Where(x => x._storeName.ToUpper().Contains(query.ToUpper())).Select(x=>x.StoreName).ToList();
         }
 
         public override bool Add([NotNull] Store store)

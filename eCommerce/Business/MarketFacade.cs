@@ -326,7 +326,7 @@ namespace eCommerce.Business
             }
 
             _logger.Info($"SearchForItem({userRes.Value.Username}, {query})");
-
+            
             return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItem(query));
         }
 
@@ -892,6 +892,7 @@ namespace eCommerce.Business
             {
                 _userManager.UpdateUser(user);
                 _userManager.UpdateUser(appointedUser);
+                _storeRepo.Update(store);
             }
 
             return removalRes;

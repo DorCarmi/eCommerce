@@ -31,7 +31,7 @@ namespace eCommerce.Business.Repositories
 
         public override void Remove(string id)
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public override void Update(Store data)
@@ -41,16 +41,17 @@ namespace eCommerce.Business.Repositories
 
         public override void UpdateManager(ManagerAppointment manager)
         {
-            throw new NotImplementedException();
+            
         }
 
         public override IEnumerable<ItemInfo> SearchForItem(string query)
         {
 
             SortedList<int, ItemInfo> list = new SortedList<int, ItemInfo>();
+            
             foreach (var store in _stores.Values)
             {
-                foreach (var item in store.GetAllItems())
+                foreach (var item in store.GetAllItems().Where(x=>x._name.ToUpper().Contains(query.ToUpper())))
                 {
                     list.Add(EditDistance(query, item._name), item.ShowItem());
                 }

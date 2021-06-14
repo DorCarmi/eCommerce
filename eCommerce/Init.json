@@ -36,19 +36,19 @@
         {
           "Action": "OpenStore",
           "Data": {
-            "StoreName": "S1"
+            "StoreName": "AppleStore"
           }
         },
 
         {
           "Action": "AddItem",
           "Data": {
-            "ItemName": "Bamba",
-            "StoreName": "S1",
-            "Amount": 20,
-            "Category": "Sweat",
-            "KeyWords": ["Summer"],
-            "PricePerUnit": 30
+            "ItemName": "iPhone",
+            "StoreName": "AppleStore",
+            "Amount": 3000000,
+            "Category": "Tech",
+            "KeyWords": ["Tech"],
+            "PricePerUnit": 2500
           }
         },
 
@@ -56,7 +56,7 @@
           "Action": "AppointManager",
           "Data": {
             "Manager": "User3",
-            "Store": "S1",
+            "Store": "AppleStore",
             "Permissions": [
               "AddItemToStore",
               "EditItemDetails",

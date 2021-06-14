@@ -31,7 +31,9 @@ export class RemoveOwner extends Component {
             alert(`${ownerId} is no longer owner of the store: ${storeId}`)
         }
         else{
-            alert(`remove owner failed because- ${res.error}`)
+            if(res) {
+                alert(`remove owner failed because- ${res.error}`)
+            }
         }
 
     }
