@@ -8,13 +8,13 @@ namespace Tests.StatisticsTests
     {
         public override StatsContext Create()
         {
-            return new StatsDbContextTests();
+            return new TestsStatsDbContext();
         }
     }
     
-    public class PersistenceRepoExtenderTest : PersistenceStatsRepo
+    public class TestsPersistenceRepoExtender : PersistenceStatsRepo
     {
-        public PersistenceRepoExtenderTest(): base(new StatsFactoryOfTests())
+        public TestsPersistenceRepoExtender(): base(new StatsFactoryOfTests())
         {
             
         }

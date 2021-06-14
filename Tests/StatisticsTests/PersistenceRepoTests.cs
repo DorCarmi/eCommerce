@@ -11,10 +11,10 @@ namespace Tests.StatisticsTests
     [TestFixture]
     public class PersistenceRepoTests
     {
-        private PersistenceRepoExtenderTest _repo;
+        private TestsPersistenceRepoExtender _repo;
         public PersistenceRepoTests()
         {
-            _repo = new PersistenceRepoExtenderTest();
+            _repo = new TestsPersistenceRepoExtender();
             _repo.CleanDB();
         }
 

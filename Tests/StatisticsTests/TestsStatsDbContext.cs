@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Tests.StatisticsTests
 {
-    public class StatsDbContextTests: StatsContext
+    public class TestsStatsDbContext: StatsContext
     {
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
