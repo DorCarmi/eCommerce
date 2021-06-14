@@ -162,7 +162,7 @@ namespace Tests.Business.UserManagerTests
                 $"All logging in should have been successful but {registeredSuccessfully} succeeded");
         }*/
 
-        [Test]
+        //[Test]
         public async Task ConcurrentLoginFewUsersTest()
         {
             const int numberOfTasks = 5;

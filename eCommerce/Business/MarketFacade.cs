@@ -176,31 +176,7 @@ namespace eCommerce.Business
 
         public Result RemoveCoOwner(string token, string storeId, string removedUserId)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-            
-            _logger.Info($"RemoveOwner({user.Username}, {store.GetStoreName()}, {removedUserId})");
-            
-            Result<User> appointedUserRes = _userManager.GetUser(removedUserId);
-            if (appointedUserRes.IsFailure)
-            {
-                return appointedUserRes;
-            }
-            User userToRemove = appointedUserRes.Value;
-            
-            Result removalRes = user.RemoveOwnerFromStore(store, userToRemove);
-            if (removalRes.IsSuccess)
-            {
-                _userManager.UpdateUser(user);
-                _userManager.UpdateUser(userToRemove);
-            }
-
-            return removalRes;
+            return this.RemoveOwnerFromStore(token, storeId, removedUserId);
         }
 
         //<CNAME>AppointManager</CNAME>
@@ -502,6 +478,7 @@ namespace eCommerce.Business
             Result addRes = user.AddItemToCart(newItemInfo);
             if (addRes.IsSuccess)
             {
+                //TODO check if need to update store
                 _userManager.UpdateUser(user);
                 _storeRepo.Update(store);
             }

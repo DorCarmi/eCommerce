@@ -210,14 +210,17 @@ namespace eCommerce.Business
 
         public virtual Result AddBasketToStore(Basket basket)
         {
-            if (this._basketsOfThisStore.FirstOrDefault(x => x.GetCart() == basket.GetCart()) != null)
+            lock (this)
             {
-                return Result.Fail("Store already contains basket for this cart");
-            }
-            else
-            {
-                this._basketsOfThisStore.Add(basket);
-                return Result.Ok(basket);
+                if (this._basketsOfThisStore.FirstOrDefault(x => x.GetCart() == basket.GetCart()) != null)
+                {
+                    return Result.Fail("Store already contains basket for this cart");
+                }
+                else
+                {
+                    this._basketsOfThisStore.Add(basket);
+                    return Result.Ok(basket);
+                }
             }
         }
         public virtual Result CalculateBasketPrices(IBasket basket)
