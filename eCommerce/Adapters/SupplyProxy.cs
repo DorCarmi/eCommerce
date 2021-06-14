@@ -29,7 +29,7 @@ namespace eCommerce.Adapters
             {
                 int transactionId = _transactionId;
                 transactionId++;
-                await Task.Delay(100);
+                await Task.Delay(30);
                 PROXY_HITS++;
                 return Result.Ok(transactionId);
             }
@@ -47,7 +47,7 @@ namespace eCommerce.Adapters
         {
             if (_adapter == null)
             {
-                await Task.Delay(100);
+                await Task.Delay(30);
                 return Result.Ok();
             }
 

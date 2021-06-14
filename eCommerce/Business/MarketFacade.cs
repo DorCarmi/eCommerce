@@ -83,130 +83,152 @@ namespace eCommerce.Business
         // <CNAME>Register</CNAME>
         public Task<Result> Register(string token, MemberInfo memberInfo, string password)
         {
-            return _userManager.Register(token, memberInfo, password);
+  
+                return _userManager.Register(token, memberInfo, password);
+            
         }
 
         // <CNAME>Login</CNAME>
         public Task<Result<string>> Login(string guestToken, string username, string password, UserToSystemState role)
         {
-            return _userManager.Login(guestToken, username, password, role);
+
+                return _userManager.Login(guestToken, username, password, role);
+            
         }
 
         // <CNAME>Logout</CNAME>
         public Result<string> Logout(string token)
         {
-            return _userManager.Logout(token);
+
+                return _userManager.Logout(token);
+            
         }
 
         public bool IsUserConnected(string token)
         {
-            return _userManager.IsUserConnected(token);
+
+                return _userManager.IsUserConnected(token);
+            
         }
 
         public Result<UserBasicInfo> GetUserBasicInfo(string token)
         {
-            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<UserBasicInfo>(userRes.Error);
-            }
-            User user = userRes.Value;
+  
+                Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<UserBasicInfo>(userRes.Error);
+                }
 
-            UserBasicInfo userBasicInfo = new UserBasicInfo(user.Username, true,
-                UserSystemStateToUserRole(user.GetState()));
-            if (userBasicInfo.UserRole == UserRole.Guest)
-            {
-                userBasicInfo.IsLoggedIn = false;
-            }
+                User user = userRes.Value;
 
-            return Result.Ok(userBasicInfo);
+                UserBasicInfo userBasicInfo = new UserBasicInfo(user.Username, true,
+                    UserSystemStateToUserRole(user.GetState()));
+                if (userBasicInfo.UserRole == UserRole.Guest)
+                {
+                    userBasicInfo.IsLoggedIn = false;
+                }
+
+                return Result.Ok(userBasicInfo);
+            
         }
 
         //<CNAME>PersonalPurchaseHistory</CNAME>
         public Result<IList<PurchaseRecord>> GetPurchaseHistory(string token)
         {
-            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<IList<PurchaseRecord>>(userRes.Error);
-            }
-            User user = userRes.Value;
 
-            var result = user.GetUserPurchaseHistory();
+                Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<IList<PurchaseRecord>>(userRes.Error);
+                }
 
-            if (result.IsFailure)
-            {
-                _logger.Error($"Error for user {user.Username} in getting the Purchase history");
-                return Result.Fail<IList<PurchaseRecord>>(result.Error);
-            }
+                User user = userRes.Value;
 
-            _logger.Info($"User {user.Username} request purchase history");
-            return result;
+                var result = user.GetUserPurchaseHistory();
+
+                if (result.IsFailure)
+                {
+                    _logger.Error($"Error for user {user.Username} in getting the Purchase history");
+                    return Result.Fail<IList<PurchaseRecord>>(result.Error);
+                }
+
+                _logger.Info($"User {user.Username} request purchase history");
+                return result;
+            
         }
         
          //<CNAME>AppointCoOwner</CNAME>
         public Result AppointCoOwner(string token, string storeId, string appointedUserId)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-            
-            _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
-            
-            Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
-            if (appointedUserRes.IsFailure)
-            {
-                return appointedUserRes;
-            }
-            User appointedUser = appointedUserRes.Value;
 
-            Result appointmentRes = user.AppointUserToOwner(store, appointedUser);
-            if (appointmentRes.IsSuccess)
-            {
-                _userManager.UpdateUser(user);
-                _userManager.UpdateUser(appointedUser);
-            }
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
 
-            return appointmentRes;
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                _logger.Info($"AppointCoOwner({user.Username}, {store.GetStoreName()}, {appointedUserId})");
+
+                Result<User> appointedUserRes = _userManager.GetUser(appointedUserId);
+                if (appointedUserRes.IsFailure)
+                {
+                    return appointedUserRes;
+                }
+
+                User appointedUser = appointedUserRes.Value;
+
+                Result appointmentRes = user.AppointUserToOwner(store, appointedUser);
+                if (appointmentRes.IsSuccess)
+                {
+                    _userManager.UpdateUser(user);
+                    _userManager.UpdateUser(appointedUser);
+                }
+
+                return appointmentRes;
+            
         }
 
         public Result RemoveCoOwner(string token, string storeId, string removedUserId)
         {
-            throw new NotImplementedException();
+            return this.RemoveOwnerFromStore(token, storeId, removedUserId);
         }
 
         //<CNAME>AppointManager</CNAME>
         public Result AppointManager(string token, string storeId, string appointedManagerUserId)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-            
-            _logger.Info($"AppointManager({user.Username}, {store.GetStoreName()}, {appointedManagerUserId})");
-            
-            Result<User> appointedUserRes = _userManager.GetUser(appointedManagerUserId);
-            if (appointedUserRes.IsFailure)
-            {
-                return appointedUserRes;
-            }
-            User appointedUser = appointedUserRes.Value;
-            
-            Result appointmentRes = user.AppointUserToManager(store, appointedUser);
-            if (appointmentRes.IsSuccess)
-            {
-                _userManager.UpdateUser(user);
-                _userManager.UpdateUser(appointedUser);
-            }
+  
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
 
-            return appointmentRes;
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                _logger.Info($"AppointManager({user.Username}, {store.GetStoreName()}, {appointedManagerUserId})");
+
+                Result<User> appointedUserRes = _userManager.GetUser(appointedManagerUserId);
+                if (appointedUserRes.IsFailure)
+                {
+                    return appointedUserRes;
+                }
+
+                User appointedUser = appointedUserRes.Value;
+
+                Result appointmentRes = user.AppointUserToManager(store, appointedUser);
+                if (appointmentRes.IsSuccess)
+                {
+                    _userManager.UpdateUser(user);
+                    _userManager.UpdateUser(appointedUser);
+                }
+
+                return appointmentRes;
+            
         }
 
         public Result RemoveManager(string token, string storeId, string removedUserId)
@@ -216,64 +238,77 @@ namespace eCommerce.Business
 
         public Result<IList<StorePermission>> GetStorePermission(string token, string storeId)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return  Result.Fail<IList<StorePermission>>(userAndStoreRes.Error);
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
 
-            return store.GetPermissions(user);
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return Result.Fail<IList<StorePermission>>(userAndStoreRes.Error);
+                }
+
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                return store.GetPermissions(user);
+            
         }
 
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
+   
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
+
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                _logger.Info(
+                    $"UpdateManagerPermission({user.Username}, {store.GetStoreName()}, {managersUserId}, {permissions})");
+
+                Result<User> mangerUserRes = _userManager.GetUser(managersUserId);
+                if (mangerUserRes.IsFailure)
+                {
+                    return mangerUserRes;
+                }
+
+                User managerUser = mangerUserRes.Value;
+                Result updateRes = user.UpdatePermissionsToManager(store, managerUser, permissions);
+                if (updateRes.IsSuccess)
+                {
+                    //TODO maybe update the user
+                    _userManager.UpdateUser(managerUser);
+                }
+
+                return updateRes;
             
-            _logger.Info($"UpdateManagerPermission({user.Username}, {store.GetStoreName()}, {managersUserId}, {permissions})");
-
-            Result<User> mangerUserRes = _userManager.GetUser(managersUserId);
-            if (mangerUserRes.IsFailure)
-            {
-                return mangerUserRes;
-            }
-            User managerUser = mangerUserRes.Value;
-            Result updateRes = user.UpdatePermissionsToManager(store, managerUser, permissions);
-            if (updateRes.IsSuccess)
-            {
-                //TODO maybe update the user
-                _userManager.UpdateUser(managerUser);
-            }
-
-            return updateRes;
         }
         
         //<CNAME:GetStoreStaff</CNAME>
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(string token,
             string storeId)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return Result.Fail<IList<Tuple<string, IList<StorePermission>>>>(userAndStoreRes.Error);
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
 
-            _logger.Info($"GetStoreStaffAndTheirPermissions({user.Username}, {store.GetStoreName()})");
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return Result.Fail<IList<Tuple<string, IList<StorePermission>>>>(userAndStoreRes.Error);
+                }
 
-            return store.GetStoreStaffAndTheirPermissions(user);
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                _logger.Info($"GetStoreStaffAndTheirPermissions({user.Username}, {store.GetStoreName()})");
+
+                return store.GetStoreStaffAndTheirPermissions(user);
+            
         }
         //<CNAME>AdminGetAllUserHistory</CNAME>
         public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryUser(string token, string ofUserId)
         {
+
+
             var userAndStoreRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
              if (userAndStoreRes.IsFailure)
              {
@@ -291,22 +326,26 @@ namespace eCommerce.Business
              }
 
              return user.GetUserPurchaseHistory(ofUser.Value);
+                             
+            
         }
          
          //<CNAME>AdminGetStoreHistory</CNAME>
          public Result<IList<PurchaseRecord>> AdminGetPurchaseHistoryStore(string token, string storeId)
          {
              Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-             if (userAndStoreRes.IsFailure)
-             {
-                 return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
-             }
-             User user = userAndStoreRes.Value.Item1;
-             Store store = userAndStoreRes.Value.Item2;
+                 if (userAndStoreRes.IsFailure)
+                 {
+                     return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
+                 }
 
-             _logger.Info($"AdminGetPurchaseHistoryStore({user.Username}, {store.GetStoreName()})");
+                 User user = userAndStoreRes.Value.Item1;
+                 Store store = userAndStoreRes.Value.Item2;
 
-             return user.GetStorePurchaseHistory(store);
+                 _logger.Info($"AdminGetPurchaseHistoryStore({user.Username}, {store.GetStoreName()})");
+
+                 return user.GetStorePurchaseHistory(store);
+             
          }
         #endregion
 
@@ -314,140 +353,162 @@ namespace eCommerce.Business
         //<CNAME>SearchForProducts</CNAME>
         public Result<IEnumerable<IItem>> SearchForItem(string token, string query)
         {
-            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<IEnumerable<IItem>>(userRes.Error);
-            }
 
-            _logger.Info($"SearchForItem({userRes.Value.Username}, {query})");
+                Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<IEnumerable<IItem>>(userRes.Error);
+                }
 
-            return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItem(query));
+                _logger.Info($"SearchForItem({userRes.Value.Username}, {query})");
+
+                return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItem(query));
+            
         }
 
         public Result<IEnumerable<IItem>> SearchForItemByPriceRange(string token, string query, double @from = 0, double to = Double.MaxValue)
         {
             Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<IEnumerable<IItem>>(userRes.Error);
-            }
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<IEnumerable<IItem>>(userRes.Error);
+                }
 
-            if (to < from)
-            {
-                to = from;
-            }
+                if (to < from)
+                {
+                    to = from;
+                }
+
+                _logger.Info($"SearchForItemByPriceRange({userRes.Value.Username}, {query}, {from}, {to})");
+
+                return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItemByPrice(query, from, to));
             
-            _logger.Info($"SearchForItemByPriceRange({userRes.Value.Username}, {query}, {from}, {to})");
-
-            return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItemByPrice(query, from, to));
         }
 
         public Result<IEnumerable<IItem>> SearchForItemByCategory(string token, string query, string category)
         {
-            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<IEnumerable<IItem>>(userRes.Error);
-            }
 
-            _logger.Info($"SearchForItemByCategory({userRes.Value.Username}, {query}, {category})");
+                Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<IEnumerable<IItem>>(userRes.Error);
+                }
 
-            return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItemByCategory(query, category));
+                _logger.Info($"SearchForItemByCategory({userRes.Value.Username}, {query}, {category})");
+
+                return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItemByCategory(query, category));
+            
         }
 
         public Result<IEnumerable<string>> SearchForStore(string token, string query)
         {
-            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<IEnumerable<string>>(userRes.Error);
-            }
-            
-            _logger.Info($"SearchForStore({userRes.Value.Username}, {query})");
 
-            return Result.Ok(_storeRepo.SearchForStore(query));
+                Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<IEnumerable<string>>(userRes.Error);
+                }
+
+                _logger.Info($"SearchForStore({userRes.Value.Username}, {query})");
+
+                return Result.Ok(_storeRepo.SearchForStore(query));
+            
         }
         
         public Result<Store> GetStore(string token, string storeId)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return Result.Fail<Store>(userAndStoreRes.Error);
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
 
-            _logger.Info($"GetStore({user.Username}, {storeId})");
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return Result.Fail<Store>(userAndStoreRes.Error);
+                }
 
-            return Result.Ok(store);
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                _logger.Info($"GetStore({user.Username}, {storeId})");
+
+                return Result.Ok(store);
+            
         } 
         public Result<IEnumerable<IItem>> GetAllStoreItems(string token, string storeId)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return Result.Fail<IEnumerable<IItem>>(userAndStoreRes.Error);
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
 
-            IList<IItem> storeItems = new List<IItem>();
-            foreach (var item in store.GetAllItems())
-            {
-                storeItems.Add(item.ShowItem());
-            }
-            
-            _logger.Info($"GetAllStoreItems({user.Username}, {storeId})");
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return Result.Fail<IEnumerable<IItem>>(userAndStoreRes.Error);
+                }
 
-            return Result.Ok<IEnumerable<IItem>>(storeItems);
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                IList<IItem> storeItems = new List<IItem>();
+                foreach (var item in store.GetAllItems())
+                {
+                    storeItems.Add(item.ShowItem());
+                }
+
+                _logger.Info($"GetAllStoreItems({user.Username}, {storeId})");
+
+                return Result.Ok<IEnumerable<IItem>>(storeItems);
             
+
         }
         
         public Result<IItem> GetItem(string token, string storeId, string itemId)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return Result.Fail<IItem>(userAndStoreRes.Error);
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
 
-            Result<Item> itemRes = store.GetItem(itemId);
-            if (itemRes.IsFailure)
-            {
-                return Result.Fail<IItem>(itemRes.Error);
-            }
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return Result.Fail<IItem>(userAndStoreRes.Error);
+                }
+
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                Result<Item> itemRes = store.GetItem(itemId);
+                if (itemRes.IsFailure)
+                {
+                    return Result.Fail<IItem>(itemRes.Error);
+                }
+
+                _logger.Info($"GetItemInfoAfterBidApprove({user.Username}, {storeId}, {itemId})");
+
+                return Result.Ok<IItem>(itemRes.Value.ShowItem());
             
-            _logger.Info($"GetItemInfoAfterBidApprove({user.Username}, {storeId}, {itemId})");
-
-            return Result.Ok<IItem>(itemRes.Value.ShowItem());
         }
 
         public Result<List<string>> GetStoreIds(string token)
         {
-            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<List<string>>(userRes.Error);
-            }
-            User user = userRes.Value;
 
-            return user.GetStoreIds();
+                Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<List<string>>(userRes.Error);
+                }
+
+                User user = userRes.Value;
+
+                return user.GetStoreIds();
+            
         }
 
         public Result<IList<string>> GetAllManagedStores(string token)
         {
-            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<IList<string>>(userRes.Error);
-            }
-            User user = userRes.Value;
 
-            return user.GetManagedStoreIds();
+                Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<IList<string>>(userRes.Error);
+                }
+
+                User user = userRes.Value;
+
+                return user.GetManagedStoreIds();
+            
         }
 
         #endregion
@@ -457,156 +518,179 @@ namespace eCommerce.Business
         //<CNAME>AddItemToCart</CNAME>
         public Result AddItemToCart(string token, string productId, string storeId, int amount)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
 
-            _logger.Info($"AddItemToCart({user.Username}, {productId}, {storeId}, {amount})");
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
 
-            Result<Item> itemRes = store.GetItem(productId);
-            if (itemRes.IsFailure)
-            {
-                return itemRes;
-            }
-            var newItemInfo = itemRes.Value.ShowItem();
-            newItemInfo.amount = amount;
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
 
-            Result addRes = user.AddItemToCart(newItemInfo);
-            if (addRes.IsSuccess)
-            {
-                //TODO check if need to update store
-                _userManager.UpdateUser(user);
-                _storeRepo.Update(store);
-            }
+                _logger.Info($"AddItemToCart({user.Username}, {productId}, {storeId}, {amount})");
 
-            return addRes;
+                Result<Item> itemRes = store.GetItem(productId);
+                if (itemRes.IsFailure)
+                {
+                    return itemRes;
+                }
+
+                var newItemInfo = itemRes.Value.ShowItem();
+                newItemInfo.amount = amount;
+
+                
+                
+                
+                Result addRes = user.AddItemToCart(newItemInfo);
+                if (addRes.IsSuccess)
+                {
+                    //TODO check if need to update store
+                    _userManager.UpdateUser(user);
+                    //_storeRepo.Update(store);
+                }
+
+                return addRes;
+            
         }
 
         public Result AskToBidOnItem(string token, string productId, string storeId, int amount, double newPrice)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
+   
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
 
-            _logger.Info($"AddItemToCart({user.Username}, {productId}, {storeId}, {amount})");
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
 
-            Result<Item> itemRes = store.GetItem(productId);
-            if (itemRes.IsFailure)
-            {
-                return itemRes;
-            }
-            var newItemInfo = itemRes.Value.ShowItem();
-            //newItemInfo.AssignStoreToItem(store);
-            return store.AskToBidOnItem(user, newItemInfo, newPrice, amount);
+                _logger.Info($"AddItemToCart({user.Username}, {productId}, {storeId}, {amount})");
+
+                Result<Item> itemRes = store.GetItem(productId);
+                if (itemRes.IsFailure)
+                {
+                    return itemRes;
+                }
+
+                var newItemInfo = itemRes.Value.ShowItem();
+                //newItemInfo.AssignStoreToItem(store);
+                return store.AskToBidOnItem(user, newItemInfo, newPrice, amount);
+            
         }
 
         //<CNAME>EditCart</CNAME>  
         public Result EditItemAmountOfCart(string token, string itemId, string storeId, int amount)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-            
-            _logger.Info($"EditItemAmountOfCart({user.Username}, {itemId}, {storeId}, {amount})");
 
-            Result<Item> itemRes = store.GetItem(itemId);
-            if (itemRes.IsFailure)
-            {
-                return itemRes;
-            }
-            var editedItemInfo = itemRes.Value.ShowItem();
-            editedItemInfo.amount = amount;
-            //TODO save
-            return user.EditCart(editedItemInfo);
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
+
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                _logger.Info($"EditItemAmountOfCart({user.Username}, {itemId}, {storeId}, {amount})");
+
+                Result<Item> itemRes = store.GetItem(itemId);
+                if (itemRes.IsFailure)
+                {
+                    return itemRes;
+                }
+
+                var editedItemInfo = itemRes.Value.ShowItem();
+                editedItemInfo.amount = amount;
+                //TODO save
+                return user.EditCart(editedItemInfo);
+            
         }
         
         //<CNAME>GetCart</CNAME>
         public Result<ICart> GetCart(string token)
         {
             Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<ICart>(userRes.Error);
-            }
-            User user = userRes.Value;
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<ICart>(userRes.Error);
+                }
 
-            _logger.Info($"GetCart({user.Username})");
-            var resCart=user.GetCartInfo();
-            if (resCart.IsFailure)
-            {
-                return Result.Fail<ICart>(resCart.Error);
-            }
-            return new Result<ICart>(resCart.Value, resCart.IsSuccess, resCart.Error);
+                User user = userRes.Value;
+
+                _logger.Info($"GetCart({user.Username})");
+                var resCart = user.GetCartInfo();
+                if (resCart.IsFailure)
+                {
+                    return Result.Fail<ICart>(resCart.Error);
+                }
+
+                return new Result<ICart>(resCart.Value, resCart.IsSuccess, resCart.Error);
+            
         }
         
         public Result<double> GetPurchaseCartPrice(string token)
         {
             Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<double>(userRes.Error);
-            }
-            User user = userRes.Value;
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<double>(userRes.Error);
+                }
 
-            _logger.Info($"GetPurchaseCartPrice({user.Username})");
+                User user = userRes.Value;
 
-            Result<Cart> cartRes = user.GetCartInfo();
-            if (cartRes.IsFailure)
-            {
-                return Result.Fail<double>(cartRes.Error);
-            }
+                _logger.Info($"GetPurchaseCartPrice({user.Username})");
 
-            ICart cart = cartRes.Value;
-            return cart.CalculatePricesForCart();
+                Result<Cart> cartRes = user.GetCartInfo();
+                if (cartRes.IsFailure)
+                {
+                    return Result.Fail<double>(cartRes.Error);
+                }
+
+                ICart cart = cartRes.Value;
+                return cart.CalculatePricesForCart();
+            
         }
 
         //<CNAME>BuyWholeCart</CNAME>
         public Result PurchaseCart(string token, PaymentInfo paymentInfo)
         {
             Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail<double>(userRes.Error);
-            }
-            User user = userRes.Value;
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail<double>(userRes.Error);
+                }
 
-            _logger.Info($"PurchaseCart({user.Username} {paymentInfo})");
-            
-            Result<Cart> cartRes = user.GetCartInfo();
-            if (cartRes.IsFailure)
-            {
-                return Result.Fail<double>(cartRes.Error);
-            }
+                User user = userRes.Value;
 
-            ICart cart = cartRes.Value;
+                _logger.Info($"PurchaseCart({user.Username} {paymentInfo})");
 
-            var storesToUpdate = cart.GetBaskets().Select(basket => basket._store );
-            
-            Result purchaseRes = cart.BuyWholeCart(user,paymentInfo);
-            if (purchaseRes.IsFailure)
-            {
-                return purchaseRes;
-            }
-            _userManager.UpdateUser(user);
-            
-            foreach (var store in storesToUpdate)
-            {
-                _storeRepo.Update(store);
-            }
-            
-            return Result.Ok();
+                Result<Cart> cartRes = user.GetCartInfo();
+                if (cartRes.IsFailure)
+                {
+                    return Result.Fail<double>(cartRes.Error);
+                }
+
+                ICart cart = cartRes.Value;
+
+                var storesToUpdate = cart.GetBaskets().Select(basket => basket._store);
+
+                Result purchaseRes = cart.BuyWholeCart(user, paymentInfo);
+                if (purchaseRes.IsFailure)
+                {
+                    return purchaseRes;
+                }
+                   
+                _userManager.UpdateUser(user);
+
+                foreach (var store in storesToUpdate)
+                {
+                    _storeRepo.Update(store);
+                }
+
+                return Result.Ok();
+
         }
         
         #endregion
@@ -616,170 +700,188 @@ namespace eCommerce.Business
         public Result OpenStore(string token, string storeName)
         {
             // TODO check with user and store
-            Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
-            if (userRes.IsFailure)
-            {
-                return Result.Fail(userRes.Error);
-            }
-            User user = userRes.Value;
-            
-            _logger.Info($"OpenStore({user.Username})");
-            
-            Store newStore = new Store(storeName, user);
-            if (!_storeRepo.Add(newStore))
-            {
-                return Result.Fail("Store name taken");
-            }
+                Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
+                if (userRes.IsFailure)
+                {
+                    return Result.Fail(userRes.Error);
+                }
 
-            if (user.OpenStore(newStore).IsFailure)
-            {
-                return Result.Fail("Error opening store");
-            }
+                User user = userRes.Value;
 
-            // TODO check save order
+                _logger.Info($"OpenStore({user.Username})");
+
+                Store newStore = new Store(storeName, user);
+                if (!_storeRepo.Add(newStore))
+                {
+                    return Result.Fail("Store name taken");
+                }
+
+                if (user.OpenStore(newStore).IsFailure)
+                {
+                    return Result.Fail("Error opening store");
+                }
+
+                // TODO check save order
+
+                _userManager.UpdateUser(user);
+                _storeRepo.Update(newStore);
+                return Result.Ok();
             
-            _userManager.UpdateUser(user);
-            _storeRepo.Update(newStore);
-            return Result.Ok();
         }
         
         //<CNAME>ItemsToStore</CNAME>
         public Result AddNewItemToStore(string token, IItem item)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
 
-            _logger.Info($"AddNewItemToStore({user.Username} ,{item})");
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
 
-            Result addItemRes = store.AddItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
-            if (addItemRes.IsSuccess)
-            {
-                _storeRepo.Update(store);
-            }
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
 
-            return addItemRes;
+                _logger.Info($"AddNewItemToStore({user.Username} ,{item})");
+
+                Result addItemRes = store.AddItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
+                if (addItemRes.IsSuccess)
+                {
+                    _storeRepo.Update(store);
+                }
+
+                return addItemRes;
+            
         }
         
         //<CNAME>ItemsInStore</CNAME>
         public Result RemoveItemFromStore(string token, string storeId, string itemId)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
 
-            _logger.Info($"RemoveItemFromStore({user.Username} ,{storeId}, {itemId})");
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
 
-            Result removeItemRes =  store.RemoveItemToStore(itemId, user);
-            if (removeItemRes.IsSuccess)
-            {
-                _storeRepo.Update(store);
-            }
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
 
-            return removeItemRes;
+                _logger.Info($"RemoveItemFromStore({user.Username} ,{storeId}, {itemId})");
+
+                Result removeItemRes = store.RemoveItemToStore(itemId, user);
+                if (removeItemRes.IsSuccess)
+                {
+                    _storeRepo.Update(store);
+                }
+
+                return removeItemRes;
+            
         }
 
         public Result EditItemInStore(string token, IItem item)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-            
-            _logger.Info($"EditItemInStore({user.Username} , {item})");
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
 
-            //public ItemInfo(int amount, string name, string storeName, string category,int pricePerUnit, List<string> keyWords,Item theItem)
-            store.EditItemToStore(
-                new ItemInfo(item.Amount, item.ItemName, item.StoreName, item.Category, item.KeyWords.ToList(),
-                    (int) item.PricePerUnit), user);
-            
-            Result editItemRes = store.EditItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
-            if (editItemRes.IsSuccess)
-            {
-                _storeRepo.Update(store);
-            }
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
 
-            return editItemRes;
+                _logger.Info($"EditItemInStore({user.Username} , {item})");
+
+                //public ItemInfo(int amount, string name, string storeName, string category,int pricePerUnit, List<string> keyWords,Item theItem)
+                store.EditItemToStore(
+                    new ItemInfo(item.Amount, item.ItemName, item.StoreName, item.Category, item.KeyWords.ToList(),
+                        (int) item.PricePerUnit), user);
+
+                Result editItemRes = store.EditItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
+                if (editItemRes.IsSuccess)
+                {
+                    _storeRepo.Update(store);
+                }
+
+                return editItemRes;
+            
         }
 
         public Result UpdateStock_AddItems(string token, IItem item)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
 
-            return store.UpdateStock_AddItems(DtoUtils.ItemDtoToProductInfo(item), user);
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
+
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                return store.UpdateStock_AddItems(DtoUtils.ItemDtoToProductInfo(item), user);
+            
         }
         
         public Result UpdateStock_SubtractItems(string token, IItem item)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
-            if (userAndStoreRes.IsFailure)
-            {
-                return userAndStoreRes;
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
 
-            return store.UpdateStock_SubtractItems(DtoUtils.ItemDtoToProductInfo(item), user);
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return userAndStoreRes;
+                }
+
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                return store.UpdateStock_SubtractItems(DtoUtils.ItemDtoToProductInfo(item), user); 
         }
         
         //<CNAME>GetStoreHistory</CNAME>
         public Result<IList<PurchaseRecord>> GetPurchaseHistoryOfStore(string token, string storeId)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
+                }
+
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
+
+                _logger.Info($"GetPurchaseHistoryOfStore({user.Username} , {storeId})");
+
+                Result<IList<PurchaseRecord>> purchaseHistoryRes = store.GetPurchaseHistory(user);
+                if (purchaseHistoryRes.IsFailure)
+                {
+                    return Result.Fail<IList<PurchaseRecord>>(purchaseHistoryRes.Error);
+                }
+
+                return Result.Ok<IList<PurchaseRecord>>((IList<PurchaseRecord>) purchaseHistoryRes.Value);
             }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
-
-            _logger.Info($"GetPurchaseHistoryOfStore({user.Username} , {storeId})");
-
-            Result<IList<PurchaseRecord>> purchaseHistoryRes = store.GetPurchaseHistory(user);
-            if (purchaseHistoryRes.IsFailure)
-            {
-                return Result.Fail<IList<PurchaseRecord>>(purchaseHistoryRes.Error);
-            }
-
-            return Result.Ok<IList<PurchaseRecord>>((IList<PurchaseRecord>) purchaseHistoryRes.Value);
-        }
 
         public Result AddRuleToStorePolicy(string token, string storeId, RuleInfoNode ruleInfoNode)
         {
-            Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
-            if (userAndStoreRes.IsFailure)
-            {
-                return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
-            }
-            User user = userAndStoreRes.Value.Item1;
-            Store store = userAndStoreRes.Value.Item2;
+                Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
+                if (userAndStoreRes.IsFailure)
+                {
+                    return Result.Fail<IList<PurchaseRecord>>(userAndStoreRes.Error);
+                }
 
-            _logger.Info($"AddRuleToStorePolicy({user.Username} , {storeId})");
+                User user = userAndStoreRes.Value.Item1;
+                Store store = userAndStoreRes.Value.Item2;
 
-            var res=store.AddRuleToStorePolicy(user,ruleInfoNode);
-            if (res.IsFailure)
-            {
-                return Result.Fail<IList<PurchaseRecord>>(res.Error);
-            }
+                _logger.Info($"AddRuleToStorePolicy({user.Username} , {storeId})");
 
-            return Result.Ok();
+                var res = store.AddRuleToStorePolicy(user, ruleInfoNode);
+                if (res.IsFailure)
+                {
+                    return Result.Fail<IList<PurchaseRecord>>(res.Error);
+                }
+
+                return Result.Ok();
+            
         }
 
         public Result AddDiscountToStore(string token, string storeId, DiscountInfoNode discountInfoNode)
