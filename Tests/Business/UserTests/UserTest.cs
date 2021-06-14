@@ -327,5 +327,35 @@ namespace Tests.Business.UserTests
             Assert.False(Chumacher.StoresOwned.ContainsKey(AbiAndHisSons.storeName));
 
         }
+        
+        [Test]
+        public void TheABC_ManagerTest()
+        {
+            //ja = new User(new MemberInfo("Ja Morant", "ja@mail.com", "Ja", DateTime.Now, "Memphis"));
+            var Goku = new User(new MemberInfo("Goku", "a@a.com", "Ab", DateTime.Now, "TLV"));
+            var Yamaka = new User(new MemberInfo("Yamaka", "b@a.com", "Bon", DateTime.Now, "TLV"));
+            var Makita = new User(new MemberInfo("Makita", "c@a.com", "Chu", DateTime.Now, "TLV"));
+            
+            //A->B
+            var AbiAndHisSons= new mokStore("AbiAndHisSons", Goku);
+            var openStoreRes=Goku.OpenStore(AbiAndHisSons);
+            Assert.True(openStoreRes.IsSuccess,openStoreRes.Error);
+            var resNominateBond=Goku.AppointUserToOwner(AbiAndHisSons, Yamaka);
+            Assert.True(resNominateBond.IsSuccess,resNominateBond.Error);
+            
+            //B->C
+            var resNominateChu=Yamaka.AppointUserToManager(AbiAndHisSons, Makita);
+            Assert.True(resNominateChu.IsSuccess,resNominateChu.Error);
+            
+            Assert.True(Yamaka.StoresOwned.ContainsKey(AbiAndHisSons.storeName));
+            Assert.True(Makita.StoresManaged.ContainsKey(AbiAndHisSons.storeName));
+
+            var resRemoveBond=Goku.RemoveOwnerFromStore(AbiAndHisSons, Yamaka);
+            Assert.True(resRemoveBond.IsSuccess,resRemoveBond.Error);
+
+            Assert.False(Yamaka.StoresOwned.ContainsKey(AbiAndHisSons.storeName));
+            Assert.False(Makita.StoresOwned.ContainsKey(AbiAndHisSons.storeName));
+
+        }
     }
 }

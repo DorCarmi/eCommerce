@@ -500,34 +500,6 @@ namespace eCommerce.DataLayer
     }
     
 
-    // public Result RemoveOwnerAppointment(OwnerAppointment ownerAppointment)
-    // {
-    //     lock (this)
-    //     {
-    //         try
-    //         {
-    //             db.Remove(ownerAppointment);
-    //
-    //             Console.WriteLine("Inserting a new User!!!");
-    //             db.SaveChanges();
-    //
-    //         }
-    //         catch (Exception e)
-    //         {
-    //             Console.WriteLine(e);
-    //             if (!CheckConnection())
-    //             {
-    //                 MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
-    //             }
-    //
-    //             return Result.Fail("Unable to Save User");
-    //             // add logging here
-    //         }
-    //
-    //         return Result.Ok();
-    //     }
-    // }
-
     public void RemoveEntity(Object entity)
     {
         lock (this)
@@ -579,7 +551,8 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+                if(db!=null)
+                    MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
             }
         }
     }
@@ -607,7 +580,8 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+                if(db!=null)
+                    MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
             }
         }
     }
