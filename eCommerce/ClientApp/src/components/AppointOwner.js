@@ -48,7 +48,7 @@ export class AppointOwner extends Component {
                 <main className="RegisterMain">
                     <div className="RegisterWindow">
                         <div className="CenterItemContainer">
-                            <h3>{`Appoint a manager for store - ${this.props.storeId}`}:</h3>
+                            <h3>{`Appoint an Owner For Store - ${this.props.storeId}`}:</h3>
                         </div>
                         <form className="RegisterForm" onSubmit={this.handleSubmit}>
                             <input type="text" name="managerId" value={this.state.managerId}
