@@ -251,9 +251,8 @@ namespace eCommerce.Business
             Result updateRes = user.UpdatePermissionsToManager(store, managerUser, permissions);
             if (updateRes.IsSuccess)
             {
-                //TODO maybe update the user
-                _userManager.UpdateUser(managerUser);
                 _storeRepo.Update(store);
+                _userManager.UpdateUser(managerUser);
             }
 
             return updateRes;

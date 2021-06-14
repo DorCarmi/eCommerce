@@ -99,7 +99,7 @@ namespace eCommerce.Business
          public void syncFromDict()
         {
             permissionsString = string.Join(";", _permissions.Select(p => (int)p));
-            //Console.WriteLine(permissionsString);
+            Console.WriteLine(permissionsString);
         }
          
          
