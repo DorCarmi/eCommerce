@@ -11,6 +11,10 @@ namespace eCommerce.Service.StorePolicies
         public string ItemId { get; set; }
         public Comperators Comperator { get; set; }
 
+        public SRuleInfo()
+        {
+        }
+        
         public SRuleInfo(RuleType ruleType, string whatIsTheRuleFor, string kind, string itemId, Comperators comperator)
         {
             RuleType = ruleType;

@@ -30,6 +30,8 @@ export function GET_HISTORY_OF_STORE_PATH(storeId){ return STORE_PATH + `/${stor
 export function ADD_POLICY_TO_STORE_PATH(storeId) { return STORE_PATH + `/${storeId}/policy`}
 export function ADD_DISCOUNT_TO_STORE_PATH(storeId) { return STORE_PATH + `/${storeId}/discount`}
 
+export function ASK_TO_BID_ITEM (storeId) { return STORE_PATH + `/${storeId}/bid`}
+
 
 // ========= Cart ========== //
 

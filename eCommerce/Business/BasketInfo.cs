@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace eCommerce.Business
 {
     public class BasketInfo
     {
-        public IList<ItemInfo> _itemsInBasket;
-        public readonly double _totalPrice;
-        public String storeName;
+        private IList<ItemInfo> _itemsInBasket;
+        private double _totalPrice;
+        private String storeName;
         public BasketInfo(IBasket basket)
         {
             _itemsInBasket = new List<ItemInfo>();
@@ -25,11 +26,23 @@ namespace eCommerce.Business
             this.storeName = basket.GetStoreName();
         }
 
+
+
+        public BasketInfo()
+        {
+        }
+
+        [Key]
+        public Guid Id { get; set; } 
         public IList<ItemInfo> ItemsInBasket
         {
             get => _itemsInBasket;
+            set => _itemsInBasket = value;
         }
-
-        public double TotalPrice => _totalPrice;
+        public double TotalPrice
+        {
+            get => _totalPrice;
+            set => _totalPrice = value;
+        }
     }
 }

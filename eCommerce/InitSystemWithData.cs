@@ -64,7 +64,7 @@ namespace eCommerce
         private void CleanUp()
         { 
             _authService.Disconnect(_guestToken);
-            _authService.Disconnect(_authService.Logout(_workingToken).Value);
+            //_authService.Disconnect(_authService.Logout(_workingToken).Value);
         }
 
         public bool Init(string initFile)
@@ -77,6 +77,7 @@ namespace eCommerce
         {
             if (!File.Exists(initFile))
             {
+                _logger.Warn($"Init file {initFile} doesn't exisits");
                 return false;
             }
             
@@ -84,6 +85,7 @@ namespace eCommerce
             BasicActionJsonFormat[] initDataJsons = JsonConvert.DeserializeObject<BasicActionJsonFormat[]>(File.ReadAllText(initFile));
             if (initDataJsons == null)
             {
+                _logger.Warn($"Init file {initFile} empty or not in the required format");
                 return false;
             }
                 

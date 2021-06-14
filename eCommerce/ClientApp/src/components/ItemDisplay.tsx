@@ -1,6 +1,8 @@
 ﻿import React, {ChangeEvent, Component} from "react";
 import {Item} from "../Data/Item";
 import {CartApi} from "../Api/CartApi";
+import {Link,Redirect} from "react-router-dom";
+
 import "./ItemDisplay.css"
 
 interface ItemDisplayProps {
@@ -90,6 +92,8 @@ export class ItemDisplay extends Component<ItemDisplayProps, ItemDisplayState> {
                 <label>Price per unit: {item.pricePerUnit}</label>
                 <label>Catagory: {item.category}</label>
                 {this.renderCartSection()}
+                <Link to = {`/bidItem/${item.storeName}/${item.itemName}`}>Bid Item</Link>
+
             </div>
         )
     }

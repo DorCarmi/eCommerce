@@ -5,24 +5,23 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using eCommerce.Adapters;
 using eCommerce.Common;
+using eCommerce.DataLayer;
 
 namespace eCommerce.Business.Repositories
 {
     public class PersistenceStoreRepo : AbstractStoreRepo
     {
-        // TODO remove dictionary and use dal in all the functions
-        private ConcurrentDictionary<string, Store> _stores;
+        private DataFacade _dataFacade;
 
-        public PersistenceStoreRepo()
+        public PersistenceStoreRepo(DataFacade dataFacade)
         {
-            _stores = new ConcurrentDictionary<string, Store>();
-            PaymentProxy._adapter = new WSEPPaymentAdapter();
-            SupplyProxy._adapter = new WSEPSupplyAdapter();
+            _dataFacade = dataFacade;
         }
 
         public override IEnumerable<ItemInfo> SearchForItem(string query)
         {
-            throw new NotImplementedException();
+            var lst = _dataFacade.GetAllItems();
+            return lst.Value.Select(x => x.ShowItem());
         }
 
         public override IEnumerable<ItemInfo> SearchForItemByPrice(string query, double @from, double to)
@@ -42,14 +41,18 @@ namespace eCommerce.Business.Repositories
 
         public override bool Add([NotNull] Store store)
         {
-            return _stores.TryAdd(store.GetStoreName().ToUpper(), store);
+            return _dataFacade.SaveStore(store).IsSuccess;
         }
 
         public override Store GetOrNull([NotNull] string storeName)
         {
-            Store store = null;
-            _stores.TryGetValue(storeName.ToUpper(), out store);
-            return store;
+            Result<Store> storeRes = _dataFacade.ReadStore(storeName);
+            if (storeRes.IsFailure)
+            {
+                return null;
+            }
+
+            return storeRes.Value;
         }
 
         public override void Remove(string id)
@@ -59,7 +62,7 @@ namespace eCommerce.Business.Repositories
 
         public override void Update(Store data)
         {
-            throw new System.NotImplementedException();
+            _dataFacade.UpdateStore(data);
         }
     }
 }

@@ -11,28 +11,13 @@ namespace eCommerce.Business
     public class Basket: IBasket
     {
 
-        private Guid BasketGuid;
-        
-        [Key]
-        public string BasketID {
-            get
-            {
-                return BasketGuid.ToString();
-            }
-            set
-            {
-                Guid currGuid;
-                var guidRes=Guid.TryParse(value, out currGuid);
-                if (guidRes)
-                {
-                    BasketGuid = currGuid;
-                }
-            }
-        }
+
+        [Key] 
+        public string BasketID { get; set; }
+
         public virtual List<ItemInfo> _itemsInBasket { get; set; }
-        //private IDictionary<string, ItemInfo> _nameToItem;
-        private List<Pair<string, ItemInfo>> _nameToItem;
-        
+        public List<Pair<string, ItemInfo>> _nameToItem;
+        //@TODO: fix nameToItem in DB
 
         private List<Pair<string, ItemInfo>> _nameToItemPairs
         {
@@ -106,12 +91,13 @@ namespace eCommerce.Business
         }
         public Basket(Cart cart, Store store)
         {
-            BasketGuid = Guid.NewGuid();
+            // BasketGuid = Guid.NewGuid();
             
             if (!store.CheckConnectionToCart(cart))
             {
                 this._cart = cart;
                 this._store = store;
+                this.BasketID = cart._cartHolder.Username + "_" + store.StoreName + "_" + DateTime.Now;
                 this._itemsInBasket = new List<ItemInfo>();
                 this._nameToItem = new List<Pair<string, ItemInfo>>();
                 this.currentPrice = 0;

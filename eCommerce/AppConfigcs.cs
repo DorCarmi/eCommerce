@@ -1,16 +1,22 @@
 ﻿using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using NLog;
 
 namespace eCommerce
 {
     public class AppConfig
     {
         private static AppConfig _instance = new AppConfig();
+        private static Logger _logger;
 
         private IConfigurationRoot _config;
         private AppConfig()
         {
+            _config = new ConfigurationBuilder()
+                .AddJsonFile("appConfig.json")
+                .Build();
+            _logger = LogManager.GetCurrentClassLogger();
         }
 
         public static AppConfig GetInstance()
@@ -37,7 +43,9 @@ namespace eCommerce
 
         public void ThrowErrorOfData(string data, string state)
         {
-            throw new InvalidDataException($"{data} data in the config file is {state}");
+            string message = $"{data} data in the config file is {state}";
+            _logger.Error(message);
+            throw new InvalidDataException(message);
         }
     }
 }

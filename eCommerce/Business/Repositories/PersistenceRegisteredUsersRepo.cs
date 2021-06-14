@@ -8,10 +8,9 @@ namespace eCommerce.Business.Repositories
     {
         private DataFacade _dataFacade;
 
-        public PersistenceRegisteredUsersRepo()
+        public PersistenceRegisteredUsersRepo(DataFacade dataFacade)
         {
-            _dataFacade = new DataFacade();
-            _dataFacade.init();
+            _dataFacade = dataFacade;
         }
 
         public void ClearTables()

@@ -9,8 +9,9 @@ namespace eCommerce.Business
 {
     public class OwnerAppointment
     {
+        [Key]
+        public string OwnerId { get; set; }
         public string Ownername { get; set; }
-        public string OwnedStorename { get; set; }
         public User User { get; set; }
         private List<StorePermission> _permissions;
 
@@ -31,8 +32,8 @@ namespace eCommerce.Business
         public OwnerAppointment(User user, string storename)
         {
             this.User = user;
+            this.OwnerId = user.Username + "_" + storename;
             this.Ownername = user.Username;
-            this.OwnedStorename = storename;
             this._permissions = new List<StorePermission>();
 
             foreach (var permission in Enum.GetValues(typeof(StorePermission)))

@@ -7,6 +7,7 @@ namespace eCommerce.Business
     public class Category
     {
         [Key]
+        public Guid Id { get; set; }
         public string name { get; private set; }
 
         public Category(string name)

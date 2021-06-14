@@ -29,11 +29,14 @@ import {makeRuleInfo, makeRuleNodeComposite, makeRuleNodeLeaf, RuleType} from ".
 import {Comperators} from "./Data/StorePolicies/Comperators";
 import {Combinations} from "./Data/StorePolicies/Combinations";
 import {makeDiscountCompositeNode, makeDiscountNodeLeaf} from "./Data/StorePolicies/DiscountInfoTree";
-import AddPolicy from "./components/AddPolicy";
 import AddRule from "./components/AddRule";
 import {AppointOwner} from "./components/AppointOwner";
 import {ShowStatsInput} from "./components/ShowStatsInput";
 import ShowStatsOutput from "./components/ShowStatsOutput";
+import AddDiscount from "./components/AddDiscount";
+import {RemoveManager} from "./components/RemoveManager";
+import {RemoveOwner} from "./components/RemoveOwner";
+import BidItem from "./components/BidItem";
 
 export default class App extends Component {
     static displayName = App.name;
@@ -145,13 +148,17 @@ export default class App extends Component {
         console.log("==========");
     }
 
+    
+    async bidExample() {
+        console.log(await this.storeApi.askToBidOnItem("S1","Bamba",3,4))
+    }
     async componentDidMount() {
         const userBasicInfo = await this.userApi.getUserBasicInfo();
         console.log(`user: ${userBasicInfo.username} role: ${userBasicInfo.userRole}`);
         if(userBasicInfo.userRole !== UserRole.Guest){
             await this.connectToWebSocket();
 
-            await this.policyExample();
+            await this.bidExample();
         }
 
         const fetchedOwnedStoredList = await this.userApi.getAllOwnedStoreIds()
@@ -245,7 +252,7 @@ export default class App extends Component {
                     <Route exact path="/store/:id/editItem/:itemId" render={({match}) => <EditItem storeId ={match.params.id} itemId ={match.params.itemId}/>} />
                     <Route exact path="/purchaseHistory/:storeId?/:userId?/:isAdmin?" render={({match}) => <PurchaseHistory storeId ={match.params.storeId} userId={match.params.userId} isAdmin={match.params.isAdmin}/>} />
                     <Route exact path="/AdminPurchaseHistory/:term" render={({match}) => <AdminPurchaseHistory term={match.params.term}/>}/>
-                    <Route exact path="/addPolicy/:storeId" render={({match}) => <AddPolicy storeId={match.params.storeId}/>}/>
+                    <Route exact path="/addPolicy/:storeId" render={({match}) => <AddDiscount storeId={match.params.storeId}/>}/>
 
 
                     <Route exact path="/addRule/:storeId" render={({match}) => <AddRule storeId={match.params.storeId}/>}/>
@@ -262,6 +269,12 @@ export default class App extends Component {
                     <Route exact path="/showStats" render={({match}) => <ShowStatsInput storeId ={match.params.storeId}/>}/>
 
                     <Route exact path="/showStats/:date" render={({match}) => <ShowStatsOutput date ={match.params.date}/>}/>
+                    
+                    <Route exact path="/removeManager/:storeId" render={({match}) => <RemoveManager storeId ={match.params.storeId}/>}/>
+
+                    <Route exact path="/removeOwner/:storeId" render={({match}) => <RemoveOwner storeId ={match.params.storeId}/>}/>
+
+                    <Route exact path="/bidItem/:storeId/:itemId/" render={({match}) => <BidItem storeId ={match.params.storeId} itemId ={match.params.itemId} />}/>
 
 
 

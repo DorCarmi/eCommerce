@@ -49,9 +49,19 @@ namespace eCommerce.Service
             return _marketFacade.AppointCoOwner(token, storeId, appointedUserId);
         }
 
+        public Result RemoveCoOwner(string token, string storeId, string removedUserId)
+        {
+            return _marketFacade.RemoveCoOwner(token, storeId, removedUserId);
+        }
+
         public Result AppointManager(string token, string storeId, string appointedManagerUserId)
         {
             return _marketFacade.AppointManager(token, storeId, appointedManagerUserId);
+        }
+
+        public Result RemoveManager(string token, string storeId, string removedUserId)
+        {
+            return _marketFacade.RemoveManager(token, storeId, removedUserId);
         }
 
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)
@@ -94,11 +104,6 @@ namespace eCommerce.Service
         public Result<LoginDateStat> AdminGetLoginStats(string token, DateTime date)
         {
             return _marketFacade.AdminGetLoginStats(token, date);
-        }
-
-        public Result RemoveOwnerFromStore(string token, string storeId, string appointedUserId)
-        {
-            return _marketFacade.RemoveOwnerFromStore(token, storeId, appointedUserId);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using eCommerce.Business;
 using eCommerce.Common;
 using eCommerce.Statistics.DAL;
 
@@ -17,17 +18,17 @@ namespace eCommerce.Statistics.Repositories
 
         public Result AddLoginStat(LoginStat stat)
         {
-            using (var context = _contextFactory.Create())
+            try
             {
-                try
+                using (var context = _contextFactory.Create())
                 {
                     context.Add(stat);
                     context.SaveChanges();
                 }
-                catch (Exception e)
-                {
-                    return Result.Fail("Error saving data");
-                }
+            } catch (Exception e)
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                return Result.Fail("Error saving data");
             }
 
             return Result.Ok();
@@ -35,32 +36,41 @@ namespace eCommerce.Statistics.Repositories
 
         public Result<List<LoginStat>> GetAllLoginStatsFrom(DateTime date)
         {
-            using (var context = _contextFactory.Create())
+            try
             {
-                try
+                using (var context = _contextFactory.Create())
                 {
                     return Result.Ok(context.Login.Where(ls => ls.DateTime.Equals(date.Date)).ToList());
                 }
-                catch (Exception e)
-                {
-                    return Result.Fail<List<LoginStat>>("Error saving data");
-                }
+            }
+            catch (Exception e)
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                return Result.Fail<List<LoginStat>>("Error saving data");
             }
         }
 
         public Result<int> GetNumberOfLoginStatsFrom(DateTime date, string userTyp)
         {
-            using (var context = _contextFactory.Create())
+            try
             {
-                try
+                using (var context = _contextFactory.Create())
                 {
+
                     return Result.Ok(context.Login.Count(ls => ls.DateTime.Equals(date.Date) &&
                                                                ls.UserType.Equals(userTyp)));
                 }
-                catch (Exception e)
-                {
-                    return Result.Fail<int>("Error saving data");
-                }
-            }        }
+            }
+            catch (Exception e)
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+                return Result.Fail<int>("Error saving data");
+            }
+        }
+        
+        public bool CheckConnection()
+        {
+            return _contextFactory.Create().Database.CanConnect();
+        }
     }
 }

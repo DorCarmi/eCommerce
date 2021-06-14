@@ -34,19 +34,44 @@ namespace eCommerce.Business
         private PurchasePolicy _myPurchasePolicy;
         
         //History and inventory
-        private StoreTransactionHistory _transactionHistory;
+        public StoreTransactionHistory _transactionHistory { get; set; }
         public ItemsInventory _inventory { get; private set; }
 
         //User issues
-        public User _founder { get; private set; }
-        public List<OwnerAppointment> _ownersAppointments { get; private set; }
-        public List<ManagerAppointment> _managersAppointments { get; private set; }
+        [NotMapped] 
+        public User _founder { get; set; }
+        public string _founderName { get; set; }
+
         
-        public List<Basket> _basketsOfThisStore { get; private set; }
+        
+        public string OwnersIds { get; set; }
+        [NotMapped]
+        public List<OwnerAppointment> _ownersAppointments { get;  set; }
+        
+        public string ManagersIds { get; set; }
+        [NotMapped]
+        public List<ManagerAppointment> _managersAppointments { get; set; }
+
+        public string basketsIds { get; set; }
+
+        [NotMapped] public List<Basket> _basketsOfThisStore;
+
+        
+        
+        public List<Basket> GetBasketsOfMembers()
+        {
+
+            return _basketsOfThisStore.Where(x => !x._cart._cartHolder.GetRole().Equals(Guest.State.GetRole()))
+                .ToList();
+        }
 
         // for ef
         public Store()
         {
+            this._myDiscountStrategies = new List<Composite>();
+            this._myPurchaseStrategies = new List<PurchaseStrategy>();
+            this._myPurchasePolicy = new PurchasePolicy(this);
+            this._UsersBids = new List<Pair<User, Bid>>();
         }
 
         public Store(String name, User founder)
@@ -63,6 +88,8 @@ namespace eCommerce.Business
             _inventory = new ItemsInventory(this);
 
             this._founder = founder;
+            this._founderName = founder.Username;
+
             _ownersAppointments = new List<OwnerAppointment>();
             
             _managersAppointments = new List<ManagerAppointment>();
@@ -461,7 +488,7 @@ namespace eCommerce.Business
 
         public virtual Result EnterBasketToHistory(IBasket basket)
         {
-            return this._transactionHistory.AddRecordToHistory(basket);
+            return this._transactionHistory.AddRecordToHistory(this, basket);
         }
 
         public virtual string GetStoreName()
@@ -644,12 +671,12 @@ namespace eCommerce.Business
 
         public virtual Result<PurchaseRecord> AddBasketRecordToStore(Basket basket)
         {
-            var purchaseRecord=this._transactionHistory.AddRecordToHistory(basket);
+            var purchaseRecord=this._transactionHistory.AddRecordToHistory(this, basket);
 
             foreach (var ownerAppointment in _ownersAppointments)
             {
                 User owner = ownerAppointment.User;
-                foreach (var item in purchaseRecord.Value.BasketInfo._itemsInBasket)
+                foreach (var item in purchaseRecord.Value.BasketInfo.ItemsInBasket)
                 {
                     owner.PublishMessage(String.Format("User: {0} , bought {1} items of {2} at {3}",
                         purchaseRecord.Value.Username, item.name, item.name, purchaseRecord.Value.GetDate()));

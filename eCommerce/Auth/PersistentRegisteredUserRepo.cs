@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using eCommerce.Auth.DAL;
+using eCommerce.Business;
 using Microsoft.EntityFrameworkCore;
 
 namespace eCommerce.Auth
@@ -18,10 +19,18 @@ namespace eCommerce.Auth
         public async Task<bool> Add(AuthUser authUser)
         {
             bool added = false;
-            using (var context = _contextFactory.Create())
+            try
             {
-                await context.User.AddAsync(authUser);
-                added = await context.SaveChangesAsync() == 1;
+                using (var context = _contextFactory.Create())
+                {
+                    await context.User.AddAsync(authUser);
+                    added = await context.SaveChangesAsync() == 1;
+
+                }
+            } catch (Exception e)
+            {
+                MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+                return false;
             }
 
             return added;
@@ -30,19 +39,27 @@ namespace eCommerce.Auth
         public async Task<AuthUser> GetUserOrNull(string username)
         {
             AuthUser authUser = null;
-            using (var context = _contextFactory.Create())
-            {
+            
                 try
                 {
-                    authUser = await context.User.SingleAsync(user => user.Username.Equals(username));
+                    using (var context = _contextFactory.Create())
+                    {
+                        authUser = await context.User.SingleAsync(user => user.Username.Equals(username));
+                    }
                 }
-                catch (InvalidOperationException e)
+                catch (Exception e)
                 {
+                    MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
                     return null;
                 }
-            }
+            
 
             return authUser;
+        }
+
+        public bool CheckConnection()
+        {
+            return _contextFactory.Create().Database.CanConnect();
         }
     }
 }

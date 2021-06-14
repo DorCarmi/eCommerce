@@ -27,9 +27,9 @@ namespace Tests.Business.UserTests
         public void Setup()
         {
             ja = new User(new MemberInfo("Ja Morant", "ja@mail.com", "Ja", DateTime.Now, "Memphis"));
-            store1= new mokStore("BasketBall stuff.. buy here");
+            store1= new mokStore("BasketBall stuff.. buy here", ja);
             tempguy = new User("10-Day-Contract guy");
-            store2 = new mokStore("More(!) BasketBall stuff.. buy here");
+            store2 = new mokStore("More(!) BasketBall stuff.. buy here", ja);
             jaren = new User(new MemberInfo("Jaren Jackson Jr.", "jjj@mail.com", "Jaren", DateTime.Now, "Memphis"));
             GM = new User(Admin.State,new MemberInfo("GM", "gm@mail.com", "GM", DateTime.Now, "Memphis"));
             dillon = new User(new MemberInfo("Dillon Brooks","db@mail.com","Dillon",DateTime.Now, "Memphis"));
@@ -42,8 +42,8 @@ namespace Tests.Business.UserTests
         public void TestOpenStore_Pass()
         {
             Assert.True(ja.HasPermission(store1,StorePermission.ControlStaffPermission).IsSuccess);
-            Assert.True(ListHelper<Store,OwnerAppointment>.ContainsKey(ja.StoresOwned,store1));
-            Assert.True(ListHelper<Store,OwnerAppointment>.KeyToValue(ja.StoresOwned,store1).User.Equals(ja));
+            Assert.True(ja.StoresOwned.ContainsKey(store1.StoreName));
+            Assert.True(ja.StoresOwned.KeyToValue(store1.StoreName).User.Equals(ja));
         } 
         [Test]
         public void TestOpenStore_Fail()
@@ -54,8 +54,8 @@ namespace Tests.Business.UserTests
         [Test]
         public void TestOpenStore_Concurrent()
         {
-            var store3 = new mokStore("New Location(!) BasketBall stuff.. buy here");
-            var store4 = new mokStore("Old Location Again(!) BasketBall stuff.. buy here");
+            var store3 = new mokStore("New Location(!) BasketBall stuff.. buy here", ja);
+            var store4 = new mokStore("Old Location Again(!) BasketBall stuff.. buy here", ja);
             Task<Result> task1 = new Task<Result>(() => { return jaren.OpenStore(store2); });
             Task<Result> task2 = new Task<Result>(() => { return jaren.OpenStore(store2); });
             task1.Start();
@@ -108,8 +108,8 @@ namespace Tests.Business.UserTests
         {
             Assert.True(ja.AppointUserToManager(store1, jaren).IsSuccess);
             Assert.True(ja.AppointedManagers != null);
-            Assert.True(ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(ja.AppointedManagers,store1));
-            Assert.True(ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(ja.AppointedManagers,store1).FirstOrDefault(m => m.User == jaren)!= null);
+            Assert.True(ja.AppointedManagers.ContainsKey(store1.StoreName));
+            Assert.True(ja.AppointedManagers.KeyToValue(store1.StoreName).FirstOrDefault(m => m.User == jaren)!= null);
         }
         [Test]
         public void TestAppointUserToManager_Fail()
@@ -128,16 +128,16 @@ namespace Tests.Business.UserTests
             task1.Start();
             task2.Start();
             Assert.True(task1.Result.IsSuccess != task2.Result.IsSuccess);
-            Assert.True(ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(ja.AppointedManagers,store1) != 
-                        ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(jaren.AppointedManagers,store1));
+            Assert.True(ja.AppointedManagers.ContainsKey(store1.StoreName) != 
+                        jaren.AppointedManagers.ContainsKey(store1.StoreName));
         }
         [Test]
         public void TestAppointUserToOwner_Pass()
         {
             Assert.True(ja.AppointUserToOwner(store1, jaren).IsSuccess);
             Assert.True(ja.AppointedOwners != null);
-            Assert.True(ListHelper<Store, IList<OwnerAppointment>>.ContainsKey(ja.AppointedOwners,store1));
-            Assert.True(ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(ja.AppointedOwners,store1).FirstOrDefault(m => m.User == jaren)!= null);
+            Assert.True(ja.AppointedOwners.ContainsKey(store1.StoreName));
+            Assert.True(ja.AppointedOwners.KeyToValue(store1.StoreName).FirstOrDefault(m => m.User == jaren)!= null);
         }
         [Test]
         public void TestAppointUserToOwner_Fail()
@@ -157,10 +157,10 @@ namespace Tests.Business.UserTests
             task2.Start();
             Assert.True(task1.Result.IsSuccess != task2.Result.IsSuccess);
             int OwnersCount = 0;
-            OwnersCount += ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(ja.AppointedOwners,store1).Count;
-            if (ListHelper<Store, IList<OwnerAppointment>>.ContainsKey(jaren.AppointedOwners,store1))
+            OwnersCount += ja.AppointedOwners.KeyToValue(store1.StoreName).Count;
+            if (jaren.AppointedOwners.ContainsKey(store1.StoreName))
             {
-                OwnersCount += ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(jaren.AppointedOwners,store1).Count;
+                OwnersCount += jaren.AppointedOwners.KeyToValue(store1.StoreName).Count;
             }
             Assert.True(OwnersCount == 2);
         }
@@ -169,7 +169,7 @@ namespace Tests.Business.UserTests
         {
             Assert.True(ja.AppointUserToManager(store1,jaren).IsSuccess);
             Assert.True(ja.UpdatePermissionsToManager(store1,jaren,new List<StorePermission>(new [] {StorePermission.AddItemToStore})).IsSuccess);
-            Assert.True(ListHelper<Store, ManagerAppointment>.KeyToValue(jaren.StoresManaged,store1).HasPermission(StorePermission.AddItemToStore).IsSuccess);
+            Assert.True(jaren.StoresManaged.KeyToValue(store1.StoreName).HasPermission(StorePermission.AddItemToStore).IsSuccess);
         }
         [Test]
         public void TestUpdatePermissionsToManager_Fail()
@@ -188,8 +188,8 @@ namespace Tests.Business.UserTests
             task2.Start();
             Assert.True(task1.Result.IsSuccess);
             Assert.True(task2.Result.IsSuccess);
-            Assert.True(ListHelper<Store, ManagerAppointment>.KeyToValue(jaren.StoresManaged,store1).HasPermission(StorePermission.AddItemToStore).IsSuccess);
-            Assert.True(ListHelper<Store, ManagerAppointment>.KeyToValue(jaren.StoresManaged,store1).HasPermission(StorePermission.ChangeItemPrice).IsSuccess != ListHelper<Store, ManagerAppointment>.KeyToValue(jaren.StoresManaged,store1).HasPermission(StorePermission.ChangeItemStrategy).IsSuccess);
+            Assert.True(jaren.StoresManaged.KeyToValue(store1.StoreName).HasPermission(StorePermission.AddItemToStore).IsSuccess);
+            Assert.True(jaren.StoresManaged.KeyToValue(store1.storeName).HasPermission(StorePermission.ChangeItemPrice).IsSuccess != jaren.StoresManaged.KeyToValue(store1.StoreName).HasPermission(StorePermission.ChangeItemStrategy).IsSuccess);
         }
         [Test]
         public void TestUserPurchaseHistory_Pass()
@@ -294,7 +294,7 @@ namespace Tests.Business.UserTests
             var res4 = task4.Result;
             Assert.True(res1.IsSuccess != res2.IsSuccess);
             Assert.True(res3.IsSuccess != res4.IsSuccess);
-            int ownersCount = ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(ja.AppointedOwners,store1).Count;
+            int ownersCount = ja.AppointedOwners.KeyToValue(store1.storeName).Count;
             Assert.True(ownersCount == 0,ownersCount.ToString());
         }
 
@@ -307,7 +307,7 @@ namespace Tests.Business.UserTests
             var Chumacher = new User(new MemberInfo("Chumacher", "c@a.com", "Chu", DateTime.Now, "TLV"));
             
             //A->B
-            var AbiAndHisSons= new mokStore("AbiAndHisSons");
+            var AbiAndHisSons= new mokStore("AbiAndHisSons", Abraham);
             var openStoreRes=Abraham.OpenStore(AbiAndHisSons);
             Assert.True(openStoreRes.IsSuccess,openStoreRes.Error);
             var resNominateBond=Abraham.AppointUserToOwner(AbiAndHisSons, Bond);
@@ -317,14 +317,14 @@ namespace Tests.Business.UserTests
             var resNominateChu=Bond.AppointUserToOwner(AbiAndHisSons, Chumacher);
             Assert.True(resNominateChu.IsSuccess,resNominateChu.Error);
             
-            Assert.True(ListHelper<Store,OwnerAppointment>.ContainsKey(Bond.StoresOwned,AbiAndHisSons));
-            Assert.True(ListHelper<Store,OwnerAppointment>.ContainsKey(Chumacher.StoresOwned,AbiAndHisSons));
+            Assert.True(Bond.StoresOwned.ContainsKey(AbiAndHisSons.storeName));
+            Assert.True(Chumacher.StoresOwned.ContainsKey(AbiAndHisSons.storeName));
 
             var resRemoveBond=Abraham.RemoveOwnerFromStore(AbiAndHisSons, Bond);
             Assert.True(resRemoveBond.IsSuccess,resRemoveBond.Error);
 
-            Assert.False(ListHelper<Store,OwnerAppointment>.ContainsKey(Bond.StoresOwned,AbiAndHisSons));
-            Assert.False(ListHelper<Store,OwnerAppointment>.ContainsKey(Chumacher.StoresOwned,AbiAndHisSons));
+            Assert.False(Bond.StoresOwned.ContainsKey(AbiAndHisSons.storeName));
+            Assert.False(Chumacher.StoresOwned.ContainsKey(AbiAndHisSons.storeName));
 
         }
     }

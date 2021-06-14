@@ -12,19 +12,6 @@ namespace eCommerce.Business
 {
     public class ItemInfo : IItem
     {
-        private string id;
-        [Key]
-        public string ItemID
-        {
-            get
-            {
-                return storeName + "-" + name;
-            }
-            set
-            {
-                id = value;
-            }
-        }
         [NotMapped]
         public int amount { get; set; }
         [NotMapped]
@@ -37,24 +24,7 @@ namespace eCommerce.Business
         [NotMapped]
         public List<string> keyWords;
 
-        public string keyWordsString
-        {
-            get
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-                foreach (var keyWord in keyWords)
-                {
-                    stringBuilder.Append(keyWord + ";");
-                }
-
-                return stringBuilder.ToString();
-            }
-            set
-            {
-                string[] arr = value.Split(';');
-                this.keyWords=arr.ToList();
-            }
-        }
+       
         [NotMapped]
         public double pricePerUnit { get; private set; }
         
@@ -179,6 +149,9 @@ namespace eCommerce.Business
         // TODO check how to set store and other properties
         // that dont have setters
         
+        [Key]
+        public Guid ItemID { get; set; }
+        
         public string ItemName { get => name;
             private set { this.name = value; }
         }
@@ -208,6 +181,24 @@ namespace eCommerce.Business
         {
             get => pricePerUnit;
             set => this.pricePerUnit = value;
+        }
+        public string keyWordsString
+        {
+            get
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (var keyWord in keyWords)
+                {
+                    stringBuilder.Append(keyWord + ";");
+                }
+
+                return stringBuilder.ToString();
+            }
+            set
+            {
+                string[] arr = value.Split(';',StringSplitOptions.RemoveEmptyEntries);
+                this.keyWords=arr.ToList();
+            }
         }
     }
 }

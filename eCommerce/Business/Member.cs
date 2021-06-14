@@ -37,11 +37,12 @@ namespace eCommerce.Business
 
         public Result<List<string>> GetStoreIds(User user)
         {
-            List<string> storeIds = new List<string>();
-            foreach (var store in ListHelper<Store, OwnerAppointment>.Keys(user.StoresOwned))
-            {
-                storeIds.Add(store.GetStoreName());
-            }
+            List<string> storeIds = ListHelper<string, OwnerAppointment>.Keys(user.StoresOwned);
+            // List<string> storeIds = new List<string>();
+            // foreach (var store in ListHelper<string, OwnerAppointment>.Keys(user.StoresOwned))
+            // {
+            //     storeIds.Add(store.GetStoreName());
+            // }
 
             return Result.Ok(storeIds);
         }
@@ -49,9 +50,9 @@ namespace eCommerce.Business
         public Result<IList<string>> GetManagedStoreIds(User user)
         {
             List<string> storeIds = new List<string>();
-            foreach (var store in ListHelper<Store, ManagerAppointment>.Keys(user.StoresManaged))
+            foreach (var storename in user.StoresManaged.Keys())
             {
-                storeIds.Add(store.GetStoreName());
+                storeIds.Add(storename);
             }
 
             return Result.Ok<IList<string>>(storeIds);

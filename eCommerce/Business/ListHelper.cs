@@ -5,7 +5,7 @@ namespace eCommerce.Business.Repositories
 {
     public class ListHelper<K,V>
     {
-        public static List<K> Keys(List<Pair<K,V>> lst)
+        public static List<K> Keys(IList<Pair<K,V>> lst)
         {
             lock (lst)
             {
@@ -19,7 +19,7 @@ namespace eCommerce.Business.Repositories
             }
         }
         
-        public static List<V> Values(List<Pair<K,V>> lst)
+        public static List<V> Values(IList<Pair<K,V>> lst)
         {
             lock (lst)
             {
@@ -33,7 +33,7 @@ namespace eCommerce.Business.Repositories
             }
         }
         
-        public static bool ContainsKey(List<Pair<K,V>> lst, K key)
+        public static bool ContainsKey(IList<Pair<K,V>> lst, K key)
         {
             lock (lst)
             {
@@ -49,7 +49,7 @@ namespace eCommerce.Business.Repositories
             }
         }
 
-        public static V KeyToValue(List<Pair<K, V>> lst, K key)
+        public static V KeyToValue(IList<Pair<K, V>> lst, K key)
         {
             lock (lst)
             {
@@ -65,7 +65,7 @@ namespace eCommerce.Business.Repositories
             }
         }
 
-        public static void Add(List<Pair<K, V>> lst, string HolderID,K pairKey,string KeyID, V pairValue)
+        public static void Add(IList<Pair<K, V>> lst, string HolderID,K pairKey,string KeyID, V pairValue)
         {
             lock (lst)
             {
@@ -73,7 +73,7 @@ namespace eCommerce.Business.Repositories
             }
         }
 
-        public static void Remove(List<Pair<K, V>> lst, K key)
+        public static void Remove(IList<Pair<K, V>> lst, K key)
         {
             lock (lst)
             {
@@ -91,7 +91,7 @@ namespace eCommerce.Business.Repositories
         }
         
         
-        public static bool TryAdd(List<Pair<K, V>> lst, string HolderID,K pairKey,string KeyID, V pairValue)
+        public static bool TryAdd(IList<Pair<K, V>> lst, string HolderID,K pairKey,string KeyID, V pairValue)
         {
             lock (lst)
             {

@@ -17,36 +17,24 @@ namespace eCommerce.Business
         private bool _isRegistered;
         private UserToSystemState _systemState;
         private MemberInfo _memberInfo { get; set; }
-
+        
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Username { get; set; }
-        
-        public MemberInfo MemberInfo
-        {
-            get
-            {
-                return _memberInfo;
-            }
-            set
-            {
-                _memberInfo = value;
-            }
-        }
 
-        [NotMapped]
-        public Cart _myCart { get; private set; }
-        
-        
         private Object dataLock;
+        
         //MemberData:
-        //private ConcurrentDictionary<Store, bool> _storesFounded;
-        private List<Pair<Store, bool>> _storesFounded;
-        private List<Pair<Store, OwnerAppointment>> _storesOwned;
-        private List<Pair<Store, ManagerAppointment>> _storesManaged;
-        private List<Pair<Store, IList<OwnerAppointment>>> _appointedOwners;
-        private List<Pair<Store, IList<ManagerAppointment>>> _appointedManagers;
-        private UserTransactionHistory _transHistory;
+        private LDict<string, bool> _storesFounded;
+        private LDict<string, OwnerAppointment> _storesOwned;
+        private LDict<string, ManagerAppointment> _storesManaged;
+        private LLDict<string, OwnerAppointment> _appointedOwners;
+        private LLDict<string, ManagerAppointment> _appointedManagers;
+        
+        public MemberInfo MemberInfo {get => _memberInfo; set =>_memberInfo = value; }
+        public UserTransactionHistory _transHistory { get; set; }
+        public Cart _myCart { get; private set; }
+        public string _cartId { get; set; }
         
 
         //constructors
@@ -57,46 +45,41 @@ namespace eCommerce.Business
             _memberInfo = new MemberInfo(Username, null,null,DateTime.Now, null);
             _systemState = Guest.State;
             _myCart = new Cart(this);
+            _cartId = _myCart.CardID;
             _isRegistered = false;
             dataLock = new Object();
-            role = _systemState.GetRole();
+            _role = _systemState.GetRole();
         }
-        public User(MemberInfo MemberInfo)
+        public User(MemberInfo memberInfo)
         {
-            _isRegistered = true;
-            Username = MemberInfo.Username;
-            _memberInfo = MemberInfo;
-            dataLock = new Object();
             _systemState = Member.State;
-            role = _systemState.GetRole();
-            _myCart = new Cart(this);
-            // _userName = memberData.Username;
-            _storesFounded = new List<Pair<Store, bool>>();
-            _storesOwned = new List<Pair<Store, OwnerAppointment>>();
-            _storesManaged = new List<Pair<Store, ManagerAppointment>>();
-            _appointedOwners = new List<Pair<Store, IList<OwnerAppointment>>>();
-            _appointedManagers = new List<Pair<Store, IList<ManagerAppointment>>>();
-            _transHistory = new UserTransactionHistory();
+            InitMember(memberInfo);
         } 
-        public User(UserToSystemState state, MemberInfo MemberInfo)
+        
+        public User(UserToSystemState state, MemberInfo memberInfo)
         {
-            _isRegistered = true;
-            Username = MemberInfo.Username;
-            _memberInfo = MemberInfo;
-            dataLock = new Object();
             _systemState = state;
-            role = _systemState.GetRole();
-            _myCart = new Cart(this);
-            _storesFounded = new List<Pair<Store, bool>>();
-            _storesOwned = new List<Pair<Store, OwnerAppointment>>();
-            _storesManaged = new List<Pair<Store, ManagerAppointment>>();
-            _appointedOwners = new List<Pair<Store, IList<OwnerAppointment>>>();
-            _appointedManagers = new List<Pair<Store, IList<ManagerAppointment>>>();
-            _transHistory = new UserTransactionHistory();
+            InitMember(memberInfo);
         }
 
-        
-    #region User Facacde Interface
+        private void InitMember(MemberInfo memberInfo)
+        {
+            _isRegistered = true;
+            _memberInfo = memberInfo;
+            Username = memberInfo.Username;
+            dataLock = new Object();
+            _role = _systemState.GetRole();
+            _myCart = new Cart(this);
+            _cartId = _myCart.CardID;
+            _storesFounded = new LDict<string, bool>();
+            _storesOwned = new LDict<string, OwnerAppointment>();
+            _storesManaged = new LDict<string, ManagerAppointment>();
+            _appointedOwners = new LLDict<string, OwnerAppointment>();
+            _appointedManagers = new LLDict<string, ManagerAppointment>();
+            _transHistory = new UserTransactionHistory(Username);
+        }
+
+        #region User Facacde Interface
         public virtual Result Login(UserToSystemState systemState, MemberData memberData)
         {
             if (systemState == null)
@@ -314,18 +297,22 @@ namespace eCommerce.Business
         public void FreeCart()
         {
             this._myCart.Free();
-            this._myCart = new Cart(this);
         }
 
         public virtual Result AnnexStakeholders(Store store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
             return _systemState.AnnexStakeholders(this,store,owners,managers);
         }
-
+        
 
         public virtual UserToSystemState GetState()
         {
             return _systemState;
+        }
+
+        public string GetRole()
+        {
+            return _systemState.GetRole();
         }
 
         public virtual Result PublishMessage(string message)
@@ -364,7 +351,7 @@ namespace eCommerce.Business
 
         public virtual Result IsAdmin()
         {
-            if (role.Equals(Admin.State.GetRole()))
+            if (_role.Equals(Admin.State.GetRole()))
                 return Result.Ok();
             return Result.Fail("Error deciding user Role");
         }
@@ -439,8 +426,8 @@ namespace eCommerce.Business
             // adds store to both Owned-By and Founded-By
             OwnerAppointment owner = new OwnerAppointment(this, store.StoreName);
 
-            bool res =ListHelper<Store,bool>.TryAdd(_storesFounded,Username,store,store._storeName,true) 
-                      && ListHelper<Store, OwnerAppointment>.TryAdd(_storesOwned,Username,store,store._storeName,owner);
+            bool res =_storesFounded.TryAdd(Username,store.StoreName,store._storeName,true) 
+                      && _storesOwned.TryAdd(Username,store.StoreName,store._storeName,owner);
             if (res)
             {
                 return store.AppointNewOwner(this,owner);
@@ -450,7 +437,7 @@ namespace eCommerce.Business
 
         public virtual Result AppointUserToOwner(Member member, Store store, User otherUser)
         {
-            if (!ListHelper<Store, OwnerAppointment>.ContainsKey(_storesOwned,store))
+            if (!_storesOwned.ContainsKey(store.StoreName))
             {
                 return Result.Fail("user \'"+Username+"\' is not an owner of the given store.");
             }
@@ -465,16 +452,16 @@ namespace eCommerce.Business
             // acquire user-data lock
             lock (dataLock)
             {
-                if (!ListHelper<Store, IList<OwnerAppointment>>.ContainsKey(_appointedOwners,store))
+                if (!_appointedOwners.ContainsKey(store.StoreName))
                 {
                     IList<OwnerAppointment> ownerList = new List<OwnerAppointment>();
                     ownerList.Add(newOwner);
-                    if (!ListHelper<Store, IList<OwnerAppointment>>.TryAdd(_appointedOwners,Username,store,store._storeName, ownerList))
+                    if (!_appointedOwners.TryAdd(store.StoreName, ownerList))
                         return Result.Fail("unable to add other-user as an Appointed-Owner");
                 }
                 else
                 {
-                    ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(_appointedOwners,store).Add(newOwner);
+                    _appointedOwners.KeyToValue(store.StoreName).Add(newOwner);
                 }
             }//release lock
             return store.AppointNewOwner(this,newOwner);
@@ -482,7 +469,7 @@ namespace eCommerce.Business
 
         public virtual Result AppointUserToManager(Member member, Store store, User otherUser)
         {
-            if (!ListHelper<Store, OwnerAppointment>.ContainsKey(_storesOwned,store)){
+            if (!_storesOwned.ContainsKey(store.StoreName)){
                 return Result.Fail("user \'"+Username+"\' is not an owner of the given store.");
             }
             Result<ManagerAppointment> res = otherUser.MakeManager(store);
@@ -494,16 +481,16 @@ namespace eCommerce.Business
             // acquire user-data lock
             lock (dataLock)
             {
-                if (!ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(_appointedManagers,store))
+                if (!_appointedManagers.ContainsKey(store.StoreName))
                 {
                     IList<ManagerAppointment> managerList = new List<ManagerAppointment>();
                     managerList.Add(newManager);
-                    if (!ListHelper<Store, IList<ManagerAppointment>>.TryAdd(_appointedManagers,Username,store,store._storeName,managerList))
+                    if (!_appointedManagers.TryAdd(store._storeName,managerList))
                         return Result.Fail("unable to add other-user as an Appointed-Manager");
                 }
                 else
                 {
-                    ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers,store).Add(newManager);
+                    _appointedManagers.KeyToValue(store.StoreName).Add(newManager);
                 }
             }//release lock
             return store.AppointNewManager(this,newManager);
@@ -512,7 +499,7 @@ namespace eCommerce.Business
         public virtual Result<OwnerAppointment> MakeOwner(Member member, Store store)
         {
             OwnerAppointment newOwner = new OwnerAppointment(this,store.StoreName);
-            if (ListHelper<Store, OwnerAppointment>.TryAdd(_storesOwned,Username,store,store._storeName, newOwner))
+            if (_storesOwned.TryAdd(Username,store.StoreName,store._storeName, newOwner))
             {
                 return Result.Ok<OwnerAppointment>(newOwner);
             }
@@ -522,8 +509,8 @@ namespace eCommerce.Business
         public virtual Result<ManagerAppointment> MakeManager(Member member, Store store)
         {
             ManagerAppointment newManager = new ManagerAppointment(this, store.StoreName);
-            if (!ListHelper<Store, OwnerAppointment>.ContainsKey(_storesOwned,store) 
-                && ListHelper<Store, ManagerAppointment>.TryAdd(_storesManaged,Username,store,store._storeName, newManager))
+            if (!_storesOwned.ContainsKey(store.StoreName) 
+                && _storesManaged.TryAdd(Username,store.StoreName,store._storeName, newManager))
             {
                 return Result.Ok<ManagerAppointment>(newManager);
             }
@@ -534,26 +521,27 @@ namespace eCommerce.Business
         {
             lock (this)
             {
-                if (!ListHelper<Store, OwnerAppointment>.ContainsKey(_storesOwned,store))
+                if (!_storesOwned.ContainsKey(store.StoreName))
                 {
                     return Result.Fail("user \'" + Username + "\' is not an owner of the given store.");
                 }
 
-                if ((!ListHelper<Store, IList<OwnerAppointment>>.ContainsKey(_appointedOwners,store)) || FindCoOwner(store, otherUser).IsFailure)
+                if ((!_appointedOwners.ContainsKey(store.StoreName)) || FindCoOwner(store, otherUser).IsFailure)
                 {
                     return Result.Fail("user \'" + Username + "\' did not appoint the owner of the given store \'" +
                                        otherUser.Username + "\'.");
                 }
 
                 var res = otherUser.RemoveOwner(store);
-                while (res.IsFailure)
+                if (res.IsFailure)
                 {
                     return res;
                 }
-                while (ListHelper<Store, IList<OwnerAppointment>>.ContainsKey(_appointedOwners,store))
+                if (_appointedOwners.ContainsKey(store.StoreName))
                 {
-                    ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(_appointedOwners,store).Remove(res.Value);
+                    _appointedOwners.RemoveFromList(store.StoreName,res.Value);
                     var resFromStore=store.RemoveOwnerFromStore(this, res.Value.User, res.Value);
+                    DataFacade.Instance.RemoveEntity(res.Value);
                     return resFromStore;
                 }
             }
@@ -564,10 +552,10 @@ namespace eCommerce.Business
         
         public virtual Result RemoveManagerFromStore(Member member, Store store,User otherUser)
         {
-            if (!ListHelper<Store, ManagerAppointment>.ContainsKey(_storesManaged,store)){
+            if (!_storesManaged.ContainsKey(store.StoreName)){
                 return Result.Fail("user \'"+Username+"\' is not a manager of the given store.");
             }
-            if ((!ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(_appointedManagers,store)) || FindCoManager(store,otherUser).IsFailure){
+            if ((!_appointedManagers.ContainsKey(store.StoreName)) || FindCoManager(store,otherUser).IsFailure){
                 return Result.Fail("user \'"+Username+"\' did not appoint the manager of the given store \'"+otherUser.Username+"\'.");
             }
             
@@ -578,10 +566,13 @@ namespace eCommerce.Business
                 return res;
             }
 
-            if (ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(_appointedManagers,store))
+            if (_appointedManagers.ContainsKey(store.StoreName))
             {
                 
-                ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers,store).Remove(res.Value);
+                _appointedManagers.RemoveFromList(store.StoreName,res.Value);
+                var resFromStore=store.RemoveManagerFromStore(this, res.Value.User, res.Value);
+                DataFacade.Instance.RemoveEntity(res.Value);
+                return resFromStore;
             }
             
     
@@ -590,7 +581,7 @@ namespace eCommerce.Business
 
         public virtual Result AnnexStakeholders(Member member,Store store, IList<OwnerAppointment> owners, IList<ManagerAppointment> managers)
         {
-            if (!ListHelper<Store, bool>.ContainsKey(_storesFounded,store))
+            if (!_storesFounded.ContainsKey(store.StoreName))
             {
                 return Result.Fail("user ["+Username+"] is not a founder of the store ["+store.GetStoreName()+"]");;
             }
@@ -602,15 +593,15 @@ namespace eCommerce.Business
                     foreach (var owner in owners)
                     {
                      
-                        ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(_appointedOwners,store).Add(owner);   
+                        _appointedOwners.KeyToValue(store.StoreName).Add(owner);   
                     }
                 }
-                if (managers != null && ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(_appointedManagers,store))
+                if (managers != null && _appointedManagers.ContainsKey(store.StoreName))
                 {
                     foreach (var manager in managers)
                     {
                      
-                        ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers,store).Add(manager);   
+                        _appointedManagers.KeyToValue(store.StoreName).Add(manager);   
                     }
                 }
             }
@@ -620,11 +611,11 @@ namespace eCommerce.Business
         private Result<ManagerAppointment> FindCoManager(Store store, User otherUser)
         {
             ManagerAppointment manager = null;
-            if (ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(_appointedManagers,store))
+            if (_appointedManagers.ContainsKey(store.StoreName))
             {
                 lock (dataLock)
                 {
-                    manager = ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers,store).FirstOrDefault((ma) => ma.User == otherUser);
+                    manager = _appointedManagers.KeyToValue(store.StoreName).FirstOrDefault((ma) => ma.User == otherUser);
                 }
             }
 
@@ -636,11 +627,11 @@ namespace eCommerce.Business
         private Result<OwnerAppointment> FindCoOwner(Store store, User otherUser)
         {
             OwnerAppointment owner = null;
-            if (ListHelper<Store, IList<OwnerAppointment>>.ContainsKey(_appointedOwners,store))
+            if (_appointedOwners.ContainsKey(store.StoreName))
             {
                 lock (dataLock)
                 {
-                    owner = ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(_appointedOwners,store).FirstOrDefault((ma) => ma.User == otherUser);
+                    owner = _appointedOwners.KeyToValue(store.StoreName).FirstOrDefault((ma) => ma.User == otherUser);
                 }
             }
 
@@ -651,7 +642,7 @@ namespace eCommerce.Business
 
         public virtual Result<OwnerAppointment> RemoveOwner(Member member, Store store)
         {
-            if (!ListHelper<Store, OwnerAppointment>.ContainsKey(_storesOwned,store))
+            if (!_storesOwned.ContainsKey(store.StoreName))
             {
                 return Result.Fail<OwnerAppointment>("user ["+Username+"] is not an owner of the store ["+store.GetStoreName()+"]");
             }
@@ -663,10 +654,10 @@ namespace eCommerce.Business
             string failMessage = "";
             
             
-            if (ListHelper<Store, IList<OwnerAppointment>>.ContainsKey(_appointedOwners,store) 
-                && ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(_appointedOwners,store)!=null)
+            if (_appointedOwners.ContainsKey(store.StoreName) 
+                && _appointedOwners.KeyToValue(store.StoreName)!=null)
             {
-                var firedList = new List<OwnerAppointment>(ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(_appointedOwners,store));
+                var firedList = new List<OwnerAppointment>(_appointedOwners.KeyToValue(store.StoreName));
                 foreach (var owner in firedList)
                 {
                     var res = RemoveOwnerFromStore(member, store, owner.User);
@@ -676,10 +667,10 @@ namespace eCommerce.Business
             }
 
 
-            if (ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(_appointedManagers,store) 
-                && ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers,store)!=null)
+            if (_appointedManagers.ContainsKey(store.StoreName) 
+                && _appointedManagers.KeyToValue(store.StoreName)!=null)
             {
-                var firedList = new List<ManagerAppointment>(ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers,store));
+                var firedList = new List<ManagerAppointment>(_appointedManagers.KeyToValue(store.StoreName));
                 foreach (var manager in firedList)
                 {
                     
@@ -689,12 +680,12 @@ namespace eCommerce.Business
                 }
             }
 
-            own = ListHelper<Store, OwnerAppointment>.KeyToValue(_storesOwned, store);
-            ListHelper<Store, OwnerAppointment>.Remove(_storesOwned,store);
-            coowners = ListHelper<Store, IList<OwnerAppointment>>.KeyToValue(_appointedOwners, store);
-            ListHelper<Store, IList<OwnerAppointment>>.Remove(_appointedOwners,store);
-            comanagers = ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers, store);
-            ListHelper<Store, IList<ManagerAppointment>>.Remove(_appointedManagers,store);
+            own = _storesOwned.KeyToValue(store.StoreName);
+            _storesOwned.Remove(store.StoreName);
+            coowners = _appointedOwners.KeyToValue( store.StoreName);
+            _appointedOwners.Remove(store.StoreName);
+            comanagers = _appointedManagers.KeyToValue(store.StoreName);
+            _appointedManagers.Remove(store.StoreName);
             if(failMessage != "")
                 return Result.Fail<OwnerAppointment>(failMessage);
             return Result.Ok(own);
@@ -703,7 +694,7 @@ namespace eCommerce.Business
         
         public virtual Result<ManagerAppointment> RemoveManager(Member member, Store store)
         {
-            if (!ListHelper<Store, ManagerAppointment>.ContainsKey(_storesManaged,store))
+            if (!_storesManaged.ContainsKey(store.StoreName))
             {
                 return Result.Fail<ManagerAppointment>("user ["+Username+"] is not a manager of the store ["+store.GetStoreName()+"]");
             }
@@ -715,10 +706,10 @@ namespace eCommerce.Business
             string failMessage = "";
             
             
-            if (ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(_appointedManagers,store) 
-                && ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers,store)!=null)
+            if (_appointedManagers.ContainsKey(store.StoreName) 
+                && _appointedManagers.KeyToValue(store.StoreName)!=null)
             {
-                var firedList = new List<ManagerAppointment>(ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers,store));
+                var firedList = new List<ManagerAppointment>(_appointedManagers.KeyToValue(store.StoreName));
                 foreach (var mngr in firedList)
                 {
                     var res = RemoveManagerFromStore(member, store, mngr.User);
@@ -727,10 +718,10 @@ namespace eCommerce.Business
                 }
             }
 
-            mng = ListHelper<Store, ManagerAppointment>.KeyToValue(_storesManaged, store);
-            ListHelper<Store, ManagerAppointment>.Remove(_storesManaged,store);
-            comanagers = ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers, store);
-            ListHelper<Store, IList<ManagerAppointment>>.Remove(_appointedManagers,store);
+            mng = _storesManaged.KeyToValue(store.StoreName);
+            _storesManaged.Remove(store.StoreName);
+            comanagers = _appointedManagers.KeyToValue(store.StoreName);
+            _appointedManagers.Remove(store.StoreName);
             
             if(failMessage != "")
                 return Result.Fail<ManagerAppointment>(failMessage);
@@ -752,12 +743,12 @@ namespace eCommerce.Business
 
         public virtual Result RemovePermissionsToManager(Member member, Store store, User otherUser, StorePermission permission)
         {
-            if (ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(_appointedManagers,store))
+            if (_appointedManagers.ContainsKey(store.StoreName))
             {
                 ManagerAppointment manager = null;
                 lock (dataLock)
                 {
-                    manager = ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers,store).FirstOrDefault((ma) => ma.User == otherUser);
+                    manager = _appointedManagers.KeyToValue(store.StoreName).FirstOrDefault((ma) => ma.User == otherUser);
                 }
 
                 if (manager != null)
@@ -775,12 +766,12 @@ namespace eCommerce.Business
             if (permissions == null || permissions.Count == 0){
                 return Result.Fail("Invalid permission list input");
             }
-            if (ListHelper<Store, IList<ManagerAppointment>>.ContainsKey(_appointedManagers,store))
+            if (_appointedManagers.ContainsKey(store.StoreName))
             {
                 ManagerAppointment manager = null;
                 lock (dataLock)
                 {
-                    manager = ListHelper<Store, IList<ManagerAppointment>>.KeyToValue(_appointedManagers,store).FirstOrDefault((ma) => ma.User == otherUser);
+                    manager = _appointedManagers.KeyToValue(store.StoreName).FirstOrDefault((ma) => ma.User == otherUser);
                 }
 
                 if (manager != null)
@@ -793,14 +784,14 @@ namespace eCommerce.Business
         
         public virtual Result HasPermission(Member member, Store store, StorePermission permission)
         {
-            if(ListHelper<Store, OwnerAppointment>.ContainsKey(_storesOwned,store))
+            if(_storesOwned.ContainsKey(store.StoreName))
             {
-                return ListHelper<Store, OwnerAppointment>.KeyToValue(_storesOwned,store).HasPermission(permission);
+                return _storesOwned.KeyToValue(store.StoreName).HasPermission(permission);
             }
 
-            if (ListHelper<Store, ManagerAppointment>.ContainsKey(_storesManaged,store))
+            if (_storesManaged.ContainsKey(store.StoreName))
             {
-                return ListHelper<Store, ManagerAppointment>.KeyToValue(_storesManaged,store).HasPermission(permission);
+                return _storesManaged.KeyToValue(store.StoreName).HasPermission(permission);
             }
             
             return Result.Fail("user\'"+Username+"\' is not a stakeholder of the given store");
@@ -832,37 +823,55 @@ namespace eCommerce.Business
         
     
     #region Test Oriented Functions
+
+    public LDict<string, bool> StoresFounded => _storesFounded;
+
+    public LDict<string, OwnerAppointment> StoresOwned => _storesOwned;
     
-    public List<Pair<Store, IList<ManagerAppointment>>> AppointedManagers => _appointedManagers;
-    public List<Pair<Store, IList<OwnerAppointment>>> AppointedOwners => _appointedOwners;
-    public List<Pair<Store, ManagerAppointment>> StoresManaged => _storesManaged;
-    public List<Pair<Store, OwnerAppointment>> StoresOwned => _storesOwned;
-    public List<Pair<Store, bool>> StoresFounded => _storesFounded;
+    public LDict<string, ManagerAppointment> StoresManaged => _storesManaged;
+    
+    public LLDict<string, OwnerAppointment> AppointedOwners => _appointedOwners;
+    
+    public LLDict<string,ManagerAppointment> AppointedManagers => _appointedManagers;
 
     #endregion
 
     
     #region DAL Oriented Functions
 
-    public virtual List<Store> storesFoundedBackup { get; set; }
-    public virtual List<Pair<Store, OwnerAppointment>> storesOwnedBackup { get; set; }
-    public virtual List<Pair<Store, ManagerAppointment>> storesManagedBackup { get; set; }
-    public virtual List<ListPair<Store, OwnerAppointment>> appointedOwnersBackup { get; set; }
-    public virtual List<ListPair<Store, ManagerAppointment>> appointedManagersBackup { get; set; }
+    private string _role;
+    public string Role
+    {
+        get
+        {
+            return _role;
+        }
+        set
+        {
+            _role = value;
+        }
+    }
 
-    public string role { get; set; }
-
+    public void setState()
+    {
+        if(_role.Equals(Member.State.GetRole()))
+        {
+            _systemState = Member.State;
+        }
+        else
+        {
+            _systemState = Admin.State;    
+        }
+    }
     public User()
     {
-        _isRegistered = false;
+        _isRegistered = true;
         dataLock = new Object();
-
-        _storesFounded = new List<Pair<Store, bool>>();
-        _storesOwned = new List<Pair<Store, OwnerAppointment>>();
-        _storesManaged = new List<Pair<Store, ManagerAppointment>>();
-        _appointedOwners = new List<Pair<Store, IList<OwnerAppointment>>>();
-        _appointedManagers = new List<Pair<Store, IList<ManagerAppointment>>>();
-        _transHistory = new UserTransactionHistory();
+        _storesFounded = new LDict<string, bool>();
+        _storesOwned = new LDict<string, OwnerAppointment>();
+        _storesManaged = new LDict<string, ManagerAppointment>();
+        _appointedOwners = new LLDict<string, OwnerAppointment>();
+        _appointedManagers = new LLDict<string, ManagerAppointment>();
     }
     
     #endregion

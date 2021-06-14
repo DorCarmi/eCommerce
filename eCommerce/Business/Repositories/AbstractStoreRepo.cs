@@ -21,7 +21,7 @@ namespace eCommerce.Business.Repositories
         /// <param name="src">The source</param>
         /// <param name="target">The target string</param>
         /// <returns>Edit distance</returns>
-        public static int EditDistance(string src, string target) {
+        public int EditDistance(string src, string target) {
             int n = src.Length;
             int m = target.Length;
             int[,] d = new int[n + 1, m + 1];

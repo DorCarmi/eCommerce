@@ -11,32 +11,17 @@ namespace eCommerce.Business
 {
     public class Cart : ICart
     {
-        private Guid CartGuid;
 
-        [Key]
-        public string CardID
-        {
-            get
-            {
-                return CartGuid.ToString();
-            }
-            set
-            {
-                Guid currGuid;
-                var guidRes=Guid.TryParse(value, out currGuid);
-                if (guidRes)
-                {
-                    CartGuid = currGuid;
-                }
-            }
-        }
+        [Key] 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string CardID { get; set; }
+        
         public User _cartHolder { get; set; }
         
         public Transaction _performTransaction;
         
-        [NotMapped]
-        //public Dictionary<Store, Basket> _baskets;
-        public List<Pair<Store, Basket>> _baskets;
+        
+        public List<Pair<Store, Basket>> _baskets { get; set; }
         
         
         private double _totalPrice;
@@ -52,7 +37,8 @@ namespace eCommerce.Business
             this._cartHolder = user;
             _baskets = new List<Pair<Store, Basket>>();
             _totalPrice = 0;
-            CartGuid = Guid.NewGuid();
+            // CartGuid = Guid.NewGuid();
+            CardID = user.Username;
         }
 
         public bool CheckForCartHolder(User user)
@@ -197,12 +183,20 @@ namespace eCommerce.Business
 
         public void Free()
         {
-            foreach (var basket in _baskets)
+            var oldBaskets = new Queue<Pair<Store, Basket>>(_baskets);
+            _baskets = new List<Pair<Store, Basket>>();
+            
+            while(oldBaskets.Count > 0)
             {
-                basket.Value.Free();
+                var pair  = oldBaskets.Dequeue();
+                pair.Value.Free();
+                // DataFacade.Instance.RemoveEntity(pair.Value);
+                DataFacade.Instance.RemoveEntity(pair);
             }
 
-            this._baskets.Clear();
+            _totalPrice = 0;
+            _performTransaction = null;
+            // this._baskets.Clear();
         }
     }
 }
