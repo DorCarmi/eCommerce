@@ -125,6 +125,54 @@ namespace Tests.AcceptanceTests
             Assert.True(result.IsFailure, "Appointing " + username + " was expected to fail since the user wasn't logged in!");
             _auth.Disconnect(token);
         }
+        
+        [TestCase("Yossi's Store", "singerMerm")]
+        [TestCase("Yossi's Store", "Lior")]
+        [Order(0)]
+        [Test]
+        public async Task TestRemoveCoOwnerSuccess(string storeName, string username)
+        {
+            string token = _auth.Connect();
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Assert.True(yossiLogin.IsSuccess, yossiLogin.Error);
+            Result result = _user.AppointCoOwner(yossiLogin.Value, storeName, username);
+            Assert.True(result.IsSuccess, "failed to appoint " + username + ": " + result.Error);
+            result = _user.RemoveCoOwner(yossiLogin.Value, storeName, username);
+            token = _auth.Logout(yossiLogin.Value).Value;
+            _auth.Disconnect(token);
+        }
+        
+        [TestCase("Yossi's Store", "singerMerm")]
+        [TestCase("Yossi's Store", "Lior")]
+        [Order(0)]
+        [Test]
+        public async Task TestRemoveCoOwnerFailure(string storeName, string username)
+        {
+            string token = _auth.Connect();
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Assert.True(yossiLogin.IsSuccess, yossiLogin.Error);
+            Result result = _user.RemoveCoOwner(yossiLogin.Value, storeName, username);
+            Assert.True(result.IsFailure);
+            token = _auth.Logout(yossiLogin.Value).Value;
+            _auth.Disconnect(token);
+        }
+        
+        [TestCase("Yossi's Store", "singerMerm", "The Polite Frog")]
+        [TestCase("Yossi's Store", "Lior", "The singer Frog")]
+        [Order(0)]
+        [Test]
+        public async Task TestRemoveCoOwnerSuccess(string storeName, string username, string wrongStore)
+        {
+            string token = _auth.Connect();
+            Result<string> yossiLogin = await _auth.Login(token, "Yossi11", "qwerty123", ServiceUserRole.Member);
+            Assert.True(yossiLogin.IsSuccess, yossiLogin.Error);
+            Result result = _user.AppointCoOwner(yossiLogin.Value, storeName, username);
+            Assert.True(result.IsSuccess, "failed to appoint " + username + ": " + result.Error);
+            result = _user.RemoveCoOwner(yossiLogin.Value, wrongStore, username);
+            token = _auth.Logout(yossiLogin.Value).Value;
+            _auth.Disconnect(token);
+        }
+        
 
         [Test]
         public void Test_ABC_Test()

@@ -97,7 +97,7 @@ namespace eCommerce.Business
                     if (pair.Key.Equals(key))
                     {
                         _list.Remove(pair);
-                        // DataFacade.Instance.RemovePair(pair);
+                        DataFacade.Instance.RemovePair(pair);
                         return;
                     }
                 }

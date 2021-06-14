@@ -53,5 +53,7 @@ namespace eCommerce.Business.Repositories
         public abstract void Remove(string id);
 
         public abstract void Update(Store data);
+
+        public abstract void UpdateManager(ManagerAppointment manager);
     }
 }

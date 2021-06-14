@@ -221,7 +221,7 @@ namespace Tests.DataLayer
             Assert.True(df.ResetConnection().IsSuccess);
             var storeRes = df.ReadStore(alenbyStore.StoreName);
             Assert.True(storeRes.IsSuccess, storeRes.Error);
-            Assert.True(storeRes.Value._basketsOfThisStore.Count == 1);
+            Assert.True(storeRes.Value.GetAllBaskets().Count == 1);
         }
         [Test]
         public void ReadUserBasketsTest()
@@ -334,16 +334,18 @@ namespace Tests.DataLayer
             var resAssign=pstation4.AssignStoreToItem(alenbyStore);
             pstation4.amount = 1;
             Assert.True(resAssign.IsSuccess,resAssign.Error);
-
+            var updateRes = df.UpdateStore(alenbyStore);
+            Assert.True(updateRes.IsSuccess,updateRes.Error);
+            
             for (int i = 0; i < 10; i++)
             {
                 var addToCartRes = ja.AddItemToCart(pstation4);
                 Assert.True(addToCartRes.IsSuccess, addToCartRes.Error);
                 var resBuy = ja.BuyWholeCart(new PaymentInfo(ja.Username, "111", "111", "11/11", "111", "abc"));
                 Assert.True(resBuy.IsSuccess, resBuy.Error);
-                Assert.True(df.UpdateStore(alenbyStore).IsSuccess);
+             
+                Assert.True(df.UpdateStore(alenbyStore).IsSuccess);   
             }
-
         }
 
         [Test]
@@ -480,10 +482,5 @@ namespace Tests.DataLayer
 
         }
         
-        [Test]
-        public void SaveStoreWithoutGuestHistoryTest()
-        {
-            Assert.Warn("Not Implemented");
-        }
     }
 }

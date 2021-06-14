@@ -100,9 +100,9 @@ export default class ManagePermissions extends Component {
            const res= await this.storeApi.updateManagerPermissions(storeId,userId,permissions)
            return res.isSuccess 
         }
-        staff.map((member) => {
+        staff.map(async (member) => {
             if (changedManagers.includes(member.userId)) {
-                if (!updatePermissions(storeId, member.userId, member.permissions)) {
+                if (! await updatePermissions(storeId, member.userId, member.permissions)) {
                     alert('Edit Permission Failed Has Not Fully Completed')
                 }
                 alert(`permissions for user:${member.userId} updated`)
@@ -125,7 +125,7 @@ export default class ManagePermissions extends Component {
                 <div>
                     <h3>{`Permissions For The Store : ${this.state.storeId}`}</h3>
                     <div><Link to={`${this.state.storeId}/appointManager`}>Appoint Manager</Link></div>
-                    <div><Link to={`/removeManager/${this.state.storeId}`}>Remove Manager</Link></div>
+                    {/*<div><Link to={`/removeManager/${this.state.storeId}`}>Remove Manager</Link></div>*/}
                     <div><Link to={`${this.state.storeId}/appointOwner`}>Appoint Owner</Link></div>
                     <div><Link to={`/removeOwner/${this.state.storeId}`}>Remove Owner</Link></div>
 

@@ -327,5 +327,7 @@ namespace Tests.Business.UserTests
             Assert.False(Chumacher.StoresOwned.ContainsKey(AbiAndHisSons.storeName));
 
         }
+        
+       
     }
 }

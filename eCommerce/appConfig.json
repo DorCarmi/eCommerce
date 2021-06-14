@@ -2,7 +2,7 @@
   "InitWithData": true,
   "InitDataFile": "Init.json",
   
-  "Memory": "InMemory",
+  "Memory": "Persistence",
 
   "AdminCreationInfo" : {
     "Username": "User1",

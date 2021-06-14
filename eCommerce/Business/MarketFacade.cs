@@ -8,6 +8,7 @@ using eCommerce.Business.Discounts;
 using eCommerce.Business.Repositories;
 
 using eCommerce.Common;
+using eCommerce.DataLayer;
 using eCommerce.Service;
 using eCommerce.Statistics;
 using NLog;
@@ -169,6 +170,7 @@ namespace eCommerce.Business
             {
                 _userManager.UpdateUser(user);
                 _userManager.UpdateUser(appointedUser);
+                _storeRepo.Update(store);
             }
 
             return appointmentRes;
@@ -204,7 +206,9 @@ namespace eCommerce.Business
             {
                 _userManager.UpdateUser(user);
                 _userManager.UpdateUser(appointedUser);
+                _storeRepo.Update(store);
             }
+            
 
             return appointmentRes;
         }
@@ -248,7 +252,8 @@ namespace eCommerce.Business
             Result updateRes = user.UpdatePermissionsToManager(store, managerUser, permissions);
             if (updateRes.IsSuccess)
             {
-                //TODO maybe update the user
+                _storeRepo.UpdateManager(managerUser.StoresManaged.KeyToValue(store.StoreName));
+                _storeRepo.Update(store);
                 _userManager.UpdateUser(managerUser);
             }
 
@@ -528,8 +533,14 @@ namespace eCommerce.Business
             }
             var editedItemInfo = itemRes.Value.ShowItem();
             editedItemInfo.amount = amount;
-            //TODO save
-            return user.EditCart(editedItemInfo);
+            Result cartRes = user.EditCart(editedItemInfo);
+
+            if (cartRes.IsSuccess)
+            {
+                _userManager.UpdateUser(user);
+            }
+            
+            return cartRes;
         }
         
         //<CNAME>GetCart</CNAME>

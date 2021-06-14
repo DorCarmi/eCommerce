@@ -541,7 +541,7 @@ namespace eCommerce.Business
                 {
                     _appointedOwners.RemoveFromList(store.StoreName,res.Value);
                     var resFromStore=store.RemoveOwnerFromStore(this, res.Value.User, res.Value);
-                    DataFacade.Instance.RemoveEntity(res.Value);
+                    // DataFacade.Instance.RemoveEntity(res.Value);
                     return resFromStore;
                 }
             }
@@ -552,7 +552,7 @@ namespace eCommerce.Business
         
         public virtual Result RemoveManagerFromStore(Member member, Store store,User otherUser)
         {
-            if (!_storesManaged.ContainsKey(store.StoreName)){
+            if (!_storesOwned.ContainsKey(store.StoreName)){
                 return Result.Fail("user \'"+Username+"\' is not a manager of the given store.");
             }
             if ((!_appointedManagers.ContainsKey(store.StoreName)) || FindCoManager(store,otherUser).IsFailure){
@@ -571,7 +571,7 @@ namespace eCommerce.Business
                 
                 _appointedManagers.RemoveFromList(store.StoreName,res.Value);
                 var resFromStore=store.RemoveManagerFromStore(this, res.Value.User, res.Value);
-                DataFacade.Instance.RemoveEntity(res.Value);
+                // DataFacade.Instance.RemoveEntity(res.Value);
                 return resFromStore;
             }
             
@@ -706,22 +706,22 @@ namespace eCommerce.Business
             string failMessage = "";
             
             
-            if (_appointedManagers.ContainsKey(store.StoreName) 
-                && _appointedManagers.KeyToValue(store.StoreName)!=null)
-            {
-                var firedList = new List<ManagerAppointment>(_appointedManagers.KeyToValue(store.StoreName));
-                foreach (var mngr in firedList)
-                {
-                    var res = RemoveManagerFromStore(member, store, mngr.User);
-                    if(res.IsFailure)
-                        failMessage= failMessage+";\n"+res.Error;
-                }
-            }
+            // if (_appointedManagers.ContainsKey(store.StoreName) 
+            //     && _appointedManagers.KeyToValue(store.StoreName)!=null)
+            // {
+            //     var firedList = new List<ManagerAppointment>(_appointedManagers.KeyToValue(store.StoreName));
+            //     foreach (var mngr in firedList)
+            //     {
+            //         var res = RemoveManagerFromStore(member, store, mngr.User);
+            //         if(res.IsFailure)
+            //             failMessage= failMessage+";\n"+res.Error;
+            //     }
+            // }
 
             mng = _storesManaged.KeyToValue(store.StoreName);
             _storesManaged.Remove(store.StoreName);
-            comanagers = _appointedManagers.KeyToValue(store.StoreName);
-            _appointedManagers.Remove(store.StoreName);
+            //comanagers = _appointedManagers.KeyToValue(store.StoreName);
+            //_appointedManagers.Remove(store.StoreName);
             
             if(failMessage != "")
                 return Result.Fail<ManagerAppointment>(failMessage);
