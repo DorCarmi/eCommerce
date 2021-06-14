@@ -4,7 +4,7 @@ namespace eCommerce.Statistics.DAL
 {
     public class StatsContextFactory
     {
-        public StatsContext Create()
+        public virtual StatsContext Create()
         {
             return new StatsContext();
         }

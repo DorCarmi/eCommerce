@@ -25,10 +25,10 @@ namespace eCommerce.Statistics.Repositories
         public Result<List<LoginStat>> GetAllLoginStatsFrom(DateTime date)
         {
             List<LoginStat> loginStats = new List<LoginStat>();
-            DateTime cateComponent = date.Date;
+            DateTime dateComponent = date.Date;
             foreach (var stat in _statLogins)
             {
-                if (stat.DateTime.Date.Equals(cateComponent))
+                if (stat.DateTime.Date.Equals(dateComponent))
                 {
                     loginStats.Add(stat);
                 }
@@ -40,10 +40,10 @@ namespace eCommerce.Statistics.Repositories
         public Result<int> GetNumberOfLoginStatsFrom(DateTime date, string userType)
         {
             int number = 0;
-            DateTime cateComponent = date.Date;
+            DateTime dateComponent = date.Date;
             foreach (var stat in _statLogins)
             {
-                if (stat.DateTime.Date.Equals(cateComponent) && stat.UserType.Equals(userType))
+                if (stat.DateTime.Date.Equals(dateComponent) && stat.UserType.Equals(userType))
                 {
                     number++;
                 }

@@ -68,7 +68,7 @@ namespace eCommerce.Statistics
 
         public Result AddLoggedIn(DateTime dateTime, string username, string userType)
         {
-            dateTime = dateTime.Date;
+            //dateTime = dateTime.Date;
             Result res = _statsRepo.AddLoginStat(new LoginStat(dateTime, username, userType));
             if (res.IsSuccess && dateTime.Date.Equals(DateTime.Now.Date))
             {
