@@ -8,6 +8,7 @@ using eCommerce.Business.Discounts;
 using eCommerce.Business.Repositories;
 
 using eCommerce.Common;
+using eCommerce.DataLayer;
 using eCommerce.Service;
 using eCommerce.Statistics;
 using NLog;
@@ -251,6 +252,7 @@ namespace eCommerce.Business
             Result updateRes = user.UpdatePermissionsToManager(store, managerUser, permissions);
             if (updateRes.IsSuccess)
             {
+                _storeRepo.UpdateManager(managerUser.StoresManaged.KeyToValue(store.StoreName));
                 _storeRepo.Update(store);
                 _userManager.UpdateUser(managerUser);
             }
