@@ -30,8 +30,8 @@ namespace Tests.AcceptanceTests
         private INStoreService _inStore;
         private IUserService _user;
         private string store = "Yossi's Store";
-        
-        
+
+
         [SetUpAttribute]
         public async Task SetUp()
         {
@@ -121,6 +121,71 @@ namespace Tests.AcceptanceTests
              Result result = _user.AppointManager(token, storeName, username);
              Assert.True(result.IsFailure, "Appointing " + username + " was expected to fail since the user wasn't logged in!");
              _auth.Disconnect(token);
+         }
+
+
+         [Test]
+         public void TestAppointManagerConcurrent()
+         {
+             MemberInfo menash = new MemberInfo("Menash","lior@gmail.com", "Lior Lee", 
+                 DateTime.ParseExact("05/07/1996", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Carl Neter 14");
+             
+             MemberInfo shimon = new MemberInfo("shimon","shimon@gmail.com", "shimon Leshimone", 
+                 DateTime.ParseExact("05/07/1996", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Carl Neter 14");
+             
+             MemberInfo yosef = new MemberInfo("yosef","yosef@gmail.com", "yosef yosef", 
+                 DateTime.ParseExact("05/07/1996", "dd/MM/yyyy", CultureInfo.InvariantCulture), "Carl Neter 14");
+
+             
+             
+             var tokenMenash = _auth.Connect();
+             var tokenShimon = _auth.Connect();
+             var tokenyosef = _auth.Connect();
+             
+             var registerMenash=_auth.Register(tokenMenash, menash, "qwerty123");
+             var registerShimon= _auth.Register(tokenShimon, shimon, "qwerty123");
+             var registerYosef= _auth.Register(tokenyosef, yosef, "qwerty123");
+             
+             Assert.True(registerMenash.Result.IsSuccess,registerMenash.Result.Error);
+             Assert.True(registerShimon.Result.IsSuccess,registerShimon.Result.Error);
+             Assert.True(registerYosef.Result.IsSuccess,registerYosef.Result.Error);
+
+             var toeknYossi = _auth.Connect();
+             Result<string> yossiLogin = _auth.Login(toeknYossi, "Yossi11", "qwerty123", ServiceUserRole.Member).Result;
+             Result<string> menashLogin =
+                 _auth.Login(tokenMenash, menash.Username, "qwerty123", ServiceUserRole.Member).Result;
+             Result<string> shimonLogin =
+                 _auth.Login(tokenShimon, shimon.Username, "qwerty123", ServiceUserRole.Member).Result;
+             Result<string> yosefLogin =
+                 _auth.Login(tokenyosef, yosef.Username, "qwerty123", ServiceUserRole.Member).Result;
+             
+             Assert.True(yossiLogin.IsSuccess,yossiLogin.Error);
+             Assert.True(menashLogin.IsSuccess,menashLogin.Error);
+             Assert.True(shimonLogin.IsSuccess,shimonLogin.Error);
+             Assert.True(yosefLogin.IsSuccess,yosefLogin.Error);
+
+
+             var appointMenash=_user.AppointCoOwner(yossiLogin.Value, store, menash.Username);
+             var appointShimon=_user.AppointCoOwner(yossiLogin.Value, store, shimon.Username);
+             
+             Assert.True(appointMenash.IsSuccess,appointMenash.Error);
+             Assert.True(appointShimon.IsSuccess,appointShimon.Error);
+             
+             Task<Result> task1 = new Task<Result>(() => { return _user.AppointManager(menashLogin.Value,store,yosef.Username); });
+             Task<Result> task2 = new Task<Result>(() => { return _user.AppointManager(shimonLogin.Value,store,yosef.Username); });
+             task1.Start();
+             task2.Start();
+
+             var task1res = task1.Result;
+             var task2res = task2.Result;
+
+             var both = task1res.IsSuccess && task2res.IsSuccess;
+
+             var oneOfThem = task1res.IsSuccess || task2res.IsSuccess;
+             
+             Assert.True(!both && oneOfThem);
+
+
          }
     }
 }

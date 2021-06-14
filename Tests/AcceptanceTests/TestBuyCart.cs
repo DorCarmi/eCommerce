@@ -39,6 +39,7 @@ namespace Tests.AcceptanceTests
         private string store_name = "Borca";
         private bool shouldTearDown = false;
         private string IvanLoginToken;
+        private IItem lastProduct;
 
         
         public TestBuyCart()
@@ -56,6 +57,9 @@ namespace Tests.AcceptanceTests
             MemberInfo Ivan = new MemberInfo("Ivan11", "Ivan@gmail.com", "Ivan Park",
                 DateTime.ParseExact("19/04/2005", "dd/MM/yyyy", CultureInfo.InvariantCulture), "hazait 14");
             string token = _auth.Connect();
+            
+           
+            
             _auth.Register(token, Ivan, "qwerty123");
             var IvanLogInTask = _auth.Login(token, "Ivan11", "qwerty123", ServiceUserRole.Member);
             var IvanLogInResult = IvanLogInTask.Result;
@@ -63,9 +67,13 @@ namespace Tests.AcceptanceTests
                 new List<string> {"dairy", "milk", "Tara"}, (double) 5.4);
             IItem product2 = new SItem("Chocolate milk", store_name, 200, "Sweet",
                 new List<string> {"dairy", "milk", "sweet"}, (double) 3.5);
+            
+             lastProduct= new SItem("Dell", store_name, 2, "Tech",
+                new List<string> {"tech", "computer"}, (double) 3500);
             _inStore.OpenStore(IvanLogInResult.Value, store_name);
             _inStore.AddNewItemToStore(IvanLogInResult.Value, product);
             _inStore.AddNewItemToStore(IvanLogInResult.Value, product2);
+            _inStore.AddNewItemToStore(IvanLogInResult.Value, lastProduct);
             token = _auth.Logout(IvanLogInResult.Value).Value;
             _auth.Disconnect(token);
         }
@@ -314,6 +322,43 @@ namespace Tests.AcceptanceTests
             _auth.Logout(IvanLogInResult.Value);
         }
         
+        [Test]
+        public void TestBuyCartConcurrenLastItem()
+        {
+            string tokenUser1 = _auth.Connect();
+            string tokenUser2 = _auth.Connect();
+            
+            string ITEM_NAME = this.lastProduct.ItemName;
+            
+            
+            _cart.AddItemToCart(tokenUser1, ITEM_NAME, store_name, 1);
+            _cart.AddItemToCart(tokenUser2, ITEM_NAME, store_name, 1);
+
+            Task<Result> task1 = new Task<Result>(() =>
+            {
+                return _cart.PurchaseCart(tokenUser1, new PaymentInfo("User1", "123456789",
+                    "1234567890123456", "12-34", "123", "address"));
+            });
+            
+            Task<Result> task2 = new Task<Result>(() =>
+            {
+                return _cart.PurchaseCart(tokenUser2, new PaymentInfo("User2", "123456789",
+                    "1234567890123456", "12-34", "123", "address"));
+            });
+            
+            task1.Start();
+            task2.Start();
+
+            var task1res = task1.Result;
+            var task2res = task2.Result;
+
+            var both = task1res.IsSuccess && task2res.IsSuccess;
+
+            var oneOfThem = task1res.IsSuccess || task2res.IsSuccess;
+             
+            Assert.True(!both && oneOfThem);
+            
+        }
         
         
         

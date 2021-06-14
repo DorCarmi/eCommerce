@@ -31,7 +31,7 @@ namespace eCommerce.Business.Repositories
 
         public override void Remove(string id)
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public override void Update(Store data)
@@ -41,7 +41,7 @@ namespace eCommerce.Business.Repositories
 
         public override void UpdateManager(ManagerAppointment manager)
         {
-            throw new NotImplementedException();
+            
         }
 
         public override IEnumerable<ItemInfo> SearchForItem(string query)
