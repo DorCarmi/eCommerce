@@ -146,7 +146,6 @@ namespace eCommerce.Business
 
         // ========== Properties ========== //
         
-        // TODO check how to set store and other properties
         // that dont have setters
         
         [Key]

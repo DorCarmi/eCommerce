@@ -14,8 +14,7 @@ using NLog;
 
 namespace eCommerce.Business
 {
-    // TODO should be singleton
-    // TODO check authException if we should throw them
+
     public class MarketFacade : IMarketFacade
     {
         private static MarketFacade _instance = new MarketFacade();
@@ -272,7 +271,6 @@ namespace eCommerce.Business
             Result updateRes = user.UpdatePermissionsToManager(store, managerUser, permissions);
             if (updateRes.IsSuccess)
             {
-                //TODO maybe update the user
                 _userManager.UpdateUser(managerUser);
             }
 
@@ -551,7 +549,6 @@ namespace eCommerce.Business
             }
             var editedItemInfo = itemRes.Value.ShowItem();
             editedItemInfo.amount = amount;
-            //TODO save
             return user.EditCart(editedItemInfo);
         }
         
@@ -638,7 +635,6 @@ namespace eCommerce.Business
         //<CNAME>OpenStore</CNAME>
         public Result OpenStore(string token, string storeName)
         {
-            // TODO check with user and store
             Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
             if (userRes.IsFailure)
             {
@@ -659,7 +655,6 @@ namespace eCommerce.Business
                 return Result.Fail("Error opening store");
             }
 
-            // TODO check save order
             
             _userManager.UpdateUser(user);
             _storeRepo.Update(newStore);

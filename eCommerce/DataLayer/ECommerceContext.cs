@@ -35,7 +35,6 @@ namespace eCommerce.DataLayer
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //@TODO::sharon - enable test mode for db - use different db + add teardown function to context 
             AppConfig config = AppConfig.GetInstance();
             string connectionString = config.GetData("DBConnectionString");
             if (connectionString == null)

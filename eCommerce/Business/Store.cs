@@ -185,7 +185,6 @@ namespace eCommerce.Business
 
             if (permissions == null)
             {
-                //TODO log it as error
                 return Result.Fail<IList<StorePermission>>("User is not a owner or manager of this store");
             }
 
@@ -380,7 +379,6 @@ namespace eCommerce.Business
             }
         }
 
-        // TODO implement this method
         public virtual Result RemoveItemToStore(string productName, User user)
         {
             var res=this._inventory.GetItem(productName);

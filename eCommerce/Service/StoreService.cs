@@ -122,13 +122,11 @@ namespace eCommerce.Service
 
         public Result UpdateStock_AddItems(string token, IItem item)
         {
-            //TODO: do we need it there is an edit function
             throw new NotImplementedException();
         }
 
         public Result UpdateStock_SubtractItems(string token, IItem item)
         {
-            //TODO: do we need it there is an edit function
             throw new NotImplementedException();
         }
 

@@ -17,7 +17,6 @@ namespace eCommerce.Business
 
         public virtual List<ItemInfo> _itemsInBasket { get; set; }
         public List<Pair<string, ItemInfo>> _nameToItem;
-        //@TODO: fix nameToItem in DB
 
         private List<Pair<string, ItemInfo>> _nameToItemPairs
         {

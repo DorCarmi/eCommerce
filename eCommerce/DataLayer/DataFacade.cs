@@ -363,7 +363,6 @@ namespace eCommerce.DataLayer
         return Result.Ok<ManagerAppointment>(manager);
     }
 
-    //TODO:: add delete basketS method
     
     public Result<Basket> ReadBasket(string basketId)
     {
@@ -595,7 +594,6 @@ namespace eCommerce.DataLayer
             return Result.Ok();
         }
 
-        // TODO check if to update market state
         public Result SaveLocalUser(User user)
         {
             db.Users.Add(user);

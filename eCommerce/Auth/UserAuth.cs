@@ -186,7 +186,6 @@ namespace eCommerce.Auth
                         break;
                     }
                     default:
-                        // TODO check the other expected types
                         break;
                 }
             }

@@ -19,7 +19,6 @@ namespace eCommerce.Business
 
         public MemberInfo(string username, string email, string name, DateTime birthday, string address)
         {
-            // TODO: may change id to real id
             Id = username;
             Username = username;
             Email = email;

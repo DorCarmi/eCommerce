@@ -5,7 +5,6 @@ using eCommerce.Common;
 
 namespace eCommerce.Statistics.Repositories
 {
-    // TODO make concurrent
     public class InMemoryStatsRepo : StatsRepo
     {
 

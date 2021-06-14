@@ -9,7 +9,7 @@ namespace eCommerce.Business
 {
     public class ItemsInventory
     {
-        [NotMapped] //TODO is this field needed
+        [NotMapped] 
         public List<Item> _aquiredItems { get; private set; }
 
         [Key] [ForeignKey("Store")]

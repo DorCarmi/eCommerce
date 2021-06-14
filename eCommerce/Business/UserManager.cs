@@ -33,7 +33,6 @@ namespace eCommerce.Business
             _auth = auth;
             _connectedUsers = new ConcurrentDictionary<string, User>();
             _connectedUsersName = new ConcurrentDictionary<string, bool>();
-            // TODO get the initialze id value from DB
             _concurrentIdGenerator = new ConcurrentIdGenerator(0);
             _registeredUsersRepo = registeredUsersRepo;
             _statisticsService = Statistics.Statistics.GetInstance();
@@ -111,7 +110,6 @@ namespace eCommerce.Business
             User newUser = new User(Member.State, memberInfo.Clone());
             if (!_registeredUsersRepo.Add(newUser))
             {
-                // TODO maybe remove the user form userAuth
                 _logger.Error($"User {memberInfo.Username} was able to register at Auth but already exists in " +
                     "the registered user repository");
                 return Result.Fail("User already exists");

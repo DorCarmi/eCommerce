@@ -115,7 +115,6 @@ namespace Tests.AcceptanceTests
             _cart = null;
         }
         
-        //TODO:Check
         [TestCase("Tara milk", "halfords", 3)]
         [TestCase("Tara milk", "halfords", 5)]
         [Test]

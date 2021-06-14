@@ -69,7 +69,6 @@ namespace eCommerce.Business
             {
                 newPermissions.Add(permission);
             }
-            //@TODO::sharon check if should add BaseManagerPermissions as well?  
             foreach (var permission in BaseManagerPermissions)
             {
                 newPermissions.Add(permission);

@@ -22,7 +22,6 @@ namespace Tests.Service
             await Task.Delay(2000);
             if (chargeAns)
             {
-                //TODO may generate id
                 return Result.Ok(100000);
             }
             else

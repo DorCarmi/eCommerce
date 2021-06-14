@@ -559,7 +559,6 @@ namespace eCommerce.Business
                 return Result.Fail("user \'"+Username+"\' did not appoint the manager of the given store \'"+otherUser.Username+"\'.");
             }
             
-            //TODO: Check with sharon-> why not exist RemoveManager method
             var res = otherUser.RemoveManager(store);
             if (res.IsFailure)
             {

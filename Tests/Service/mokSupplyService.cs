@@ -18,7 +18,6 @@ namespace Tests.Service
         public async Task<Result<int>> SupplyProducts(string storeName, string[] itemsNames, string userAddress)
         {
             await Task.Delay(2000);
-            //TODO may generate id
             if (chargeAns)
             {
                 return Result.Ok(100000);

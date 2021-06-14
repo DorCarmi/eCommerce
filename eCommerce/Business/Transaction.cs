@@ -108,7 +108,6 @@ namespace eCommerce.Business
                     return Result.Fail("<Supply>Supply info found incorrect by supply system");
                 }
             }
-            //TODO: save in history transcation id
             
 
             foreach (var basket in _cart.GetBaskets())
