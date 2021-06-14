@@ -42,7 +42,7 @@ export class AppointOwner extends Component {
 
     render () {
         if (this.state.submitted) {
-            return <Redirect exact to="/"/>
+            return <Redirect exact to={`/managePermissions/${this.props.storeId}`}/>
         } else {
             return (
                 <main className="RegisterMain">

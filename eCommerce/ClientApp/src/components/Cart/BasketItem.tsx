@@ -26,8 +26,10 @@ export class BasketItem extends Component<BasketItemProps, BasketItemState> {
     }
 
     handleAmountUpdate(event: ChangeEvent<HTMLInputElement>){
+        const {item} = this.props;
         const parsed = parseInt(event.target.value);
-        if(isNaN(parsed) || parsed < 0){
+        console.log(item.amount)
+        if(isNaN(parsed) || parsed < 0 ){
             alert("invalid quantity");
             return;
         }

@@ -32,7 +32,7 @@ export default class ManagePermissions extends Component {
         this.handleInputChange = this.handleInputChange.bind(this);
 
     }
-    ADMIN_USERID ='_Admin'
+    ADMIN_USERID ='User1'
 
     async componentDidMount() {
         const fetchedStaff = await this.getStaff();

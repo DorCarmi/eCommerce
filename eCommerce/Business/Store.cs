@@ -832,7 +832,7 @@ namespace eCommerce.Business
             {
                 ItemInfo theItemAfterApproval = theBid.Value.GetItemInfoAfterBidApprove();
                 theBid.Key.PublishMessage(
-                    $"Your bid for the item {theItemAfterApproval.name} with price={theItemAfterApproval.pricePerUnit} was approved and appears now in your basket");
+                    $"Your bid for the item {theItemAfterApproval.name} with price={theItemAfterApproval.pricePerUnit} was disapproved");
                 return Result.Ok();
             }
         }
