@@ -164,7 +164,9 @@ namespace eCommerce.Business
             {
                 if (item.amount == -1 || item.amount == 0)
                 {
+                    ItemInfo itinfo = ListHelper<string,ItemInfo>.KeyToValue(_nameToItem,item.name);
                     ListHelper<string,ItemInfo>.Remove(_nameToItem,item.name);
+                    _itemsInBasket.Remove(itinfo);
                     this.currentPrice = this.GetRegularTotalPrice();
                     return Result.Ok();
                 }
