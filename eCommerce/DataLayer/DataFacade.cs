@@ -121,8 +121,7 @@ namespace eCommerce.DataLayer
                 {
                     // db.Update(user);
                     db.SaveChanges();
-                    // RemoveLingeringEntities();
-                    db.SaveChanges();
+                    
                 }
                 catch (Exception e)
                 {
@@ -253,8 +252,7 @@ namespace eCommerce.DataLayer
                     store.basketsIds = string.Join(";", store.GetBasketsOfMembers().Select(b => b.BasketID));
                     
                     db.SaveChanges();
-                    // RemoveLingeringEntities();
-                    db.SaveChanges();
+                    
                 }
                 catch (Exception e)
                 {
@@ -371,15 +369,15 @@ namespace eCommerce.DataLayer
                 }
 
                 var BasketsIds = store.basketsIds.Split(";", StringSplitOptions.RemoveEmptyEntries);
-                store._basketsOfThisStore = new List<Basket>();
+                var baskets = new List<Basket>();
                 foreach (var basketId in BasketsIds)
                 {
                     var res = ReadBasket(basketId);
                     if (res.IsFailure)
                         return Result.Fail<Store>("In ReadStore -  Get Basket: " + res.Error);
-                    store._basketsOfThisStore.Add(res.Value);
+                    baskets.Add(res.Value);
                 }
-
+                store.SetBasketsOfMembers(baskets);
                 return Result.Ok<Store>(store);
             }
         }
