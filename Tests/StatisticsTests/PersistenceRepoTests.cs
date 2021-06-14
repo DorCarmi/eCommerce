@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using eCommerce.Common;
-using eCommerce.Migrations.User;
 using eCommerce.Statistics;
 using eCommerce.Statistics.Repositories;
 using NUnit.Framework;

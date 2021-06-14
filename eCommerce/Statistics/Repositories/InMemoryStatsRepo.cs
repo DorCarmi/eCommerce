@@ -5,7 +5,7 @@ using eCommerce.Common;
 
 namespace eCommerce.Statistics.Repositories
 {
-    // TODO make concurrent
+    
     public class InMemoryStatsRepo : StatsRepo
     {
 
@@ -13,12 +13,17 @@ namespace eCommerce.Statistics.Repositories
         
         public InMemoryStatsRepo()
         {
+            
             _statLogins = new List<LoginStat>();
         }
         
         public Result AddLoginStat(LoginStat stat)
         {
-            _statLogins.Add(stat);
+            lock (_statLogins)
+            {
+                _statLogins.Add(stat);
+            }
+
             return Result.Ok();
         }
 
@@ -26,11 +31,14 @@ namespace eCommerce.Statistics.Repositories
         {
             List<LoginStat> loginStats = new List<LoginStat>();
             DateTime dateComponent = date.Date;
-            foreach (var stat in _statLogins)
+            lock (_statLogins)
             {
-                if (stat.DateTime.Date.Equals(dateComponent))
+                foreach (var stat in _statLogins)
                 {
-                    loginStats.Add(stat);
+                    if (stat.DateTime.Date.Equals(dateComponent))
+                    {
+                        loginStats.Add(stat);
+                    }
                 }
             }
 
@@ -41,11 +49,14 @@ namespace eCommerce.Statistics.Repositories
         {
             int number = 0;
             DateTime dateComponent = date.Date;
-            foreach (var stat in _statLogins)
+            lock (_statLogins)
             {
-                if (stat.DateTime.Date.Equals(dateComponent) && stat.UserType.Equals(userType))
+                foreach (var stat in _statLogins)
                 {
-                    number++;
+                    if (stat.DateTime.Date.Equals(dateComponent) && stat.UserType.Equals(userType))
+                    {
+                        number++;
+                    }
                 }
             }
 

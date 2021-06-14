@@ -527,60 +527,70 @@ namespace eCommerce.DataLayer
 
     public void RemoveEntity(Object entity)
     {
-        try
+        lock (this)
         {
-            db.Remove(entity);
-                    
-            Console.WriteLine("removing "+entity.GetType()+" from DB");
-            db.SaveChanges();
-                    
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+            try
+            {
+                db.Remove(entity);
+
+                Console.WriteLine("removing " + entity.GetType() + " from DB");
+                db.SaveChanges();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+            }
         }
     }
 
 
     public void RemovePair<K,V>(Pair<K,V> pair)
     {
-        try
+        lock (this)
         {
-            Console.WriteLine("removing "+pair.Value.GetType()+" from DB");
-            db.Remove(pair.Value);
-            db.Remove(pair);
-            db.SaveChanges();
-                    
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+            try
+            {
+                Console.WriteLine("removing " + pair.Value.GetType() + " from DB");
+                db.Remove(pair.Value);
+                db.Remove(pair);
+                db.SaveChanges();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+            }
         }
     }
 
     
     public void RemoveListPair<K,V>(ListPair<K,V> pair)
     {
-        try
+        lock (this)
         {
-
-            var valQueue = new Queue<V>(pair.ValList);
-            while (valQueue.Count > 0)
+            try
             {
-                var val = valQueue.Dequeue();
-                db.Remove(val);
+
+                var valQueue = new Queue<V>(pair.ValList);
+                while (valQueue.Count > 0)
+                {
+                    var val = valQueue.Dequeue();
+                    db.Remove(val);
+                }
+
+                db.Remove(pair);
+                Console.WriteLine("removing " + pair.ValList.GetType() + " from DB");
+                db.SaveChanges();
+
             }
-            db.Remove(pair);
-            Console.WriteLine("removing "+pair.ValList.GetType()+" from DB");
-            db.SaveChanges();
-                    
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            MarketState.GetInstance().SetErrorState("Bad connection to db",this.CheckConnection);
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+            }
         }
     }
 
@@ -589,18 +599,27 @@ namespace eCommerce.DataLayer
     public IDbContextTransaction BeginTransaction()
     {
         // lock db
-        var transaction = db.Database.BeginTransaction();
-        return transaction;
+        lock (this)
+        {
+            var transaction = db.Database.BeginTransaction();
+            return transaction;
+        }
     }
     public void CommitTransaction(IDbContextTransaction transaction)
     {
         // lock db
-        transaction.Commit();
+        lock (this)
+        {
+            transaction.Commit();
+        }
     }
     public void RollbackTransaction(IDbContextTransaction transaction)
     {
         // lock db
-        transaction.Rollback();
+        lock (this)
+        {
+            transaction.Rollback();
+        }
     }
     
 
