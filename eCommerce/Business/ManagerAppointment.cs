@@ -101,6 +101,7 @@ namespace eCommerce.Business
         public void syncToDict()
         {
             string[] list = permissionsString.Split(";");
+            _permissions = new List<StorePermission>();
             foreach (string p in list)
             {
                 _permissions.Add((StorePermission)int.Parse(p));

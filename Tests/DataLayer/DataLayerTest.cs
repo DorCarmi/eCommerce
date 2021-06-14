@@ -221,7 +221,7 @@ namespace Tests.DataLayer
             Assert.True(df.ResetConnection().IsSuccess);
             var storeRes = df.ReadStore(alenbyStore.StoreName);
             Assert.True(storeRes.IsSuccess, storeRes.Error);
-            Assert.True(storeRes.Value._basketsOfThisStore.Count == 1);
+            Assert.True(storeRes.Value.GetAllBaskets().Count == 1);
         }
         [Test]
         public void ReadUserBasketsTest()

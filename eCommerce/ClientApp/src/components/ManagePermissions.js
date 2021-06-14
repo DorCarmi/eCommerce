@@ -125,7 +125,7 @@ export default class ManagePermissions extends Component {
                 <div>
                     <h3>{`Permissions For The Store : ${this.state.storeId}`}</h3>
                     <div><Link to={`${this.state.storeId}/appointManager`}>Appoint Manager</Link></div>
-                    <div><Link to={`/removeManager/${this.state.storeId}`}>Remove Manager</Link></div>
+                    {/*<div><Link to={`/removeManager/${this.state.storeId}`}>Remove Manager</Link></div>*/}
                     <div><Link to={`${this.state.storeId}/appointOwner`}>Appoint Owner</Link></div>
                     <div><Link to={`/removeOwner/${this.state.storeId}`}>Remove Owner</Link></div>
 

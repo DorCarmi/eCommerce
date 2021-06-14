@@ -121,8 +121,7 @@ namespace eCommerce.DataLayer
                 {
                     // db.Update(user);
                     db.SaveChanges();
-                    // RemoveLingeringEntities();
-                    db.SaveChanges();
+                    
                 }
                 catch (Exception e)
                 {
@@ -253,8 +252,7 @@ namespace eCommerce.DataLayer
                     store.basketsIds = string.Join(";", store.GetBasketsOfMembers().Select(b => b.BasketID));
                     
                     db.SaveChanges();
-                    // RemoveLingeringEntities();
-                    db.SaveChanges();
+                    
                 }
                 catch (Exception e)
                 {
@@ -371,15 +369,15 @@ namespace eCommerce.DataLayer
                 }
 
                 var BasketsIds = store.basketsIds.Split(";", StringSplitOptions.RemoveEmptyEntries);
-                store._basketsOfThisStore = new List<Basket>();
+                var baskets = new List<Basket>();
                 foreach (var basketId in BasketsIds)
                 {
                     var res = ReadBasket(basketId);
                     if (res.IsFailure)
                         return Result.Fail<Store>("In ReadStore -  Get Basket: " + res.Error);
-                    store._basketsOfThisStore.Add(res.Value);
+                    baskets.Add(res.Value);
                 }
-
+                store.SetBasketsOfMembers(baskets);
                 return Result.Ok<Store>(store);
             }
         }
@@ -502,34 +500,6 @@ namespace eCommerce.DataLayer
     }
     
 
-    // public Result RemoveOwnerAppointment(OwnerAppointment ownerAppointment)
-    // {
-    //     lock (this)
-    //     {
-    //         try
-    //         {
-    //             db.Remove(ownerAppointment);
-    //
-    //             Console.WriteLine("Inserting a new User!!!");
-    //             db.SaveChanges();
-    //
-    //         }
-    //         catch (Exception e)
-    //         {
-    //             Console.WriteLine(e);
-    //             if (!CheckConnection())
-    //             {
-    //                 MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
-    //             }
-    //
-    //             return Result.Fail("Unable to Save User");
-    //             // add logging here
-    //         }
-    //
-    //         return Result.Ok();
-    //     }
-    // }
-
     public void RemoveEntity(Object entity)
     {
         lock (this)
@@ -581,7 +551,8 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+                if(db!=null)
+                    MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
             }
         }
     }
@@ -609,7 +580,8 @@ namespace eCommerce.DataLayer
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+                if(db!=null)
+                    MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
             }
         }
     }

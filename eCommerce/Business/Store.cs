@@ -54,7 +54,7 @@ namespace eCommerce.Business
 
         public string basketsIds { get; set; }
 
-        [NotMapped] public List<Basket> _basketsOfThisStore;
+        [NotMapped] private List<Basket> _basketsOfThisStore;
 
         
         
@@ -64,6 +64,15 @@ namespace eCommerce.Business
             return _basketsOfThisStore.Where(x => !x._cart._cartHolder.GetRole().Equals(Guest.State.GetRole()))
                 .ToList();
         }
+        public void SetBasketsOfMembers(List<Basket> baskets)
+        {
+            _basketsOfThisStore = baskets;
+        }
+        public List<Basket> GetAllBaskets()
+        {
+            return _basketsOfThisStore;
+        }
+        
 
         // for ef
         public Store()

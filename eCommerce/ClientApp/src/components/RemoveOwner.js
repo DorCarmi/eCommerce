@@ -31,7 +31,9 @@ export class RemoveOwner extends Component {
             alert(`${ownerId} is no longer owner of the store: ${storeId}`)
         }
         else{
-            alert(`remove owner failed because- ${res.error}`)
+            if(res) {
+                alert(`remove owner failed because- ${res.error}`)
+            }
         }
 
     }
@@ -50,7 +52,7 @@ export class RemoveOwner extends Component {
                 <main className="RegisterMain">
                     <div className="RegisterWindow">
                         <div className="CenterItemContainer">
-                            <h3>Remove Manager</h3>
+                            <h3>Remove Owner</h3>
                         </div>
                         <form className="RegisterForm" onSubmit={this.handleSubmit}>
                             <input type="text" name="ownerId" value={this.state.ownerId}
