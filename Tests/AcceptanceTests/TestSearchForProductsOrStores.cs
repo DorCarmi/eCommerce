@@ -92,7 +92,7 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<IEnumerable<IItem>> result = _inStore.SearchForItem(token, query);
-            Assert.False(result.IsSuccess && result.Value.GetEnumerator().MoveNext(), "Query \"" + query + "\" returned a non-empty list!");
+            Assert.True(result.IsSuccess && result.Value.GetEnumerator().MoveNext(), "Query \"" + query + "\" returned a non-empty list!");
             _auth.Disconnect(token);
         }
         
