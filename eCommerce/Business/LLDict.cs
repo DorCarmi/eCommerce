@@ -97,6 +97,27 @@ namespace eCommerce.Business
                     if (pair.Key.Equals(key))
                     {
                         _list.Remove(pair);
+                        // DataFacade.Instance.RemoveListPair(pair);
+                        return;
+                    }
+                }
+
+                return;
+            }
+        }
+        public void RemoveFromList(K key, V value)
+        {
+            lock (_list)
+            {
+                foreach (var pair in _list)
+                {
+                    if (pair.Key.Equals(key))
+                    {
+                        pair.ValList.Remove(value);
+                        if (pair.ValList.Count == 0)
+                        {
+                            // DataFacade.Instance.RemoveListPair(pair);
+                        }
                         return;
                     }
                 }

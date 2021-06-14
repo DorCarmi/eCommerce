@@ -69,7 +69,9 @@ namespace eCommerce.Business
         public Store()
         {
             this._myDiscountStrategies = new List<Composite>();
+            this._myPurchaseStrategies = new List<PurchaseStrategy>();
             this._myPurchasePolicy = new PurchasePolicy(this);
+            this._UsersBids = new List<Pair<User, Bid>>();
         }
 
         public Store(String name, User founder)
