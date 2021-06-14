@@ -92,20 +92,20 @@ namespace Tests.AcceptanceTests
         {
             string token = _auth.Connect();
             Result<IEnumerable<IItem>> result = _inStore.SearchForItem(token, query);
-            Assert.False(result.IsSuccess && result.Value.GetEnumerator().MoveNext(), "Query \"" + query + "\" returned a non-empty list!");
+            Assert.True(result.IsSuccess, result.Error);
+            Assert.False(result.Value.GetEnumerator().MoveNext(), "Query \"" + query + "\" returned a non-empty list!");
             _auth.Disconnect(token);
         }
         
         [TestCase("Red dragon Crush")]
         [TestCase("Mermaid")]
-        //TODO: Check
         [Order(0)]
         [Test]
         public void TestNotExistsStore(string query)
         {
             string token = _auth.Connect();
             Result<IEnumerable<string>> result = _inStore.SearchForStore(token, query);
-            Assert.False(result.IsSuccess && result.Value.GetEnumerator().MoveNext(), "Query \"" + query + "\" returned a non-empty list!");
+            Assert.False(result.IsSuccess && result.Value.GetEnumerator().MoveNext(), "Query \"" + query + "\" returned a non-empty list! : " + result.Value.GetEnumerator().Current);
             _auth.Disconnect(token);
         }
     }
