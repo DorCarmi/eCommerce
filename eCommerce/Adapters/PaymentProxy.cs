@@ -34,8 +34,8 @@ namespace eCommerce.Adapters
                 PROXY_HITS++;
                 return Result.Ok(transactionId);
             }
-            
-            
+
+
 
             Result<int> ans;
             ans = await _adapter.Charge(price, paymentInfoUserName, paymentInfoIDNumber,
@@ -64,14 +64,17 @@ namespace eCommerce.Adapters
 
         public async Task<Result> Refund(int transactionId)
         {
-            if (_adapter == null)
+            lock (this)
             {
-                await Task.Delay(30);
-                PROXY_REFUNDS++;
-                return Result.Ok();
+                if (_adapter == null)
+                {
+                    Task.Delay(30);
+                    PROXY_REFUNDS++;
+                    return Result.Ok();
+                }
             }
 
-            
+
             var ans = await _adapter.Refund(transactionId);
             if (ans.IsSuccess)
             {

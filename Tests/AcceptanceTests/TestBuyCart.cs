@@ -322,6 +322,7 @@ namespace Tests.AcceptanceTests
             _auth.Logout(IvanLogInResult.Value);
         }
         
+        [Order(7)]
         [Test]
         public void TestBuyCartConcurrenLastItem()
         {
@@ -337,13 +338,13 @@ namespace Tests.AcceptanceTests
             Task<Result> task1 = new Task<Result>(() =>
             {
                 return _cart.PurchaseCart(tokenUser1, new PaymentInfo("User1", "123456789",
-                    "1234567890123456", "12-34", "123", "address"));
+                    "1234567890123456", "12-34", "123", "address11"));
             });
             
             Task<Result> task2 = new Task<Result>(() =>
             {
                 return _cart.PurchaseCart(tokenUser2, new PaymentInfo("User2", "123456789",
-                    "1234567890123456", "12-34", "123", "address"));
+                    "1234567890123456", "12-34", "123", "address22"));
             });
             
             task1.Start();
@@ -356,7 +357,8 @@ namespace Tests.AcceptanceTests
 
             var oneOfThem = task1res.IsSuccess || task2res.IsSuccess;
              
-            Assert.True(!both && oneOfThem);
+            Assert.False(both,"user1: "+task1res.Error+", User2: "+task2res.Error);
+            Assert.True(oneOfThem,"user1: "+task1res.Error+", User2: "+task2res.Error);
             
         }
         
