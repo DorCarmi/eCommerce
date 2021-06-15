@@ -97,7 +97,7 @@ namespace eCommerce.Business
 
                 var supply =
                     _supply.SupplyProducts(basket.GetStoreName(), itemNames.ToArray(), paymentInfo.FullAddress);
-                supply.Wait();
+                var x = supply.Result;
                 if (!supply.Result.IsSuccess)
                 {
                     this._payment.Refund(paymentTransactionId);
