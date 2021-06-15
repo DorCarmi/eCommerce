@@ -176,6 +176,7 @@ namespace eCommerce.Business
             return appointmentRes;
         }
 
+        //<CNAME>RemoveCoOwner</CNAME>
         public Result RemoveCoOwner(string token, string storeId, string removedUserId)
         {
             return this.RemoveOwnerFromStore(token, storeId, removedUserId);
@@ -231,6 +232,7 @@ namespace eCommerce.Business
             return store.GetPermissions(user);
         }
 
+        //<CNAME>UpdateManagerPermission</CNAME>
         public Result UpdateManagerPermission(string token, string storeId, string managersUserId, IList<StorePermission> permissions)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -260,7 +262,7 @@ namespace eCommerce.Business
             return updateRes;
         }
         
-        //<CNAME:GetStoreStaff</CNAME>
+        //<CNAME>GetStoreStaff</CNAME>
         public Result<IList<Tuple<string, IList<StorePermission>>>> GetStoreStaffAndTheirPermissions(string token,
             string storeId)
         {
@@ -361,6 +363,7 @@ namespace eCommerce.Business
             return Result.Ok<IEnumerable<IItem>>(_storeRepo.SearchForItemByCategory(query, category));
         }
 
+        //<CNAME>SearchForStore</CNAME>
         public Result<IEnumerable<string>> SearchForStore(string token, string query)
         {
             Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
@@ -491,6 +494,7 @@ namespace eCommerce.Business
             return addRes;
         }
 
+        //<CNAME>AddBidToItem</CNAME>
         public Result AskToBidOnItem(string token, string productId, string storeId, int amount, double newPrice)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -562,6 +566,7 @@ namespace eCommerce.Business
             return new Result<ICart>(resCart.Value, resCart.IsSuccess, resCart.Error);
         }
         
+        //<CNAME>GetCartPrice</CNAME>
         public Result<double> GetPurchaseCartPrice(string token)
         {
             Result<User> userRes = _userManager.GetUserIfConnectedOrLoggedIn(token);
@@ -698,6 +703,7 @@ namespace eCommerce.Business
             return removeItemRes;
         }
 
+        //<CNAME>EditItemInStore</CNAME>
         public Result EditItemInStore(string token, IItem item)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
@@ -724,6 +730,7 @@ namespace eCommerce.Business
             return editItemRes;
         }
 
+        //<CNAME>UpdateStockAdd</CNAME>
         public Result UpdateStock_AddItems(string token, IItem item)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
@@ -737,6 +744,7 @@ namespace eCommerce.Business
             return store.UpdateStock_AddItems(DtoUtils.ItemDtoToProductInfo(item), user);
         }
         
+        //<CNAME>UpdateStockSub</CNAME>
         public Result UpdateStock_SubtractItems(string token, IItem item)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, item.StoreName);
@@ -772,6 +780,7 @@ namespace eCommerce.Business
             return Result.Ok<IList<PurchaseRecord>>((IList<PurchaseRecord>) purchaseHistoryRes.Value);
         }
 
+        //<CNAME>AddRoleToStorePolicy</CNAME>
         public Result AddRuleToStorePolicy(string token, string storeId, RuleInfoNode ruleInfoNode)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -793,6 +802,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
+        //<CNAME>AddDiscountToStore</CNAME>
         public Result AddDiscountToStore(string token, string storeId, DiscountInfoNode discountInfoNode)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -814,6 +824,7 @@ namespace eCommerce.Business
             return Result.Ok();
         }
 
+        //<CNAME>GetStorePolicy</CNAME>
         public Result<IList<RuleInfoNode>> GetStorePolicyRules(string token, string storeId)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
@@ -835,6 +846,7 @@ namespace eCommerce.Business
             return res;
         }
 
+        //<CNAME>GetStoreDiscounts</CNAME>
         public Result<IList<DiscountInfoNode>> GetStoreDiscounts(string token, string storeId)
         {
             Result<Tuple<User, Store>> userAndStoreRes = GetUserAndStore(token, storeId);
