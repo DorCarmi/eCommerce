@@ -99,6 +99,10 @@ namespace eCommerce.Service
 
             marketFacade = MarketFacade.GetInstance();
             marketFacade.Init(authService, userRepo, storeRepo);
+            if (memoryAs != null && memoryAs.Equals("Persistence"))
+            {
+                marketFacade.AddDB(DataFacade.Instance);
+            }
 
             string initFilePath;
             string initWithData = config.GetData("InitWithData");

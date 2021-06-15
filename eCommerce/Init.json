@@ -36,19 +36,19 @@
         {
           "Action": "OpenStore",
           "Data": {
-            "StoreName": "AppleStore"
+            "StoreName": "S1"
           }
         },
 
         {
           "Action": "AddItem",
           "Data": {
-            "ItemName": "iPhone",
-            "StoreName": "AppleStore",
-            "Amount": 3000000,
+            "ItemName": "Bamba",
+            "StoreName": "S1",
+            "Amount": 20,
             "Category": "Tech",
             "KeyWords": ["Tech"],
-            "PricePerUnit": 2500
+            "PricePerUnit": 30
           }
         },
 

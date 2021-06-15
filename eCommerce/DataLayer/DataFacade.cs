@@ -607,6 +607,35 @@ namespace eCommerce.DataLayer
 
     #region SQL Transactions
 
+
+    public bool MakeTransaction(Action dbAction)
+    {
+        lock (this)
+        {
+            using (var transaction = db.Database.BeginTransaction())
+            {
+                try
+                {
+                    dbAction.Invoke();
+                    transaction.Commit();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    transaction.Rollback();
+                    if (!CheckConnection())
+                    {
+                        MarketState.GetInstance().SetErrorState("Bad connection to db", this.CheckConnection);
+                    }
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+    
     public IDbContextTransaction BeginTransaction()
     {
         // lock db

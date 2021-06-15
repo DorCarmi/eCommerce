@@ -25,10 +25,11 @@ namespace eCommerce.Business
 
         private AbstractStoreRepo _storeRepo;
         private UserManager _userManager;
+        private DataFacade _dataFacade;
 
         private MarketFacade()
         {
-            
+            _dataFacade = null;
         }
         
         private MarketFacade(IUserAuth userAuth,
@@ -59,7 +60,13 @@ namespace eCommerce.Business
         {
             _storeRepo = storeRepo;
             _userManager = new UserManager(userAuth, registeredUsersRepo);
+            _dataFacade = null;
             CreateMainAdmin();
+        }
+
+        public void AddDB(DataFacade dataFacade)
+        {
+            _dataFacade = dataFacade;
         }
 
         public void CreateMainAdmin()
@@ -166,11 +173,15 @@ namespace eCommerce.Business
             User appointedUser = appointedUserRes.Value;
 
             Result appointmentRes = user.AppointUserToOwner(store, appointedUser);
-            if (appointmentRes.IsSuccess)
+            if (appointmentRes.IsSuccess && _dataFacade != null)
             {
-                _userManager.UpdateUser(user);
-                _userManager.UpdateUser(appointedUser);
-                _storeRepo.Update(store);
+                _dataFacade.MakeTransaction(() =>
+                    {
+                        _userManager.UpdateUser(user);
+                        _userManager.UpdateUser(appointedUser);
+                        _storeRepo.Update(store);
+                    }
+                );
             }
 
             return appointmentRes;
@@ -202,11 +213,15 @@ namespace eCommerce.Business
             User appointedUser = appointedUserRes.Value;
             
             Result appointmentRes = user.AppointUserToManager(store, appointedUser);
-            if (appointmentRes.IsSuccess)
+            if (appointmentRes.IsSuccess && _dataFacade != null)
             {
-                _userManager.UpdateUser(user);
-                _userManager.UpdateUser(appointedUser);
-                _storeRepo.Update(store);
+                _dataFacade.MakeTransaction(() =>
+                    {
+                        _userManager.UpdateUser(user);
+                        _userManager.UpdateUser(appointedUser);
+                        _storeRepo.Update(store);
+                    }
+                );
             }
             
 
@@ -250,11 +265,15 @@ namespace eCommerce.Business
             }
             User managerUser = mangerUserRes.Value;
             Result updateRes = user.UpdatePermissionsToManager(store, managerUser, permissions);
-            if (updateRes.IsSuccess)
+            if (updateRes.IsSuccess && _dataFacade != null)
             {
-                _storeRepo.UpdateManager(managerUser.StoresManaged.KeyToValue(store.StoreName));
-                _storeRepo.Update(store);
-                _userManager.UpdateUser(managerUser);
+                _dataFacade.MakeTransaction(() =>
+                    {
+                        _storeRepo.UpdateManager(managerUser.StoresManaged.KeyToValue(store.StoreName));
+                        _storeRepo.Update(store);
+                        _userManager.UpdateUser(managerUser);
+                    }
+                );
             }
 
             return updateRes;
@@ -481,11 +500,14 @@ namespace eCommerce.Business
             newItemInfo.amount = amount;
 
             Result addRes = user.AddItemToCart(newItemInfo);
-            if (addRes.IsSuccess)
+            if (addRes.IsSuccess && _dataFacade != null)
             {
-                //TODO check if need to update store
-                _userManager.UpdateUser(user);
-                _storeRepo.Update(store);
+                _dataFacade.MakeTransaction(() =>
+                    {
+                        _userManager.UpdateUser(user);
+                        _storeRepo.Update(store);
+                    }
+                );
             }
 
             return addRes;
@@ -610,13 +632,21 @@ namespace eCommerce.Business
             {
                 return purchaseRes;
             }
-            _userManager.UpdateUser(user);
             
-            foreach (var store in storesToUpdate)
+            if (_dataFacade != null)
             {
-                _storeRepo.Update(store);
-            }
+                _dataFacade.MakeTransaction(() =>
+                    {
+                        _userManager.UpdateUser(user);
             
+                        foreach (var store in storesToUpdate)
+                        {
+                            _storeRepo.Update(store);
+                        }
+
+                    }
+                );
+            }
             return Result.Ok();
         }
         
@@ -648,9 +678,16 @@ namespace eCommerce.Business
             }
 
             // TODO check save order
-            
-            _userManager.UpdateUser(user);
-            _storeRepo.Update(newStore);
+            if (_dataFacade != null)
+            {
+                _dataFacade.MakeTransaction(() =>
+                    {
+                        _userManager.UpdateUser(user);
+                        _storeRepo.Update(newStore);
+                    }
+                );
+            }
+
             return Result.Ok();
         }
         
@@ -668,9 +705,13 @@ namespace eCommerce.Business
             _logger.Info($"AddNewItemToStore({user.Username} ,{item})");
 
             Result addItemRes = store.AddItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
-            if (addItemRes.IsSuccess)
+            if (addItemRes.IsSuccess && _dataFacade != null)
             {
-                _storeRepo.Update(store);
+                _dataFacade.MakeTransaction(() =>
+                    {
+                        _storeRepo.Update(store);
+                    }
+                );
             }
 
             return addItemRes;
@@ -690,9 +731,9 @@ namespace eCommerce.Business
             _logger.Info($"RemoveItemFromStore({user.Username} ,{storeId}, {itemId})");
 
             Result removeItemRes =  store.RemoveItemToStore(itemId, user);
-            if (removeItemRes.IsSuccess)
+            if (removeItemRes.IsSuccess && _dataFacade != null)
             {
-                _storeRepo.Update(store);
+                _dataFacade.MakeTransaction(() => { _storeRepo.Update(store); });
             }
 
             return removeItemRes;
@@ -716,9 +757,13 @@ namespace eCommerce.Business
                     (int) item.PricePerUnit), user);
             
             Result editItemRes = store.EditItemToStore(DtoUtils.ItemDtoToProductInfo(item), user);
-            if (editItemRes.IsSuccess)
+            if (editItemRes.IsSuccess && _dataFacade != null)
             {
-                _storeRepo.Update(store);
+                _dataFacade.MakeTransaction(() =>
+                    {
+                        _storeRepo.Update(store);
+                    }
+                );
             }
 
             return editItemRes;
@@ -888,11 +933,15 @@ namespace eCommerce.Business
             User appointedUser = appointedUserRes.Value;
 
             Result removalRes = user.RemoveOwnerFromStore(store, appointedUser);
-            if (removalRes.IsSuccess)
+            if (removalRes.IsSuccess && _dataFacade != null)
             {
-                _userManager.UpdateUser(user);
-                _userManager.UpdateUser(appointedUser);
-                _storeRepo.Update(store);
+                _dataFacade.MakeTransaction(() =>
+                    {
+                        _userManager.UpdateUser(user);
+                        _userManager.UpdateUser(appointedUser);
+                        _storeRepo.Update(store);
+                    }
+                );
             }
 
             return removalRes;
