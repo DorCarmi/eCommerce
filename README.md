@@ -1,8 +1,7 @@
 # eCommerce
-***
-##System presentation video (Hebrew)
+## System presentation video (Hebrew)
 [![Video](https://img.youtube.com/vi/ojOsFSQDm-4/0.jpg)](https://www.youtube.com/watch?v=ojOsFSQDm-4)
-***   
+
 ## Data initialization:
 The file format is JSON and contains a list of action.
 
