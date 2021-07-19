@@ -8,7 +8,7 @@ export class Home extends Component {
   render () {
     return (
       <div>
-        <h1>Welcome to the greadt ecommerce store</h1>
+        <h1>Welcome to the great ecommerce store</h1>
         {/*<WebSocketExample/>*/}
       </div>
     );
